@@ -2,23 +2,47 @@
 
 #include <GL/glew.h>
 
-#include <cstdint>
-
 #include "EGLType.h"
 
 namespace egl
 {
-template <typename T>
-struct VAOVertexAttribT
+struct VAOVertexAttrib
 {
-    uint32_t numComponents = EGLTypeTraits<T>::NumComponents;
-    EGLType type = EGLTypeTraits<T>::Type;
+    explicit VAOVertexAttrib(
+        uint32_t inNumComponents,
+        EGLType inType,
+        uint32_t inStride,
+        bool inNormalized = false,
+        uint32_t inOffset = 0)
+        : numComponents(inNumComponents)
+        , type(inType)
+        , normalized(inNormalized)
+        , stride(inStride)
+        , offset(inOffset)
+    {
+    }
+
+    uint32_t numComponents = 1;
+    EGLType type = EGLType::BOOL;
     bool normalized = false;
-    uint32_t stride = EGLTypeTraits<T>::Size;
+    uint32_t stride = 0;
     uint32_t offset = 0;
 };
 
-class VAOVertexAttrib : public VAOVertexAttribT<int32_t>
+template <typename T = bool>
+struct VAOVertexAttribT : public VAOVertexAttrib
 {
+    explicit VAOVertexAttribT(
+        uint32_t inStride = egl::EGLTypeTraits<T>::NumBytes,
+        bool inNormalized = false,
+        uint32_t inOffset = 0)
+        : VAOVertexAttrib(
+              egl::EGLTypeTraits<T>::NumComponents,
+              egl::EGLTypeTraits<T>::Type,
+              inStride,
+              inNormalized,
+              inOffset)
+    {
+    }
 };
 }

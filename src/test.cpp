@@ -6,10 +6,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "VAO.h"
-#include "VBO.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
+#include "EBO.h"
+#include "VAO.h"
+#include "VBO.h"
+#include "Vec.h"
+#include "VAOVertexAttrib.h"
 
 using namespace egl;
 
@@ -70,56 +73,55 @@ int main()
 
     glfwSetKeyCallback(window, key_callback);
 
-    // Create Vertex Array Object
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
     // Create a Vertex Buffer Object and copy the vertex data to it
-    VBO verticesVBO;
     GLfloat vertices[] = {
         -0.5f, 0.5f, // Top-left
         0.5f, 0.5f, // Top-right
         0.5f, -0.5f, // Bottom-right
         -0.5f, -0.5f // Bottom-left
     };
-    verticesVBO.BufferData(vertices, sizeof(vertices));
+    const VBO verticesVBO(vertices, sizeof(vertices));
 
-    VBO colorsVBO;
     GLfloat colors[] = {
         1.0f, 0.0f, 0.0f, // Top-left
         0.0f, 1.0f, 0.0f, // Top-right
         0.0f, 0.0f, 1.0f, // Bottom-right
         1.0f, 1.0f, 1.0f // Bottom-left
     };
-    colorsVBO.BufferData(colors, sizeof(colors));
+    const VBO colorsVBO(colors, sizeof(colors));
 
     // Create an element array
-    GLuint elements[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
-    GLuint ebo;
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+    GLuint elements[]
+        = {
+            0, 1, 2,
+            2, 3, 0
+          };
+    const EBO ebo(elements, sizeof(elements));
 
     const VertexShader vertexShader(GetFileContents("../res/default.vert"));
     const FragmentShader fragmentShader(GetFileContents("../res/default.frag"));
     const ShaderProgram shaderProgram(vertexShader, fragmentShader);
-    // glBindFragDataLocation(shaderProgram.GetGLId(), 0, "outColor");
     shaderProgram.Use();
 
     // Specify the layout of the vertex data
-    const GLint posAttrib = glGetAttribLocation(shaderProgram.GetGLId(), "position"); // shaderProgram.GetAttribLocation("position");
-    glEnableVertexAttribArray(posAttrib);
-    verticesVBO.Bind();
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+    const GLint posAttrib = shaderProgram.GetAttribLocation("position");
+    const GLint colorAttrib = shaderProgram.GetAttribLocation("color");
 
-    const GLint colAttrib = glGetAttribLocation(shaderProgram.GetGLId(), "color");
-    glEnableVertexAttribArray(colAttrib);
-    colorsVBO.Bind();
-    glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    VAO vao;
+    vao.AddVBO(verticesVBO, posAttrib, VAOVertexAttribT<Vec2<float> >());
+    vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttribT<Vec3<float> >());
+    vao.AddVBO(verticesVBO, posAttrib, VAOVertexAttrib(2, EGLType::FLOAT, false, 2 * sizeof(float), 0));
+    vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttrib(3, EGLType::FLOAT, false, 3 * sizeof(float), 0));
+    vao.SetEBO(ebo);
+
+    // Vec4<int> v(Vec4<int>::One());
+    const auto v = Vec<float, 99>::One();
+    // v[0] = 2;
+    // v[1] = 3;
+    // v[2] = 4;
+    // v[3] = 73272398;
+    std::cout << v << std::endl;
+    // std::cout << v << std::endl;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -128,8 +130,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw a rectangle from the 2 triangles using 6 indices
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
@@ -137,10 +137,6 @@ int main()
 
         glfwWaitEvents();
     }
-
-    glDeleteBuffers(1, &ebo);
-
-    glDeleteVertexArrays(1, &vao);
 
     glfwDestroyWindow(window);
 

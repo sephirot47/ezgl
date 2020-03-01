@@ -5,7 +5,9 @@
 namespace egl
 {
 
+class EBO;
 class VAOVertexAttrib;
+class VBO;
 
 class VAO
 {
@@ -17,8 +19,11 @@ public:
     VAO& operator=(VAO&& inRHS) = default;
     ~VAO();
 
-    template <typename T>
-    void AddVertexAttrib(uint32_t inAttributeLocation, bool inNormalized = false, uint32_t inOffset = 0);
+    void Bind() const;
+    void UnBind() const;
+    void AddVBO(const VBO& inVBO, uint32_t inAttribIndex, const VAOVertexAttrib& inVertexAttrib);
+    void SetEBO(const EBO& inEBO);
+
     void AddVertexAttrib(uint32_t inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
     void RemoveVertexAttrib(uint32_t inAttributeLocation);
 

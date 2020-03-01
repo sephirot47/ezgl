@@ -9,6 +9,7 @@ VBO::VBO()
     glGenBuffers(1, &mGLId);
 }
 VBO::VBO(const void* inData, std::size_t inSize)
+    : VBO()
 {
     BufferData(inData, inSize);
 }
