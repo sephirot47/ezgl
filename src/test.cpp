@@ -110,18 +110,10 @@ int main()
     VAO vao;
     vao.AddVBO(verticesVBO, posAttrib, VAOVertexAttribT<Vec2<float> >());
     vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttribT<Vec3<float> >());
-    vao.AddVBO(verticesVBO, posAttrib, VAOVertexAttrib(2, EGLType::FLOAT, false, 2 * sizeof(float), 0));
-    vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttrib(3, EGLType::FLOAT, false, 3 * sizeof(float), 0));
     vao.SetEBO(ebo);
 
-    // Vec4<int> v(Vec4<int>::One());
-    const auto v = Vec<float, 99>::One();
-    // v[0] = 2;
-    // v[1] = 3;
-    // v[2] = 4;
-    // v[3] = 73272398;
+    const auto v = Vec4f::One();
     std::cout << v << std::endl;
-    // std::cout << v << std::endl;
 
     while (!glfwWindowShouldClose(window))
     {
