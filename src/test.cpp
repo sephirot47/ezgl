@@ -113,7 +113,10 @@ int main()
     vao.SetEBO(ebo);
 
     const auto v = Vec4f::One();
+    constexpr Vec4f cv{ 1, 2, 3, 4 };
+    // std::array<float, 4> arr{ 1, 2, 3, 4 };
     std::cout << v << std::endl;
+    std::cout << cv << std::endl;
 
     while (!glfwWindowShouldClose(window))
     {
