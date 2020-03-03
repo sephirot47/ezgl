@@ -110,7 +110,7 @@ struct EGLTypeTraits<double> : public _EGLTypeTraitsBase<double>
     static constexpr auto GLComponentType = GLType;
 };
 
-template <typename, uint8_t>
+template <typename, std::size_t>
 class Vec;
 
 template <>

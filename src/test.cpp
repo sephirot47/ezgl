@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Shader.h"
+#include "VariadicRepeat.h"
 #include "ShaderProgram.h"
 #include "EBO.h"
 #include "VAO.h"
@@ -112,11 +113,17 @@ int main()
     vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttribT<Vec3<float> >());
     vao.SetEBO(ebo);
 
-    const auto v = Vec4f::One();
-    constexpr Vec4f cv{ 1, 2, 3, 4 };
+    constexpr Vec4i v{ 1, 2, 3, 4 };
+    constexpr Vec4i w = Vec4i::One();
+    // constexpr Vec<int, 10> one{ 1 };
+    // const Vec4f cv{ 1, 2, 3, 4 };
     // std::array<float, 4> arr{ 1, 2, 3, 4 };
-    std::cout << v << std::endl;
-    std::cout << cv << std::endl;
+    // constexpr auto dot = Vec4i::Dot(v, w);
+    constexpr auto result = v + w;
+    std::cout << result << std::endl;
+    // std::cout << w << std::endl;
+    // std::cout << dot << std::endl;
+    // std::cout << cv << std::endl;
 
     while (!glfwWindowShouldClose(window))
     {

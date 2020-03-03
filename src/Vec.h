@@ -4,80 +4,60 @@
 #include <cstdint>
 #include <ostream>
 #include <iostream>
+#include <type_traits>
 #include <initializer_list>
+
+#include "VariadicRepeat.h"
 
 namespace egl
 {
-template <typename T>
-;
-struct All
-{
-        All((const T &inV) : v(inV) {} 
-        T v;
-}
-
-template <typename T, uint8_t N>
+template <typename T, std::size_t N>
 class Vec
 {
 public:
+    static_assert(N >= 2);
+
     using ValueType = T;
     static constexpr auto NumComponents = N;
 
-    Vec() = default;
+    Vec() noexcept = default;
 
-    template <typename... TArgs>
-    Vec(TArgs&&... inArgs)
-    {
-        const auto inArgsArray = { inArgs... };
-        int i = 0;
-        for (const auto& v : inArgsArray)
-        {
-            mComponents[i] = v;
-            ++i;
-        }
-    }
+    constexpr Vec(const T& inAllValue) noexcept;
 
-    Vec(const All& inValueForAllComponents)
-    {
-        for (int i = 0; i < N; ++i)
-            mComponents[i] = inValueForAllComponents;
-    }
+    template <typename... TArgs, typename = std::enable_if_t<sizeof...(TArgs) == N> >
+    constexpr Vec(TArgs&&... inArgs) noexcept;
 
-    Vec(const Vec&) = default;
-    Vec& operator=(const Vec&) = default;
+    constexpr Vec(const Vec&) noexcept = default;
+    constexpr Vec& operator=(const Vec&) noexcept = default;
 
-    Vec(Vec&&) = default;
-    Vec& operator=(Vec&&) = default;
+    constexpr Vec(Vec&&) noexcept = default;
+    constexpr Vec& operator=(Vec&&) noexcept = default;
 
     ~Vec() = default;
 
-    T& Get(std::size_t i);
-    const T& Get(std::size_t i) const;
-    T& operator[](std::size_t i);
-    const T& operator[](std::size_t i) const;
+    static constexpr T Dot(const Vec& inLHS, const Vec& inRHS);
+    static constexpr Vec Zero();
+    static constexpr Vec One();
 
-    static const Vec& One()
-    {
-        static const Vec one;
-        for (int i = 0; i < N; ++i)
-            one[i] = 1;
-        return one;
-    }
+    // Operators
+    T& operator[](std::size_t i);
+    constexpr const T& operator[](std::size_t i) const;
+    constexpr Vec<T, N> operator+(const Vec& inRHS) const;
+    constexpr Vec<T, N> operator-(const Vec& inRHS) const;
+    constexpr Vec<T, N> operator*(const Vec& inRHS) const;
+    constexpr Vec<T, N> operator/(const Vec& inRHS) const;
+    constexpr Vec<T, N> operator+(const T& inRHS) const;
+    constexpr Vec<T, N> operator-(const T& inRHS) const;
+    constexpr Vec<T, N> operator*(const T& inRHS) const;
+    constexpr Vec<T, N> operator/(const T& inRHS) const;
 
 protected:
     std::array<T, N> mComponents;
 };
 //
 
-template <typename T, uint8_t N>
-inline std::ostream& operator<<(std::ostream& inLHS, const Vec<T, N>& inRHS)
-{
-    inLHS << "(";
-    for (auto i = 0; i < N; ++i)
-        inLHS << inRHS.Get(i) << (i < N - 1 ? ", " : "");
-    inLHS << ")";
-    return inLHS;
-}
+template <typename T, std::size_t N>
+inline std::ostream& operator<<(std::ostream& inLHS, const Vec<T, N>& inRHS);
 
 template <typename T>
 using Vec2 = Vec<T, 2>;
