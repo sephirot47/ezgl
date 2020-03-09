@@ -3,13 +3,17 @@
 #include <GL/glew.h>
 
 #include "EBO.h"
+
+#include "GL.h"
+#include "Macros.h"
 #include "VBO.h"
 
 namespace egl
 {
 VAO::VAO()
 {
-    glGenVertexArrays(1, &mGLId);
+    GL_SAFE_CALL(glGenVertexArrays(1, &mGLId));
+    ENSURES(mGLId > 0);
 }
 
 VAO::~VAO()
@@ -19,40 +23,57 @@ VAO::~VAO()
 
 void VAO::Bind() const
 {
-    glBindVertexArray(mGLId);
+    GL_SAFE_CALL(glBindVertexArray(mGLId));
 }
 
 void VAO::UnBind() const
 {
-    glBindVertexArray(0);
+    GL_SAFE_CALL(glBindVertexArray(0));
 }
 
-void VAO::AddVBO(const VBO& inVBO, uint32_t inAttribIndex, const VAOVertexAttrib& inVertexAttrib)
+bool VAO::IsBound() const
 {
-    Bind();
+    const auto bound_id = GetBoundGLId();
+    return bound_id != 0 && bound_id == mGLId;
+}
+
+GLId VAO::GetBoundGLId()
+{
+    GLint bound_id = 0;
+    GL_SAFE_CALL(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &bound_id));
+    return static_cast<GLId>(bound_id);
+}
+
+void VAO::AddVBO(const VBO& inVBO, GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+{
+    EXPECTS(IsBound());
     inVBO.Bind();
-    AddVertexAttrib(inAttribIndex, inVertexAttrib);
+    AddVertexAttrib(inAttribLocation, inVertexAttrib);
 }
 
 void VAO::SetEBO(const EBO& inEBO)
 {
-    Bind();
+    EXPECTS(IsBound());
     inEBO.Bind();
 }
 
-void VAO::AddVertexAttrib(uint32_t inAttribIndex, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVertexAttrib(GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
-    glEnableVertexAttribArray(inAttribIndex);
-    glVertexAttribPointer(inAttribIndex,
+    EXPECTS(IsBound());
+    EXPECTS(inVertexAttrib.numComponents > 0);
+    GL_SAFE_CALL(glEnableVertexAttribArray(inAttribLocation));
+    GL_SAFE_CALL(glVertexAttribPointer(inAttribLocation,
         inVertexAttrib.numComponents,
         static_cast<GLenum>(inVertexAttrib.type),
         inVertexAttrib.normalized,
         inVertexAttrib.stride,
-        reinterpret_cast<const void*>(inVertexAttrib.offset));
+        reinterpret_cast<const void*>(inVertexAttrib.offset)));
 }
 
-void VAO::RemoveVertexAttrib(uint32_t inAttribIndex)
+void VAO::RemoveVertexAttrib(GLId inAttribLocation)
 {
-    glDisableVertexAttribArray(inAttribIndex);
+    EXPECTS(IsBound());
+    EXPECTS(inAttribLocation > 0);
+    GL_SAFE_CALL(glDisableVertexAttribArray(inAttribLocation));
 }
 }

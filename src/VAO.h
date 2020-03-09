@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "GL.h"
+
 namespace egl
 {
 
@@ -21,16 +23,19 @@ public:
 
     void Bind() const;
     void UnBind() const;
-    void AddVBO(const VBO& inVBO, uint32_t inAttribIndex, const VAOVertexAttrib& inVertexAttrib);
+    bool IsBound() const;
+    static GLId GetBoundGLId();
+
+    void AddVBO(const VBO& inVBO, GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
     void SetEBO(const EBO& inEBO);
 
-    void AddVertexAttrib(uint32_t inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
-    void RemoveVertexAttrib(uint32_t inAttributeLocation);
+    void AddVertexAttrib(GLId inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
+    void RemoveVertexAttrib(GLId inAttributeLocation);
 
-    uint32_t GetGLId() const { return mGLId; }
+    GLId GetGLId() const { return mGLId; }
 
 private:
-    uint32_t mGLId = 0;
+    GLId mGLId = 0;
 };
 }
 

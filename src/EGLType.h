@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include "Mat.h"
 #include "Vec.h"
 
 namespace egl
@@ -32,6 +33,13 @@ enum class EGLType
     DOUBLE_VEC2 = GL_DOUBLE_VEC2,
     DOUBLE_VEC3 = GL_DOUBLE_VEC3,
     DOUBLE_VEC4 = GL_DOUBLE_VEC4,
+
+    FLOAT_MAT2 = GL_FLOAT_MAT2,
+    DOUBLE_MAT2 = GL_DOUBLE_MAT2,
+    FLOAT_MAT3 = GL_FLOAT_MAT3,
+    DOUBLE_MAT3 = GL_DOUBLE_MAT3,
+    FLOAT_MAT4 = GL_FLOAT_MAT4,
+    DOUBLE_MAT4 = GL_DOUBLE_MAT4,
 };
 
 template <typename T, uint8_t TNumComponents = 1>
@@ -114,107 +122,149 @@ template <typename, std::size_t>
 class Vec;
 
 template <>
-struct EGLTypeTraits<Vec<bool, 2u> > : public _EGLTypeTraitsBase<bool, 2u>
+struct EGLTypeTraits<Vec<bool, 2u>> : public _EGLTypeTraitsBase<bool, 2u>
 {
     static constexpr auto GLType = EGLType::BOOL_VEC2;
     static constexpr auto GLComponentType = EGLType::BOOL;
 };
 
 template <>
-struct EGLTypeTraits<Vec<bool, 3u> > : public _EGLTypeTraitsBase<bool, 3u>
+struct EGLTypeTraits<Vec<bool, 3u>> : public _EGLTypeTraitsBase<bool, 3u>
 {
     static constexpr auto GLType = EGLType::BOOL_VEC3;
     static constexpr auto GLComponentType = EGLType::BOOL;
 };
 
 template <>
-struct EGLTypeTraits<Vec<bool, 4u> > : public _EGLTypeTraitsBase<bool, 4u>
+struct EGLTypeTraits<Vec<bool, 4u>> : public _EGLTypeTraitsBase<bool, 4u>
 {
     static constexpr auto GLType = EGLType::BOOL_VEC4;
     static constexpr auto GLComponentType = EGLType::BOOL;
 };
 
 template <>
-struct EGLTypeTraits<Vec<int32_t, 2u> > : public _EGLTypeTraitsBase<int32_t, 2u>
+struct EGLTypeTraits<Vec<int32_t, 2u>> : public _EGLTypeTraitsBase<int32_t, 2u>
 {
     static constexpr auto GLType = EGLType::INT_VEC2;
     static constexpr auto GLComponentType = EGLType::INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<int32_t, 3u> > : public _EGLTypeTraitsBase<int32_t, 3u>
+struct EGLTypeTraits<Vec<int32_t, 3u>> : public _EGLTypeTraitsBase<int32_t, 3u>
 {
     static constexpr auto GLType = EGLType::INT_VEC3;
     static constexpr auto GLComponentType = EGLType::INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<int32_t, 4u> > : public _EGLTypeTraitsBase<int32_t, 4u>
+struct EGLTypeTraits<Vec<int32_t, 4u>> : public _EGLTypeTraitsBase<int32_t, 4u>
 {
     static constexpr auto GLType = EGLType::INT_VEC4;
     static constexpr auto GLComponentType = EGLType::INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<uint32_t, 2u> > : public _EGLTypeTraitsBase<uint32_t, 2u>
+struct EGLTypeTraits<Vec<uint32_t, 2u>> : public _EGLTypeTraitsBase<uint32_t, 2u>
 {
     static constexpr auto GLType = EGLType::UNSIGNED_INT_VEC2;
     static constexpr auto GLComponentType = EGLType::UNSIGNED_INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<uint32_t, 3u> > : public _EGLTypeTraitsBase<uint32_t, 3u>
+struct EGLTypeTraits<Vec<uint32_t, 3u>> : public _EGLTypeTraitsBase<uint32_t, 3u>
 {
     static constexpr auto GLType = EGLType::UNSIGNED_INT_VEC3;
     static constexpr auto GLComponentType = EGLType::UNSIGNED_INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<uint32_t, 4u> > : public _EGLTypeTraitsBase<uint32_t, 4u>
+struct EGLTypeTraits<Vec<uint32_t, 4u>> : public _EGLTypeTraitsBase<uint32_t, 4u>
 {
     static constexpr auto GLType = EGLType::UNSIGNED_INT_VEC4;
     static constexpr auto GLComponentType = EGLType::UNSIGNED_INT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<float, 2u> > : public _EGLTypeTraitsBase<float, 2u>
+struct EGLTypeTraits<Vec<float, 2u>> : public _EGLTypeTraitsBase<float, 2u>
 {
     static constexpr auto GLType = EGLType::FLOAT_VEC2;
     static constexpr auto GLComponentType = EGLType::FLOAT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<float, 3u> > : public _EGLTypeTraitsBase<float, 3u>
+struct EGLTypeTraits<Vec<float, 3u>> : public _EGLTypeTraitsBase<float, 3u>
 {
     static constexpr auto GLType = EGLType::FLOAT_VEC3;
     static constexpr auto GLComponentType = EGLType::FLOAT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<float, 4u> > : public _EGLTypeTraitsBase<float, 4u>
+struct EGLTypeTraits<Vec<float, 4u>> : public _EGLTypeTraitsBase<float, 4u>
 {
     static constexpr auto GLType = EGLType::FLOAT_VEC4;
     static constexpr auto GLComponentType = EGLType::FLOAT;
 };
 
 template <>
-struct EGLTypeTraits<Vec<double, 2u> > : public _EGLTypeTraitsBase<double, 2u>
+struct EGLTypeTraits<Vec<double, 2u>> : public _EGLTypeTraitsBase<double, 2u>
 {
     static constexpr auto GLType = EGLType::DOUBLE_VEC2;
     static constexpr auto GLComponentType = EGLType::DOUBLE;
 };
 
 template <>
-struct EGLTypeTraits<Vec<double, 3u> > : public _EGLTypeTraitsBase<double, 3u>
+struct EGLTypeTraits<Vec<double, 3u>> : public _EGLTypeTraitsBase<double, 3u>
 {
     static constexpr auto GLType = EGLType::DOUBLE_VEC3;
     static constexpr auto GLComponentType = EGLType::DOUBLE;
 };
 
 template <>
-struct EGLTypeTraits<Vec<double, 4u> > : public _EGLTypeTraitsBase<double, 4u>
+struct EGLTypeTraits<Vec<double, 4u>> : public _EGLTypeTraitsBase<double, 4u>
 {
     static constexpr auto GLType = EGLType::DOUBLE_VEC4;
+    static constexpr auto GLComponentType = EGLType::DOUBLE;
+};
+
+template <>
+struct EGLTypeTraits<Mat2f> : public _EGLTypeTraitsBase<float, 2u * 2u>
+{
+    static constexpr auto GLType = EGLType::FLOAT_MAT2;
+    static constexpr auto GLComponentType = EGLType::FLOAT;
+};
+
+template <>
+struct EGLTypeTraits<Mat2d> : public _EGLTypeTraitsBase<double, 2u * 2u>
+{
+    static constexpr auto GLType = EGLType::DOUBLE_MAT2;
+    static constexpr auto GLComponentType = EGLType::DOUBLE;
+};
+
+template <>
+struct EGLTypeTraits<Mat3f> : public _EGLTypeTraitsBase<float, 3u * 3u>
+{
+    static constexpr auto GLType = EGLType::FLOAT_MAT3;
+    static constexpr auto GLComponentType = EGLType::FLOAT;
+};
+
+template <>
+struct EGLTypeTraits<Mat3d> : public _EGLTypeTraitsBase<double, 3u * 3u>
+{
+    static constexpr auto GLType = EGLType::DOUBLE_MAT3;
+    static constexpr auto GLComponentType = EGLType::DOUBLE;
+};
+
+template <>
+struct EGLTypeTraits<Mat4f> : public _EGLTypeTraitsBase<float, 4u * 4u>
+{
+    static constexpr auto GLType = EGLType::FLOAT_MAT4;
+    static constexpr auto GLComponentType = EGLType::FLOAT;
+};
+
+template <>
+struct EGLTypeTraits<Mat4d> : public _EGLTypeTraitsBase<double, 4u * 4u>
+{
+    static constexpr auto GLType = EGLType::DOUBLE_MAT4;
     static constexpr auto GLComponentType = EGLType::DOUBLE;
 };
 }

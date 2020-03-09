@@ -22,10 +22,10 @@ public:
 
     Vec() noexcept = default;
 
-    constexpr Vec(const T& inAllValue) noexcept;
+    constexpr explicit Vec(const T& inAllValue) noexcept;
 
-    template <typename... TArgs, typename = std::enable_if_t<sizeof...(TArgs) == N> >
-    constexpr Vec(TArgs&&... inArgs) noexcept;
+    template <typename... TArgs, typename = std::enable_if_t<sizeof...(TArgs) == N>>
+    constexpr explicit Vec(TArgs&&... inArgs) noexcept;
 
     constexpr Vec(const Vec&) noexcept = default;
     constexpr Vec& operator=(const Vec&) noexcept = default;
@@ -35,12 +35,34 @@ public:
 
     ~Vec() = default;
 
+    constexpr T Length() const;
+    constexpr T SqLength() const;
+    [[nodiscard]] constexpr Vec Normalized() const;
+    void Normalize();
+
+    static constexpr T Normalized(const Vec& inRHS);
+    static constexpr T SqDistance(const Vec& inLHS, const Vec& inRHS);
+    static constexpr T Distance(const Vec& inLHS, const Vec& inRHS);
     static constexpr T Dot(const Vec& inLHS, const Vec& inRHS);
+    static constexpr Vec Cross(const Vec& inLHS, const Vec& inRHS); // Only for Vec3
+
     static constexpr Vec Zero();
     static constexpr Vec One();
+    static constexpr Vec All(const T& inAllValue);
+
+    T* Data();
+    const T* Data() const;
+
+    // Iterators
+    constexpr std::array<T, N>::iterator begin();
+    constexpr std::array<T, N>::iterator end();
+    constexpr std::array<T, N>::const_iterator begin() const;
+    constexpr std::array<T, N>::const_iterator end() const;
+    constexpr std::array<T, N>::const_iterator cbegin() const;
+    constexpr std::array<T, N>::const_iterator cend() const;
 
     // Operators
-    T& operator[](std::size_t i);
+    constexpr T& operator[](std::size_t i);
     constexpr const T& operator[](std::size_t i) const;
     constexpr Vec<T, N> operator+(const Vec& inRHS) const;
     constexpr Vec<T, N> operator-(const Vec& inRHS) const;
@@ -50,6 +72,15 @@ public:
     constexpr Vec<T, N> operator-(const T& inRHS) const;
     constexpr Vec<T, N> operator*(const T& inRHS) const;
     constexpr Vec<T, N> operator/(const T& inRHS) const;
+    constexpr void operator+=(const Vec& inRHS);
+    constexpr void operator-=(const Vec& inRHS);
+    constexpr void operator*=(const Vec& inRHS);
+    constexpr void operator/=(const Vec& inRHS);
+    constexpr void operator+=(const T& inRHS);
+    constexpr void operator-=(const T& inRHS);
+    constexpr void operator*=(const T& inRHS);
+    constexpr void operator/=(const T& inRHS);
+    constexpr Vec<T, N> operator-() const;
 
 protected:
     std::array<T, N> mComponents;

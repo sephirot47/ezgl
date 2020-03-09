@@ -2,22 +2,26 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <filesystem>
+#include <chrono>
+#include <thread>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Macros.h"
 #include "Shader.h"
-#include "VariadicRepeat.h"
 #include "ShaderProgram.h"
 #include "EBO.h"
+#include "Math.h"
 #include "VAO.h"
-#include "VBO.h"
-#include "Vec.h"
 #include "VAOVertexAttrib.h"
+#include "VariadicRepeat.h"
+#include "VBO.h"
 
 using namespace egl;
 
-static std::string GetFileContents(const std::string& filepath)
+static std::string GetFileContents(const std::filesystem::path& filepath)
 {
     std::ifstream ifs(filepath.c_str());
     const std::string contents((std::istreambuf_iterator<char>(ifs)),
@@ -25,31 +29,10 @@ static std::string GetFileContents(const std::string& filepath)
     return contents;
 }
 
-static void error_callback(int error, const char* description)
-{
-    fputs(description, stderr);
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode,
-    int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-static void render(GLFWwindow* window)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
-}
-
 int main()
 {
-    glfwSetErrorCallback(error_callback);
-
     if (!glfwInit())
-    {
-        throw std::runtime_error("Error initiating GLFW");
-    }
+        THROW_EXCEPTION("Error initiating GLFW");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -61,83 +44,64 @@ int main()
     if (!window)
     {
         glfwTerminate();
-        throw std::runtime_error("Error creating GLFW window");
+        THROW_EXCEPTION("Error creating GLFW window");
     }
     glfwMakeContextCurrent(window);
 
     glewExperimental = GL_TRUE;
     const auto glew_init_error = glewInit();
     if (glew_init_error != GLEW_OK)
-    {
-        throw std::runtime_error("Error initiating GLEW");
-    }
+        THROW_EXCEPTION("Error initiating GLEW");
 
-    glfwSetKeyCallback(window, key_callback);
-
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    GLfloat vertices[] = {
-        -0.5f, 0.5f, // Top-left
-        0.5f, 0.5f, // Top-right
-        0.5f, -0.5f, // Bottom-right
-        -0.5f, -0.5f // Bottom-left
+    constexpr std::array vertices {
+        Vec3f { -0.5f, 0.5f, 0.0f },
+        Vec3f { 0.5f, 0.5f, 0.0f },
+        Vec3f { 0.5f, -0.5f, 0.0f },
+        Vec3f { -0.5f, -0.5f, 0.0f }
     };
-    const VBO verticesVBO(vertices, sizeof(vertices));
-
-    GLfloat colors[] = {
-        1.0f, 0.0f, 0.0f, // Top-left
-        0.0f, 1.0f, 0.0f, // Top-right
-        0.0f, 0.0f, 1.0f, // Bottom-right
-        1.0f, 1.0f, 1.0f // Bottom-left
-    };
-    const VBO colorsVBO(colors, sizeof(colors));
+    const VBO vertices_vbo { vertices.data(), sizeof(vertices) };
 
     // Create an element array
-    GLuint elements[]
-        = {
-            0, 1, 2,
-            2, 3, 0
-          };
-    const EBO ebo(elements, sizeof(elements));
+    constexpr std::array elements { 0, 1, 2, 2, 3, 0 };
+    const EBO ebo(elements.data(), sizeof(elements));
 
-    const VertexShader vertexShader(GetFileContents("../res/default.vert"));
-    const FragmentShader fragmentShader(GetFileContents("../res/default.frag"));
-    const ShaderProgram shaderProgram(vertexShader, fragmentShader);
-    shaderProgram.Use();
+    const VertexShader vertex_shader { GetFileContents("../res/default.vert") };
+    const FragmentShader fragment_shader { GetFileContents("../res/default.frag") };
+    ShaderProgram shader_program { vertex_shader, fragment_shader };
+    shader_program.Bind();
 
     // Specify the layout of the vertex data
-    const GLint posAttrib = shaderProgram.GetAttribLocation("position");
-    const GLint colorAttrib = shaderProgram.GetAttribLocation("color");
+    const auto pos_attrib = shader_program.GetAttribLocation("position");
 
     VAO vao;
-    vao.AddVBO(verticesVBO, posAttrib, VAOVertexAttribT<Vec2<float> >());
-    vao.AddVBO(colorsVBO, colorAttrib, VAOVertexAttribT<Vec3<float> >());
+    vao.Bind();
+    vao.AddVBO(vertices_vbo, *pos_attrib, VAOVertexAttribT<Vec3f>());
     vao.SetEBO(ebo);
 
-    constexpr Vec4i v{ 1, 2, 3, 4 };
-    constexpr Vec4i w = Vec4i::One();
-    // constexpr Vec<int, 10> one{ 1 };
-    // const Vec4f cv{ 1, 2, 3, 4 };
-    // std::array<float, 4> arr{ 1, 2, 3, 4 };
-    // constexpr auto dot = Vec4i::Dot(v, w);
-    constexpr auto result = v + w;
-    std::cout << result << std::endl;
-    // std::cout << w << std::endl;
-    // std::cout << dot << std::endl;
-    // std::cout << cv << std::endl;
+    constexpr Vec3f v { 1.0f, 2.0f, 3.0f };
+    constexpr auto w = Vec3f::One();
+    constexpr auto result = Cross(v, w);
+    std::cout << result << std::endl
+              << std::endl;
 
+    double time = 0;
+    shader_program.SetUniform("Color", Vec3f(1.0f, 0.0f, 0.0f));
     while (!glfwWindowShouldClose(window))
     {
         // Clear the screen to black
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Draw a rectangle from the 2 triangles using 6 indices
+        const auto q = Quatf::AngleAxis(time * 3.14f, Normalized(Vec3f { 1.0f, 0.4f, 0.2f }));
+        const auto model_matrix = RotationMat4(q);
+        shader_program.SetUniform("Model", model_matrix);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        glfwWaitEvents();
+        time += 0.03;
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 
     glfwDestroyWindow(window);

@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "GL.h"
+
 namespace egl
 {
 
@@ -9,7 +11,10 @@ class EBO
 {
 public:
     EBO();
-    EBO(const void* inData, std::size_t inSize);
+
+    template <typename T>
+    EBO(const T* inData, std::size_t inSize);
+
     EBO(const EBO& inRHS) = delete;
     EBO& operator=(const EBO& inRHS) = delete;
     EBO(EBO&& inRHS) = default;
@@ -18,12 +23,17 @@ public:
 
     void Bind() const;
     void UnBind() const;
+    bool IsBound() const;
+    static GLId GetBoundGLId();
 
-    void BufferData(const void* inData, std::size_t inSize);
+    template <typename T>
+    void BufferData(const T* inData, std::size_t inSize);
 
-    uint32_t GetGLId() const { return mGLId; }
+    GLId GetGLId() const { return mGLId; }
 
 private:
-    uint32_t mGLId = 0;
+    GLId mGLId = 0;
 };
 }
+
+#include "EBO.tcc"

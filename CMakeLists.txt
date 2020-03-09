@@ -4,9 +4,10 @@ project(ezgl)
 
 file(GLOB SRC_FILES "src/*.cpp")
 
-add_executable(test.exe "${SRC_FILES}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+add_executable(test.exe "${SRC_FILES}")
 
 find_package(OpenGL REQUIRED)
 target_include_directories(test.exe PUBLIC ${OPENGL_INCLUDE_DIRS})

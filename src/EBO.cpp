@@ -1,17 +1,13 @@
 #include "EBO.h"
 
-#include <GL/glew.h>
+#include "GL.h"
+#include "Macros.h"
 
 namespace egl
 {
 EBO::EBO()
 {
-    glGenBuffers(1, &mGLId);
-}
-EBO::EBO(const void* inData, std::size_t inSize)
-    : EBO()
-{
-    BufferData(inData, inSize);
+    GL_SAFE_CALL(glGenBuffers(1, &mGLId));
 }
 
 EBO::~EBO()
@@ -21,18 +17,24 @@ EBO::~EBO()
 
 void EBO::Bind() const
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLId);
+    GL_SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLId));
 }
 
 void EBO::UnBind() const
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    GL_SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-void EBO::BufferData(const void* inData, std::size_t inSize)
+bool EBO::IsBound() const
 {
-    Bind();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, inSize, inData, GL_STATIC_DRAW);
-    UnBind();
+    const auto bound_id = GetBoundGLId();
+    return bound_id != 0 && bound_id == mGLId;
+}
+
+GLId EBO::GetBoundGLId()
+{
+    GLint bound_id = 0;
+    GL_SAFE_CALL(glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &bound_id));
+    return static_cast<GLId>(bound_id);
 }
 }

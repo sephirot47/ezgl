@@ -1,17 +1,14 @@
 #include "VBO.h"
 
-#include <GL/glew.h>
+#include "GL.h"
+#include "Macros.h"
 
 namespace egl
 {
 VBO::VBO()
 {
-    glGenBuffers(1, &mGLId);
-}
-VBO::VBO(const void* inData, std::size_t inSize)
-    : VBO()
-{
-    BufferData(inData, inSize);
+    GL_SAFE_CALL(glGenBuffers(1, &mGLId));
+    ENSURES(mGLId > 0);
 }
 
 VBO::~VBO()
@@ -21,18 +18,25 @@ VBO::~VBO()
 
 void VBO::Bind() const
 {
-    glBindBuffer(GL_ARRAY_BUFFER, mGLId);
+    GL_SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, mGLId));
 }
 
 void VBO::UnBind() const
 {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    GL_SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-void VBO::BufferData(const void* inData, std::size_t inSize)
+bool VBO::IsBound() const
 {
-    Bind();
-    glBufferData(GL_ARRAY_BUFFER, inSize, inData, GL_STATIC_DRAW);
-    UnBind();
+    const auto bound_id = GetBoundGLId();
+    return bound_id != 0 && bound_id == mGLId;
 }
+
+GLId VBO::GetBoundGLId()
+{
+    GLint bound_id = 0;
+    GL_SAFE_CALL(glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &bound_id));
+    return static_cast<GLId>(bound_id);
+}
+
 }
