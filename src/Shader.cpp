@@ -8,37 +8,24 @@
 namespace egl
 {
 Shader::Shader(const GL::EShaderType inShaderType, const std::string_view inSourceCode)
+    : mGLId(GL::CreateShader(inShaderType))
 {
-    mGLId = GL_SAFE_CALL_RET(glCreateShader(static_cast<GLuint>(inShaderType)));
     if (mGLId == 0)
-        THROW_EXCEPTION("Error creating shader");
+        THROW_EXCEPTION("Error creating shader of type " << GL::EnumCast(inShaderType));
 
-    const GLchar* source_code_ptr = inSourceCode.data();
-    const GLint source_code_length = inSourceCode.size();
-    GL_SAFE_CALL(glShaderSource(mGLId, 1, &source_code_ptr, &source_code_length));
+    GL::ShaderSource(mGLId, inSourceCode);
+    GL::CompileShader(mGLId);
 
-    GL_SAFE_CALL(glCompileShader(mGLId));
-
-    GLint compiled_correctly = false;
-    GL_SAFE_CALL(glGetShaderiv(mGLId, GL_COMPILE_STATUS, &compiled_correctly));
+    const auto compiled_correctly = GL::GetShaderInteger(mGLId, GL::EShaderInfo::COMPILE_STATUS);
     if (!compiled_correctly)
     {
-        GLint max_error_length = 0;
-        GL_SAFE_CALL(glGetShaderiv(mGLId, GL_INFO_LOG_LENGTH, &max_error_length));
-
-        std::string error_msg;
-        error_msg.resize(max_error_length);
-
-        GLint error_length = 0;
-        GL_SAFE_CALL(glGetShaderInfoLog(mGLId, max_error_length, &error_length, (GLchar*)error_msg.data()));
-        error_msg.resize(error_length - 1);
-
+        const auto error_msg = GL::GetShaderInfoLog(mGLId);
         THROW_EXCEPTION("Error compiling shader: " << error_msg);
     }
 }
 
 Shader::~Shader()
 {
-    glDeleteShader(mGLId);
+    GL::DeleteShader(mGLId);
 }
 }

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <string>
 
 #include <GL/glew.h>
 
@@ -16,6 +17,8 @@ namespace egl
 class GL
 {
 public:
+    using Char = GLchar;
+    using Byte = GLbyte;
     using Uint = GLuint;
     using Int = GLint;
     using Id = GLuint;
@@ -116,6 +119,12 @@ public:
         TRIANGLES = GL_TRIANGLES
     };
 
+    enum class EShaderInfo
+    {
+        COMPILE_STATUS = GL_COMPILE_STATUS,
+        INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH
+    };
+
     static GL::Id GenBuffer();
     static GL::Id CreateBuffer();
     static void BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId);
@@ -127,6 +136,13 @@ public:
     static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);
 
     static void DrawElements(const GL::EPrimitivesMode inPrimitivesMode, const GL::Size inNumberOfPrimitives, const GL::EDataType inIndicesDataType, const GL::Size inBeginPrimiviteIndex = 0);
+
+    static GL::Id CreateShader(const GL::EShaderType inShaderType);
+    static void ShaderSource(const GL::Id inShaderId, const std::string_view inSourceCode);
+    static void CompileShader(const GL::Id inShaderId);
+    static GL::Int GetShaderInteger(const GL::Id inShaderId, const GL::EShaderInfo inShaderInfoEnum);
+    static std::string GetShaderInfoLog(const GL::Id inShaderId);
+    static void DeleteShader(const GL::Id inShaderId);
 
     template <typename T>
     static GL::Int GetInteger(const T& inGLEnum);

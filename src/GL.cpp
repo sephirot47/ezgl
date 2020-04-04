@@ -42,6 +42,50 @@ void GL::DrawElements(const GL::EPrimitivesMode inPrimitivesMode, const GL::Size
     GL_SAFE_CALL(glDrawElements(GL::EnumCast(inPrimitivesMode), inNumberOfPrimitives, GL::EnumCast(inIndicesDataType), reinterpret_cast<const void*>(inBeginPrimiviteIndex)));
 }
 
+GL::Id GL::CreateShader(const GL::EShaderType inShaderType)
+{
+    const auto new_shader_id = GL_SAFE_CALL_RET(glCreateShader(GL::EnumCast(inShaderType)));
+    return new_shader_id;
+}
+
+void GL::ShaderSource(const GL::Id inShaderId, const std::string_view inSourceCode)
+{
+    const GLchar* source_code_ptr = inSourceCode.data();
+    const GLint source_code_length = inSourceCode.size();
+    GL_SAFE_CALL(glShaderSource(inShaderId, 1, &source_code_ptr, &source_code_length));
+}
+
+void GL::CompileShader(const GL::Id inShaderId)
+{
+    GL_SAFE_CALL(glCompileShader(inShaderId));
+}
+
+GL::Int GL::GetShaderInteger(const GL::Id inShaderId, const GL::EShaderInfo inShaderInfoEnum)
+{
+    GL::Int result = 0;
+    GL_SAFE_CALL(glGetShaderiv(inShaderId, GL::EnumCast(inShaderInfoEnum), &result));
+    return result;
+}
+
+std::string GL::GetShaderInfoLog(const GL::Id inShaderId)
+{
+    const auto max_error_length = GL::GetShaderInteger(inShaderId, GL::EShaderInfo::INFO_LOG_LENGTH);
+
+    std::string info_msg;
+    info_msg.resize(max_error_length);
+
+    GL::Int error_length = 0;
+    GL_SAFE_CALL(glGetShaderInfoLog(inShaderId, max_error_length, &error_length, reinterpret_cast<GL::Char*>(info_msg.data())));
+    info_msg.resize(error_length - 1);
+
+    return info_msg;
+}
+
+void GL::DeleteShader(const GL::Id inShaderId)
+{
+    GL_SAFE_CALL(glDeleteShader(inShaderId));
+}
+
 GL::EError GL::CheckError()
 {
     return static_cast<GL::EError>(glGetError());
