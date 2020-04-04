@@ -27,6 +27,50 @@ void GL::DeleteBuffer(const GL::Id inBufferId)
     GL_SAFE_CALL(glDeleteBuffers(1, &inBufferId));
 }
 
+GL::Id GL::GenVertexArray()
+{
+    GL::Id new_vertex_array_id = 0;
+    GL_SAFE_CALL(glGenVertexArrays(1, &new_vertex_array_id));
+    return new_vertex_array_id;
+}
+
+GL::Id GL::CreateVertexArray()
+{
+    GL::Id new_vertex_array_id = 0;
+    GL_SAFE_CALL(glCreateVertexArrays(1, &new_vertex_array_id))
+    return new_vertex_array_id;
+}
+
+void GL::BindVertexArray(const GL::Id inVAOId)
+{
+    GL_SAFE_CALL(glBindVertexArray(inVAOId));
+}
+
+void GL::EnableVertexAttribArray(const GL::Id inAttribLocation)
+{
+    GL_SAFE_CALL(glEnableVertexAttribArray(inAttribLocation));
+}
+
+void GL::VertexAttribPointer(const GL::Id inAttribLocation, const GL::Size inNumComponents, const GL::EDataType inDataType, const bool inNormalized, const GL::Size inStride, const GL::Size inOffset)
+{
+    GL_SAFE_CALL(glVertexAttribPointer(inAttribLocation,
+        inNumComponents,
+        GL::EnumCast(inDataType),
+        inNormalized,
+        inStride,
+        reinterpret_cast<const void*>(inOffset)));
+}
+
+void GL::DisableVertexAttribArray(const GL::Id inAttribLocation)
+{
+    GL_SAFE_CALL(glDisableVertexAttribArray(inAttribLocation));
+}
+
+void GL::DeleteVertexArray(const GL::Id inVAOId)
+{
+    GL_SAFE_CALL(glDeleteVertexArrays(1, &inVAOId));
+}
+
 void GL::ClearColor(const Color4f& inColor)
 {
     GL_SAFE_CALL(glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]));

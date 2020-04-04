@@ -11,25 +11,25 @@
 namespace egl
 {
 VAO::VAO()
+    : mGLId(GL::CreateVertexArray())
 {
-    GL_SAFE_CALL(glGenVertexArrays(1, &mGLId));
     if (mGLId == 0)
         THROW_EXCEPTION("Error creating VAO");
 }
 
 VAO::~VAO()
 {
-    glDeleteVertexArrays(1, &mGLId);
+    GL::DeleteVertexArray(mGLId);
 }
 
 void VAO::Bind() const
 {
-    GL_SAFE_CALL(glBindVertexArray(mGLId));
+    GL::BindVertexArray(mGLId);
 }
 
 void VAO::UnBind() const
 {
-    GL_SAFE_CALL(glBindVertexArray(0));
+    GL::BindVertexArray(0);
 }
 
 bool VAO::IsBound() const
@@ -40,8 +40,7 @@ bool VAO::IsBound() const
 
 GL::Id VAO::GetBoundGLId()
 {
-    GLint bound_id = 0;
-    GL_SAFE_CALL(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &bound_id));
+    const auto bound_id = GL::GetInteger(GL::EBufferBindingType::VERTEX_ARRAY);
     return static_cast<GL::Id>(bound_id);
 }
 
@@ -62,19 +61,19 @@ void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& 
 {
     EXPECTS(IsBound());
     EXPECTS(inVertexAttrib.mNumComponents > 0);
-    GL_SAFE_CALL(glEnableVertexAttribArray(inAttribLocation));
-    GL_SAFE_CALL(glVertexAttribPointer(inAttribLocation,
+    GL::EnableVertexAttribArray(inAttribLocation);
+    GL::VertexAttribPointer(inAttribLocation,
         inVertexAttrib.mNumComponents,
-        GL::EnumCast(inVertexAttrib.mType),
+        inVertexAttrib.mType,
         inVertexAttrib.mNormalized,
         inVertexAttrib.mStride,
-        reinterpret_cast<const void*>(inVertexAttrib.mOffset)));
+        inVertexAttrib.mOffset);
 }
 
 void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)
 {
     EXPECTS(IsBound());
     EXPECTS(inAttribLocation > 0);
-    GL_SAFE_CALL(glDisableVertexAttribArray(inAttribLocation));
+    GL::DisableVertexAttribArray(inAttribLocation);
 }
 }

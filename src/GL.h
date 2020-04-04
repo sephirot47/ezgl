@@ -50,13 +50,15 @@ public:
     enum class EBufferType
     {
         ARRAY_BUFFER = GL_ARRAY_BUFFER,
-        ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER
+        ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER,
+        VERTEX_ARRAY = GL_VERTEX_ARRAY
     };
 
     enum class EBufferBindingType
     {
         ARRAY_BUFFER = GL_ARRAY_BUFFER_BINDING,
-        ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER_BINDING
+        ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER_BINDING,
+        VERTEX_ARRAY = GL_VERTEX_ARRAY_BINDING
     };
 
     enum class EAccessHint
@@ -139,9 +141,16 @@ public:
     static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint);
     static void DeleteBuffer(const GL::Id inBufferId);
 
+    static GL::Id GenVertexArray();
+    static GL::Id CreateVertexArray();
+    static void BindVertexArray(const GL::Id inVAOId);
+    static void EnableVertexAttribArray(const GL::Id inAttribLocation);
+    static void VertexAttribPointer(const GL::Id inAttribLocation, const GL::Size inNumComponents, const GL::EDataType inDataType, const bool inNormalized, const GL::Size inStride, const GL::Size inOffset = 0);
+    static void DisableVertexAttribArray(const GL::Id inAttribLocation);
+    static void DeleteVertexArray(const GL::Id inVAOId);
+
     static void ClearColor(const Color4f& inColor);
     static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);
-
     static void DrawElements(const GL::EPrimitivesMode inPrimitivesMode, const GL::Size inNumberOfPrimitives, const GL::EDataType inIndicesDataType, const GL::Size inBeginPrimiviteIndex = 0);
 
     static GL::Id CreateShader(const GL::EShaderType inShaderType);
