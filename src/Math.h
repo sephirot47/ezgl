@@ -105,6 +105,28 @@ constexpr Quat<T> ToQuaternion(const Mat4<T>& inRotationMat)
     }
 }
 
+template <typename TMat>
+constexpr TMat Diagonal(const typename TMat::ValueType inDiagonalValue)
+{
+    static_assert(TMat::NumRows == TMat::NumCols);
+
+    constexpr auto N = TMat::NumRows;
+    using ValueType = typename TMat::ValueType;
+
+    TMat diagonal_matrix(static_cast<ValueType>(0));
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        diagonal_matrix[i][i] = inDiagonalValue;
+    }
+    return diagonal_matrix;
+}
+
+template <typename TMat>
+constexpr TMat Identity()
+{
+    return Diagonal<TMat>(static_cast<typename TMat::ValueType>(1));
+}
+
 template <typename T>
 constexpr Mat4<T> TranslationMat4(const Vec3<T>& inTranslation)
 {

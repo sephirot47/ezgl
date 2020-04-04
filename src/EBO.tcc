@@ -3,18 +3,15 @@
 namespace egl
 {
 template <typename T>
-EBO::EBO(const T* inData, std::size_t inSize)
+EBO::EBO(const Span<T>& inData)
     : EBO()
 {
-    Bind();
-    BufferData(inData, inSize);
-    UnBind();
+    BufferData(inData);
 }
 
 template <typename T>
-void EBO::BufferData(const T* inData, std::size_t inSize)
+void EBO::BufferData(const Span<T>& inData)
 {
-    EXPECTS(IsBound());
-    GL_SAFE_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, inSize, inData, GL_STATIC_DRAW));
+    GL::BufferData(mGLId, inData, GL::EAccessHint::STATIC_DRAW);
 }
 }

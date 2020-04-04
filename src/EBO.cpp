@@ -6,23 +6,23 @@
 namespace egl
 {
 EBO::EBO()
+    : mGLId(GL::CreateBuffer())
 {
-    GL_SAFE_CALL(glGenBuffers(1, &mGLId));
 }
 
 EBO::~EBO()
 {
-    glDeleteBuffers(1, &mGLId);
+    GL::DeleteBuffer(mGLId);
 }
 
 void EBO::Bind() const
 {
-    GL_SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLId));
+    GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, mGLId);
 }
 
 void EBO::UnBind() const
 {
-    GL_SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+    GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, 0);
 }
 
 bool EBO::IsBound() const
@@ -31,10 +31,14 @@ bool EBO::IsBound() const
     return bound_id != 0 && bound_id == mGLId;
 }
 
-GLId EBO::GetBoundGLId()
+GL::Id EBO::GetGLId() const
 {
-    GLint bound_id = 0;
-    GL_SAFE_CALL(glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &bound_id));
-    return static_cast<GLId>(bound_id);
+    return mGLId;
+}
+
+GL::Id EBO::GetBoundGLId()
+{
+    const auto bound_id = GL::GetInteger(GL::EBufferBindingType::ELEMENT_ARRAY);
+    return static_cast<GL::Id>(bound_id);
 }
 }

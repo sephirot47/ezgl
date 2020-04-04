@@ -24,15 +24,15 @@ public:
     void Bind() const;
     void UnBind() const;
     bool IsBound() const;
-    static GLId GetBoundGLId();
+    static GL::Id GetBoundGLId();
 
     template <typename T>
     void BufferData(const T* inData, std::size_t inSize);
 
-    GLId GetGLId() const { return mGLId; }
+    GL::Id GetGLId() const { return mGLId; }
 
 private:
-    GLId mGLId = 0;
+    GL::Id mGLId = 0;
 };
 }
 

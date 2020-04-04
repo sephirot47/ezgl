@@ -11,10 +11,10 @@ namespace egl
 class Shader
 {
 public:
-    GLId GetGLId() const { return mGLId; }
+    GL::Id GetGLId() const { return mGLId; }
 
 protected:
-    Shader(EShaderType inShaderType, const std::string_view& inSourceCode);
+    Shader(GL::EShaderType inShaderType, const std::string_view inSourceCode);
     Shader(const Shader& inRHS) = delete;
     Shader& operator=(const Shader& inRHS) = delete;
     Shader(Shader&& inRHS) = default;
@@ -22,14 +22,14 @@ protected:
     virtual ~Shader();
 
 private:
-    GLId mGLId = 0;
+    GL::Id mGLId = 0;
 };
 
 class VertexShader : public Shader
 {
 public:
-    explicit VertexShader(const std::string_view& inSourceCode)
-        : Shader(EShaderType::VERTEX, inSourceCode)
+    explicit VertexShader(const std::string_view inSourceCode)
+        : Shader(GL::EShaderType::VERTEX, inSourceCode)
     {
     }
     VertexShader(const VertexShader& inRHS) = delete;
@@ -42,8 +42,8 @@ public:
 class FragmentShader : public Shader
 {
 public:
-    explicit FragmentShader(const std::string_view& inSourceCode)
-        : Shader(EShaderType::FRAGMENT, inSourceCode)
+    explicit FragmentShader(const std::string_view inSourceCode)
+        : Shader(GL::EShaderType::FRAGMENT, inSourceCode)
     {
     }
     FragmentShader(const FragmentShader& inRHS) = delete;

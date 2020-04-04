@@ -24,18 +24,18 @@ public:
     void Bind() const;
     void UnBind() const;
     bool IsBound() const;
-    static GLId GetBoundGLId();
+    static GL::Id GetBoundGLId();
 
-    void AddVBO(const VBO& inVBO, GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
+    void AddVBO(const VBO& inVBO, GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
     void SetEBO(const EBO& inEBO);
 
-    void AddVertexAttrib(GLId inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
-    void RemoveVertexAttrib(GLId inAttributeLocation);
+    void AddVertexAttrib(GL::Id inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
+    void RemoveVertexAttrib(GL::Id inAttributeLocation);
 
-    GLId GetGLId() const { return mGLId; }
+    GL::Id GetGLId() const { return mGLId; }
 
 private:
-    GLId mGLId = 0;
+    GL::Id mGLId = 0;
 };
 }
 

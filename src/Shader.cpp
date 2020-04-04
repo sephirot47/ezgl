@@ -7,10 +7,10 @@
 
 namespace egl
 {
-Shader::Shader(const EShaderType inShaderType, const std::string_view& inSourceCode)
+Shader::Shader(const GL::EShaderType inShaderType, const std::string_view inSourceCode)
 {
     mGLId = GL_SAFE_CALL_RET(glCreateShader(static_cast<GLuint>(inShaderType)));
-    if (!mGLId)
+    if (mGLId == 0)
         THROW_EXCEPTION("Error creating shader");
 
     const GLchar* source_code_ptr = inSourceCode.data();

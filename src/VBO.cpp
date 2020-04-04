@@ -32,11 +32,11 @@ bool VBO::IsBound() const
     return bound_id != 0 && bound_id == mGLId;
 }
 
-GLId VBO::GetBoundGLId()
+GL::Id VBO::GetBoundGLId()
 {
     GLint bound_id = 0;
     GL_SAFE_CALL(glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &bound_id));
-    return static_cast<GLId>(bound_id);
+    return static_cast<GL::Id>(bound_id);
 }
 
 }

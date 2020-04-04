@@ -37,14 +37,14 @@ bool VAO::IsBound() const
     return bound_id != 0 && bound_id == mGLId;
 }
 
-GLId VAO::GetBoundGLId()
+GL::Id VAO::GetBoundGLId()
 {
     GLint bound_id = 0;
     GL_SAFE_CALL(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &bound_id));
-    return static_cast<GLId>(bound_id);
+    return static_cast<GL::Id>(bound_id);
 }
 
-void VAO::AddVBO(const VBO& inVBO, GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVBO(const VBO& inVBO, GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
     EXPECTS(IsBound());
     inVBO.Bind();
@@ -57,20 +57,20 @@ void VAO::SetEBO(const EBO& inEBO)
     inEBO.Bind();
 }
 
-void VAO::AddVertexAttrib(GLId inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVertexAttrib(GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
     EXPECTS(IsBound());
-    EXPECTS(inVertexAttrib.numComponents > 0);
+    EXPECTS(inVertexAttrib.mNumComponents > 0);
     GL_SAFE_CALL(glEnableVertexAttribArray(inAttribLocation));
     GL_SAFE_CALL(glVertexAttribPointer(inAttribLocation,
-        inVertexAttrib.numComponents,
-        static_cast<GLenum>(inVertexAttrib.type),
-        inVertexAttrib.normalized,
-        inVertexAttrib.stride,
-        reinterpret_cast<const void*>(inVertexAttrib.offset)));
+        inVertexAttrib.mNumComponents,
+        GL::EnumCast(inVertexAttrib.mType),
+        inVertexAttrib.mNormalized,
+        inVertexAttrib.mStride,
+        reinterpret_cast<const void*>(inVertexAttrib.mOffset)));
 }
 
-void VAO::RemoveVertexAttrib(GLId inAttribLocation)
+void VAO::RemoveVertexAttrib(GL::Id inAttribLocation)
 {
     EXPECTS(IsBound());
     EXPECTS(inAttribLocation > 0);

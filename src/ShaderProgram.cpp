@@ -41,18 +41,18 @@ bool ShaderProgram::IsBound() const
     return bound_id != 0 && bound_id == mGLId;
 }
 
-GLId ShaderProgram::GetBoundGLId()
+GL::Id ShaderProgram::GetBoundGLId()
 {
     GLint bound_id = 0;
     GL_SAFE_CALL(glGetIntegerv(GL_CURRENT_PROGRAM, &bound_id));
-    return static_cast<GLId>(bound_id);
+    return static_cast<GL::Id>(bound_id);
 }
 
-GLId GetUniformLocationWithException(const ShaderProgram& inShaderProgram, std::string_view inName)
+GL::Id GetUniformLocationWithException(const ShaderProgram& inShaderProgram, std::string_view inName)
 {
     const auto uniform_location_optional = inShaderProgram.GetUniformLocation(inName.data());
     if (!uniform_location_optional)
-        THROW_EXCEPTION("Uniform " << inName.data() << " not found in shader program with id " << inShaderProgram.GetGLId());
+        THROW_EXCEPTION("Uniform \"" << inName.data() << "\" not found in shader program with id " << inShaderProgram.GetGLId());
     return *uniform_location_optional;
 }
 
@@ -178,15 +178,15 @@ void ShaderProgram::SetUniform(std::string_view inName, const Mat4d& inValue)
     GL_SAFE_CALL(glUniformMatrix4dv(GetUniformLocationWithException(*this, inName), 1, true, inValue.Data()));
 }
 
-std::optional<GLId> ShaderProgram::GetAttribLocation(std::string_view inName) const
+std::optional<GL::Id> ShaderProgram::GetAttribLocation(std::string_view inName) const
 {
-    const auto attrib_location = GL_SAFE_CALL_RET(glGetAttribLocation(mGLId, inName.data()));
-    return std::make_optional(attrib_location);
+    const GL::Id attrib_location = GL_SAFE_CALL_RET(glGetAttribLocation(mGLId, inName.data()));
+    return (attrib_location != GL::InvalidId) ? std::make_optional(attrib_location) : std::nullopt;
 }
 
-std::optional<GLId> ShaderProgram::GetUniformLocation(std::string_view inName) const
+std::optional<GL::Id> ShaderProgram::GetUniformLocation(std::string_view inName) const
 {
-    const auto uniform_location = GL_SAFE_CALL_RET(glGetUniformLocation(mGLId, inName.data()));
-    return std::make_optional(uniform_location);
+    const GL::Id uniform_location = GL_SAFE_CALL_RET(glGetUniformLocation(mGLId, inName.data()));
+    return (uniform_location != GL::InvalidId) ? std::make_optional(uniform_location) : std::nullopt;
 }
 }

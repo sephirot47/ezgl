@@ -17,6 +17,7 @@ template <typename T, std::size_t NRows, std::size_t NCols>
 class Mat
 {
 public:
+    using ValueType = T;
     static constexpr auto NumRows = NRows;
     static constexpr auto NumCols = NCols;
 

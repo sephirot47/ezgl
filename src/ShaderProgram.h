@@ -25,11 +25,11 @@ public:
     void Bind() const;
     void UnBind() const;
     bool IsBound() const;
-    static GLId GetBoundGLId();
+    static GL::Id GetBoundGLId();
 
-    std::optional<GLId> GetAttribLocation(std::string_view inName) const;
-    std::optional<GLId> GetUniformLocation(std::string_view inName) const;
-    GLId GetGLId() const { return mGLId; }
+    std::optional<GL::Id> GetAttribLocation(std::string_view inName) const;
+    std::optional<GL::Id> GetUniformLocation(std::string_view inName) const;
+    GL::Id GetGLId() const { return mGLId; }
 
     void SetUniform(std::string_view inName, bool inValue);
     void SetUniform(std::string_view inName, int8_t inValue);
@@ -57,7 +57,7 @@ public:
     void SetUniform(const T& inValue) = delete;
 
 private:
-    GLId mGLId = 0;
+    GL::Id mGLId = 0;
 };
 }
 

@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "GL.h"
+#include "Span.h"
 
 namespace egl
 {
@@ -13,7 +14,7 @@ public:
     EBO();
 
     template <typename T>
-    EBO(const T* inData, std::size_t inSize);
+    explicit EBO(const Span<T>& inData);
 
     EBO(const EBO& inRHS) = delete;
     EBO& operator=(const EBO& inRHS) = delete;
@@ -24,15 +25,15 @@ public:
     void Bind() const;
     void UnBind() const;
     bool IsBound() const;
-    static GLId GetBoundGLId();
+    static GL::Id GetBoundGLId();
 
     template <typename T>
-    void BufferData(const T* inData, std::size_t inSize);
+    void BufferData(const Span<T>& inData);
 
-    GLId GetGLId() const { return mGLId; }
+    GL::Id GetGLId() const;
 
 private:
-    GLId mGLId = 0;
+    GL::Id mGLId = 0;
 };
 }
 

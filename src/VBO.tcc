@@ -10,7 +10,6 @@ VBO::VBO(const T* inData, std::size_t inSize)
 {
     Bind();
     BufferData(inData, inSize);
-    UnBind();
 }
 
 template <typename T>
