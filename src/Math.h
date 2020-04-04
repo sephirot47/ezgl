@@ -144,7 +144,7 @@ constexpr Quat<T> ToQuaternion(const Mat4<T>& inRotationMat)
     }
 }
 
-template <typename TMat>
+template <typename TMat, typename = std::enable_if_t<IsMat_v<TMat>>>
 constexpr TMat Diagonal(const typename TMat::ValueType inDiagonalValue)
 {
     static_assert(TMat::NumRows == TMat::NumCols);
@@ -160,7 +160,7 @@ constexpr TMat Diagonal(const typename TMat::ValueType inDiagonalValue)
     return diagonal_matrix;
 }
 
-template <typename TMat>
+template <typename TMat, typename = std::enable_if_t<IsMat_v<TMat>>>
 constexpr TMat Identity()
 {
     return Diagonal<TMat>(static_cast<typename TMat::ValueType>(1));
@@ -210,8 +210,8 @@ constexpr Mat4<T> ScaleMat4(const Vec3<T>& inScale)
     };
 }
 
-template <typename T, typename TT>
-constexpr T Lerp(const T& inFrom, const T& inTo, const TT& t)
+template <typename T, typename TInterpolationFactor>
+constexpr T Lerp(const T& inFrom, const T& inTo, const TInterpolationFactor& t)
 {
     return inFrom + (inTo - inFrom) * t;
 }
