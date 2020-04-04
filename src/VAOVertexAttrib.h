@@ -10,7 +10,7 @@ struct VAOVertexAttrib
 {
     explicit VAOVertexAttrib(
         uint32_t inNumComponents,
-        EGLType inType,
+        GL::EDataType inType,
         uint32_t inStride,
         bool inNormalized = false,
         uint32_t inOffset = 0)
@@ -23,7 +23,7 @@ struct VAOVertexAttrib
     }
 
     uint32_t mNumComponents = 1;
-    EGLType mType = EGLType::BOOL;
+    GL::EDataType mType = GL::EDataType::BOOL;
     bool mNormalized = false;
     uint32_t mStride = 0;
     uint32_t mOffset = 0;

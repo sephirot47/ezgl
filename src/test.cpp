@@ -68,7 +68,7 @@ int main()
         const auto q = Quatf::AngleAxis(time * 3.14f, Normalized(Vec3f { 1.0f, 0.4f, 0.2f }));
         const auto model_matrix = RotationMat4(q);
         shader_program.SetUniform("Model", model_matrix);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        GL::DrawElements(GL::EPrimitivesMode::TRIANGLES, 6, GL::EDataType::UNSIGNED_INT);
 
         window.SwapBuffers();
         window.PollEvents();

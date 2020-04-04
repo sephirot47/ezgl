@@ -37,6 +37,11 @@ void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags)
     GL_SAFE_CALL(glClear(GL::EnumCast(inBufferBitFlags)));
 }
 
+void GL::DrawElements(const GL::EPrimitivesMode inPrimitivesMode, const GL::Size inNumberOfPrimitives, const GL::EDataType inIndicesDataType, const GL::Size inBeginPrimiviteIndex)
+{
+    GL_SAFE_CALL(glDrawElements(GL::EnumCast(inPrimitivesMode), inNumberOfPrimitives, GL::EnumCast(inIndicesDataType), reinterpret_cast<const void*>(inBeginPrimiviteIndex)));
+}
+
 GL::EError GL::CheckError()
 {
     return static_cast<GL::EError>(glGetError());
