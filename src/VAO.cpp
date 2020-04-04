@@ -44,7 +44,7 @@ GL::Id VAO::GetBoundGLId()
     return static_cast<GL::Id>(bound_id);
 }
 
-void VAO::AddVBO(const VBO& inVBO, GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVBO(const VBO& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
     EXPECTS(IsBound());
     inVBO.Bind();
@@ -57,7 +57,7 @@ void VAO::SetEBO(const EBO& inEBO)
     inEBO.Bind();
 }
 
-void VAO::AddVertexAttrib(GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
     EXPECTS(IsBound());
     EXPECTS(inVertexAttrib.mNumComponents > 0);
@@ -70,7 +70,7 @@ void VAO::AddVertexAttrib(GL::Id inAttribLocation, const VAOVertexAttrib& inVert
         reinterpret_cast<const void*>(inVertexAttrib.mOffset)));
 }
 
-void VAO::RemoveVertexAttrib(GL::Id inAttribLocation)
+void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)
 {
     EXPECTS(IsBound());
     EXPECTS(inAttribLocation > 0);

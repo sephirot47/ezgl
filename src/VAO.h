@@ -26,11 +26,11 @@ public:
     bool IsBound() const;
     static GL::Id GetBoundGLId();
 
-    void AddVBO(const VBO& inVBO, GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
+    void AddVBO(const VBO& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
     void SetEBO(const EBO& inEBO);
 
-    void AddVertexAttrib(GL::Id inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
-    void RemoveVertexAttrib(GL::Id inAttributeLocation);
+    void AddVertexAttrib(const GL::Id inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
+    void RemoveVertexAttrib(const GL::Id inAttributeLocation);
 
     GL::Id GetGLId() const { return mGLId; }
 
