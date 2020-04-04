@@ -8,7 +8,8 @@ namespace egl
 EBO::EBO()
     : mGLId(GL::CreateBuffer())
 {
-    ENSURES(mGLId > 0);
+    if (mGLId == 0)
+        THROW_EXCEPTION("Error creating EBO");
 }
 
 EBO::~EBO()

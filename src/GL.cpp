@@ -86,6 +86,146 @@ void GL::DeleteShader(const GL::Id inShaderId)
     GL_SAFE_CALL(glDeleteShader(inShaderId));
 }
 
+GL::Id GL::CreateProgram()
+{
+    return GL_SAFE_CALL_RET(glCreateProgram());
+}
+
+void GL::UseProgram(const GL::Id inShaderProgramId)
+{
+    GL_SAFE_CALL(glUseProgram(inShaderProgramId));
+}
+
+void GL::AttachShader(const GL::Id inShaderProgramId, const GL::Id inShaderId)
+{
+    GL_SAFE_CALL(glAttachShader(inShaderProgramId, inShaderId));
+}
+
+void GL::LinkProgram(const GL::Id inShaderProgramId)
+{
+    GL_SAFE_CALL(glLinkProgram(inShaderProgramId));
+}
+
+GL::Id GL::GetAttribLocation(const GL::Id inShaderProgramId, const std::string_view inAttribName)
+{
+    return GL_SAFE_CALL_RET(glGetAttribLocation(inShaderProgramId, inAttribName.data()));
+}
+
+GL::Id GL::GetUniformLocation(const GL::Id inShaderProgramId, const std::string_view inUniformName)
+{
+    return GL_SAFE_CALL_RET(glGetUniformLocation(inShaderProgramId, inUniformName.data()));
+}
+
+void GL::DeleteProgram(const GL::Id inShaderProgramId)
+{
+    GL_SAFE_CALL(glDeleteProgram(inShaderProgramId));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, bool inValue)
+{
+    GL::Uniform(inUniformLocation, static_cast<int32_t>(inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, int8_t inValue)
+{
+    GL::Uniform(inUniformLocation, static_cast<int32_t>(inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, int16_t inValue)
+{
+    GL::Uniform(inUniformLocation, static_cast<int32_t>(inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, int32_t inValue)
+{
+    GL_SAFE_CALL(glUniform1i(inUniformLocation, inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, float inValue)
+{
+    GL_SAFE_CALL(glUniform1f(inUniformLocation, inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, double inValue)
+{
+    GL_SAFE_CALL(glUniform1d(inUniformLocation, inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec2i& inValue)
+{
+    GL_SAFE_CALL(glUniform2i(inUniformLocation, inValue[0], inValue[1]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec2f& inValue)
+{
+    GL_SAFE_CALL(glUniform2f(inUniformLocation, inValue[0], inValue[1]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec2d& inValue)
+{
+    GL_SAFE_CALL(glUniform2d(inUniformLocation, inValue[0], inValue[1]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec3i& inValue)
+{
+    GL_SAFE_CALL(glUniform3i(inUniformLocation, inValue[0], inValue[1], inValue[2]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec3f& inValue)
+{
+    GL_SAFE_CALL(glUniform3f(inUniformLocation, inValue[0], inValue[1], inValue[2]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec3d& inValue)
+{
+    GL_SAFE_CALL(glUniform3d(inUniformLocation, inValue[0], inValue[1], inValue[2]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec4i& inValue)
+{
+    GL_SAFE_CALL(glUniform4i(inUniformLocation, inValue[0], inValue[1], inValue[2], inValue[3]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec4f& inValue)
+{
+    GL_SAFE_CALL(glUniform4f(inUniformLocation, inValue[0], inValue[1], inValue[2], inValue[3]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Vec4d& inValue)
+{
+    GL_SAFE_CALL(glUniform4d(inUniformLocation, inValue[0], inValue[1], inValue[2], inValue[3]));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat2f& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix2fv(inUniformLocation, 1, true, inValue.Data()));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat2d& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix2dv(inUniformLocation, 1, true, inValue.Data()));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat3f& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix3fv(inUniformLocation, 1, true, inValue.Data()));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat3d& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix3dv(inUniformLocation, 1, true, inValue.Data()));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat4f& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix4fv(inUniformLocation, 1, true, inValue.Data()));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, const Mat4d& inValue)
+{
+    GL_SAFE_CALL(glUniformMatrix4dv(inUniformLocation, 1, true, inValue.Data()));
+}
+
 GL::EError GL::CheckError()
 {
     return static_cast<GL::EError>(glGetError());

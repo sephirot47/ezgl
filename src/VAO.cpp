@@ -13,7 +13,8 @@ namespace egl
 VAO::VAO()
 {
     GL_SAFE_CALL(glGenVertexArrays(1, &mGLId));
-    ENSURES(mGLId > 0);
+    if (mGLId == 0)
+        THROW_EXCEPTION("Error creating VAO");
 }
 
 VAO::~VAO()

@@ -8,7 +8,8 @@ namespace egl
 VBO::VBO()
     : mGLId(GL::CreateBuffer())
 {
-    ENSURES(mGLId > 0);
+    if (mGLId == 0)
+        THROW_EXCEPTION("Error creating VBO");
 }
 
 VBO::~VBO()

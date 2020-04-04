@@ -9,7 +9,9 @@
 #include "Color.h"
 #include "Flags.h"
 #include "Macros.h"
+#include "Mat.h"
 #include "Span.h"
+#include "Vec.h"
 
 namespace egl
 {
@@ -125,6 +127,11 @@ public:
         INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH
     };
 
+    enum class EShaderProgramEnum
+    {
+        CURRENT_PROGRAM = GL_CURRENT_PROGRAM
+    };
+
     static GL::Id GenBuffer();
     static GL::Id CreateBuffer();
     static void BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId);
@@ -143,6 +150,35 @@ public:
     static GL::Int GetShaderInteger(const GL::Id inShaderId, const GL::EShaderInfo inShaderInfoEnum);
     static std::string GetShaderInfoLog(const GL::Id inShaderId);
     static void DeleteShader(const GL::Id inShaderId);
+
+    static GL::Id CreateProgram();
+    static void UseProgram(const GL::Id inShaderProgramId);
+    static void AttachShader(const GL::Id inShaderProgramId, const GL::Id inShaderId);
+    static void LinkProgram(const GL::Id inShaderProgramId);
+    static GL::Id GetAttribLocation(const GL::Id inShaderProgramId, const std::string_view inAttribName);
+    static GL::Id GetUniformLocation(const GL::Id inShaderProgramId, const std::string_view inUniformName);
+    static void Uniform(const GL::Id inUniformLocation, bool inValue);
+    static void Uniform(const GL::Id inUniformLocation, int8_t inValue);
+    static void Uniform(const GL::Id inUniformLocation, int16_t inValue);
+    static void Uniform(const GL::Id inUniformLocation, int32_t inValue);
+    static void Uniform(const GL::Id inUniformLocation, float inValue);
+    static void Uniform(const GL::Id inUniformLocation, double inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec2i& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec2f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec2d& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec3i& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec3f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec3d& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec4i& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec4f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Vec4d& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat2f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat2d& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat3f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat3d& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat4f& inValue);
+    static void Uniform(const GL::Id inUniformLocation, const Mat4d& inValue);
+    static void DeleteProgram(const GL::Id inShaderProgramId);
 
     template <typename T>
     static GL::Int GetInteger(const T& inGLEnum);

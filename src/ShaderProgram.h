@@ -11,7 +11,6 @@
 
 namespace egl
 {
-
 class ShaderProgram
 {
 public:
@@ -27,37 +26,19 @@ public:
     bool IsBound() const;
     static GL::Id GetBoundGLId();
 
-    std::optional<GL::Id> GetAttribLocation(std::string_view inName) const;
-    std::optional<GL::Id> GetUniformLocation(std::string_view inName) const;
-    GL::Id GetGLId() const { return mGLId; }
-
-    void SetUniform(std::string_view inName, bool inValue);
-    void SetUniform(std::string_view inName, int8_t inValue);
-    void SetUniform(std::string_view inName, int16_t inValue);
-    void SetUniform(std::string_view inName, int32_t inValue);
-    void SetUniform(std::string_view inName, float inValue);
-    void SetUniform(std::string_view inName, double inValue);
-    void SetUniform(std::string_view inName, const Vec2i& inValue);
-    void SetUniform(std::string_view inName, const Vec2f& inValue);
-    void SetUniform(std::string_view inName, const Vec2d& inValue);
-    void SetUniform(std::string_view inName, const Vec3i& inValue);
-    void SetUniform(std::string_view inName, const Vec3f& inValue);
-    void SetUniform(std::string_view inName, const Vec3d& inValue);
-    void SetUniform(std::string_view inName, const Vec4i& inValue);
-    void SetUniform(std::string_view inName, const Vec4f& inValue);
-    void SetUniform(std::string_view inName, const Vec4d& inValue);
-    void SetUniform(std::string_view inName, const Mat2f& inValue);
-    void SetUniform(std::string_view inName, const Mat2d& inValue);
-    void SetUniform(std::string_view inName, const Mat3f& inValue);
-    void SetUniform(std::string_view inName, const Mat3d& inValue);
-    void SetUniform(std::string_view inName, const Mat4f& inValue);
-    void SetUniform(std::string_view inName, const Mat4d& inValue);
+    std::optional<GL::Id> GetAttribLocation(const std::string_view inAttribName) const;
+    std::optional<GL::Id> GetUniformLocation(const std::string_view inUniformName) const;
+    GL::Id GetGLId() const;
 
     template <typename T>
-    void SetUniform(const T& inValue) = delete;
+    void SetUniform(const GL::Id inUniformLocation, const T& inValue);
+    template <typename T>
+    void SetUniform(const std::string_view inName, const T& inValue);
 
 private:
     GL::Id mGLId = 0;
+
+    GL::Id GetUniformLocationWithException(const ShaderProgram& inShaderProgram, const std::string_view inName);
 };
 }
 
