@@ -91,7 +91,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator+(const Mat<T, NRow
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] + inRHS[r][c];
+            result[r][c] = (*this)[r][c] + inRHS[r][c];
         }
     }
     return result;
@@ -117,7 +117,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-(const Mat<T, NRow
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] - inRHS[r][c];
+            result[r][c] = (*this)[r][c] - inRHS[r][c];
         }
     }
     return result;
@@ -130,7 +130,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator+(const T& inRHS) c
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] + inRHS;
+            result[r][c] = (*this)[r][c] + inRHS;
         }
     }
     return result;
@@ -144,7 +144,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-(const T& inRHS) c
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] - inRHS;
+            result[r][c] = (*this)[r][c] - inRHS;
         }
     }
     return result;
@@ -158,7 +158,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator*(const T& inRHS) c
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] * inRHS;
+            result[r][c] = (*this)[r][c] * inRHS;
         }
     }
     return result;
@@ -172,7 +172,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator/(const T& inRHS) c
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = *this[r][c] / inRHS;
+            result[r][c] = (*this)[r][c] / inRHS;
         }
     }
     return result;
@@ -210,7 +210,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-() const
     {
         for (std::size_t c = 0; c < NCols; ++c)
         {
-            result[r][c] = -(*this[r][c]);
+            result[r][c] = -((*this)[r][c]);
         }
     }
     return result;

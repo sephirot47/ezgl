@@ -46,20 +46,16 @@ public:
     static constexpr T Dot(const Vec& inLHS, const Vec& inRHS);
     static constexpr Vec Cross(const Vec& inLHS, const Vec& inRHS); // Only for Vec3
 
-    static constexpr Vec Zero();
-    static constexpr Vec One();
-    static constexpr Vec All(const T& inAllValue);
-
     T* Data();
     const T* Data() const;
 
     // Iterators
-    constexpr std::array<T, N>::iterator begin();
-    constexpr std::array<T, N>::iterator end();
-    constexpr std::array<T, N>::const_iterator begin() const;
-    constexpr std::array<T, N>::const_iterator end() const;
-    constexpr std::array<T, N>::const_iterator cbegin() const;
-    constexpr std::array<T, N>::const_iterator cend() const;
+    constexpr typename std::array<T, N>::iterator begin();
+    constexpr typename std::array<T, N>::iterator end();
+    constexpr typename std::array<T, N>::const_iterator begin() const;
+    constexpr typename std::array<T, N>::const_iterator end() const;
+    constexpr typename std::array<T, N>::const_iterator cbegin() const;
+    constexpr typename std::array<T, N>::const_iterator cend() const;
 
     // Operators
     constexpr T& operator[](std::size_t i);
@@ -85,7 +81,6 @@ public:
 protected:
     std::array<T, N> mComponents;
 };
-//
 
 template <typename T, std::size_t N>
 inline std::ostream& operator<<(std::ostream& inLHS, const Vec<T, N>& inRHS);
@@ -113,6 +108,22 @@ using Vec4i = Vec4<int32_t>;
 using Vec4u = Vec4<uint32_t>;
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
+
+template <typename T>
+struct IsVec
+{
+    static constexpr bool value = false;
+};
+
+template <typename T, std::size_t N>
+struct IsVec<Vec<T, N>>
+{
+    static constexpr bool value = true;
+};
+
+template <typename T>
+constexpr bool IsVec_v = IsVec<T>::value;
+
 }
 
 #include "Vec.tcc"

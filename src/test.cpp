@@ -52,6 +52,9 @@ int main()
     // Specify the layout of the vertex data
     const auto pos_attrib = shader_program.GetAttribLocation("position");
 
+    constexpr auto test = Vec4f(-2, 5, -99, -1);
+    constexpr auto test_abs = Abs(test);
+
     VAO vao;
     vao.Bind();
     vao.AddVBO(vertices_vbo, *pos_attrib, VAOVertexAttribT<Vec3f>());

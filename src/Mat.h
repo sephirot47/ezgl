@@ -81,6 +81,22 @@ using Mat4 = Mat<T, 4, 4>;
 using Mat4f = Mat4<float>;
 using Mat4d = Mat4<double>;
 using Mat4i = Mat4<int32_t>;
+
+template <typename T>
+struct IsMat
+{
+    static constexpr bool value = false;
+};
+
+template <typename T, std::size_t N>
+struct IsMat<Mat<T, N, N>>
+{
+    static constexpr bool value = true;
+};
+
+template <typename T>
+inline constexpr bool IsMat_v = IsMat<T>::value;
+
 }
 
 #include "Mat.tcc"

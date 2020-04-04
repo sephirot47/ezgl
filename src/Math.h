@@ -5,28 +5,67 @@
 
 #include "Quat.h"
 #include "Mat.h"
+#include "TypeTraits.h"
 #include "Vec.h"
 
 namespace egl
 {
 
-template <typename T = float>
-constexpr Vec3<T> Right() { return { static_cast<T>(1), static_cast<T>(0), static_cast<T>(0) }; }
-template <typename T = float>
-constexpr Vec3<T> Left() { return { static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0) }; }
-template <typename T = float>
-constexpr Vec3<T> Up() { return { static_cast<T>(0), static_cast<T>(1), static_cast<T>(0) }; }
-template <typename T = float>
-constexpr Vec3<T> Down() { return { static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0) }; }
-template <typename T = float>
-constexpr Vec3<T> Forward() { return { static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1) }; }
-template <typename T = float>
-constexpr Vec3<T> Back() { return { static_cast<T>(0), static_cast<T>(0), static_cast<T>(1) }; }
+template <typename TVec>
+constexpr TVec Right()
+{
+    static_assert(TVec::NumComponents >= 1);
+    TVec result { static_cast<typename TVec::ValueType>(0) };
+    result[0] = static_cast<typename TVec::ValueType>(1);
+    return result;
+}
+template <typename TVec>
+constexpr TVec Left() { return -Right<TVec>(); }
+
+template <typename TVec>
+constexpr TVec Up()
+{
+    static_assert(TVec::NumComponents >= 2);
+    TVec result { static_cast<typename TVec::ValueType>(0) };
+    result[1] = static_cast<typename TVec::ValueType>(1);
+    return result;
+}
+template <typename TVec>
+constexpr TVec Down() { return -Up<TVec>(); }
+
+template <typename TVec>
+constexpr TVec Forward()
+{
+    static_assert(TVec::NumComponents >= 3);
+    TVec result { static_cast<typename TVec::ValueType>(0) };
+    result[2] = static_cast<typename TVec::ValueType>(1);
+    return result;
+}
+template <typename TVec>
+constexpr TVec Back() { return -Forward<TVec>(); }
+
+template <typename TVecOrMat>
+constexpr TVecOrMat All(const typename TVecOrMat::ValueType& inAllValue) { return TVecOrMat(inAllValue); }
+template <typename TVecOrMat>
+constexpr TVecOrMat Zero() { return All<TVecOrMat>(0); }
+template <typename TVecOrMat>
+constexpr TVecOrMat One() { return All<TVecOrMat>(1); }
 
 template <typename T>
-constexpr T Abs(const T& inValue)
+constexpr std::enable_if_t<IsNumber_v<T>, T> Abs(const T& inValue)
 {
     return std::abs(inValue);
+}
+
+template <typename TVecOrMat>
+constexpr std::enable_if_t<IsVecOrMat_v<TVecOrMat>, TVecOrMat> Abs(const TVecOrMat& inVecOrMat)
+{
+    auto result = inVecOrMat;
+    for (auto& v : result)
+    {
+        v = Abs(v);
+    }
+    return result;
 }
 
 template <typename T>

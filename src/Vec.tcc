@@ -76,24 +76,6 @@ constexpr Vec<T, N> Vec<T, N>::Cross(const Vec& inLHS, const Vec& inRHS)
 }
 
 template <typename T, std::size_t N>
-constexpr Vec<T, N> Vec<T, N>::Zero()
-{
-    return All(0);
-}
-
-template <typename T, std::size_t N>
-constexpr Vec<T, N> Vec<T, N>::One()
-{
-    return All(1);
-}
-
-template <typename T, std::size_t N>
-constexpr Vec<T, N> Vec<T, N>::All(const T& inAllValue)
-{
-    return Vec(inAllValue);
-}
-
-template <typename T, std::size_t N>
 T* Vec<T, N>::Data()
 {
     return &mComponents[0];
@@ -106,36 +88,36 @@ const T* Vec<T, N>::Data() const
 }
 
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::iterator Vec<T, N>::begin()
+constexpr typename std::array<T, N>::iterator Vec<T, N>::begin()
 {
     return std::begin(mComponents);
 }
 
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::iterator Vec<T, N>::end()
+constexpr typename std::array<T, N>::iterator Vec<T, N>::end()
 {
     return std::end(mComponents);
 }
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::const_iterator Vec<T, N>::begin() const
+constexpr typename std::array<T, N>::const_iterator Vec<T, N>::begin() const
 {
     return std::begin(mComponents);
 }
 
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::const_iterator Vec<T, N>::end() const
+constexpr typename std::array<T, N>::const_iterator Vec<T, N>::end() const
 {
     return std::end(mComponents);
 }
 
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::const_iterator Vec<T, N>::cbegin() const
+constexpr typename std::array<T, N>::const_iterator Vec<T, N>::cbegin() const
 {
     return std::cbegin(mComponents);
 }
 
 template <typename T, std::size_t N>
-constexpr std::array<T, N>::const_iterator Vec<T, N>::cend() const
+constexpr typename std::array<T, N>::const_iterator Vec<T, N>::cend() const
 {
     return std::cend(mComponents);
 }
