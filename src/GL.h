@@ -44,11 +44,13 @@ public:
 
     enum class EBufferType
     {
+        ARRAY_BUFFER = GL_ARRAY_BUFFER,
         ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER
     };
 
     enum class EBufferBindingType
     {
+        ARRAY_BUFFER = GL_ARRAY_BUFFER_BINDING,
         ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER_BINDING
     };
 

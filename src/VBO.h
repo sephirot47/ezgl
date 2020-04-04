@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "GL.h"
+#include "Span.h"
 
 namespace egl
 {
@@ -13,7 +14,7 @@ public:
     VBO();
 
     template <typename T>
-    VBO(const T* inData, std::size_t inSize);
+    VBO(const Span<T>& inData);
 
     VBO(const VBO& inRHS) = delete;
     VBO& operator=(const VBO& inRHS) = delete;
@@ -27,7 +28,7 @@ public:
     static GL::Id GetBoundGLId();
 
     template <typename T>
-    void BufferData(const T* inData, std::size_t inSize);
+    void BufferData(const Span<T>& inData);
 
     GL::Id GetGLId() const { return mGLId; }
 

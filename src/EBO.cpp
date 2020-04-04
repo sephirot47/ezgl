@@ -8,6 +8,7 @@ namespace egl
 EBO::EBO()
     : mGLId(GL::CreateBuffer())
 {
+    ENSURES(mGLId > 0);
 }
 
 EBO::~EBO()

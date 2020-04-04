@@ -38,7 +38,7 @@ int main()
         Vec3f { 0.5f, -0.5f, 0.0f },
         Vec3f { -0.5f, -0.5f, 0.0f }
     };
-    const VBO vertices_vbo { vertices.data(), sizeof(vertices) };
+    const VBO vertices_vbo { MakeSpan(vertices) };
 
     // Create an element array
     constexpr std::array<GL::Uint, 6> elements { 0, 1, 2, 2, 3, 0 };

@@ -6,24 +6,24 @@
 namespace egl
 {
 VBO::VBO()
+    : mGLId(GL::CreateBuffer())
 {
-    GL_SAFE_CALL(glGenBuffers(1, &mGLId));
     ENSURES(mGLId > 0);
 }
 
 VBO::~VBO()
 {
-    glDeleteBuffers(1, &mGLId);
+    GL::DeleteBuffer(mGLId);
 }
 
 void VBO::Bind() const
 {
-    GL_SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, mGLId));
+    GL_SAFE_CALL(GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, mGLId));
 }
 
 void VBO::UnBind() const
 {
-    GL_SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GL_SAFE_CALL(GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, 0));
 }
 
 bool VBO::IsBound() const
@@ -34,8 +34,7 @@ bool VBO::IsBound() const
 
 GL::Id VBO::GetBoundGLId()
 {
-    GLint bound_id = 0;
-    GL_SAFE_CALL(glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &bound_id));
+    const auto bound_id = GL::GetInteger(GL::EBufferBindingType::ARRAY_BUFFER);
     return static_cast<GL::Id>(bound_id);
 }
 
