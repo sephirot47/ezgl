@@ -3,6 +3,9 @@
 #include <array>
 #include <ostream>
 
+#include "Vec.h"
+#include "Mat.h"
+
 namespace egl
 {
 

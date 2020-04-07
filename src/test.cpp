@@ -7,11 +7,13 @@
 #include <thread>
 
 #include "Macros.h"
+#include "Mesh.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "EBO.h"
 #include "Math.h"
 #include "Span.h"
+#include "StreamOperators.h"
 #include "VAO.h"
 #include "VAOVertexAttrib.h"
 #include "VariadicRepeat.h"
@@ -52,8 +54,46 @@ int main()
     // Specify the layout of the vertex data
     const auto pos_attrib = shader_program.GetAttribLocation("position");
 
-    constexpr auto test = Vec4f(-2, 5, -99, -1);
-    constexpr auto test_abs = Abs(test);
+    Mesh test_mesh;
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddVertex({});
+    test_mesh.AddFace(0, 3, 1);
+    test_mesh.AddFace(0, 4, 3);
+    test_mesh.AddFace(0, 5, 4);
+    test_mesh.AddFace(0, 6, 5);
+    test_mesh.AddFace(0, 1, 6);
+    test_mesh.AddFace(1, 7, 6);
+    test_mesh.AddFace(1, 8, 2);
+    test_mesh.AddFace(3, 8, 1);
+    test_mesh.AddFace(3, 10, 8);
+    test_mesh.AddFace(3, 9, 10);
+    test_mesh.AddFace(3, 4, 9);
+    PEEK(test_mesh.GetCornersData());
+
+    for (int vertex_id = 0; vertex_id < test_mesh.GetNumberOfVertices(); ++vertex_id)
+    {
+        PEEK(vertex_id);
+        for (auto vertex_corners_it = test_mesh.GetVertexIncidentCornerIdsCirculatorBegin(vertex_id);
+             vertex_corners_it.IsValid();
+             ++vertex_corners_it)
+        {
+            const auto corner_id = *vertex_corners_it;
+            PEEK(corner_id);
+        }
+        PRINT("-");
+    }
+
+    /*
+*/
 
     VAO vao;
     vao.Bind();
