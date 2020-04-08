@@ -13,13 +13,7 @@ std::ostream& operator<<(std::ostream& ioLHS, const Mesh::Edge& inRHS)
 
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::VertexData& inRHS)
 {
-    ioLHS << "VertexData<FaceId: " << inRHS.mIncidentFaceId << ", Position: " << inRHS.mPosition << ", Normal: " << inRHS.mNormal << ">";
-    return ioLHS;
-}
-
-std::ostream& operator<<(std::ostream& ioLHS, const Mesh::CornerData& inRHS)
-{
-    ioLHS << "CornerData<VertexId: " << inRHS.mVertexId << ", FaceId: " << inRHS.mFaceId << ", OppositeCornerId: " << inRHS.mOppositeCornerId << ">";
+    ioLHS << "VertexData<NeighborFacesIds: " << inRHS.mNeighborFacesId << ", Position: " << inRHS.mPosition << ", Normal: " << inRHS.mNormal << ">";
     return ioLHS;
 }
 }

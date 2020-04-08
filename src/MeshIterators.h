@@ -7,39 +7,32 @@ class MeshCirculatorBase
 {
 public:
     using MeshId = typename TMesh::Id;
-    static constexpr auto MeshInvalidId = TMesh::InvalidId;
-
-    MeshCirculatorBase(const TMesh& inMesh, const MeshId inStartId)
-        : mMesh(inMesh)
-        , mBeginId(*TMeshCirculatorImplementation::GetFirstId(mMesh, inStartId))
-        , mCurrentId(mBeginId)
+    MeshCirculatorBase(const TMesh& inMesh, const MeshId inCirculatorId)
+        : mImpl(inMesh, inCirculatorId)
     {
     }
 
     void operator++()
     {
-        EXPECTS(TMesh::IsValid(mCurrentId));
-        mCurrentId = TMeshCirculatorImplementation::Incremented(mMesh, *mCurrentId);
-        ++mStepCounter;
+        EXPECTS(IsValid());
+        TMeshCirculatorImplementation::Increment(mImpl);
     }
 
     void operator--()
     {
-        EXPECTS(TMesh::IsValid(mCurrentId));
-        mCurrentId = TMeshCirculatorImplementation::Decremented(mMesh, *mCurrentId);
-        --mStepCounter;
+        EXPECTS(IsValid());
+        TMeshCirculatorImplementation::Decrement(mImpl);
     }
 
     MeshId operator*() const
     {
-        EXPECTS(TMesh::IsValid(mCurrentId));
-        return *mCurrentId;
+        EXPECTS(IsValid());
+        return *(mImpl.Get());
     }
 
     bool operator==(const MeshCirculatorBase& inRHS) const
     {
-        const bool both_are_invalid = (!IsValid() && !inRHS.IsValid());
-        return (mCurrentId == inRHS.mCurrentId) || both_are_invalid;
+        return (mImpl.Get() == inRHS.mImpl.Get());
     }
 
     bool operator!=(const MeshCirculatorBase& inRHS) const
@@ -49,36 +42,50 @@ public:
 
     bool IsValid() const
     {
-        const bool is_invalid = !TMesh::IsValid(mCurrentId) || (mCurrentId == mBeginId && mStepCounter != 0);
-        return !is_invalid;
+        return TMesh::IsValid(mImpl.Get());
     }
 
 private:
-    const TMesh& mMesh;
-    int mStepCounter = 0;
-    const MeshId mBeginId = MeshInvalidId;
-    std::optional<MeshId> mCurrentId = MeshInvalidId;
+    TMeshCirculatorImplementation mImpl;
 };
 
 template <typename TMesh>
-struct MeshCirculatorVertexIncidentCornerIdsImplementation
+struct MeshCirculatorVertexNeighborFaceIdsImplementation
 {
-    static std::optional<typename TMesh::Id> GetFirstId(const TMesh& inMesh, const typename TMesh::Id inBeginVertexId)
+    using MeshId = typename TMesh::Id;
+
+    const TMesh& mMesh;
+    const MeshId mVertexId = TMesh::InvalidId;
+    MeshId mCurrentNeighborFaceId = 0;
+
+    MeshCirculatorVertexNeighborFaceIdsImplementation(const TMesh& inMesh, const MeshId inVertexId)
+        : mMesh(inMesh)
+        , mVertexId(inVertexId)
     {
-        return inMesh.GetCornerIdFromFaceIdAndVertexId(inMesh.GetFaceIdFromVertexId(inBeginVertexId), inBeginVertexId);
     }
 
-    static std::optional<typename TMesh::Id> Incremented(const TMesh& inMesh, const typename TMesh::Id inCurrentCornerId)
+    static void Increment(MeshCirculatorVertexNeighborFaceIdsImplementation& ioCirculator)
     {
-        return inMesh.GetNextIncidentCornerId(inCurrentCornerId);
+        ++ioCirculator.mCurrentNeighborFaceId;
     }
 
-    static std::optional<typename TMesh::Id> Decremented(const TMesh& inMesh, const typename TMesh::Id inCurrentCornerId)
+    static void Decrement(MeshCirculatorVertexNeighborFaceIdsImplementation& ioCirculator)
     {
-        return inMesh.GetPreviousIncidentCornerId(inCurrentCornerId);
+        --ioCirculator.mCurrentNeighborFaceId;
+    }
+
+    std::optional<typename TMesh::Id> Get() const
+    {
+        if (!TMesh::IsValid(mVertexId))
+            return std::nullopt;
+
+        const auto& vertex_neighbor_faces_ids = mMesh.GetVerticesData().at(mVertexId).mNeighborFacesId;
+        if (mCurrentNeighborFaceId >= vertex_neighbor_faces_ids.size())
+            return std::nullopt;
+        return std::make_optional(vertex_neighbor_faces_ids.at(mCurrentNeighborFaceId));
     }
 };
 
 template <typename TMesh>
-using MeshCirculatorVertexIncidentCornerIds = MeshCirculatorBase<TMesh, MeshCirculatorVertexIncidentCornerIdsImplementation<TMesh>>;
+using MeshCirculatorVertexNeighborFaceIds = MeshCirculatorBase<TMesh, MeshCirculatorVertexNeighborFaceIdsImplementation<TMesh>>;
 }

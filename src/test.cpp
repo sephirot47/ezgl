@@ -77,23 +77,17 @@ int main()
     test_mesh.AddFace(3, 10, 8);
     test_mesh.AddFace(3, 9, 10);
     test_mesh.AddFace(3, 4, 9);
-    PEEK(test_mesh.GetCornersData());
+    PEEK(test_mesh.GetVerticesData());
 
     for (int vertex_id = 0; vertex_id < test_mesh.GetNumberOfVertices(); ++vertex_id)
     {
         PEEK(vertex_id);
-        for (auto vertex_corners_it = test_mesh.GetVertexIncidentCornerIdsCirculatorBegin(vertex_id);
-             vertex_corners_it.IsValid();
-             ++vertex_corners_it)
+        for (auto neighbor_face_id : test_mesh.AllVertexNeighborFaceIds(vertex_id))
         {
-            const auto corner_id = *vertex_corners_it;
-            PEEK(corner_id);
+            PEEK(neighbor_face_id);
         }
         PRINT("-");
     }
-
-    /*
-*/
 
     VAO vao;
     vao.Bind();

@@ -16,10 +16,7 @@ namespace egl
 template <typename TFirst, typename TSecond>
 std::ostream& operator<<(std::ostream& ioLHS, const std::pair<TFirst, TSecond>& inRHS)
 {
-    ioLHS << "<";
-    for (auto it = inRHS.cbegin(); it != inRHS.cend(); ++it)
-        ioLHS << (*it) << (it == inRHS.cend() ? "" : ", ");
-    ioLHS << ">";
+    ioLHS << "<" << inRHS.first << ", " << inRHS.second << ">";
     return ioLHS;
 }
 
@@ -97,5 +94,4 @@ std::ostream& operator<<(std::ostream& ioLHS, const std::optional<T>& inRHS)
 
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::Edge& inRHS);
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::VertexData& inRHS);
-std::ostream& operator<<(std::ostream& ioLHS, const Mesh::CornerData& inRHS);
 }
