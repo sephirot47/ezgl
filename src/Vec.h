@@ -15,7 +15,7 @@ template <typename T, std::size_t N>
 class Vec
 {
 public:
-    static_assert(N >= 2);
+    static_assert(N >= 1);
 
     using ValueType = T;
     static constexpr auto NumComponents = N;
@@ -35,17 +35,6 @@ public:
 
     ~Vec() = default;
 
-    constexpr T Length() const;
-    constexpr T SqLength() const;
-    [[nodiscard]] constexpr Vec Normalized() const;
-    void Normalize();
-
-    static constexpr T Normalized(const Vec& inRHS);
-    static constexpr T SqDistance(const Vec& inLHS, const Vec& inRHS);
-    static constexpr T Distance(const Vec& inLHS, const Vec& inRHS);
-    static constexpr T Dot(const Vec& inLHS, const Vec& inRHS);
-    static constexpr Vec Cross(const Vec& inLHS, const Vec& inRHS); // Only for Vec3
-
     T* Data();
     const T* Data() const;
 
@@ -58,6 +47,8 @@ public:
     constexpr typename std::array<T, N>::const_iterator cend() const;
 
     // Operators
+    constexpr bool operator==(const Vec& inRHS) const;
+    constexpr bool operator!=(const Vec& inRHS) const;
     constexpr T& operator[](std::size_t i);
     constexpr const T& operator[](std::size_t i) const;
     constexpr Vec<T, N> operator+(const Vec& inRHS) const;

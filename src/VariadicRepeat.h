@@ -18,5 +18,8 @@ constexpr std::array<T, N> _GetArrayWithRepeatedValueRec(const T& inValue, TArgs
 template <typename T, std::size_t N>
 constexpr std::array<T, N> GetArrayWithRepeatedValue(const T& inValue)
 {
-    return _GetArrayWithRepeatedValueRec<T, N, 2>(inValue, inValue);
+    if constexpr (N == 1)
+        return std::array<T, N> { inValue };
+    else
+        return _GetArrayWithRepeatedValueRec<T, N, 2>(inValue, inValue);
 }

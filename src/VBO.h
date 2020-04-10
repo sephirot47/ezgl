@@ -18,8 +18,8 @@ public:
 
     VBO(const VBO& inRHS) = delete;
     VBO& operator=(const VBO& inRHS) = delete;
-    VBO(VBO&& inRHS) = default;
-    VBO& operator=(VBO&& inRHS) = default;
+    VBO(VBO&& ioRHS) noexcept;
+    VBO& operator=(VBO&& ioRHS) noexcept;
     ~VBO();
 
     void Bind() const;

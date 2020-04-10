@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+#include <memory>
 
 #include "GL.h"
 
@@ -17,8 +19,8 @@ public:
     VAO();
     VAO(const VAO& inRHS) = delete;
     VAO& operator=(const VAO& inRHS) = delete;
-    VAO(VAO&& inRHS) = default;
-    VAO& operator=(VAO&& inRHS) = default;
+    VAO(VAO&& ioRHS) noexcept;
+    VAO& operator=(VAO&& ioRHS) noexcept;
     ~VAO();
 
     void Bind() const;
@@ -26,16 +28,20 @@ public:
     bool IsBound() const;
     static GL::Id GetBoundGLId();
 
-    void AddVBO(const VBO& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
-    void SetEBO(const EBO& inEBO);
+    void AddVBO(const std::shared_ptr<VBO>& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
+    void SetEBO(const std::shared_ptr<EBO>& inEBO);
 
     void AddVertexAttrib(const GL::Id inAttributeLocation, const VAOVertexAttrib& inVertexAttrib);
     void RemoveVertexAttrib(const GL::Id inAttributeLocation);
 
-    GL::Id GetGLId() const { return mGLId; }
+    const std::vector<std::shared_ptr<EBO>>& GetEBOs() const;
+    const std::vector<std::shared_ptr<VBO>>& GetVBOs() const;
+    GL::Id GetGLId() const;
 
 private:
     GL::Id mGLId = 0;
+    std::vector<std::shared_ptr<EBO>> mEBOs;
+    std::vector<std::shared_ptr<VBO>> mVBOs;
 };
 }
 

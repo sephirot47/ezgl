@@ -12,19 +12,35 @@ VBO::VBO()
         THROW_EXCEPTION("Error creating VBO");
 }
 
+VBO::VBO(VBO&& ioRHS) noexcept
+{
+    *this = std::move(ioRHS);
+}
+
+VBO& VBO::operator=(VBO&& ioRHS) noexcept
+{
+    if (this == &ioRHS)
+        return *this;
+
+    mGLId = ioRHS.mGLId;
+    ioRHS.mGLId = 0;
+    return *this;
+}
+
 VBO::~VBO()
 {
-    GL::DeleteBuffer(mGLId);
+    if (mGLId != 0)
+        GL::DeleteBuffer(mGLId);
 }
 
 void VBO::Bind() const
 {
-    GL_SAFE_CALL(GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, mGLId));
+    GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, mGLId);
 }
 
 void VBO::UnBind() const
 {
-    GL_SAFE_CALL(GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, 0));
+    GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, 0);
 }
 
 bool VBO::IsBound() const

@@ -39,6 +39,8 @@ public:
     constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator cend() const;
 
     // Operators
+    constexpr bool operator==(const Mat& inRHS) const;
+    constexpr bool operator!=(const Mat& inRHS) const;
     constexpr Vec<T, NCols>& operator[](std::size_t inRow);
     constexpr const Vec<T, NCols>& operator[](std::size_t inRow) const;
     constexpr Mat<T, NRows, NCols> operator+(const Mat<T, NRows, NCols>& inRHS) const;
@@ -63,6 +65,9 @@ private:
 
 template <typename T, std::size_t NRows, std::size_t NCols>
 inline std::ostream& operator<<(std::ostream& inLHS, const Mat<T, NRows, NCols>& inRHS);
+
+template <typename T, std::size_t N>
+using SquareMat = Mat<T, N, N>;
 
 template <typename T>
 using Mat2 = Mat<T, 2, 2>;

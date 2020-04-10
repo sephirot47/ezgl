@@ -6,6 +6,8 @@
 #include <chrono>
 #include <thread>
 
+#include "Camera.h"
+#include "DrawableMesh.h"
 #include "Macros.h"
 #include "Mesh.h"
 #include "Shader.h"
@@ -34,78 +36,49 @@ int main()
 {
     Window window;
 
-    constexpr std::array vertices {
-        Vec3f { -0.5f, 0.5f, 0.0f },
-        Vec3f { 0.5f, 0.5f, 0.0f },
-        Vec3f { 0.5f, -0.5f, 0.0f },
-        Vec3f { -0.5f, -0.5f, 0.0f }
-    };
-    const VBO vertices_vbo { MakeSpan(vertices) };
-
-    // Create an element array
-    constexpr std::array<GL::Uint, 6> elements { 0, 1, 2, 2, 3, 0 };
-    const EBO ebo(MakeSpan(elements));
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     const VertexShader vertex_shader { GetFileContents("../res/default.vert") };
     const FragmentShader fragment_shader { GetFileContents("../res/default.frag") };
     ShaderProgram shader_program { vertex_shader, fragment_shader };
     shader_program.Bind();
 
-    // Specify the layout of the vertex data
-    const auto pos_attrib = shader_program.GetAttribLocation("position");
+    DrawableMesh test_mesh;
+    test_mesh.Read("test.obj");
+    test_mesh.ComputeNormals();
+    test_mesh.UpdateVAOs();
 
-    Mesh test_mesh;
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddVertex({});
-    test_mesh.AddFace(0, 3, 1);
-    test_mesh.AddFace(0, 4, 3);
-    test_mesh.AddFace(0, 5, 4);
-    test_mesh.AddFace(0, 6, 5);
-    test_mesh.AddFace(0, 1, 6);
-    test_mesh.AddFace(1, 7, 6);
-    test_mesh.AddFace(1, 8, 2);
-    test_mesh.AddFace(3, 8, 1);
-    test_mesh.AddFace(3, 10, 8);
-    test_mesh.AddFace(3, 9, 10);
-    test_mesh.AddFace(3, 4, 9);
-    PEEK(test_mesh.GetVerticesData());
+        Vec3f obj_pos = RandomUnit<Vec3f>() * 10.0f;
 
-    for (int vertex_id = 0; vertex_id < test_mesh.GetNumberOfVertices(); ++vertex_id)
+    Camera camera;
     {
-        PEEK(vertex_id);
-        for (auto neighbor_face_id : test_mesh.AllVertexNeighborFaceIds(vertex_id))
-        {
-            PEEK(neighbor_face_id);
-        }
-        PRINT("-");
+        camera.SetPosition(Vec3f(0.0f, 0.0f, 0.0f));
+        camera.LookAtPoint(obj_pos, Vec3f(0, 1, 0));
+
+        PerspectiveParameters perspective_params;
+        perspective_params.mZFar = 1000.0f;
+        camera.SetPerspectiveParameters(perspective_params);
     }
 
-    VAO vao;
-    vao.Bind();
-    vao.AddVBO(vertices_vbo, *pos_attrib, VAOVertexAttribT<Vec3f>());
-    vao.SetEBO(ebo);
-
-    double time = 0;
-    shader_program.SetUniform("Color", Color3f { 1.0f, 1.0f, 0.0f });
+    float time = 0.0f;
+    shader_program.SetUniform("UColor", Color3f { 1.0f, 1.0f, 1.0f });
     while (!window.ShouldClose())
     {
+        PEEK(obj_pos);
+
         // Clear the screen to black
         GL::ClearColor(Color4f { 0.0f, 0.0f, 0.0f, 1.0f });
         GL::ClearBuffer(GL::EBufferBitFlags::COLOR | GL::EBufferBitFlags::DEPTH);
 
-        const auto q = Quatf::AngleAxis(time * 3.14f, Normalized(Vec3f { 1.0f, 0.4f, 0.2f }));
-        const auto model_matrix = RotationMat4(q);
-        shader_program.SetUniform("Model", model_matrix);
-        GL::DrawElements(GL::EPrimitivesMode::TRIANGLES, 6, GL::EDataType::UNSIGNED_INT);
+        const auto q = AngleAxis(time * 3.14f * 0.1f, Normalized(Vec3f { 1.0f, 0.2f, -0.5f }));
+        const auto model_matrix = TranslationMat4(obj_pos) * RotationMat4(q);
+        const auto view_matrix = camera.GetViewMatrix();
+        const auto projection_matrix = camera.GetProjectionMatrix();
+        shader_program.SetUniform("UModel", model_matrix);
+        shader_program.SetUniform("UView", view_matrix);
+        shader_program.SetUniform("UProjection", projection_matrix);
+        test_mesh.Draw();
 
         window.SwapBuffers();
         window.PollEvents();

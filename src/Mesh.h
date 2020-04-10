@@ -2,6 +2,7 @@
 
 #include <array>
 #include <algorithm>
+#include <filesystem>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -17,7 +18,7 @@ namespace egl
 class Mesh
 {
 public:
-    using Id = std::size_t;
+    using Id = uint32_t;
     using FaceId = Mesh::Id;
     using VertexId = Mesh::Id;
     using InternalCornerId = int8_t; // [0, 2];
@@ -63,17 +64,14 @@ public:
     Mesh& operator=(const Mesh& inRHS) = default;
     Mesh(Mesh&& inRHS) = default;
     Mesh& operator=(Mesh&& inRHS) = default;
-    ~Mesh() = default;
+    virtual ~Mesh() = default;
 
-    void AddVertex(const Mesh::VertexData& inVertexData);
+    void AddVertex(const Vec3f& inPosition);
     void AddFace(const Mesh::VertexId& inFaceVertexId0, const Mesh::VertexId& inFaceVertexId1, const Mesh::VertexId& inFaceVertexId2);
     void ComputeNormals();
+    void Clear();
 
     void SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition);
-
-    CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
-    CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorEnd() const;
-    Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
 
     static bool IsValid(const Mesh::Id inId);
     static bool IsValid(const std::optional<Mesh::Id> inOptionalId);
@@ -81,6 +79,13 @@ public:
     const std::vector<Mesh::FaceData>& GetFacesData() const;
     std::size_t GetNumberOfFaces() const;
     std::size_t GetNumberOfVertices() const;
+
+    // Circulators
+    CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
+    CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorEnd() const;
+    Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
+
+    virtual void Read(const std::filesystem::path& inMeshPath);
 
 private:
     std::vector<Mesh::VertexData> mVerticesData;

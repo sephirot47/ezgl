@@ -2,79 +2,30 @@
 
 namespace egl
 {
-template <typename TMesh, typename TMeshCirculatorImplementation>
-class MeshCirculatorBase
+template <typename TMesh>
+class MeshCirculatorVertexNeighborFaceIds
 {
 public:
     using MeshId = typename TMesh::Id;
-    MeshCirculatorBase(const TMesh& inMesh, const MeshId inCirculatorId)
-        : mImpl(inMesh, inCirculatorId)
-    {
-    }
 
-    void operator++()
-    {
-        EXPECTS(IsValid());
-        TMeshCirculatorImplementation::Increment(mImpl);
-    }
-
-    void operator--()
-    {
-        EXPECTS(IsValid());
-        TMeshCirculatorImplementation::Decrement(mImpl);
-    }
-
-    MeshId operator*() const
-    {
-        EXPECTS(IsValid());
-        return *(mImpl.Get());
-    }
-
-    bool operator==(const MeshCirculatorBase& inRHS) const
-    {
-        return (mImpl.Get() == inRHS.mImpl.Get());
-    }
-
-    bool operator!=(const MeshCirculatorBase& inRHS) const
-    {
-        return !(*this == inRHS);
-    }
-
-    bool IsValid() const
-    {
-        return TMesh::IsValid(mImpl.Get());
-    }
-
-private:
-    TMeshCirculatorImplementation mImpl;
-};
-
-template <typename TMesh>
-struct MeshCirculatorVertexNeighborFaceIdsImplementation
-{
-    using MeshId = typename TMesh::Id;
-
-    const TMesh& mMesh;
-    const MeshId mVertexId = TMesh::InvalidId;
-    MeshId mCurrentNeighborFaceId = 0;
-
-    MeshCirculatorVertexNeighborFaceIdsImplementation(const TMesh& inMesh, const MeshId inVertexId)
+    MeshCirculatorVertexNeighborFaceIds(const TMesh& inMesh, const MeshId inVertexId)
         : mMesh(inMesh)
         , mVertexId(inVertexId)
     {
     }
+    MeshId operator*() const { EXPECTS(IsValid()); return *Get(); }
+    void operator++() { EXPECTS(IsValid()); ++mCurrentNeighborFaceId; }
+    void operator--() { EXPECTS(IsValid()); --mCurrentNeighborFaceId; }
+    bool operator==(const MeshCirculatorVertexNeighborFaceIds& inRHS) const { return (Get() == inRHS.Get()); }
+    bool operator!=(const MeshCirculatorVertexNeighborFaceIds& inRHS) const { return !(*this == inRHS); }
+    bool IsValid() const { return TMesh::IsValid(Get()); }
 
-    static void Increment(MeshCirculatorVertexNeighborFaceIdsImplementation& ioCirculator)
-    {
-        ++ioCirculator.mCurrentNeighborFaceId;
-    }
+private:
+    const TMesh& mMesh;
+    const MeshId mVertexId = TMesh::InvalidId;
+    MeshId mCurrentNeighborFaceId = 0;
 
-    static void Decrement(MeshCirculatorVertexNeighborFaceIdsImplementation& ioCirculator)
-    {
-        --ioCirculator.mCurrentNeighborFaceId;
-    }
-
-    std::optional<typename TMesh::Id> Get() const
+    std::optional<MeshId> Get() const
     {
         if (!TMesh::IsValid(mVertexId))
             return std::nullopt;
@@ -86,6 +37,4 @@ struct MeshCirculatorVertexNeighborFaceIdsImplementation
     }
 };
 
-template <typename TMesh>
-using MeshCirculatorVertexNeighborFaceIds = MeshCirculatorBase<TMesh, MeshCirculatorVertexNeighborFaceIdsImplementation<TMesh>>;
 }

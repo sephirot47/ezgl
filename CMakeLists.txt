@@ -2,14 +2,18 @@ cmake_minimum_required(VERSION 3.7)
 
 project(ezgl)
 
-add_subdirectory(third_party/assimp)
-
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 file(GLOB SRC_FILES "src/*.cpp")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")
 
 add_executable(test.exe "${SRC_FILES}")
+target_include_directories(test.exe PUBLIC "${CMAKE_BINARY_DIR}/third_party/assimp/include")
+
+find_package(assimp REQUIRED)
+target_include_directories(test.exe PUBLIC ${assimp_INCLUDE_DIRS})
+target_link_libraries(test.exe ${assimp_LIBRARIES})
 
 find_package(OpenGL REQUIRED)
 target_include_directories(test.exe PUBLIC ${OPENGL_INCLUDE_DIRS})

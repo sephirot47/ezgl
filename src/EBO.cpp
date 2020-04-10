@@ -12,9 +12,25 @@ EBO::EBO()
         THROW_EXCEPTION("Error creating EBO");
 }
 
+EBO::EBO(EBO&& ioRHS) noexcept
+{
+    *this = std::move(ioRHS);
+}
+
+EBO& EBO::operator=(EBO&& ioRHS) noexcept
+{
+    if (this == &ioRHS)
+        return *this;
+
+    mGLId = ioRHS.mGLId;
+    ioRHS.mGLId = 0;
+    return *this;
+}
+
 EBO::~EBO()
 {
-    GL::DeleteBuffer(mGLId);
+    if (mGLId != 0)
+        GL::DeleteBuffer(mGLId);
 }
 
 void EBO::Bind() const

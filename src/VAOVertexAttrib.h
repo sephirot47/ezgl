@@ -33,12 +33,12 @@ template <typename T = bool>
 struct VAOVertexAttribT : public VAOVertexAttrib
 {
     explicit VAOVertexAttribT(
-        uint32_t inStride = EGLTypeTraits<T>::NumBytes,
+        uint32_t inStride = GLTypeTraits<T>::NumBytes,
         bool inNormalized = false,
         uint32_t inOffset = 0)
         : VAOVertexAttrib(
-            EGLTypeTraits<T>::NumComponents,
-            EGLTypeTraits<T>::GLComponentType,
+            GLTypeTraits<T>::NumComponents,
+            GLTypeTraits<T>::GLComponentType,
             inStride,
             inNormalized,
             inOffset)

@@ -13,31 +13,17 @@ template <typename T>
 class Quat
 {
 public:
+    using ValueType = T;
+    static constexpr std::size_t NumComponents = 4;
+
     constexpr Quat() noexcept;
     constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept;
 
-    constexpr T Length() const;
-    constexpr T SqLength() const;
-    constexpr Quat<T> Conjugated() const;
-    constexpr Quat<T> Normalized() const;
-    constexpr Quat<T> Inversed() const;
-    constexpr Vec3<T> GetEulerAngles() const;
-    constexpr T GetPitch() const;
-    constexpr T GetYaw() const;
-    constexpr T GetRoll() const;
-    constexpr Vec3<T> GetAngleAxis() const;
-
-    static constexpr Quat<T> FromEulerAngles(const Vec3<T>& inEulerAnglesRads);
-    static constexpr Vec3<T> GetEulerAngles(const Quat<T>& inQuat);
-    static constexpr Quat<T> FromTo(const Vec3<T>& inFrom, const Vec3<T>& inTo);
-    static constexpr Quat<T> LookDirection(const Vec3<T>& inForward, const Vec3<T>& inUp = Vec3<T>::Up());
-    static constexpr Quat<T> AngleAxis(const T& inAngleRads, const Vec3<T>& inAxis);
-
     // Operators
-    constexpr T& operator[](std::size_t i);
-    constexpr const T& operator[](std::size_t i) const;
     constexpr bool operator==(const Quat<T>& inRHS) const;
     constexpr bool operator!=(const Quat<T>& inRHS) const;
+    constexpr T& operator[](std::size_t i);
+    constexpr const T& operator[](std::size_t i) const;
     constexpr Quat<T> operator+(const Quat<T>& inRHS) const;
     constexpr Quat<T> operator-(const Quat<T>& inRHS) const;
     constexpr Quat<T> operator*(const T& inRHS) const;
@@ -53,7 +39,7 @@ public:
     constexpr Quat<T> operator-() const;
 
 private:
-    std::array<T, 4> mComponents;
+    std::array<T, 4> mComponents; // x, y, z, w
 };
 
 template <typename T>
@@ -69,6 +55,20 @@ using Quati = Quat<int>;
 using Quatf = Quat<float>;
 using Quatd = Quat<double>;
 
+template <typename T>
+struct IsQuat
+{
+    static constexpr bool value = false;
+};
+
+template <typename T>
+struct IsQuat<Quat<T>>
+{
+    static constexpr bool value = true;
+};
+
+template <typename T>
+inline constexpr bool IsQuat_v = IsQuat<T>::value;
 }
 
 #include "Quat.tcc"

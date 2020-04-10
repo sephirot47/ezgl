@@ -18,8 +18,8 @@ public:
 
     EBO(const EBO& inRHS) = delete;
     EBO& operator=(const EBO& inRHS) = delete;
-    EBO(EBO&& inRHS) = default;
-    EBO& operator=(EBO&& inRHS) = default;
+    EBO(EBO&& ioRHS) noexcept;
+    EBO& operator=(EBO&& ioRHS) noexcept;
     ~EBO();
 
     void Bind() const;

@@ -4,19 +4,21 @@
 #include <unordered_map>
 #include <utility>
 
+#include <assimp/Importer.hpp> // C++ importer interface
+#include <assimp/scene.h> // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
+
 #include "Macros.h"
 #include "StreamOperators.h"
 #include "MeshIterators.h"
 
 namespace egl
 {
-void Mesh::ComputeNormals()
+void Mesh::AddVertex(const Vec3f& inPosition)
 {
-}
-
-void Mesh::AddVertex(const Mesh::VertexData& inVertexData)
-{
-    mVerticesData.emplace_back(inVertexData);
+    Mesh::VertexData vertex_data;
+    vertex_data.mPosition = inPosition;
+    mVerticesData.push_back(std::move(vertex_data));
 }
 
 void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0, const Mesh::VertexId& inFaceVertexId1, const Mesh::VertexId& inFaceVertexId2)
@@ -99,6 +101,44 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0, const Mesh::VertexId& 
     }
 }
 
+void Mesh::ComputeNormals()
+{
+    for (auto& face_data : mFacesData)
+    {
+        const auto vertex_position_0 = mVerticesData.at(face_data.mVerticesIds[0]).mPosition;
+        const auto vertex_position_1 = mVerticesData.at(face_data.mVerticesIds[1]).mPosition;
+        const auto vertex_position_2 = mVerticesData.at(face_data.mVerticesIds[2]).mPosition;
+        const auto v1_v0 = (vertex_position_0 - vertex_position_1);
+        const auto v1_v2 = (vertex_position_2 - vertex_position_1);
+        const auto face_normal = Normalized(Cross(v1_v2, v1_v0));
+        face_data.mNormal = face_normal;
+        ENSURES(IsNormalized(face_data.mNormal));
+    }
+
+    for (auto& vertex_data : mVerticesData)
+    {
+        auto normal_mean = Zero<Vec3f>();
+        {
+            for (const auto& neighbor_face_id : vertex_data.mNeighborFacesId)
+            {
+                assert(IsNormalized(mFacesData.at(neighbor_face_id).mNormal));
+                normal_mean += mFacesData.at(neighbor_face_id).mNormal;
+            }
+
+            if (!vertex_data.mNeighborFacesId.empty())
+                normal_mean /= vertex_data.mNeighborFacesId.size();
+        }
+        vertex_data.mNormal = Normalized(normal_mean);
+        ENSURES(IsNormalized(vertex_data.mNormal));
+    }
+}
+
+void Mesh::Clear()
+{
+    mVerticesData.clear();
+    mFacesData.clear();
+}
+
 void Mesh::SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition)
 {
     mVerticesData.at(inVertexId).mPosition = inPosition;
@@ -147,5 +187,43 @@ std::size_t Mesh::GetNumberOfFaces() const
 std::size_t Mesh::GetNumberOfVertices() const
 {
     return mVerticesData.size();
+}
+
+void Mesh::Read(const std::filesystem::path& inMeshPath)
+{
+    Assimp::Importer importer;
+    const auto* scene_ptr = importer.ReadFile(inMeshPath.string(),
+        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+
+    if (!scene_ptr)
+        THROW_EXCEPTION("Error loading mesh from '" << inMeshPath.string() << "': " << importer.GetErrorString());
+
+    const auto& scene = *scene_ptr;
+
+    if (scene.mNumMeshes == 0)
+        THROW_EXCEPTION("Error loading mesh from '" << inMeshPath.string() << "': the file contains no mesh.");
+
+    const auto AiVector3DToVec3f = [](const aiVector3D& inAiVector3D) {
+        return Vec3f(inAiVector3D.x, inAiVector3D.y, inAiVector3D.z);
+    };
+
+    const auto& aiMesh = *(scene.mMeshes[0]);
+    Clear();
+
+    // Create vertices
+    for (std::size_t vertex_id = 0; vertex_id < aiMesh.mNumVertices; ++vertex_id)
+    {
+        const auto ai_vertex_position = aiMesh.mVertices[vertex_id];
+        const auto vertex_position = AiVector3DToVec3f(ai_vertex_position);
+        AddVertex(vertex_position);
+    }
+
+    // Create faces
+    for (std::size_t face_id = 0; face_id < aiMesh.mNumFaces; ++face_id)
+    {
+        const auto ai_face = aiMesh.mFaces[face_id];
+        EXPECTS(ai_face.mNumIndices == 3);
+        AddFace(ai_face.mIndices[0], ai_face.mIndices[1], ai_face.mIndices[2]);
+    }
 }
 }

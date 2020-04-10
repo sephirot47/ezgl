@@ -72,6 +72,18 @@ constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator Mat<T, NRows
 }
 
 template <typename T, std::size_t NRows, std::size_t NCols>
+constexpr bool Mat<T, NRows, NCols>::operator==(const Mat& inRHS) const
+{
+    return mRows == inRHS.mRows;
+}
+
+template <typename T, std::size_t NRows, std::size_t NCols>
+constexpr bool Mat<T, NRows, NCols>::operator!=(const Mat& inRHS) const
+{
+    return !(*this == inRHS);
+}
+
+template <typename T, std::size_t NRows, std::size_t NCols>
 constexpr Vec<T, NCols>& Mat<T, NRows, NCols>::operator[](std::size_t inRow)
 {
     return mRows[inRow];
