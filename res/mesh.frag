@@ -1,6 +1,6 @@
 #version 430 core
 
-uniform vec3 UColor;
+uniform vec4 UColor;
 
 layout(location = 0) in vec3 iv_of_world_normal;
 
@@ -13,6 +13,6 @@ void main()
     float light_intensity = max(dot(iv_of_world_normal_normalized, -light_dir), 0);
     light_intensity += 0.2f;
 
-    vec3 lighted_color = light_intensity * UColor;
-    of_color = vec4(lighted_color * 0.00001f + iv_of_world_normal_normalized, 1);
+    vec4 lighted_color = light_intensity * UColor;
+    of_color = lighted_color;
 }

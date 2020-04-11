@@ -7,18 +7,18 @@ namespace egl
 class Window
 {
 public:
-    Window();
-    Window(const Window& inRHS) = delete;
-    Window& operator=(const Window& inRHS) = delete;
-    Window(Window&& inRHS) = delete;
-    Window& operator=(Window&& inRHS) = delete;
-    ~Window();
+  Window();
+  Window(const Window& inRHS) = delete;
+  Window& operator=(const Window& inRHS) = delete;
+  Window(Window&& inRHS) = delete;
+  Window& operator=(Window&& inRHS) = delete;
+  ~Window();
 
-    bool ShouldClose() const;
-    void SwapBuffers();
-    void PollEvents();
+  bool ShouldClose() const;
+  void SwapBuffers();
+  void PollEvents();
 
 private:
-    GLFWwindow* mHandle = nullptr;
+  GLFWwindow* mHandle = nullptr;
 };
 }

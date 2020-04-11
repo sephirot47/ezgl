@@ -1,6 +1,33 @@
 ﻿---
 BasedOnStyle: WebKit
+AccessModifierOffset: '-2'
+AllowAllArgumentsOnNextLine: 'false'
+AllowAllConstructorInitializersOnNextLine: 'false'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: 'Yes'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
 BreakBeforeBraces: Allman
-SortIncludes: false 
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: '120'
+ConstructorInitializerAllOnOneLineOrOnePerLine: 'false'
+ExperimentalAutoDetectBinPacking: 'false'
+IncludeBlocks: Merge
+IndentWidth: '2'
+Language: Cpp
+MaxEmptyLinesToKeep: '1'
+SortIncludes: 'true'
+SortUsingDeclarations: 'true'
+Standard: Cpp11
+TabWidth: '2'
+UseTab: Never
 
 ...

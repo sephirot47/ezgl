@@ -1,11 +1,10 @@
 #pragma once
 
+#include "VariadicRepeat.h"
 #include <array>
 #include <cstdint>
-#include <type_traits>
 #include <initializer_list>
-
-#include "VariadicRepeat.h"
+#include <type_traits>
 
 namespace egl
 {
@@ -17,50 +16,50 @@ template <typename T, std::size_t NRows, std::size_t NCols>
 class Mat
 {
 public:
-    using ValueType = T;
-    static constexpr auto NumRows = NRows;
-    static constexpr auto NumCols = NCols;
+  using ValueType = T;
+  static constexpr auto NumRows = NRows;
+  static constexpr auto NumCols = NCols;
 
-    constexpr Mat() noexcept;
-    constexpr explicit Mat(const T& inAllValue) noexcept;
+  constexpr Mat() noexcept;
+  constexpr explicit Mat(const T& inAllValue) noexcept;
 
-    template <typename... TArgs, typename = std::enable_if_t<(sizeof...(TArgs) > 1)>>
-    constexpr explicit Mat(TArgs&&... inArgs) noexcept;
+  template <typename... TArgs, typename = std::enable_if_t<(sizeof...(TArgs) > 1)>>
+  constexpr explicit Mat(TArgs&&... inArgs) noexcept;
 
-    T* Data();
-    const T* Data() const;
+  T* Data();
+  const T* Data() const;
 
-    // Iterators
-    constexpr typename std::array<Vec<T, NCols>, NRows>::iterator begin();
-    constexpr typename std::array<Vec<T, NCols>, NRows>::iterator end();
-    constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator begin() const;
-    constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator end() const;
-    constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator cbegin() const;
-    constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator cend() const;
+  // Iterators
+  constexpr typename std::array<Vec<T, NCols>, NRows>::iterator begin();
+  constexpr typename std::array<Vec<T, NCols>, NRows>::iterator end();
+  constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator begin() const;
+  constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator end() const;
+  constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator cbegin() const;
+  constexpr typename std::array<Vec<T, NCols>, NRows>::const_iterator cend() const;
 
-    // Operators
-    constexpr bool operator==(const Mat& inRHS) const;
-    constexpr bool operator!=(const Mat& inRHS) const;
-    constexpr Vec<T, NCols>& operator[](std::size_t inRow);
-    constexpr const Vec<T, NCols>& operator[](std::size_t inRow) const;
-    constexpr Mat<T, NRows, NCols> operator+(const Mat<T, NRows, NCols>& inRHS) const;
-    constexpr Mat<T, NRows, NCols> operator-(const Mat<T, NRows, NCols>& inRHS) const;
-    void operator+=(const Mat<T, NRows, NCols>& inRHS);
-    void operator-=(const Mat<T, NRows, NCols>& inRHS);
-    constexpr Mat<T, NRows, NCols> operator+(const T& inRHS) const;
-    constexpr Mat<T, NRows, NCols> operator-(const T& inRHS) const;
-    constexpr Mat<T, NRows, NCols> operator*(const T& inRHS) const;
-    constexpr Mat<T, NRows, NCols> operator/(const T& inRHS) const;
-    void operator+=(const T& inRHS);
-    void operator-=(const T& inRHS);
-    void operator*=(const T& inRHS);
-    void operator/=(const T& inRHS);
-    constexpr Mat<T, NRows, NCols> operator-() const;
-    template <std::size_t TRHSCols>
-    constexpr Mat<T, NRows, TRHSCols> operator*(const Mat<T, NCols, TRHSCols>& inRHS) const;
+  // Operators
+  constexpr bool operator==(const Mat& inRHS) const;
+  constexpr bool operator!=(const Mat& inRHS) const;
+  constexpr Vec<T, NCols>& operator[](std::size_t inRow);
+  constexpr const Vec<T, NCols>& operator[](std::size_t inRow) const;
+  constexpr Mat<T, NRows, NCols> operator+(const Mat<T, NRows, NCols>& inRHS) const;
+  constexpr Mat<T, NRows, NCols> operator-(const Mat<T, NRows, NCols>& inRHS) const;
+  void operator+=(const Mat<T, NRows, NCols>& inRHS);
+  void operator-=(const Mat<T, NRows, NCols>& inRHS);
+  constexpr Mat<T, NRows, NCols> operator+(const T& inRHS) const;
+  constexpr Mat<T, NRows, NCols> operator-(const T& inRHS) const;
+  constexpr Mat<T, NRows, NCols> operator*(const T& inRHS) const;
+  constexpr Mat<T, NRows, NCols> operator/(const T& inRHS) const;
+  void operator+=(const T& inRHS);
+  void operator-=(const T& inRHS);
+  void operator*=(const T& inRHS);
+  void operator/=(const T& inRHS);
+  constexpr Mat<T, NRows, NCols> operator-() const;
+  template <std::size_t TRHSCols>
+  constexpr Mat<T, NRows, TRHSCols> operator*(const Mat<T, NCols, TRHSCols>& inRHS) const;
 
 private:
-    std::array<Vec<T, NCols>, NRows> mRows;
+  std::array<Vec<T, NCols>, NRows> mRows;
 };
 
 template <typename T, std::size_t NRows, std::size_t NCols>
@@ -90,13 +89,13 @@ using Mat4i = Mat4<int32_t>;
 template <typename T>
 struct IsMat
 {
-    static constexpr bool value = false;
+  static constexpr bool value = false;
 };
 
 template <typename T, std::size_t N>
 struct IsMat<Mat<T, N, N>>
 {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename T>

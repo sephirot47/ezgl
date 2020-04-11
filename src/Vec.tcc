@@ -1,248 +1,245 @@
 #include "Vec.h"
-
 #include <cmath>
 
 namespace egl
 {
 
 template <typename T, std::size_t N>
-constexpr Vec<T, N>::Vec(const T& inAllValue) noexcept
-    : mComponents { GetArrayWithRepeatedValue<T, N>(inAllValue) }
+constexpr Vec<T, N>::Vec(const T& inAllValue) noexcept : mComponents { GetArrayWithRepeatedValue<T, N>(inAllValue) }
 {
 }
 
 template <typename T, std::size_t N>
 template <typename... TArgs, typename>
-constexpr Vec<T, N>::Vec(TArgs&&... inArgs) noexcept
-    : mComponents { std::forward<TArgs>(inArgs)... }
+constexpr Vec<T, N>::Vec(TArgs&&... inArgs) noexcept : mComponents { std::forward<TArgs>(inArgs)... }
 {
 }
 
 template <typename T, std::size_t N>
 T* Vec<T, N>::Data()
 {
-    return &mComponents[0];
+  return &mComponents[0];
 }
 
 template <typename T, std::size_t N>
 const T* Vec<T, N>::Data() const
 {
-    return &mComponents[0];
+  return &mComponents[0];
 }
 
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::iterator Vec<T, N>::begin()
 {
-    return std::begin(mComponents);
+  return std::begin(mComponents);
 }
 
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::iterator Vec<T, N>::end()
 {
-    return std::end(mComponents);
+  return std::end(mComponents);
 }
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::const_iterator Vec<T, N>::begin() const
 {
-    return std::begin(mComponents);
+  return std::begin(mComponents);
 }
 
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::const_iterator Vec<T, N>::end() const
 {
-    return std::end(mComponents);
+  return std::end(mComponents);
 }
 
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::const_iterator Vec<T, N>::cbegin() const
 {
-    return std::cbegin(mComponents);
+  return std::cbegin(mComponents);
 }
 
 template <typename T, std::size_t N>
 constexpr typename std::array<T, N>::const_iterator Vec<T, N>::cend() const
 {
-    return std::cend(mComponents);
+  return std::cend(mComponents);
 }
 
 template <typename T, std::size_t N>
 constexpr bool Vec<T, N>::operator==(const Vec& inRHS) const
 {
-    return mComponents == inRHS.mComponents;
+  return mComponents == inRHS.mComponents;
 }
 
 template <typename T, std::size_t N>
 constexpr bool Vec<T, N>::operator!=(const Vec& inRHS) const
 {
-    return !(*this == inRHS);
+  return !(*this == inRHS);
 }
 
 template <typename T, std::size_t N>
 constexpr T& Vec<T, N>::operator[](std::size_t i)
 {
-    return mComponents[i];
+  return mComponents[i];
 }
 
 template <typename T, std::size_t N>
 constexpr const T& Vec<T, N>::operator[](std::size_t i) const
 {
-    return mComponents[i];
+  return mComponents[i];
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator+(const Vec<T, N>& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] + inRHS[i];
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] + inRHS[i];
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator-(const Vec& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] - inRHS[i];
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] - inRHS[i];
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator*(const Vec& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] * inRHS[i];
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] * inRHS[i];
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator/(const Vec& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] / inRHS[i];
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] / inRHS[i];
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator+(const T& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] + inRHS;
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] + inRHS;
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator-(const T& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] - inRHS;
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] - inRHS;
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator*(const T& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] * inRHS;
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] * inRHS;
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator/(const T& inRHS) const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = mComponents[i] / inRHS;
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = mComponents[i] / inRHS;
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec<T, N> Vec<T, N>::operator-() const
 {
-    Vec<T, N> result {};
-    for (std::size_t i = 0; i < N; ++i)
-    {
-        result[i] = -mComponents[i];
-    }
-    return result;
+  Vec<T, N> result {};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = -mComponents[i];
+  }
+  return result;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator+=(const Vec<T, N>& inRHS)
 {
-    *this = *this + inRHS;
+  *this = *this + inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator-=(const Vec<T, N>& inRHS)
 {
-    *this = *this - inRHS;
+  *this = *this - inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator*=(const Vec<T, N>& inRHS)
 {
-    *this = *this * inRHS;
+  *this = *this * inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator/=(const Vec<T, N>& inRHS)
 {
-    *this = *this / inRHS;
+  *this = *this / inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator+=(const T& inRHS)
 {
-    *this = *this + inRHS;
+  *this = *this + inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator-=(const T& inRHS)
 {
-    *this = *this - inRHS;
+  *this = *this - inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator*=(const T& inRHS)
 {
-    *this = *this * inRHS;
+  *this = *this * inRHS;
 }
 
 template <typename T, std::size_t N>
 constexpr void Vec<T, N>::operator/=(const T& inRHS)
 {
-    *this = *this / inRHS;
+  *this = *this / inRHS;
 }
 
 template <typename T, std::size_t N>
 inline std::ostream& operator<<(std::ostream& inLHS, const Vec<T, N>& inRHS)
 {
-    inLHS << "(";
-    for (std::size_t i = 0; i < N; ++i)
-        inLHS << inRHS[i] << (i < N - 1 ? " " : "");
-    inLHS << ")";
-    return inLHS;
+  inLHS << "(";
+  for (std::size_t i = 0; i < N; ++i)
+    inLHS << inRHS[i] << (i < N - 1 ? ", " : "");
+  inLHS << ")";
+  return inLHS;
 }
 }

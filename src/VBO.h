@@ -1,9 +1,8 @@
 #pragma once
 
-#include <cstdint>
-
 #include "GL.h"
 #include "Span.h"
+#include <cstdint>
 
 namespace egl
 {
@@ -11,29 +10,29 @@ namespace egl
 class VBO
 {
 public:
-    VBO();
+  VBO();
 
-    template <typename T>
-    VBO(const Span<T>& inData);
+  template <typename T>
+  VBO(const Span<T>& inData);
 
-    VBO(const VBO& inRHS) = delete;
-    VBO& operator=(const VBO& inRHS) = delete;
-    VBO(VBO&& ioRHS) noexcept;
-    VBO& operator=(VBO&& ioRHS) noexcept;
-    ~VBO();
+  VBO(const VBO& inRHS) = delete;
+  VBO& operator=(const VBO& inRHS) = delete;
+  VBO(VBO&& ioRHS) noexcept;
+  VBO& operator=(VBO&& ioRHS) noexcept;
+  ~VBO();
 
-    void Bind() const;
-    void UnBind() const;
-    bool IsBound() const;
-    static GL::Id GetBoundGLId();
+  void Bind() const;
+  void UnBind() const;
+  bool IsBound() const;
+  static GL::Id GetBoundGLId();
 
-    template <typename T>
-    void BufferData(const Span<T>& inData);
+  template <typename T>
+  void BufferData(const Span<T>& inData);
 
-    GL::Id GetGLId() const { return mGLId; }
+  GL::Id GetGLId() const { return mGLId; }
 
 private:
-    GL::Id mGLId = 0;
+  GL::Id mGLId = 0;
 };
 }
 

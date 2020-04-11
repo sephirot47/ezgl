@@ -1,116 +1,102 @@
 #include "VAO.h"
-
-#include <GL/glew.h>
-
 #include "EBO.h"
-
 #include "GL.h"
 #include "Macros.h"
 #include "VBO.h"
+#include <GL/glew.h>
 
 namespace egl
 {
-VAO::VAO()
-    : mGLId(GL::CreateVertexArray())
+VAO::VAO() : mGLId(GL::CreateVertexArray())
 {
-    if (mGLId == 0)
-        THROW_EXCEPTION("Error creating VAO");
+  if (mGLId == 0)
+    THROW_EXCEPTION("Error creating VAO");
 }
 
-VAO::VAO(VAO&& ioRHS) noexcept
-{
-    *this = std::move(ioRHS);
-}
+VAO::VAO(VAO&& ioRHS) noexcept { *this = std::move(ioRHS); }
 
 VAO& VAO::operator=(VAO&& ioRHS) noexcept
 {
-    if (this == &ioRHS)
-        return *this;
-
-    mGLId = ioRHS.mGLId;
-    ioRHS.mGLId = 0;
+  if (this == &ioRHS)
     return *this;
+
+  if (mGLId != 0)
+    GL::DeleteVertexArray(mGLId);
+
+  mGLId = ioRHS.mGLId;
+  ioRHS.mGLId = 0;
+
+  mEBO = std::move(ioRHS.mEBO);
+  mVBOs = std::move(ioRHS.mVBOs);
+
+  return *this;
 }
 
 VAO::~VAO()
 {
-    if (mGLId != 0)
-        GL::DeleteVertexArray(mGLId);
+  if (mGLId != 0)
+    GL::DeleteVertexArray(mGLId);
 }
 
-void VAO::Bind() const
-{
-    GL::BindVertexArray(mGLId);
-}
+void VAO::Bind() const { GL::BindVertexArray(mGLId); }
 
-void VAO::UnBind() const
-{
-    GL::BindVertexArray(0);
-}
+void VAO::UnBind() const { GL::BindVertexArray(0); }
 
 bool VAO::IsBound() const
 {
-    const auto bound_id = GetBoundGLId();
-    return bound_id != 0 && bound_id == mGLId;
+  const auto bound_id = GetBoundGLId();
+  return bound_id != 0 && bound_id == mGLId;
 }
 
 GL::Id VAO::GetBoundGLId()
 {
-    const auto bound_id = GL::GetInteger(GL::EBufferBindingType::VERTEX_ARRAY);
-    return static_cast<GL::Id>(bound_id);
+  const auto bound_id = GL::GetInteger(GL::EBufferBindingType::VERTEX_ARRAY);
+  return static_cast<GL::Id>(bound_id);
 }
 
-void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
+void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
+    const GL::Id inAttribLocation,
+    const VAOVertexAttrib& inVertexAttrib)
 {
-    EXPECTS(IsBound());
+  EXPECTS(IsBound());
 
-    mVBOs.push_back(inVBO);
+  mVBOs.push_back(inVBO);
 
-    inVBO->Bind();
-    AddVertexAttrib(inAttribLocation, inVertexAttrib);
+  inVBO->Bind();
+  AddVertexAttrib(inAttribLocation, inVertexAttrib);
 }
 
 void VAO::SetEBO(const std::shared_ptr<EBO>& inEBO)
 {
-    EXPECTS(IsBound());
+  EXPECTS(IsBound());
 
-    mEBOs.push_back(inEBO);
-
-    inEBO->Bind();
+  mEBO = inEBO;
+  inEBO->Bind();
 }
 
 void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
-    EXPECTS(IsBound());
-    EXPECTS(inVertexAttrib.mNumComponents > 0);
-    GL::EnableVertexAttribArray(inAttribLocation);
-    GL::VertexAttribPointer(inAttribLocation,
-        inVertexAttrib.mNumComponents,
-        inVertexAttrib.mType,
-        inVertexAttrib.mNormalized,
-        inVertexAttrib.mStride,
-        inVertexAttrib.mOffset);
+  EXPECTS(IsBound());
+  EXPECTS(inVertexAttrib.mNumComponents > 0);
+  GL::EnableVertexAttribArray(inAttribLocation);
+  GL::VertexAttribPointer(inAttribLocation,
+      inVertexAttrib.mNumComponents,
+      inVertexAttrib.mType,
+      inVertexAttrib.mNormalized,
+      inVertexAttrib.mStride,
+      inVertexAttrib.mOffset);
 }
 
 void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)
 {
-    EXPECTS(IsBound());
-    EXPECTS(inAttribLocation > 0);
-    GL::DisableVertexAttribArray(inAttribLocation);
+  EXPECTS(IsBound());
+  EXPECTS(inAttribLocation > 0);
+  GL::DisableVertexAttribArray(inAttribLocation);
 }
 
-const std::vector<std::shared_ptr<EBO>>& VAO::GetEBOs() const
-{
-    return mEBOs;
-}
+const std::shared_ptr<EBO>& VAO::GetEBO() const { return mEBO; }
 
-const std::vector<std::shared_ptr<VBO>>& VAO::GetVBOs() const
-{
-    return mVBOs;
-}
+const std::vector<std::shared_ptr<VBO>>& VAO::GetVBOs() const { return mVBOs; }
 
-GL::Id VAO::GetGLId() const
-{
-    return mGLId;
-}
+GL::Id VAO::GetGLId() const { return mGLId; }
 }

@@ -1,10 +1,9 @@
 #pragma once
 
+#include "Mat.h"
+#include "Vec.h"
 #include <array>
 #include <ostream>
-
-#include "Vec.h"
-#include "Mat.h"
 
 namespace egl
 {
@@ -13,33 +12,33 @@ template <typename T>
 class Quat
 {
 public:
-    using ValueType = T;
-    static constexpr std::size_t NumComponents = 4;
+  using ValueType = T;
+  static constexpr std::size_t NumComponents = 4;
 
-    constexpr Quat() noexcept;
-    constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept;
+  constexpr Quat() noexcept;
+  constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept;
 
-    // Operators
-    constexpr bool operator==(const Quat<T>& inRHS) const;
-    constexpr bool operator!=(const Quat<T>& inRHS) const;
-    constexpr T& operator[](std::size_t i);
-    constexpr const T& operator[](std::size_t i) const;
-    constexpr Quat<T> operator+(const Quat<T>& inRHS) const;
-    constexpr Quat<T> operator-(const Quat<T>& inRHS) const;
-    constexpr Quat<T> operator*(const T& inRHS) const;
-    constexpr Quat<T> operator*(const Quat<T>& inRHS) const;
-    constexpr Vec3<T> operator*(const Vec3<T>& inRHS) const;
-    constexpr Vec4<T> operator*(const Vec4<T>& inRHS) const;
-    constexpr Quat<T> operator/(const T& inRHS) const;
-    void operator+=(const Quat<T>& inRHS);
-    void operator-=(const Quat<T>& inRHS);
-    void operator*=(const T& inRHS);
-    void operator*=(const Quat<T>& inRHS);
-    void operator/=(const T& inRHS);
-    constexpr Quat<T> operator-() const;
+  // Operators
+  constexpr bool operator==(const Quat<T>& inRHS) const;
+  constexpr bool operator!=(const Quat<T>& inRHS) const;
+  constexpr T& operator[](std::size_t i);
+  constexpr const T& operator[](std::size_t i) const;
+  constexpr Quat<T> operator+(const Quat<T>& inRHS) const;
+  constexpr Quat<T> operator-(const Quat<T>& inRHS) const;
+  constexpr Quat<T> operator*(const T& inRHS) const;
+  constexpr Quat<T> operator*(const Quat<T>& inRHS) const;
+  constexpr Vec3<T> operator*(const Vec3<T>& inRHS) const;
+  constexpr Vec4<T> operator*(const Vec4<T>& inRHS) const;
+  constexpr Quat<T> operator/(const T& inRHS) const;
+  void operator+=(const Quat<T>& inRHS);
+  void operator-=(const Quat<T>& inRHS);
+  void operator*=(const T& inRHS);
+  void operator*=(const Quat<T>& inRHS);
+  void operator/=(const T& inRHS);
+  constexpr Quat<T> operator-() const;
 
 private:
-    std::array<T, 4> mComponents; // x, y, z, w
+  std::array<T, 4> mComponents; // x, y, z, w
 };
 
 template <typename T>
@@ -58,13 +57,13 @@ using Quatd = Quat<double>;
 template <typename T>
 struct IsQuat
 {
-    static constexpr bool value = false;
+  static constexpr bool value = false;
 };
 
 template <typename T>
 struct IsQuat<Quat<T>>
 {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename T>

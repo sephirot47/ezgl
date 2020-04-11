@@ -1,62 +1,51 @@
 #include "EBO.h"
-
 #include "GL.h"
 #include "Macros.h"
 
 namespace egl
 {
-EBO::EBO()
-    : mGLId(GL::CreateBuffer())
+EBO::EBO() : mGLId(GL::CreateBuffer())
 {
-    if (mGLId == 0)
-        THROW_EXCEPTION("Error creating EBO");
+  if (mGLId == 0)
+    THROW_EXCEPTION("Error creating EBO");
 }
 
-EBO::EBO(EBO&& ioRHS) noexcept
-{
-    *this = std::move(ioRHS);
-}
+EBO::EBO(EBO&& ioRHS) noexcept { *this = std::move(ioRHS); }
 
 EBO& EBO::operator=(EBO&& ioRHS) noexcept
 {
-    if (this == &ioRHS)
-        return *this;
-
-    mGLId = ioRHS.mGLId;
-    ioRHS.mGLId = 0;
+  if (this == &ioRHS)
     return *this;
+
+  if (mGLId != 0)
+    GL::DeleteVertexArray(mGLId);
+
+  mGLId = ioRHS.mGLId;
+  ioRHS.mGLId = 0;
+  return *this;
 }
 
 EBO::~EBO()
 {
-    if (mGLId != 0)
-        GL::DeleteBuffer(mGLId);
+  if (mGLId != 0)
+    GL::DeleteBuffer(mGLId);
 }
 
-void EBO::Bind() const
-{
-    GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, mGLId);
-}
+void EBO::Bind() const { GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, mGLId); }
 
-void EBO::UnBind() const
-{
-    GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, 0);
-}
+void EBO::UnBind() const { GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, 0); }
 
 bool EBO::IsBound() const
 {
-    const auto bound_id = GetBoundGLId();
-    return bound_id != 0 && bound_id == mGLId;
+  const auto bound_id = GetBoundGLId();
+  return bound_id != 0 && bound_id == mGLId;
 }
 
-GL::Id EBO::GetGLId() const
-{
-    return mGLId;
-}
+GL::Id EBO::GetGLId() const { return mGLId; }
 
 GL::Id EBO::GetBoundGLId()
 {
-    const auto bound_id = GL::GetInteger(GL::EBufferBindingType::ELEMENT_ARRAY);
-    return static_cast<GL::Id>(bound_id);
+  const auto bound_id = GL::GetInteger(GL::EBufferBindingType::ELEMENT_ARRAY);
+  return static_cast<GL::Id>(bound_id);
 }
 }
