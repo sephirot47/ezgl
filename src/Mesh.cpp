@@ -2,9 +2,11 @@
 #include "Macros.h"
 #include "MeshIterators.h"
 #include "StreamOperators.h"
-#include <assimp/Importer.hpp> // C++ importer interface
-#include <assimp/postprocess.h> // Post processing flags
-#include <assimp/scene.h> // Output data structure
+#include <algorithm>
+#include <assimp/Exporter.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <cassert>
 #include <unordered_map>
 #include <utility>
@@ -23,9 +25,12 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
     const Mesh::VertexId& inFaceVertexId2)
 {
   // Vertices must have been added before
-  EXPECTS(inFaceVertexId0 < mVerticesData.size());
-  EXPECTS(inFaceVertexId1 < mVerticesData.size());
-  EXPECTS(inFaceVertexId2 < mVerticesData.size());
+  if (inFaceVertexId0 >= mVerticesData.size())
+    THROW_EXCEPTION("Trying to add a face with non-existent vertex id " << inFaceVertexId0);
+  if (inFaceVertexId1 >= mVerticesData.size())
+    THROW_EXCEPTION("Trying to add a face with non-existent vertex id " << inFaceVertexId1);
+  if (inFaceVertexId2 >= mVerticesData.size())
+    THROW_EXCEPTION("Trying to add a face with non-existent vertex id " << inFaceVertexId2);
 
   // Add face
   mFacesData.emplace_back();
@@ -216,6 +221,79 @@ void Mesh::Read(const std::filesystem::path& inMeshPath)
     EXPECTS(ai_face.mNumIndices == 3);
     AddFace(ai_face.mIndices[0], ai_face.mIndices[1], ai_face.mIndices[2]);
   }
+}
+
+void Mesh::Write(const std::filesystem::path& inMeshPath) const
+{
+  EXPECTS(!inMeshPath.extension().string().empty());
+
+  aiScene ai_scene;
+
+  ai_scene.mNumMaterials = 1;
+  ai_scene.mMaterials = new aiMaterial*[ai_scene.mNumMaterials];
+  ai_scene.mMaterials[0] = new aiMaterial();
+
+  ai_scene.mNumMeshes = 1;
+  ai_scene.mMeshes = new aiMesh*[ai_scene.mNumMeshes];
+  ai_scene.mMeshes[0] = new aiMesh();
+  auto& ai_mesh = *ai_scene.mMeshes[0];
+  {
+    const auto Vec3fToAiVector3D
+        = [](const Vec3f& inVector) { return aiVector3D(inVector[0], inVector[1], inVector[2]); };
+
+    ai_mesh.mMaterialIndex = 0;
+
+    ai_mesh.mNumVertices = GetNumberOfVertices();
+    ai_mesh.mVertices = new aiVector3D[ai_mesh.mNumVertices];
+    for (std::size_t vertex_id = 0; vertex_id < GetNumberOfVertices(); ++vertex_id)
+    {
+      ai_mesh.mVertices[vertex_id] = Vec3fToAiVector3D(GetVerticesData().at(vertex_id).mPosition);
+    }
+
+    ai_mesh.mNumFaces = GetNumberOfFaces();
+    ai_mesh.mFaces = new aiFace[ai_mesh.mNumFaces];
+    for (std::size_t face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
+    {
+      aiFace& ai_face = ai_mesh.mFaces[face_id];
+      ai_face.mNumIndices = 3;
+      ai_face.mIndices = new unsigned int[ai_face.mNumIndices];
+
+      const auto& face_data = GetFacesData()[face_id];
+      ai_face.mIndices[0] = face_data.mVerticesIds[0];
+      ai_face.mIndices[1] = face_data.mVerticesIds[1];
+      ai_face.mIndices[2] = face_data.mVerticesIds[2];
+    }
+  }
+
+  ai_scene.mRootNode = new aiNode();
+  {
+    ai_scene.mRootNode->mNumMeshes = 1;
+    ai_scene.mRootNode->mMeshes = new unsigned int[ai_scene.mRootNode->mNumMeshes];
+    ai_scene.mRootNode->mMeshes[0] = 0;
+  }
+
+  Assimp::Exporter exporter;
+
+  const auto get_format_id_from_extension = [&exporter](const std::string_view extension) {
+    std::string lower_case_extension;
+    std::transform(extension.cbegin(), extension.cend(), std::back_inserter(lower_case_extension), ::tolower);
+
+    for (std::size_t i = 0; i < exporter.GetExportFormatCount(); ++i)
+    {
+      const auto format_description = exporter.GetExportFormatDescription(i);
+      if (lower_case_extension == format_description->fileExtension)
+        return format_description->id;
+    }
+
+    THROW_EXCEPTION("Can't export mesh with file extension '" << lower_case_extension << "'");
+  };
+
+  const auto extension = inMeshPath.extension().string().substr(1); // Get extension without "."
+  const auto format_id = get_format_id_from_extension(extension);
+
+  const auto export_result = exporter.Export(&ai_scene, format_id, inMeshPath.string());
+  if (export_result != aiReturn_SUCCESS)
+    THROW_EXCEPTION("Error when exporting mesh to " << inMeshPath << ": " << exporter.GetErrorString());
 }
 
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::Edge& inRHS)

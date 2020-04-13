@@ -121,7 +121,8 @@ public:
     TRIANGLES = GL_TRIANGLES,
     LINES = GL_LINES,
     LINES_LOOP = GL_LINE_LOOP,
-    LINE_STRIP = GL_LINE_STRIP
+    LINE_STRIP = GL_LINE_STRIP,
+    POINTS = GL_POINTS,
   };
 
   enum class EShaderInfo

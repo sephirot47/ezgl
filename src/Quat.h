@@ -18,6 +18,14 @@ public:
   constexpr Quat() noexcept;
   constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept;
 
+  // Iterators
+  constexpr typename std::array<T, 4>::iterator begin();
+  constexpr typename std::array<T, 4>::iterator end();
+  constexpr typename std::array<T, 4>::const_iterator begin() const;
+  constexpr typename std::array<T, 4>::const_iterator end() const;
+  constexpr typename std::array<T, 4>::const_iterator cbegin() const;
+  constexpr typename std::array<T, 4>::const_iterator cend() const;
+
   // Operators
   constexpr bool operator==(const Quat<T>& inRHS) const;
   constexpr bool operator!=(const Quat<T>& inRHS) const;

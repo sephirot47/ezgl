@@ -14,13 +14,14 @@ public:
 
   Segment() = default;
   Segment(const Vec<T, N>& inFromPoint, const Vec<T, N>& inToPoint);
-  Segment(const Segment& inRHS);
-  Segment& operator=(const Segment& inRHS);
-  Segment(Segment&& inRHS);
-  Segment& operator=(Segment&& inRHS);
+  Segment(const Segment& inRHS) = default;
+  Segment& operator=(const Segment& inRHS) = default;
+  Segment(Segment&& inRHS) = default;
+  Segment& operator=(Segment&& inRHS) = default;
 
   Vec<T, N> GetFromPoint() const;
   Vec<T, N> GetToPoint() const;
+  Vec<T, N> GetVector() const;
 
 private:
   Vec<T, N> mFromPoint = Vec<T, N> { 0 };

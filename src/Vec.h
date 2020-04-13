@@ -19,8 +19,7 @@ public:
   using ValueType = T;
   static constexpr auto NumComponents = N;
 
-  Vec() noexcept = default;
-
+  constexpr Vec() noexcept;
   constexpr explicit Vec(const T& inAllValue) noexcept;
 
   template <typename... TArgs, typename = std::enable_if_t<sizeof...(TArgs) == N>>

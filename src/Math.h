@@ -2,6 +2,7 @@
 
 #include "Mat.h"
 #include "Quat.h"
+#include "Segment.h"
 #include "TypeTraits.h"
 #include "Vec.h"
 #include <cmath>
@@ -9,49 +10,6 @@
 
 namespace egl
 {
-
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Right()
-{
-  static_assert(TVec::NumComponents >= 1);
-  TVec result { static_cast<typename TVec::ValueType>(0) };
-  result[0] = static_cast<typename TVec::ValueType>(1);
-  return result;
-}
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Left()
-{
-  return -Right<TVec>();
-}
-
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Up()
-{
-  static_assert(TVec::NumComponents >= 2);
-  TVec result { static_cast<typename TVec::ValueType>(0) };
-  result[1] = static_cast<typename TVec::ValueType>(1);
-  return result;
-}
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Down()
-{
-  return -Up<TVec>();
-}
-
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Forward()
-{
-  static_assert(TVec::NumComponents >= 3);
-  TVec result { static_cast<typename TVec::ValueType>(0) };
-  result[2] = static_cast<typename TVec::ValueType>(-1);
-  return result;
-}
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Back()
-{
-  return -Forward<TVec>();
-}
-
 template <typename TVecOrMat>
 constexpr TVecOrMat All(const typename TVecOrMat::ValueType& inAllValue)
 {
@@ -66,6 +24,67 @@ template <typename TVecOrMat>
 constexpr TVecOrMat One()
 {
   return All<TVecOrMat>(1);
+}
+
+template <typename T>
+constexpr auto Right()
+{
+  if constexpr (IsVec_v<T>)
+  {
+    static_assert(T::NumComponents >= 1);
+    T result = All<T>(static_cast<typename T::ValueType>(0));
+    result[0] = static_cast<typename T::ValueType>(1);
+    return result;
+  }
+  else
+  {
+    static_assert("Not implemented for this type");
+  }
+}
+template <typename T>
+constexpr auto Up()
+{
+  if constexpr (IsVec_v<T>)
+  {
+    static_assert(T::NumComponents >= 2);
+    T result = All<T>(static_cast<typename T::ValueType>(0));
+    result[1] = static_cast<typename T::ValueType>(1);
+    return result;
+  }
+  else
+  {
+    static_assert("Not implemented for this type");
+  }
+}
+template <typename T>
+constexpr auto Forward()
+{
+  if constexpr (IsVec_v<T>)
+  {
+    static_assert(T::NumComponents >= 3);
+    T result = All<T>(static_cast<typename T::ValueType>(0));
+    result[2] = static_cast<typename T::ValueType>(-1);
+    return result;
+  }
+  else
+  {
+    static_assert("Not implemented for this type");
+  }
+}
+template <typename T>
+constexpr T Left()
+{
+  return -Right<T>();
+}
+template <typename T>
+constexpr T Down()
+{
+  return -Up<T>();
+}
+template <typename T>
+constexpr T Back()
+{
+  return -Forward<T>();
 }
 
 template <typename T>
@@ -84,26 +103,42 @@ constexpr T HalfPi()
   return Pi<T>() / 2;
 }
 template <typename T>
-constexpr T DoublePi()
+constexpr T TwoPi()
 {
   return Pi<T>() * 2;
 }
-
 template <typename T>
-constexpr std::enable_if_t<IsNumber_v<T>, T> Abs(const T& inValue)
+constexpr T FullCircleRads()
 {
-  return std::abs(inValue);
+  return TwoPi<T>();
+}
+template <typename T>
+constexpr T HalfCircleRads()
+{
+  return FullCircleRads<T>() / 2;
+}
+template <typename T>
+constexpr T QuarterCircleRads()
+{
+  return FullCircleRads<T>() / 4;
 }
 
-template <typename TVecOrMat>
-constexpr std::enable_if_t<IsVecOrMat_v<TVecOrMat>, TVecOrMat> Abs(const TVecOrMat& inVecOrMat)
+template <typename T>
+constexpr auto Abs(const T& inValue)
 {
-  auto result = inVecOrMat;
-  for (auto& v : result)
+  if constexpr (IsNumber_v<T>)
   {
-    v = Abs(v);
+    return std::abs(inValue);
   }
-  return result;
+  else
+  {
+    auto result = inValue;
+    for (auto& v : result)
+    {
+      v = Abs(v);
+    }
+    return result;
+  }
 }
 
 template <typename T>
@@ -250,6 +285,12 @@ constexpr Vec3<T> Direction(const Quat<T>& inQuat)
   return inQuat * Forward<Vec3<T>>();
 }
 
+template <typename T, std::size_t N>
+constexpr Vec3<T> Direction(const Segment<T, N>& inSegment)
+{
+  return NormalizedSafe(inSegment.GetVector());
+}
+
 template <typename T>
 constexpr T Pitch(const Quat<T>& inQuat)
 {
@@ -304,18 +345,6 @@ template <typename T>
 constexpr Quat<T> Conjugated(const Quat<T>& inQuat)
 {
   return -inQuat;
-}
-
-template <typename TVec>
-constexpr std::enable_if_t<IsVec_v<TVec>, TVec> Inverted(const TVec& inVector)
-{
-  return static_cast<typename TVec::ValueType>(1.0) / inVector;
-}
-
-template <typename TQuat>
-constexpr std::enable_if_t<IsQuat_v<TQuat>, TQuat> Inverted(const TQuat& inQuat)
-{
-  return Conjugated(inQuat) / SqLength(inQuat);
 }
 
 template <typename T, std::size_t N>
@@ -400,65 +429,96 @@ constexpr T Determinant(const SquareMat<T, N>& inMat)
   }
 }
 
-template <typename T, std::size_t N>
-constexpr SquareMat<T, N> Inverted(const SquareMat<T, N>& inMat)
-{
-  const auto determinant = Determinant(inMat);
-  if (determinant == 0)
-    THROW_EXCEPTION("Singular matrix (determinant is 0), can not compute its inverse");
-
-  const auto adjoint = Adjoint(inMat);
-
-  const auto inverse = adjoint / determinant;
-  return inverse;
-}
-
 template <typename T>
-const std::enable_if_t<std::is_arithmetic_v<T>, T> RandomUnit()
+constexpr auto Inverted(const T& inValue)
 {
-  return static_cast<double>(rand()) / RAND_MAX;
-}
-
-template <typename T>
-const std::enable_if_t<!std::is_arithmetic_v<T>, T> RandomUnit()
-{
-  using ValueType = typename T::ValueType;
-
-  T result;
-  for (ValueType& value : result)
+  if constexpr (IsVec_v<T> || IsQuat_v<T>)
   {
-    value = RandomUnit<ValueType>();
+    return -inValue;
   }
+  else if constexpr (IsMat_v<T>)
+  {
+    const auto determinant = Determinant(inValue);
+    if (determinant == 0)
+      THROW_EXCEPTION("Singular matrix (determinant is 0), can not compute its inverse");
 
-  result = Normalized(result);
+    const auto adjoint = Adjoint(inValue);
 
-  return result;
+    const auto inverse = adjoint / determinant;
+    return inverse;
+  }
+  else
+  {
+    static_assert("Inverted not implemented for this type.");
+  }
+}
+
+template <typename T>
+constexpr Quat<T> AngleAxis(const T& inAngleRads, const Vec3<T>& inAxisNormalized)
+{
+  EXPECTS(IsNormalized(inAxisNormalized));
+
+  const auto half_angle = inAngleRads * static_cast<T>(0.5);
+  const auto half_angle_sin = std::sin(half_angle);
+  auto result_quat = Quat<T>(inAxisNormalized[0] * half_angle_sin,
+      inAxisNormalized[1] * half_angle_sin,
+      inAxisNormalized[2] * half_angle_sin,
+      std::cos(half_angle));
+  ENSURES(IsNormalized(result_quat));
+  return result_quat;
+}
+
+template <typename T>
+constexpr auto RandomUnit()
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return static_cast<T>(static_cast<double>(rand()) / RAND_MAX);
+  }
+  else if constexpr (IsQuat_v<T>)
+  {
+    using ValueType = typename T::ValueType;
+    return AngleAxis(RandomUnit<ValueType>() * FullCircleRads<ValueType>(), RandomUnit<Vec3<ValueType>>());
+  }
+  else
+  {
+    using ValueType = typename T::ValueType;
+
+    T result;
+    for (auto& value : result)
+    {
+      value = RandomUnit<ValueType>();
+    }
+    result = Normalized(result);
+    return result;
+  }
 }
 
 template <typename T>
 // Min always included. Max excluded in integer types, included in real types.
-const std::enable_if_t<std::is_arithmetic_v<T>, T> Random(const T& inMin, const T& inMax)
+constexpr auto Random(const T& inMin, const T& inMax)
 {
-  return static_cast<T>(RandomUnit<double>() * (inMax - inMin) + inMin);
-}
-
-template <typename T>
-const std::enable_if_t<!std::is_arithmetic_v<T>, T> Random(const T& inMin, const T& inMax)
-{
-  using ValueType = typename T::ValueType;
-
-  T result;
-  auto min_it = inMin.begin();
-  auto max_it = inMax.begin();
-  auto result_it = result.begin();
-  while (result_it != result.end())
+  if constexpr (IsNumber_v<T>)
   {
-    *result_it = Random<ValueType>(*min_it, *max_it);
-    ++min_it;
-    ++max_it;
-    ++result_it;
+    return static_cast<T>(RandomUnit<double>() * (inMax - inMin) + inMin);
   }
-  return result;
+  else
+  {
+    using ValueType = typename T::ValueType;
+
+    T result;
+    auto min_it = inMin.begin();
+    auto max_it = inMax.begin();
+    auto result_it = result.begin();
+    while (result_it != result.end())
+    {
+      *result_it = Random<ValueType>(*min_it, *max_it);
+      ++min_it;
+      ++max_it;
+      ++result_it;
+    }
+    return result;
+  }
 }
 
 template <typename T, std::size_t N>
@@ -472,16 +532,18 @@ constexpr SquareMat<T, N> Diagonal(const T& inDiagonalValue)
   return diagonal_matrix;
 }
 
-template <typename TMat>
-constexpr std::enable_if_t<IsMat_v<TMat>, TMat> Identity()
+template <typename T>
+constexpr auto Identity()
 {
-  return Diagonal<TMat>(static_cast<typename TMat::ValueType>(1));
-}
-
-template <typename TQuat>
-constexpr std::enable_if_t<IsQuat_v<TQuat>, TQuat> Identity()
-{
-  return TQuat { 0, 0, 0, 1 };
+  if constexpr (IsMat_v<T>)
+  {
+    using ValueType = typename T::ValueType;
+    return Diagonal<ValueType, T::NumRows>(static_cast<ValueType>(1));
+  }
+  else if constexpr (IsQuat_v<T>)
+  {
+    return T { 0, 0, 0, 1 };
+  }
 }
 
 template <typename T>
@@ -519,18 +581,9 @@ constexpr Quat<T> FromTo(const Vec3<T>& inFromNormalized, const Vec3<T>& inToNor
 }
 
 template <typename T>
-constexpr Quat<T> AngleAxis(const T& inAngleRads, const Vec3<T>& inAxisNormalized)
+constexpr bool AlmostParallel(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
 {
-  EXPECTS(IsNormalized(inAxisNormalized));
-
-  const auto half_angle = inAngleRads * static_cast<T>(0.5);
-  const auto half_angle_sin = std::sin(half_angle);
-  auto result_quat = Quat<T>(inAxisNormalized[0] * half_angle_sin,
-      inAxisNormalized[1] * half_angle_sin,
-      inAxisNormalized[2] * half_angle_sin,
-      std::cos(half_angle));
-  ENSURES(IsNormalized(result_quat));
-  return result_quat;
+  return IsAlmostEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(1));
 }
 
 template <typename T>
@@ -539,10 +592,19 @@ constexpr Quat<T> LookInDirection(const Vec3<T>& inForwardNormalized, const Vec3
   EXPECTS(IsNormalized(inForwardNormalized));
   EXPECTS(IsNormalized(inUpNormalized));
 
+  auto up_vector = inUpNormalized;
+  if (AlmostParallel(inForwardNormalized, up_vector))
+  {
+    auto right_vector = Right<Vec3f>();
+    if (AlmostParallel(inForwardNormalized, right_vector))
+      right_vector = Normalized(Vec3f(0.5f, 0.5f, 0.0f));
+    up_vector = Cross(inForwardNormalized, right_vector);
+  }
+  assert(IsNormalized(up_vector));
+
   const auto z_axis = -inForwardNormalized;
-  const auto x_axis = Normalized(Cross(inUpNormalized, z_axis));
-  const auto y_axis
-      = Cross(z_axis, x_axis); // No need to normalize because both operands are already normalized and orthogonal
+  const auto x_axis = Normalized(Cross(up_vector, z_axis));
+  const auto y_axis = Cross(z_axis, x_axis); // No need to normalize bc both operands are already normalized and ortho
   assert(IsNormalized(y_axis));
 
   auto rotation_basis_matrix = Mat4<T> { Vec4<T> { x_axis[0], y_axis[0], z_axis[0], static_cast<T>(0) },
@@ -553,6 +615,12 @@ constexpr Quat<T> LookInDirection(const Vec3<T>& inForwardNormalized, const Vec3
   const auto quat_result = Normalized(ToQuaternion(rotation_basis_matrix));
   ENSURES(IsNormalized(quat_result));
   return quat_result;
+}
+
+template <typename T>
+constexpr Mat4<T> NormalMat4(const Mat4<T> & inModelViewMatrix)
+{
+  return Transposed(Inverted(inModelViewMatrix));
 }
 
 template <typename T>

@@ -86,6 +86,7 @@ public:
   Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
 
   virtual void Read(const std::filesystem::path& inMeshPath);
+  void Write(const std::filesystem::path& inMeshPath) const;
 
 private:
   std::vector<Mesh::VertexData> mVerticesData;

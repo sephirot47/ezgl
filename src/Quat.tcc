@@ -16,6 +16,41 @@ constexpr Quat<T>::Quat(const T& inX, const T& inY, const T& inZ, const T& inW) 
 }
 
 template <typename T>
+constexpr typename std::array<T, 4>::iterator Quat<T>::begin()
+{
+  return std::begin(mComponents);
+}
+
+template <typename T>
+constexpr typename std::array<T, 4>::iterator Quat<T>::end()
+{
+  return std::end(mComponents);
+}
+template <typename T>
+constexpr typename std::array<T, 4>::const_iterator Quat<T>::begin() const
+{
+  return std::begin(mComponents);
+}
+
+template <typename T>
+constexpr typename std::array<T, 4>::const_iterator Quat<T>::end() const
+{
+  return std::end(mComponents);
+}
+
+template <typename T>
+constexpr typename std::array<T, 4>::const_iterator Quat<T>::cbegin() const
+{
+  return std::cbegin(mComponents);
+}
+
+template <typename T>
+constexpr typename std::array<T, 4>::const_iterator Quat<T>::cend() const
+{
+  return std::cend(mComponents);
+}
+
+template <typename T>
 constexpr bool Quat<T>::operator==(const Quat<T>& inRHS) const
 {
   return mComponents == inRHS.mComponents;

@@ -5,6 +5,12 @@ namespace egl
 {
 
 template <typename T, std::size_t N>
+constexpr Vec<T, N>::Vec() noexcept : Vec(0)
+{
+}
+
+
+template <typename T, std::size_t N>
 constexpr Vec<T, N>::Vec(const T& inAllValue) noexcept : mComponents { GetArrayWithRepeatedValue<T, N>(inAllValue) }
 {
 }

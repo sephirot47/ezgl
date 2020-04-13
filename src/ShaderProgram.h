@@ -33,6 +33,8 @@ public:
   void SetUniform(const GL::Id inUniformLocation, const T& inValue);
   template <typename T>
   void SetUniform(const std::string_view inName, const T& inValue);
+  template <typename T>
+  void SetUniformSafe(const std::string_view inName, const T& inValue);
 
 private:
   GL::Id mGLId = 0;

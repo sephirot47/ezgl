@@ -19,4 +19,10 @@ Vec<T, N> Segment<T, N>::GetToPoint() const
 {
   return mToPoint;
 }
+
+template <typename T, std::size_t N>
+Vec<T, N> Segment<T, N>::GetVector() const
+{
+  return (mToPoint - mFromPoint);
+}
 }

@@ -18,7 +18,7 @@ Window::Window()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, false);
   glfwWindowHint(GLFW_RESIZABLE, true);
 
-  mHandle = glfwCreateWindow(640, 480, "Test", nullptr, nullptr);
+  mHandle = glfwCreateWindow(700, 700, "Test", nullptr, nullptr);
   if (!mHandle)
     THROW_EXCEPTION("Error creating GLFW window");
 
@@ -31,6 +31,11 @@ Window::Window()
 
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(&GL::ErrorCallback, 0);
+
+  glPointSize(5.0f);
+  glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 }
 
 Window::~Window()

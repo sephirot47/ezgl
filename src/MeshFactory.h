@@ -12,8 +12,12 @@ public:
   GMeshFactory() = delete;
 
   static TMesh GetCube();
+  static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
+  static TMesh GetHemisphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
+  static TMesh GetCone(const std::size_t inNumVerticesX);
 
 private:
+  static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY, const bool inIsHemisphere);
   static  void ConsolidateMesh(TMesh& ioMesh, const DrawableMesh::ENormalsType &inNormalsType);
 };
 

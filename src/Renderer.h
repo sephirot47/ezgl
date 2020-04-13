@@ -4,8 +4,10 @@
 #include "Color.h"
 #include "Math.h"
 #include "Segment.h"
+#include "DrawableMesh.h"
 #include "ShaderProgram.h"
 #include <cstdint>
+#include <stack>
 
 namespace egl
 {
@@ -15,6 +17,13 @@ class ShaderProgram;
 class Renderer
 {
 public:
+  enum class EDrawType
+  {
+    SOLID,
+    WIREFRAME,
+    POINTS
+  };
+
   Renderer();
   Renderer(const Renderer& inRHS) = default;
   Renderer& operator=(const Renderer& inRHS) = default;
@@ -31,24 +40,49 @@ public:
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);
   void Scale(const Vec3f& inScale);
+  void Scale(const float inScale);
 
   void SetColor(const Color4f& inColor);
   void ResetColor();
 
+  void PushState();
+  void PopState();
+  void ResetState();
+
   template <typename T, std::size_t N>
   void DrawSegment(const Segment<T, N>& inSegment);
-  void DrawMesh(const DrawableMesh& inDrawableMesh);
-  void DrawAxes(const float inAxisLength);
+  template <typename T, std::size_t N>
+  void DrawSegments(const Span<Segment<T, N>>& inSegments);
+
+  template <typename T, std::size_t N>
+  void DrawPoint(const Vec<T, N>& inPoint);
+  template <typename T, std::size_t N>
+  void DrawPoints(const Span<Vec<T, N>>& inPoints);
+
+  void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType = Renderer::EDrawType::SOLID);
+  void DrawAxes();
+  void DrawArrow(const Segment3f &inArrowSegment);
+  void DrawThickArrow(const Segment3f &inArrowSegment);
 
 private:
-  Camera mCamera;
-  Mat4f mModelMatrix;
-  Color4f mColor;
+  struct State
+  {
+    Camera mCamera;
+    Mat4f mModelMatrix = Identity<Mat4f>();
+    Color4f mColor = One<Color4f>();
+  };
 
-  ShaderProgram mSegmentsShaderProgram;
-  ShaderProgram mMeshShaderProgram;
+  std::stack<State> mStateStack;
+  ShaderProgram mUnshadedShaderProgram;
+  ShaderProgram mShadedShaderProgram;
 
-  void SetUniforms(ShaderProgram& ioShaderProgram);
+  DrawableMesh mCone;
+
+  static const State DefaultState;
+  State &GetCurrentState();
+  const State &GetCurrentState() const;
+
+  void UseShaderProgram(ShaderProgram& ioShaderProgram);
 };
 }
 

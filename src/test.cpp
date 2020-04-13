@@ -29,22 +29,29 @@ using namespace egl;
 
 int main()
 {
+  srand(time(0));
+
   Window window;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 
   DrawableMesh test_mesh;
-  test_mesh.Read("test.obj");
-  test_mesh.UpdateVAOs(DrawableMesh::ENormalsType::FLAT);
+  test_mesh.Read("monkey.obj");
+  // test_mesh.UpdateVAOs(DrawableMesh::ENormalsType::FLAT);
   // test_mesh = DrawableMeshFactory::GetCube();
+  // test_mesh = DrawableMeshFactory::GetHemisphere(99, 99);
+  // test_mesh = DrawableMeshFactory::GetSphere(99, 99);
+  // test_mesh.UpdateVAOs(DrawableMesh::ENormalsType::FLAT);
+  // test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj");
 
   Renderer renderer;
 
-  Vec3f obj_pos = Vec3f(-5.0f, -5.0f, -5.0f);
+  // Vec3f obj_pos = Vec3f(-5.0f, -5.0f, -5.0f) * 0.3f;
+  Vec3f obj_pos = Vec3f(5.0f, 0.0f, 0.0f);
   Camera camera;
   {
-    camera.SetPosition(Vec3f(0.0f, 10.0f, 0.0f));
+    camera.SetPosition(Vec3f(0.0f, 0.0f, 2.0f));
     camera.LookAtPoint(obj_pos, Vec3f(0.0f, 1.0f, 0.0f));
 
     PerspectiveParameters perspective_params;
@@ -56,23 +63,37 @@ int main()
   float time = 0.0f;
   while (!window.ShouldClose())
   {
+    renderer.PushState();
+
     // Clear the screen to black
     GL::ClearColor(Color4f { 0.0f, 0.0f, 0.0f, 1.0f });
     GL::ClearBuffer(GL::EBufferBitFlags::COLOR | GL::EBufferBitFlags::DEPTH);
 
-    const auto q = AngleAxis(time * 3.14f * 0.1f, Normalized(Vec3f { 1.0f, 0.2f, -0.5f }));
-    const auto model_matrix = TranslationMat4(obj_pos) * RotationMat4(q);
-    renderer.SetModelMatrix(model_matrix);
+    const auto q = AngleAxis(time * 1.0f, Normalized(Vec3f { 5.0f, 2.2f, -9.5f }));
+    renderer.Translate(obj_pos);
+    renderer.Rotate(q);
+
+    renderer.Scale(All<Vec3f>(9.0f));
+    renderer.Scale(All<Vec3f>(0.3f));
     renderer.SetColor(Color4f { 1.0f, 1.0f, 1.0f, 1.0f });
     renderer.DrawMesh(test_mesh);
 
-renderer.DrawAxes(5.0f);
+    renderer.SetColor(Color4f { 0.0f, 0.0f, 1.0f, 1.0f });
+    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+
+    renderer.SetColor(Color4f { 1.0f, 0.0f, 0.0f, 1.0f });
+    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+
+    renderer.Scale(All<Vec3f>(5.0f));
+    renderer.DrawAxes();
 
     window.SwapBuffers();
     window.PollEvents();
 
     time += 0.03;
     std::this_thread::sleep_for(std::chrono::milliseconds(30));
+
+    renderer.PopState();
   }
 
   return EXIT_SUCCESS;
