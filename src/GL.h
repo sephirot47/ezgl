@@ -131,10 +131,50 @@ public:
     INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH
   };
 
+  enum class Enablable
+  {
+    DEPTH_TEST = GL_DEPTH_TEST,
+    CULL_FACE = GL_CULL_FACE,
+    BLEND = GL_BLEND,
+    LINE_SMOOTH = GL_LINE_SMOOTH,
+  };
+
   enum class EShaderProgramEnum
   {
     CURRENT_PROGRAM = GL_CURRENT_PROGRAM
   };
+
+  enum class EBlendFactor
+  {
+    ZERO = GL_ZERO,
+    ONE = GL_ONE,
+    SRC_COLOR = GL_SRC_COLOR,
+    ONE_MINUS_SRC_COLOR = GL_ONE_MINUS_SRC_COLOR,
+    DST_COLOR = GL_DST_COLOR,
+    ONE_MINUS_DST_COLOR = GL_ONE_MINUS_DST_COLOR,
+    SRC_ALPHA = GL_SRC_ALPHA,
+    ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA,
+    DST_ALPHA = GL_DST_ALPHA,
+    ONE_MINUS_DST_ALPHA = GL_ONE_MINUS_DST_ALPHA,
+    CONSTANT_COLOR = GL_CONSTANT_COLOR,
+    ONE_MINUS_CONSTANT_COLOR = GL_ONE_MINUS_CONSTANT_COLOR,
+    CONSTANT_ALPHA = GL_CONSTANT_ALPHA,
+    ONE_MINUS_CONSTANT_ALPHA = GL_ONE_MINUS_CONSTANT_ALPHA,
+    SRC_ALPHA_SATURATE = GL_SRC_ALPHA_SATURATE,
+    SRC1_COLOR = GL_SRC1_COLOR,
+    ONE_MINUS_SRC1_COLOR = GL_ONE_MINUS_SRC1_COLOR,
+    SRC1_ALPHA = GL_SRC1_ALPHA,
+    ONE_MINUS_SRC1_ALPHA = GL_ONE_MINUS_SRC1_ALPHA,
+  };
+
+  static void Enable(const GL::Enablable inEnablable);
+  static void Disable(const GL::Enablable inEnablable);
+  static void SetEnabled(const GL::Enablable inEnablable, const bool inEnabled);
+
+  static void BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor);
+
+  static void PointSize(const float inPointSize);
+  static void LineWidth(const float inLineWidth);
 
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();

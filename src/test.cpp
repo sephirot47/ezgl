@@ -33,25 +33,20 @@ int main()
 
   Window window;
 
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-
   DrawableMesh test_mesh;
   test_mesh.Read("monkey.obj");
-  // test_mesh.UpdateVAOs(DrawableMesh::ENormalsType::FLAT);
   // test_mesh = DrawableMeshFactory::GetCube();
   // test_mesh = DrawableMeshFactory::GetHemisphere(99, 99);
   // test_mesh = DrawableMeshFactory::GetSphere(99, 99);
-  // test_mesh.UpdateVAOs(DrawableMesh::ENormalsType::FLAT);
   // test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj");
 
   Renderer renderer;
 
   // Vec3f obj_pos = Vec3f(-5.0f, -5.0f, -5.0f) * 0.3f;
-  Vec3f obj_pos = Vec3f(5.0f, 0.0f, 0.0f);
+  Vec3f obj_pos = Vec3f(0.0f, 0.0f, 0.0f);
   Camera camera;
   {
-    camera.SetPosition(Vec3f(0.0f, 0.0f, 2.0f));
+    camera.SetPosition(Vec3f(5.0f, 0.0f, 8.0f) * 1.5f);
     camera.LookAtPoint(obj_pos, Vec3f(0.0f, 1.0f, 0.0f));
 
     PerspectiveParameters perspective_params;
@@ -65,27 +60,29 @@ int main()
   {
     renderer.PushState();
 
-    // Clear the screen to black
-    GL::ClearColor(Color4f { 0.0f, 0.0f, 0.0f, 1.0f });
-    GL::ClearBuffer(GL::EBufferBitFlags::COLOR | GL::EBufferBitFlags::DEPTH);
+    renderer.ClearBackground(Pink());
+    renderer.ClearDepth();
 
-    const auto q = AngleAxis(time * 1.0f, Normalized(Vec3f { 5.0f, 2.2f, -9.5f }));
+    const auto q = AngleAxis(time * 0.4f, Normalized(Vec3f { 9.0f, 92.2f, -9.5f }));
     renderer.Translate(obj_pos);
     renderer.Rotate(q);
 
-    renderer.Scale(All<Vec3f>(9.0f));
-    renderer.Scale(All<Vec3f>(0.3f));
-    renderer.SetColor(Color4f { 1.0f, 1.0f, 1.0f, 1.0f });
+    renderer.Scale(All<Vec3f>(10.0f));
+    renderer.SetLineWidth(3.0f);
+    renderer.DrawAxes();
+
+    renderer.Rotate(q);
+    renderer.Scale(All<Vec3f>(0.5f));
+    renderer.SetColor(Red());
+    renderer.SetLightSpecularExponent(60.0f);
     renderer.DrawMesh(test_mesh);
 
-    renderer.SetColor(Color4f { 0.0f, 0.0f, 1.0f, 1.0f });
+    renderer.SetColor(Blue());
     // renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
-    renderer.SetColor(Color4f { 1.0f, 0.0f, 0.0f, 1.0f });
+    renderer.SetPointSize(4.0f);
+    renderer.SetColor(Red());
     // renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
-
-    renderer.Scale(All<Vec3f>(5.0f));
-    renderer.DrawAxes();
 
     window.SwapBuffers();
     window.PollEvents();

@@ -3,6 +3,27 @@
 namespace egl
 {
 
+void GL::Enable(const GL::Enablable inEnablable) { glEnable(GL::EnumCast(inEnablable)); }
+
+void GL::Disable(const GL::Enablable inEnablable) { glDisable(GL::EnumCast(inEnablable)); }
+
+void GL::PointSize(const float inPointSize) { glPointSize(inPointSize); }
+
+void GL::LineWidth(const float inLineWidth) { glLineWidth(inLineWidth); }
+
+void GL::SetEnabled(const GL::Enablable inEnablable, const bool inEnabled)
+{
+  if (inEnabled)
+    GL::Enable(inEnablable);
+  else
+    GL::Disable(inEnablable);
+}
+
+void GL::BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor)
+{
+  glBlendFunc(GL::EnumCast(inSourceBlendFactor), GL::EnumCast(inDestBlendFactor));
+}
+
 GL::Id GL::GenBuffer()
 {
   GL::Id new_buffer_id = 0;

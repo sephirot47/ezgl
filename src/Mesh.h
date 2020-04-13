@@ -18,6 +18,7 @@ class Mesh
 {
 public:
   using Id = uint32_t;
+  using CornerId = Mesh::Id;
   using FaceId = Mesh::Id;
   using VertexId = Mesh::Id;
   using InternalCornerId = uint8_t; // [0, 2];
@@ -51,9 +52,15 @@ public:
     Vec3f mPosition = Zero<Vec3f>();
   };
 
+  struct CornerData
+  {
+    Vec3f mNormal = Zero<Vec3f>();
+  };
+
   struct FaceData
   {
     std::array<Mesh::VertexId, 3> mVerticesIds;
+    Vec3f mNormal = Zero<Vec3f>();
   };
 
   Mesh() = default;
@@ -67,18 +74,26 @@ public:
   void AddFace(const Mesh::VertexId& inFaceVertexId0,
       const Mesh::VertexId& inFaceVertexId1,
       const Mesh::VertexId& inFaceVertexId2);
-  Vec3f ComputeFaceNormal(const Mesh::FaceId &inFaceId);
-  Vec3f ComputeVertexSmoothNormal(const Mesh::VertexId &inVertexId);
+  void ComputeFaceNormals();
+  void ComputeCornerNormals(const float inMinEdgeAngleToSmooth);
+  void ComputeNormals(const float inMinEdgeAngleToSmooth);
   void Clear();
+
+  void SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f &inFaceNormal);
+  void SetCornerNormal(const Mesh::CornerId inCornerId, const Vec3f &inCornerNormal);
+  const Vec3f& GetFaceNormal(const Mesh::CornerId &inCornerId);
+  const Vec3f& GetCornerNormal(const Mesh::FaceId &inFaceId);
 
   void SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition);
 
   static bool IsValid(const Mesh::Id inId);
   static bool IsValid(const std::optional<Mesh::Id> inOptionalId);
   const std::vector<Mesh::VertexData>& GetVerticesData() const;
+  const std::vector<Mesh::CornerData>& GetCornersData() const;
   const std::vector<Mesh::FaceData>& GetFacesData() const;
   std::size_t GetNumberOfFaces() const;
   std::size_t GetNumberOfVertices() const;
+  std::size_t GetNumberOfCorners() const;
 
   // Circulators
   CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
@@ -90,6 +105,7 @@ public:
 
 private:
   std::vector<Mesh::VertexData> mVerticesData;
+  std::vector<Mesh::CornerData> mCornersData;
   std::vector<Mesh::FaceData> mFacesData;
 };
 

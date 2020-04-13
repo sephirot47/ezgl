@@ -41,6 +41,8 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
   // For each vertex of the new face, update neighbor faces
   for (Mesh::InternalCornerId internal_corner_id = 0; internal_corner_id < 3; ++internal_corner_id)
   {
+    mCornersData.emplace_back();
+
     const auto& new_face_vertex_id = new_face_vertices_ids[internal_corner_id];
     std::vector<Mesh::FaceId> new_vertex_ordered_neighbor_faces_ids; // Find the list of neighbor faces ordered in CCW
     {
@@ -115,33 +117,28 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
   }
 }
 
-Vec3f Mesh::ComputeFaceNormal(const Mesh::FaceId& inFaceId)
+void Mesh::SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f& inFaceNormal)
 {
-  const auto& face_data = mFacesData.at(inFaceId);
-  const auto vertex_position_0 = mVerticesData.at(face_data.mVerticesIds[0]).mPosition;
-  const auto vertex_position_1 = mVerticesData.at(face_data.mVerticesIds[1]).mPosition;
-  const auto vertex_position_2 = mVerticesData.at(face_data.mVerticesIds[2]).mPosition;
-  const auto v1_v0 = (vertex_position_0 - vertex_position_1);
-  const auto v1_v2 = (vertex_position_2 - vertex_position_1);
-  const auto face_normal = NormalizedSafe(Cross(v1_v2, v1_v0));
-  return face_normal;
+  EXPECTS(inFaceId < mFacesData.size());
+  mFacesData.at(inFaceId).mNormal = inFaceNormal;
 }
 
-Vec3f Mesh::ComputeVertexSmoothNormal(const Mesh::VertexId& inVertexId)
+void Mesh::SetCornerNormal(const Mesh::CornerId inCornerId, const Vec3f& inCornerNormal)
 {
-  auto normal_sum = Zero<Vec3f>();
-  {
-    const auto& vertex_data = mVerticesData.at(inVertexId);
-    for (const auto& neighbor_face_id : vertex_data.mNeighborFacesId)
-    {
-      const auto neighbor_face_normal = ComputeFaceNormal(neighbor_face_id);
-      assert(IsNormalized(neighbor_face_normal));
-      normal_sum += ComputeFaceNormal(neighbor_face_id);
-    }
-  }
+  EXPECTS(inCornerId < mCornersData.size());
+  mCornersData.at(inCornerId).mNormal = inCornerNormal;
+}
 
-  const auto vertex_smooth_normal = NormalizedSafe(normal_sum);
-  return vertex_smooth_normal;
+const Vec3f& Mesh::GetFaceNormal(const Mesh::FaceId& inFaceId)
+{
+  EXPECTS(inFaceId < mFacesData.size());
+  return mFacesData.at(inFaceId).mNormal;
+}
+
+const Vec3f& Mesh::GetCornerNormal(const Mesh::CornerId& inCornerId)
+{
+  EXPECTS(inCornerId < mCornersData.size());
+  return mCornersData.at(inCornerId).mNormal;
 }
 
 void Mesh::Clear()
@@ -186,6 +183,65 @@ std::size_t Mesh::GetNumberOfFaces() const { return mFacesData.size(); }
 
 std::size_t Mesh::GetNumberOfVertices() const { return mVerticesData.size(); }
 
+std::size_t Mesh::GetNumberOfCorners() const { return mCornersData.size(); }
+
+void Mesh::ComputeFaceNormals()
+{
+  for (auto& face_data : mFacesData)
+  {
+    const auto vertex_position_0 = mVerticesData.at(face_data.mVerticesIds[0]).mPosition;
+    const auto vertex_position_1 = mVerticesData.at(face_data.mVerticesIds[1]).mPosition;
+    const auto vertex_position_2 = mVerticesData.at(face_data.mVerticesIds[2]).mPosition;
+    const auto v1_v0 = (vertex_position_0 - vertex_position_1);
+    const auto v1_v2 = (vertex_position_2 - vertex_position_1);
+    const auto face_normal = NormalizedSafe(Cross(v1_v2, v1_v0));
+    face_data.mNormal = face_normal;
+  }
+}
+
+void Mesh::ComputeCornerNormals(const float inMinEdgeAngleToSmooth)
+{
+  const auto min_edge_dot_to_smooth = std::cos(inMinEdgeAngleToSmooth);
+  for (Mesh::CornerId corner_id = 0; corner_id < mCornersData.size(); ++corner_id)
+  {
+    auto& corner_data = mCornersData.at(corner_id);
+    const auto face_id = (corner_id / 3);
+    const auto internal_corner_id = (corner_id % 3);
+    const auto vertex_id = mFacesData.at(face_id).mVerticesIds.at(internal_corner_id);
+    const auto& face_normal = mFacesData.at(face_id).mNormal;
+    assert(IsNormalized(face_normal));
+
+    auto normal_sum = Zero<Vec3f>();
+    {
+      const auto& vertex_data = mVerticesData.at(vertex_id);
+      for (const auto& neighbor_face_id : vertex_data.mNeighborFacesId)
+      {
+        if (face_id == neighbor_face_id)
+        {
+          normal_sum += face_normal;
+          continue;
+        }
+
+        const auto neighbor_face_normal = mFacesData.at(neighbor_face_id).mNormal;
+        assert(IsNormalized(neighbor_face_normal));
+
+        const auto edge_dot = Dot(face_normal, neighbor_face_normal);
+        if (edge_dot >= min_edge_dot_to_smooth)
+          normal_sum += neighbor_face_normal;
+      }
+    }
+
+    const auto corner_normal = NormalizedSafe(normal_sum);
+    corner_data.mNormal = corner_normal;
+  }
+}
+
+void Mesh::ComputeNormals(const float inMinEdgeAngleToSmooth)
+{
+  ComputeFaceNormals();
+  ComputeCornerNormals(inMinEdgeAngleToSmooth);
+}
+
 void Mesh::Read(const std::filesystem::path& inMeshPath)
 {
   Assimp::Importer importer;
@@ -207,7 +263,7 @@ void Mesh::Read(const std::filesystem::path& inMeshPath)
   Clear();
 
   // Create vertices
-  for (std::size_t vertex_id = 0; vertex_id < aiMesh.mNumVertices; ++vertex_id)
+  for (Mesh::VertexId vertex_id = 0; vertex_id < aiMesh.mNumVertices; ++vertex_id)
   {
     const auto ai_vertex_position = aiMesh.mVertices[vertex_id];
     const auto vertex_position = AiVector3DToVec3f(ai_vertex_position);
@@ -215,11 +271,22 @@ void Mesh::Read(const std::filesystem::path& inMeshPath)
   }
 
   // Create faces
-  for (std::size_t face_id = 0; face_id < aiMesh.mNumFaces; ++face_id)
+  for (Mesh::FaceId face_id = 0; face_id < aiMesh.mNumFaces; ++face_id)
   {
     const auto ai_face = aiMesh.mFaces[face_id];
     EXPECTS(ai_face.mNumIndices == 3);
     AddFace(ai_face.mIndices[0], ai_face.mIndices[1], ai_face.mIndices[2]);
+  }
+
+  // Assign corner normals
+  for (Mesh::CornerId corner_id = 0; corner_id < GetNumberOfCorners(); ++corner_id)
+  {
+    const auto face_id = (corner_id / 3);
+    const auto internal_corner_id = (corner_id % 3);
+    const auto vertex_id = mFacesData.at(face_id).mVerticesIds.at(internal_corner_id);
+    const auto ai_corner_normal = aiMesh.mNormals[vertex_id];
+    const auto corner_normal = NormalizedSafe(AiVector3DToVec3f(ai_corner_normal));
+    SetCornerNormal(corner_id, corner_normal);
   }
 }
 
@@ -245,14 +312,14 @@ void Mesh::Write(const std::filesystem::path& inMeshPath) const
 
     ai_mesh.mNumVertices = GetNumberOfVertices();
     ai_mesh.mVertices = new aiVector3D[ai_mesh.mNumVertices];
-    for (std::size_t vertex_id = 0; vertex_id < GetNumberOfVertices(); ++vertex_id)
+    for (Mesh::VertexId vertex_id = 0; vertex_id < GetNumberOfVertices(); ++vertex_id)
     {
       ai_mesh.mVertices[vertex_id] = Vec3fToAiVector3D(GetVerticesData().at(vertex_id).mPosition);
     }
 
     ai_mesh.mNumFaces = GetNumberOfFaces();
     ai_mesh.mFaces = new aiFace[ai_mesh.mNumFaces];
-    for (std::size_t face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
+    for (Mesh::FaceId face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
     {
       aiFace& ai_face = ai_mesh.mFaces[face_id];
       ai_face.mNumIndices = 3;

@@ -18,7 +18,7 @@ public:
 
 private:
   static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY, const bool inIsHemisphere);
-  static  void ConsolidateMesh(TMesh& ioMesh, const DrawableMesh::ENormalsType &inNormalsType);
+  static  void ConsolidateMesh(TMesh& ioMesh);
 };
 
 using MeshFactory = GMeshFactory<Mesh>;

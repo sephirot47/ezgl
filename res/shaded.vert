@@ -15,7 +15,7 @@ layout(location = 1) out vec3 out_world_normal;
 void main()
 {
     out_world_position = (UModel * vec4(in_model_position, 1)).xyz;
-    out_world_normal = (UNormal * vec4(in_model_normal, 0)).xyz;
+    out_world_normal = normalize((UNormal * vec4(in_model_normal,0)).xyz);
 
     gl_Position = UProjectionViewModel * vec4(in_model_position, 1.0);
 }

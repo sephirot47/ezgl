@@ -30,7 +30,7 @@ TMesh GMeshFactory<TMesh>::GetCube()
   cube.AddFace(0, 6, 4);
   cube.AddFace(0, 2, 6);
 
-  ConsolidateMesh(cube, DrawableMesh::ENormalsType::FLAT);
+  ConsolidateMesh(cube);
   return cube;
 }
 
@@ -128,16 +128,19 @@ TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumVerticesX,
     }
   }
 
-  ConsolidateMesh(sphere, DrawableMesh::ENormalsType::SMOOTH);
+  ConsolidateMesh(sphere);
   return sphere;
 }
 
 template <typename TMesh>
-void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh, const DrawableMesh::ENormalsType& inNormalsType)
+void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh)
 {
+  constexpr auto max_smooth_angle = DegreeToRad(45.0f);
+  ioMesh.ComputeNormals(max_smooth_angle);
+
   if constexpr (std::is_same_v<TMesh, DrawableMesh>)
   {
-    ioMesh.UpdateVAOs(inNormalsType);
+    ioMesh.UpdateVAOs();
   }
 }
 }

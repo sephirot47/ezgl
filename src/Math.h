@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Color.h"
 #include "Mat.h"
 #include "Quat.h"
 #include "Segment.h"
@@ -24,6 +25,136 @@ template <typename TVecOrMat>
 constexpr TVecOrMat One()
 {
   return All<TVecOrMat>(1);
+}
+
+template <typename T>
+constexpr T ColorCast(const Color4f& inColor)
+{
+  if constexpr (T::NumComponents == 3)
+    return T { inColor[0], inColor[1], inColor[2] };
+  else
+    return T { inColor[0], inColor[1], inColor[2], inColor[3] };
+}
+
+template <typename T = Color4f>
+constexpr T Black()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Gray()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T White()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Red()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Green()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Blue()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Cyan()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Magenta()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Yellow()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Brown()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0.5), static_cast<TValue>(0.25), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Orange()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(0.5), static_cast<TValue>(0), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Purple()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(0.5), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1) });
+}
+
+template <typename T = Color4f>
+constexpr T Pink()
+{
+  using TValue = typename T::ValueType;
+  return ColorCast<T>(
+      Color4f { static_cast<TValue>(1), static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(1) });
+}
+
+template <typename TColor>
+constexpr TColor WithAlpha(const TColor &inColor, const typename TColor::ValueType inAlpha)
+{
+  TColor new_color = inColor;
+  new_color[3] = inAlpha;
+  return new_color;
+}
+
+template <typename TColor>
+constexpr TColor WithValue(const TColor &inColor, const typename TColor::ValueType inValue)
+{
+  TColor new_color = inColor;
+  for (std::size_t i = 0; i < 3; ++i)
+    new_color[i] *= inValue;
+  return new_color;
 }
 
 template <typename T>
@@ -618,7 +749,7 @@ constexpr Quat<T> LookInDirection(const Vec3<T>& inForwardNormalized, const Vec3
 }
 
 template <typename T>
-constexpr Mat4<T> NormalMat4(const Mat4<T> & inModelViewMatrix)
+constexpr Mat4<T> NormalMat4(const Mat4<T>& inModelViewMatrix)
 {
   return Transposed(Inverted(inModelViewMatrix));
 }

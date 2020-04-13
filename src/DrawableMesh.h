@@ -21,14 +21,8 @@ public:
   DrawableMesh(DrawableMesh&&) = default;
   virtual ~DrawableMesh() = default;
 
-  enum class ENormalsType
-  {
-    SMOOTH,
-    FLAT
-  };
-
   void Bind() const;
-  void UpdateVAOs(const DrawableMesh::ENormalsType& inNormalsType = ENormalsType::SMOOTH);
+  void UpdateVAOs();
 
   void Read(const std::filesystem::path& inMeshPath) final;
 
