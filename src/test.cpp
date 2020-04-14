@@ -33,6 +33,47 @@ int main()
 
   Window window;
 
+  window.SetInputEventCallback([](const InputEvent& inInputEvent) {
+    switch (inInputEvent.GetType())
+    {
+
+    case InputEvent::Type::Key:
+    {
+      const auto& key_event = inInputEvent.As<InputEvent::Type::Key>();
+      PEEK(int(key_event.mKey));
+    }
+    break;
+
+    case InputEvent::Type::MouseButton:
+    {
+      const auto mouse_button_event = inInputEvent.As<InputEvent::Type::MouseButton>();
+      PEEK(int(mouse_button_event.mButton));
+    }
+    break;
+
+    case InputEvent::Type::MouseMove:
+    {
+      const auto mouse_move_event = inInputEvent.As<InputEvent::Type::MouseMove>();
+      PEEK(mouse_move_event.mPosition);
+    }
+    break;
+
+    case InputEvent::Type::MouseEnterExit:
+    {
+      const auto mouse_enter_exit_event = inInputEvent.As<InputEvent::Type::MouseEnterExit>();
+      PEEK(mouse_enter_exit_event.mEntered);
+    }
+    break;
+
+    case InputEvent::Type::MouseScroll:
+    {
+      const auto mouse_scroll_event = inInputEvent.As<InputEvent::Type::MouseScroll>();
+      PEEK(mouse_scroll_event.mDeltaScroll);
+    }
+    break;
+    }
+  });
+
   DrawableMesh test_mesh;
   test_mesh.Read("monkey.obj");
   // test_mesh = DrawableMeshFactory::GetCube();
@@ -74,7 +115,7 @@ int main()
     renderer.Rotate(q);
     renderer.Scale(All<Vec3f>(0.5f));
     renderer.SetColor(Red());
-    renderer.SetLightSpecularExponent(60.0f);
+    renderer.SetLightSpecularExponent(120.0f);
     renderer.DrawMesh(test_mesh);
 
     renderer.SetColor(Blue());

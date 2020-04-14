@@ -1,6 +1,9 @@
 #pragma once
 
+#include "GL.h"
+#include "Input.h"
 #include <cstdint>
+#include <functional>
 #include <string_view>
 
 class GLFWwindow;
@@ -26,8 +29,7 @@ public:
     bool mUseAntialiasing = true;
   };
 
-
-  Window(const Window::CreateOptions &inCreateOptions = Window::CreateOptions());
+  Window(const Window::CreateOptions& inCreateOptions = Window::CreateOptions());
   Window(const Window& inRHS) = delete;
   Window& operator=(const Window& inRHS) = delete;
   Window(Window&& inRHS) = delete;
@@ -38,7 +40,20 @@ public:
   void SwapBuffers();
   void PollEvents();
 
+  // Input callbacks
+  using InputEventCallback = std::function<void(const InputEvent&)>;
+  void SetInputEventCallback(const InputEventCallback& inInputEventCallback);
+  const InputEventCallback& GetInputEventCallback() const;
+
+  // Input direct
+  bool IsMouseButtonPressed(const MouseButton &inMouseButton);
+  bool IsKeyPressed(const Key &inKey);
+  Vec2f GetMousePosition() const;
+
 private:
   GLFWwindow* mHandle = nullptr;
+  InputEventCallback mInputEventCallback = nullptr;
 };
 }
+
+#include "Window.tcc"
