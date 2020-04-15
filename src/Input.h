@@ -158,10 +158,10 @@ enum class MouseButton
   BUTTON_6 = GLFW_MOUSE_BUTTON_6,
   BUTTON_7 = GLFW_MOUSE_BUTTON_7,
   BUTTON_8 = GLFW_MOUSE_BUTTON_8,
-  BUTTON_LAST = GLFW_MOUSE_BUTTON_LAST,
-  BUTTON_LEFT = GLFW_MOUSE_BUTTON_LEFT,
-  BUTTON_RIGHT = GLFW_MOUSE_BUTTON_RIGHT,
-  BUTTON_MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE,
+  LAST = GLFW_MOUSE_BUTTON_LAST,
+  LEFT = GLFW_MOUSE_BUTTON_LEFT,
+  RIGHT = GLFW_MOUSE_BUTTON_RIGHT,
+  MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE,
 };
 
 enum class ModifierKey
@@ -176,18 +176,36 @@ enum class ModifierKey
 };
 DECLARE_FLAGS(ModifierKey);
 
-struct KeyEvent
+struct KeyOrButtonEvent
 {
-  Key mKey = Key::UNKNOWN;
-  KeyAction mAction = KeyAction::PRESS;
-  ModifierKey mModifiers = ModifierKey::ALT;
+  ModifierKey mModifiers = ModifierKey::NONE;
+
+  bool IsAltModifierPressed() const { return (mModifiers & ModifierKey::ALT) != ModifierKey::NONE; }
+  bool IsShiftModifierPressed() const { return (mModifiers & ModifierKey::SHIFT) != ModifierKey::NONE; }
+  bool IsControlModifierPressed() const { return (mModifiers & ModifierKey::CONTROL) != ModifierKey::NONE; }
+  bool IsCapsLockModifierPressed() const { return (mModifiers & ModifierKey::CAPS_LOCK) != ModifierKey::NONE; }
+  bool IsNumLockModifierPressed() const { return (mModifiers & ModifierKey::NUM_LOCK) != ModifierKey::NONE; }
+  bool IsSuperModifierPressed() const { return (mModifiers & ModifierKey::SUPER) != ModifierKey::NONE; }
 };
 
-struct MouseButtonEvent
+struct KeyEvent : public KeyOrButtonEvent
 {
-  MouseButton mButton = MouseButton::UNKNOWN;
+  KeyAction mAction = KeyAction::UNKNOWN;
+  Key mKey = Key::UNKNOWN;
+
+  bool IsPress() const { return mAction == KeyAction::PRESS; }
+  bool IsRepeat() const { return mAction == KeyAction::REPEAT; }
+  bool IsPressOrRepeat() const { return IsPress() || IsRepeat(); }
+  bool IsRelease() const { return mAction == KeyAction::RELEASE; }
+};
+
+struct MouseButtonEvent : public KeyOrButtonEvent
+{
   MouseAction mAction = MouseAction::UNKNOWN;
-  ModifierKey mModifiers = ModifierKey::NONE;
+  MouseButton mButton = MouseButton::UNKNOWN;
+
+  bool IsPress() const { return mAction == MouseAction::PRESS; }
+  bool IsRelease() const { return mAction == MouseAction::RELEASE; }
 };
 
 struct MouseMoveEvent
@@ -205,8 +223,8 @@ struct MouseScrollEvent
   Vec2f mDeltaScroll = Vec2f(0.0f, 0.0f);
 };
 
-
-using VariantInputEvent = std::variant<KeyEvent, MouseButtonEvent, MouseMoveEvent, MouseEnterExitEvent, MouseScrollEvent>;
+using VariantInputEvent
+    = std::variant<KeyEvent, MouseButtonEvent, MouseMoveEvent, MouseEnterExitEvent, MouseScrollEvent>;
 struct InputEvent : public VariantInputEvent
 {
   using VariantInputEvent::operator=;

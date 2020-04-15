@@ -12,7 +12,7 @@ Camera::Camera()
 
 void Camera::SetPosition(const Vec3f& inPosition) { mPosition = inPosition; }
 
-void Camera::SetOrientation(const Quatf& inOrientation) { mOrientation = inOrientation; }
+void Camera::SetOrientation(const Quatf& inOrientation) { mOrientation = Normalized(inOrientation); }
 
 void Camera::SetPerspectiveParameters(const PerspectiveParameters& inPerspectiveParameters)
 {
@@ -58,6 +58,12 @@ const PerspectiveParameters& Camera::GetPerspectiveParameters() const
   EXPECTS(IsPerspective());
   const auto& perspective_parameters = std::get<PerspectiveParameters>(mProjectionParametersVariant);
   return perspective_parameters;
+}
+
+Mat4f Camera::GetModelMatrix() const
+{
+  const auto model_matrix = TranslationMat4(mPosition) * RotationMat4(mOrientation);
+  return model_matrix;
 }
 
 Mat4f Camera::GetViewMatrix() const

@@ -7,6 +7,7 @@
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include <cstdint>
+#include <memory>
 #include <stack>
 
 namespace egl
@@ -43,7 +44,7 @@ public:
   void SetPointSize(const float inPointSize);
   void SetLineWidth(const float inLineWidth);
 
-  void SetCamera(const Camera& camera);
+  void SetCamera(const std::shared_ptr<Camera>& inCamera);
   void ResetCamera();
 
   void SetModelMatrix(const Mat4f& inModelMatrix);
@@ -57,9 +58,9 @@ public:
   void SetColor(const Color4f& inColor);
   void ResetColor();
 
-  void SetLightAmbientColor(const Color4f &inLightAmbientColor);
-  void SetLightDiffuseColor(const Color4f &inLightDiffuseColor);
-  void SetLightSpecularColor(const Color4f &inLightSpecularColor);
+  void SetLightAmbientColor(const Color4f& inLightAmbientColor);
+  void SetLightDiffuseColor(const Color4f& inLightDiffuseColor);
+  void SetLightSpecularColor(const Color4f& inLightSpecularColor);
   void SetLightSpecularExponent(const float inSpecularExponent);
 
   void PushState();
@@ -83,7 +84,7 @@ public:
 private:
   struct State
   {
-    Camera mCamera;
+    std::shared_ptr<Camera> mCamera = std::make_shared<Camera>();
     Mat4f mModelMatrix = Identity<Mat4f>();
     Color4f mColor = One<Color4f>();
 

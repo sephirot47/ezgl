@@ -75,7 +75,7 @@ void Renderer::SetLineWidth(const float inLineWidth)
   GL::LineWidth(inLineWidth);
 }
 
-void Renderer::SetCamera(const Camera& camera) { GetCurrentState().mCamera = camera; }
+void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
 void Renderer::ResetCamera() { GetCurrentState().mCamera = DefaultState.mCamera; }
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix) { GetCurrentState().mModelMatrix = inModelMatrix; }
@@ -206,12 +206,12 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
 void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 {
   const auto& model_matrix = GetCurrentState().mModelMatrix;
-  const auto view_matrix = GetCurrentState().mCamera.GetViewMatrix();
+  const auto view_matrix = GetCurrentState().mCamera->GetViewMatrix();
   const auto normal_matrix = NormalMat4(model_matrix);
-  const auto projection_matrix = GetCurrentState().mCamera.GetProjectionMatrix();
+  const auto projection_matrix = GetCurrentState().mCamera->GetProjectionMatrix();
   const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
-  const auto camera_world_position = GetCurrentState().mCamera.GetPosition();
-  const auto camera_world_direction = Direction(GetCurrentState().mCamera.GetOrientation());
+  const auto camera_world_position = GetCurrentState().mCamera->GetPosition();
+  const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetOrientation());
 
   ioShaderProgram.Bind();
   ioShaderProgram.SetUniformSafe("UColor", GetCurrentState().mColor);

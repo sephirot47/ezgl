@@ -24,11 +24,16 @@ public:
 
   const Vec3f& GetPosition() const;
   const Quatf& GetOrientation() const;
+  Vec3f GetForward() const;
+  Vec3f GetRight() const;
+  Vec3f GetUp() const;
+
   bool IsOrthographic() const;
   bool IsPerspective() const;
   const OrthographicParameters& GetOrthographicParameters() const;
   const PerspectiveParameters& GetPerspectiveParameters() const;
 
+  Mat4f GetModelMatrix() const;
   Mat4f GetViewMatrix() const;
   Mat4f GetProjectionMatrix() const;
 

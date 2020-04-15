@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Macros.h"
 #include <GL/glew.h>
+#include <algorithm>
 
 namespace egl
 {
@@ -89,10 +90,7 @@ bool Window::IsMouseButtonPressed(const MouseButton& inMouseButton)
   return glfwGetMouseButton(mHandle, static_cast<int>(inMouseButton)) == GLFW_PRESS;
 }
 
-bool Window::IsKeyPressed(const Key& inKey)
-{
-  return glfwGetKey(mHandle, static_cast<int>(inKey)) == GLFW_PRESS;
-}
+bool Window::IsKeyPressed(const Key& inKey) { return glfwGetKey(mHandle, static_cast<int>(inKey)) == GLFW_PRESS; }
 
 Vec2f Window::GetMousePosition() const
 {
@@ -103,15 +101,25 @@ Vec2f Window::GetMousePosition() const
   return mouse_position;
 }
 
-// Input free functions
 template <typename TInputEvent>
 void CallInputEventCallback(GLFWwindow* inGLFWWindow, const TInputEvent& inInputEvent)
 {
   const Window& window = *(reinterpret_cast<Window*>(glfwGetWindowUserPointer(inGLFWWindow)));
-  if (!window.GetInputEventCallback())
-    return;
-  window.GetInputEventCallback()({ inInputEvent });
+  if (const auto& input_event_callback = window.GetInputEventCallback())
+    input_event_callback({ inInputEvent });
+
+  for (auto& input_listener : window.GetInputListeners())
+    input_listener->OnInput({ inInputEvent });
 }
+
+void Window::AddInputListener(InputListener* inInputListener) { mInputListeners.push_back(inInputListener); }
+void Window::RemoveInputListener(InputListener* inInputListener)
+{
+  PEEK(inInputListener);
+  mInputListeners.erase(std::find(mInputListeners.cbegin(), mInputListeners.cend(), inInputListener));
+  PEEK(mInputListeners.size());
+}
+const std::vector<InputListener*>& Window::GetInputListeners() const { return mInputListeners; }
 
 void GLFWMouseButtonCallback(GLFWwindow* inGLFWWindow, int inButton, int inAction, int inModifiers)
 {
@@ -152,5 +160,21 @@ void GLFWKeyCallback(GLFWwindow* inGLFWWindow, int inKey, int inScancode, int in
   key_event.mModifiers = static_cast<ModifierKey>(inModifiers);
   CallInputEventCallback(inGLFWWindow, key_event);
 };
+
+InputListener::~InputListener()
+{
+  if (const auto window = mWindow.lock())
+    window->RemoveInputListener(this);
+}
+
+void InputListener::ListenToInput(const std::shared_ptr<Window>& inWindow)
+{
+  EXPECTS(inWindow);
+  mWindow = inWindow;
+
+  inWindow->AddInputListener(this);
+}
+
+const std::weak_ptr<Window>& InputListener::GetWindow() const { return mWindow; }
 
 }

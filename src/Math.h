@@ -8,6 +8,7 @@
 #include "Vec.h"
 #include <cmath>
 #include <cstdint>
+#include <tuple>
 
 namespace egl
 {
@@ -141,7 +142,7 @@ constexpr T Pink()
 }
 
 template <typename TColor>
-constexpr TColor WithAlpha(const TColor &inColor, const typename TColor::ValueType inAlpha)
+constexpr TColor WithAlpha(const TColor& inColor, const typename TColor::ValueType inAlpha)
 {
   TColor new_color = inColor;
   new_color[3] = inAlpha;
@@ -149,7 +150,7 @@ constexpr TColor WithAlpha(const TColor &inColor, const typename TColor::ValueTy
 }
 
 template <typename TColor>
-constexpr TColor WithValue(const TColor &inColor, const typename TColor::ValueType inValue)
+constexpr TColor WithValue(const TColor& inColor, const typename TColor::ValueType inValue)
 {
   TColor new_color = inColor;
   for (std::size_t i = 0; i < 3; ++i)
@@ -289,7 +290,7 @@ constexpr T Sign(const T& inValue)
 }
 
 template <typename T>
-constexpr bool IsAlmostEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
+constexpr bool VeryEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
 {
   return Abs(inLHS - inRHS) < inEpsilon;
 }
@@ -331,7 +332,7 @@ template <typename T>
 constexpr bool IsNormalized(const T& inV)
 {
   using ValueType = typename T::ValueType;
-  return IsAlmostEqual(SqLength(inV), static_cast<ValueType>(1));
+  return VeryEqual(SqLength(inV), static_cast<ValueType>(1));
 }
 
 template <typename T>
@@ -413,13 +414,17 @@ constexpr Quat<T> ToQuaternion(const Mat4<T>& inRotationMat)
 template <typename T>
 constexpr Vec3<T> Direction(const Quat<T>& inQuat)
 {
-  return inQuat * Forward<Vec3<T>>();
+  EXPECTS(IsNormalized(inQuat));
+  const auto direction = Normalized(inQuat * Forward<Vec3<T>>());
+  ENSURES(IsNormalized(direction));
+  return direction;
 }
 
 template <typename T, std::size_t N>
 constexpr Vec3<T> Direction(const Segment<T, N>& inSegment)
 {
-  return NormalizedSafe(inSegment.GetVector());
+  const auto direction = NormalizedSafe(inSegment.GetVector());
+  return direction;
 }
 
 template <typename T>
@@ -461,10 +466,12 @@ constexpr T RadToDegree(const T& inV)
 template <typename T>
 constexpr Vec3<T> AngleAxis(const Quat<T>& inQuat)
 {
-  const auto angle = 2 * std::acos(inQuat[3]);
+  EXPECTS(IsNormalized(inQuat));
+
+  const auto angle = static_cast<T>(2) * std::acos(inQuat[3]);
   const auto wSquared = inQuat[3] * inQuat[3];
-  const auto oneMinusWSquared = (1.0f - wSquared);
-  if (oneMinusWSquared)
+  const auto oneMinusWSquared = (static_cast<T>(1) - wSquared);
+  if (VeryEqual(oneMinusWSquared, static_cast<T>(0)))
     return Zero<Vec3<T>>();
 
   const auto sqrt = std::sqrt(oneMinusWSquared);
@@ -476,6 +483,58 @@ template <typename T>
 constexpr Quat<T> Conjugated(const Quat<T>& inQuat)
 {
   return -inQuat;
+}
+
+template <typename T>
+constexpr Vec3<T> Forward(const Quat<T>& inQuat)
+{
+  EXPECTS(IsNormalized(inQuat));
+
+  return Direction(inQuat);
+}
+
+template <typename T>
+constexpr std::tuple<Vec3<T>, Vec3<T>, Vec3<T>> Axes(const Vec3<T>& inForwardVectorNormalized,
+    const Vec3<T>& inUpVectorNormalized = Up<Vec3<T>>())
+{
+  EXPECTS(IsNormalized(inForwardVectorNormalized));
+  EXPECTS(IsNormalized(inUpVectorNormalized));
+
+  const auto forward_vector = inForwardVectorNormalized;
+
+  auto up_vector = inUpVectorNormalized;
+  auto right_vector = Zero<Vec3f>();
+  if (VeryParallel(forward_vector, up_vector))
+  {
+    right_vector = Right<Vec3f>();
+    if (VeryParallel(right_vector, forward_vector))
+      right_vector = Normalized(Vec3f(0.5f, 0.5f, 0.0f));
+
+    up_vector = Normalized(Cross(right_vector, forward_vector));
+    right_vector = Cross(forward_vector, up_vector);
+  }
+  else
+  {
+    right_vector = Normalized(Cross(forward_vector, up_vector));
+    up_vector = Cross(right_vector, forward_vector);
+  }
+
+  ENSURES(IsNormalized(forward_vector));
+  ENSURES(IsNormalized(up_vector));
+  ENSURES(IsNormalized(right_vector));
+
+  ENSURES(VeryPerpendicular(forward_vector, up_vector));
+  ENSURES(VeryPerpendicular(forward_vector, right_vector));
+  ENSURES(VeryPerpendicular(up_vector, right_vector));
+
+  return { right_vector, up_vector, forward_vector };
+}
+
+template <typename T>
+constexpr std::tuple<Vec3<T>, Vec3<T>, Vec3<T>> Axes(const Quat<T>& inOrientation)
+{
+  EXPECTS(IsNormalized(inOrientation));
+  return { inOrientation * Right<Vec3<T>>(), inOrientation * Up<Vec3<T>>(), inOrientation * Forward<Vec3<T>>() };
 }
 
 template <typename T, std::size_t N>
@@ -595,6 +654,7 @@ constexpr Quat<T> AngleAxis(const T& inAngleRads, const Vec3<T>& inAxisNormalize
       inAxisNormalized[1] * half_angle_sin,
       inAxisNormalized[2] * half_angle_sin,
       std::cos(half_angle));
+
   ENSURES(IsNormalized(result_quat));
   return result_quat;
 }
@@ -712,9 +772,15 @@ constexpr Quat<T> FromTo(const Vec3<T>& inFromNormalized, const Vec3<T>& inToNor
 }
 
 template <typename T>
-constexpr bool AlmostParallel(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
+constexpr bool VeryParallel(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
 {
-  return IsAlmostEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(1));
+  return VeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(1));
+}
+
+template <typename T>
+constexpr bool VeryPerpendicular(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
+{
+  return VeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(0));
 }
 
 template <typename T>
@@ -723,20 +789,8 @@ constexpr Quat<T> LookInDirection(const Vec3<T>& inForwardNormalized, const Vec3
   EXPECTS(IsNormalized(inForwardNormalized));
   EXPECTS(IsNormalized(inUpNormalized));
 
-  auto up_vector = inUpNormalized;
-  if (AlmostParallel(inForwardNormalized, up_vector))
-  {
-    auto right_vector = Right<Vec3f>();
-    if (AlmostParallel(inForwardNormalized, right_vector))
-      right_vector = Normalized(Vec3f(0.5f, 0.5f, 0.0f));
-    up_vector = Cross(inForwardNormalized, right_vector);
-  }
-  assert(IsNormalized(up_vector));
-
-  const auto z_axis = -inForwardNormalized;
-  const auto x_axis = Normalized(Cross(up_vector, z_axis));
-  const auto y_axis = Cross(z_axis, x_axis); // No need to normalize bc both operands are already normalized and ortho
-  assert(IsNormalized(y_axis));
+  const auto [x_axis, y_axis, inverted_z_axis] = Axes(inForwardNormalized, inUpNormalized);
+  const auto z_axis = -inverted_z_axis;
 
   auto rotation_basis_matrix = Mat4<T> { Vec4<T> { x_axis[0], y_axis[0], z_axis[0], static_cast<T>(0) },
     Vec4<T> { x_axis[1], y_axis[1], z_axis[1], static_cast<T>(0) },
@@ -861,4 +915,85 @@ constexpr TQuat SLerp(const TQuat& inFrom, const TQuat& inTo, const T& inT)
     return (std::sin((static_cast<T>(1) - inT) * angle) * inFrom + std::sin(inT * angle) * to) / std::sin(angle);
   }
 }
+
+// Swizzling
+// clang-format off
+template <typename T, std::size_t N> constexpr Vec2<T> XX(const Vec<T, N> &inV) { return Vec2<T>{inV[0], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> XY(const Vec<T, N> &inV) { return Vec2<T>{inV[0], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> XZ(const Vec<T, N> &inV) { return Vec2<T>{inV[0], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> YX(const Vec<T, N> &inV) { return Vec2<T>{inV[1], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> YY(const Vec<T, N> &inV) { return Vec2<T>{inV[1], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> YZ(const Vec<T, N> &inV) { return Vec2<T>{inV[1], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> ZX(const Vec<T, N> &inV) { return Vec2<T>{inV[2], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> ZY(const Vec<T, N> &inV) { return Vec2<T>{inV[2], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> ZZ(const Vec<T, N> &inV) { return Vec2<T>{inV[2], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec2<T> X0(const Vec<T, N> &inV) { return Vec2<T>{inV[0], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec2<T> Y0(const Vec<T, N> &inV) { return Vec2<T>{inV[1], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec2<T> X1(const Vec<T, N> &inV) { return Vec2<T>{inV[0], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec2<T> Y1(const Vec<T, N> &inV) { return Vec2<T>{inV[1], static_cast<T>(1)}; }
+
+template <typename T, std::size_t N> constexpr Vec3<T> XXX(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[0], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XXY(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[0], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XXZ(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[0], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XYX(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[1], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XYY(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[1], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XYZ(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[1], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XZX(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[2], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XZY(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[2], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XZZ(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[2], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YXX(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[0], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YXY(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[0], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YXZ(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[0], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YYX(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[1], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YYY(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[1], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YYZ(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[1], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YZX(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[2], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YZY(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[2], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YZZ(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[2], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZXX(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[0], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZXY(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[0], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZXZ(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[0], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZYX(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[1], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZYY(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[1], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZYZ(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[1], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZZX(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[2], inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZZY(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[2], inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZZZ(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[2], inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XX0(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[0], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XY0(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[1], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XZ0(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[2], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YX0(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[0], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YY0(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[1], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YZ0(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[2], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZX0(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[0], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZY0(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[1], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZZ0(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[2], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XX1(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[0], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XY1(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[1], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> XZ1(const Vec<T, N> &inV) { return Vec3<T>{inV[0], inV[2], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YX1(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[0], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YY1(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[1], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> YZ1(const Vec<T, N> &inV) { return Vec3<T>{inV[1], inV[2], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZX1(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[0], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZY1(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[1], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> ZZ1(const Vec<T, N> &inV) { return Vec3<T>{inV[2], inV[2], static_cast<T>(1)}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X0X(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(0), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X0Y(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(0), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X0Z(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(0), inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y0X(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(0), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y0Y(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(0), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y0Z(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(0), inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z0X(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(0), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z0Y(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(0), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z0Z(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(0), inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X1X(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(1), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X1Y(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(1), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> X1Z(const Vec<T, N> &inV) { return Vec3<T>{inV[0], static_cast<T>(1), inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y1X(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(1), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y1Y(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(1), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Y1Z(const Vec<T, N> &inV) { return Vec3<T>{inV[1], static_cast<T>(1), inV[2]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z1X(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[0]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z1Y(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[1]}; }
+template <typename T, std::size_t N> constexpr Vec3<T> Z1Z(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[2]}; }
+// clang-format on
 }

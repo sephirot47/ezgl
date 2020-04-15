@@ -240,6 +240,35 @@ constexpr void Vec<T, N>::operator/=(const T& inRHS)
 }
 
 template <typename T, std::size_t N>
+inline constexpr Vec<T, N> operator+(const T& inLHS, const Vec<T, N>& inRHS)
+{
+  Vec<T, N> lhs_vec(inLHS);
+  return lhs_vec + inRHS;
+}
+
+template <typename T, std::size_t N>
+inline constexpr Vec<T, N> operator-(const T& inLHS, const Vec<T, N>& inRHS)
+{
+  Vec<T, N> lhs_vec(inLHS);
+  return lhs_vec - inRHS;
+}
+
+template <typename T, std::size_t N>
+inline constexpr Vec<T, N> operator*(const T& inLHS, const Vec<T, N>& inRHS)
+{
+  Vec<T, N> lhs_vec(inLHS);
+  return lhs_vec * inRHS;
+}
+
+template <typename T, std::size_t N>
+inline constexpr Vec<T, N> operator/(const T& inLHS, const Vec<T, N>& inRHS)
+{
+  Vec<T, N> lhs_vec(inLHS);
+  return lhs_vec / inRHS;
+}
+
+
+template <typename T, std::size_t N>
 inline std::ostream& operator<<(std::ostream& inLHS, const Vec<T, N>& inRHS)
 {
   inLHS << "(";
