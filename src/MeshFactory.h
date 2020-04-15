@@ -15,6 +15,7 @@ public:
   static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
   static TMesh GetHemisphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
   static TMesh GetCone(const std::size_t inNumVerticesX);
+  static TMesh GetCylinder(const std::size_t inNumVerticesX);
 
 private:
   static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY, const bool inIsHemisphere);

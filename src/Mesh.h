@@ -2,6 +2,7 @@
 
 #include "Macros.h"
 #include "Math.h"
+#include "Mat.h"
 #include "MeshIterators.h"
 #include "Range.h"
 #include "Vec.h"
@@ -85,6 +86,7 @@ public:
   const Vec3f& GetCornerNormal(const Mesh::FaceId &inFaceId);
 
   void SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition);
+  void Transform(const Mat4f &inTransform);
 
   static bool IsValid(const Mesh::Id inId);
   static bool IsValid(const std::optional<Mesh::Id> inOptionalId);

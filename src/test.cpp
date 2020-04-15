@@ -76,10 +76,11 @@ int main()
   });
 
   DrawableMesh test_mesh;
-  test_mesh.Read("monkey.obj");
+  // test_mesh.Read("monkey.obj");
+  // test_mesh = DrawableMeshFactory::GetCone(32);
   // test_mesh = DrawableMeshFactory::GetCube();
-  test_mesh = DrawableMeshFactory::GetHemisphere(99, 99);
-  // test_mesh = DrawableMeshFactory::GetSphere(99, 99);
+  // test_mesh = DrawableMeshFactory::GetHemisphere(99, 99);
+  test_mesh = DrawableMeshFactory::GetSphere(20, 20);
   // test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj");
 
   Renderer renderer;
@@ -108,10 +109,8 @@ int main()
     renderer.ClearBackground(Pink());
     renderer.ClearDepth();
 
-    camera_controller_fly.Update(30ms);
-
     renderer.Translate(obj_pos);
-    // const auto q = AngleAxis(time * 0.4f, Normalized(Vec3f { 9.0f, 92.2f, -9.5f }));
+    const auto q = AngleAxis(time * 0.4f, Normalized(Vec3f { 9.0f, 92.2f, -9.5f }));
     // renderer.Rotate(q);
 
     renderer.Scale(All<Vec3f>(10.0f));
@@ -125,14 +124,16 @@ int main()
     renderer.DrawMesh(test_mesh);
 
     renderer.SetColor(Blue());
-    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+    renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     renderer.SetPointSize(4.0f);
     renderer.SetColor(Red());
-    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+    renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     window->SwapBuffers();
     window->PollEvents();
+
+    camera_controller_fly.Update(30ms);
 
     time += 0.03;
     std::this_thread::sleep_for(30ms);

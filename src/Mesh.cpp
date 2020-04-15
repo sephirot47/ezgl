@@ -152,6 +152,14 @@ void Mesh::SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPos
   mVerticesData.at(inVertexId).mPosition = inPosition;
 }
 
+void Mesh::Transform(const Mat4f& inTransform)
+{
+  for (auto& vertex_data : mVerticesData)
+  {
+    vertex_data.mPosition = XYZ(inTransform * XYZ1(vertex_data.mPosition));
+  }
+}
+
 Mesh::CirculatorVertexNeighborFaceIds Mesh::GetVertexNeighborFaceIdsCirculatorBegin(
     const Mesh::VertexId inVertexId) const
 {

@@ -49,80 +49,83 @@ TMesh GMeshFactory<TMesh>::GetHemisphere(const std::size_t inNumVerticesX, const
 template <typename TMesh>
 TMesh GMeshFactory<TMesh>::GetCone(const std::size_t inNumVerticesX)
 {
-  return GetHemisphere(inNumVerticesX, 2);
+  auto cone = GetHemisphere(inNumVerticesX, 2);
+  cone.Transform(ScaleMat4(Vec3f { 1.0f, 1.0f, 2.0f }));
+  ConsolidateMesh(cone);
+  return cone;
 }
 
 template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumVerticesX,
-    const std::size_t inNumVerticesY,
+TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumVerticesY,
+    const std::size_t inNumVerticesZ,
     const bool inIsHemisphere)
 {
-  EXPECTS(inNumVerticesX >= 3);
   EXPECTS(inNumVerticesY >= 3);
+  EXPECTS(inNumVerticesZ >= 3);
 
   TMesh sphere;
 
   // Add vertices
-  const auto angle_y_increment = (HalfCircleRads<float>() / (inNumVerticesY - (inIsHemisphere ? 2 : 1) )) / (inIsHemisphere ? 2 : 1);
-  const auto angle_x_increment = -FullCircleRads<float>() / inNumVerticesX;
-  auto angle_y = (inIsHemisphere ? 0.0f : -QuarterCircleRads<float>());
-  for (Mesh::VertexId y = 0; y < inNumVerticesY; ++y)
+  const auto angle_z_increment
+      = -(HalfCircleRads<float>() / (inNumVerticesZ - (inIsHemisphere ? 2 : 1))) / (inIsHemisphere ? 2 : 1);
+  const auto angle_y_increment = -FullCircleRads<float>() / inNumVerticesY;
+  auto angle_z = (inIsHemisphere ? 0.0f : QuarterCircleRads<float>());
+  for (Mesh::VertexId z = 0; z < inNumVerticesZ; ++z)
   {
-    if (y == 0 || y == (inNumVerticesY - 1)) // South or north pole, single vertex
+    if (z == 0 || z == (inNumVerticesZ - 1)) // South or north pole, single vertex
     {
-      sphere.AddVertex(Vec3f { 0.0f, std::sin(angle_y), 0.0f });
+      sphere.AddVertex(Vec3f { 0.0f, 0.0f, std::sin(angle_z) });
       if (inIsHemisphere)
         continue;
     }
     else // Middle vertices
     {
-      const auto position_y = std::sin(angle_y);
-      const auto cos_y = std::cos(angle_y);
+      const auto position_z = std::sin(angle_z);
+      const auto cos_z = std::cos(angle_z);
 
-      auto angle_x = 0.0f;
-      for (Mesh::VertexId x = 0; x < inNumVerticesX; ++x)
+      auto angle_y = 0.0f;
+      for (Mesh::VertexId y = 0; y < inNumVerticesY; ++y)
       {
-        const auto position_x = cos_y * std::cos(angle_x);
-        const auto position_z = cos_y * std::sin(angle_x);
+        const auto position_x = cos_z * std::cos(angle_y);
+        const auto position_y = cos_z * std::sin(angle_y);
         const auto point = Vec3f { position_x, position_y, position_z };
         sphere.AddVertex(point);
 
-        angle_x += angle_x_increment;
+        angle_y += angle_y_increment;
       }
     }
 
-    angle_y += angle_y_increment;
+    angle_z += angle_z_increment;
   }
 
   // Add faces
-  for (Mesh::VertexId y = 0; y < inNumVerticesY - 1; ++y)
+  for (Mesh::VertexId z = 0; z < inNumVerticesZ - 1; ++z)
   {
-    const bool is_current_south_pole = (y == 0);
-    const bool is_up_north_pole = ((y + 1) == inNumVerticesY - 1);
-    for (Mesh::VertexId x = 0; x < inNumVerticesX; ++x)
+    const bool is_current_south_pole = (z == 0);
+    const bool is_up_north_pole = ((z + 1) == inNumVerticesZ - 1);
+    for (Mesh::VertexId y = 0; y < inNumVerticesY; ++y)
     {
-      // PRINT(y << ", " << x);
       if (is_current_south_pole) // Current row is the south pole point
       {
         const auto south_pole_vertex_index = 0;
-        const auto up_vertex_index = 1 + x;
-        const auto up_right_vertex_index = 1 + ((x + 1) % inNumVerticesX);
+        const auto up_vertex_index = 1 + y;
+        const auto up_right_vertex_index = 1 + ((y + 1) % inNumVerticesY);
         sphere.AddFace(south_pole_vertex_index, up_right_vertex_index, up_vertex_index);
       }
       else if (!is_up_north_pole) // Middle vertices
       {
-        const auto current_vertex_index = (1 + (y - 1) * inNumVerticesX) + x;
-        const auto right_vertex_index = (1 + (y - 1) * inNumVerticesX) + ((x + 1) % inNumVerticesX);
-        const auto up_vertex_index = (1 + y * inNumVerticesX) + x;
-        const auto up_right_vertex_index = (1 + y * inNumVerticesX) + ((x + 1) % inNumVerticesX);
+        const auto current_vertex_index = (1 + (z - 1) * inNumVerticesY) + y;
+        const auto right_vertex_index = (1 + (z - 1) * inNumVerticesY) + ((y + 1) % inNumVerticesY);
+        const auto up_vertex_index = (1 + z * inNumVerticesY) + y;
+        const auto up_right_vertex_index = (1 + z * inNumVerticesY) + ((y + 1) % inNumVerticesY);
         sphere.AddFace(current_vertex_index, right_vertex_index, up_right_vertex_index);
         sphere.AddFace(current_vertex_index, up_right_vertex_index, up_vertex_index);
       }
       else // Next row above is the north pole point
       {
-        const auto current_vertex_index = (1 + (y - 1) * inNumVerticesX) + x;
-        const auto right_vertex_index = (1 + (y - 1) * inNumVerticesX) + ((x + 1) % inNumVerticesX);
-        const auto north_pole_vertex_index = (1 + ((inNumVerticesY - 2) * inNumVerticesX));
+        const auto current_vertex_index = (1 + (z - 1) * inNumVerticesY) + y;
+        const auto right_vertex_index = (1 + (z - 1) * inNumVerticesY) + ((y + 1) % inNumVerticesY);
+        const auto north_pole_vertex_index = (1 + ((inNumVerticesZ - 2) * inNumVerticesY));
         sphere.AddFace(current_vertex_index, right_vertex_index, north_pole_vertex_index);
       }
     }
@@ -130,6 +133,61 @@ TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumVerticesX,
 
   ConsolidateMesh(sphere);
   return sphere;
+}
+
+template <typename TMesh>
+TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
+{
+  EXPECTS(inNumVerticesX >= 3);
+
+  TMesh cylinder;
+
+  // Forward and back circle vertices
+  for (bool forward : { true, false })
+  {
+    for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
+    {
+      const auto progression = (static_cast<float>(i) / inNumVerticesX);
+      const auto angle = FullCircleRads<float>() * progression;
+      const auto x = std::cos(angle) * 0.5f;
+      const auto y = std::sin(angle) * 0.5f;
+      const auto z = (forward ? -0.5f : 0.5f);
+      const auto vertex_position = Vec3f(x, y, z);
+      cylinder.AddVertex(vertex_position);
+    }
+  }
+
+  // Forward and back central vertices
+  cylinder.AddVertex(Vec3f { 0.0f, 0.0f, -0.5f });
+  cylinder.AddVertex(Vec3f { 0.0f, 0.0f, 0.5f });
+
+  // Pipe faces
+  for (Mesh::VertexId forward_vertex_id = 0; forward_vertex_id < inNumVerticesX; ++forward_vertex_id)
+  {
+    const auto next_forward_vertex_id = (forward_vertex_id + 1) % inNumVerticesX;
+    const auto back_vertex_id = (forward_vertex_id + inNumVerticesX);
+    const auto next_back_vertex_id = (next_forward_vertex_id + inNumVerticesX);
+    cylinder.AddFace(forward_vertex_id, next_forward_vertex_id, back_vertex_id);
+    cylinder.AddFace(back_vertex_id, next_forward_vertex_id, next_back_vertex_id);
+  }
+
+  // Cap vertices
+  for (bool forward : { true, false })
+  {
+    for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
+    {
+      const auto cap_vertex_id = (i + (forward ? 0 : inNumVerticesX));
+      const auto next_cap_vertex_id = (cap_vertex_id + 1) % inNumVerticesX + (forward ? 0 : inNumVerticesX);
+      const auto cap_central_vertex_id = (forward ? (inNumVerticesX * 2) : (inNumVerticesX * 2 + 1));
+      if (forward)
+        cylinder.AddFace(next_cap_vertex_id, cap_vertex_id, cap_central_vertex_id);
+      else
+        cylinder.AddFace(cap_vertex_id, next_cap_vertex_id, cap_central_vertex_id);
+    }
+  }
+
+  ConsolidateMesh(cylinder);
+  return cylinder;
 }
 
 template <typename TMesh>

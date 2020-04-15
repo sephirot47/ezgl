@@ -189,6 +189,22 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator/(const T& inRHS) c
 }
 
 template <typename T, std::size_t NRows, std::size_t NCols>
+constexpr Vec<T, NCols> Mat<T, NRows, NCols>::operator*(const Vec<T, NCols>& inRHS) const
+{
+  Vec<T, NCols> result;
+  for (std::size_t r = 0; r < NRows; ++r)
+  {
+    const auto& row_vector = (*this)[r];
+    result[r] = 0;
+    for (std::size_t c = 0; c < NCols; ++c)
+    {
+      result[r] += (row_vector[c] * inRHS[c]);
+    }
+  }
+  return result;
+}
+
+template <typename T, std::size_t NRows, std::size_t NCols>
 void Mat<T, NRows, NCols>::operator+=(const T& inRHS)
 {
   *this = *this + inRHS;

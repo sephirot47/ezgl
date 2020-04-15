@@ -50,6 +50,7 @@ public:
   constexpr Mat<T, NRows, NCols> operator-(const T& inRHS) const;
   constexpr Mat<T, NRows, NCols> operator*(const T& inRHS) const;
   constexpr Mat<T, NRows, NCols> operator/(const T& inRHS) const;
+  constexpr Vec<T, NCols> operator*(const Vec<T, NCols>& inRHS) const;
   void operator+=(const T& inRHS);
   void operator-=(const T& inRHS);
   void operator*=(const T& inRHS);

@@ -196,8 +196,7 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
   DrawSegment(inArrowSegment);
   Translate(inArrowSegment.GetToPoint());
   Rotate(LookInDirection(Direction(inArrowSegment)));
-  Rotate(-AngleAxis(QuarterCircleRads<float>(), Right<Vec3f>()));
-  Scale(Vec3f { 0.05f, 0.15f, 0.05f });
+  Scale(Vec3f { 0.05f, 0.05f, 0.08f });
   DrawMesh(mCone);
 
   PopState();

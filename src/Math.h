@@ -995,5 +995,8 @@ template <typename T, std::size_t N> constexpr Vec3<T> Y1Z(const Vec<T, N> &inV)
 template <typename T, std::size_t N> constexpr Vec3<T> Z1X(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[0]}; }
 template <typename T, std::size_t N> constexpr Vec3<T> Z1Y(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[1]}; }
 template <typename T, std::size_t N> constexpr Vec3<T> Z1Z(const Vec<T, N> &inV) { return Vec3<T>{inV[2], static_cast<T>(1), inV[2]}; }
+
+template <typename T, std::size_t N> constexpr Vec4<T> XYZ0(const Vec<T, N> &inV) { return Vec4<T>{inV[0], inV[1], inV[2], static_cast<T>(0)}; }
+template <typename T, std::size_t N> constexpr Vec4<T> XYZ1(const Vec<T, N> &inV) { return Vec4<T>{inV[0], inV[1], inV[2], static_cast<T>(1)}; }
 // clang-format on
 }
