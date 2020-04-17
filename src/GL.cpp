@@ -82,6 +82,29 @@ void GL::DisableVertexAttribArray(const GL::Id inAttribLocation) { glDisableVert
 
 void GL::DeleteVertexArray(const GL::Id inVAOId) { glDeleteVertexArrays(1, &inVAOId); }
 
+GL::Id GL::GenTexture()
+{
+  GL::Id new_texture_id = 0;
+  glGenTextures(1, &new_texture_id);
+  return new_texture_id;
+}
+
+GL::Id GL::CreateTexture(const GL::ETextureTarget &inTextureTarget)
+{
+  GL::Id new_texture_id = 0;
+  glCreateTextures(GL::EnumCast(inTextureTarget), 1, &new_texture_id);
+  return new_texture_id;
+}
+
+void GL::BindTexture(const GL::ETextureTarget &inTextureTarget, const GL::Id& inTextureId) { glBindTexture(GL::EnumCast(inTextureTarget), inTextureId); }
+
+void GL::GenerateTextureMipMap(const GL::Id& inTextureId) { glGenerateTextureMipmap(inTextureId); }
+
+void GL::ActiveTexture(const GL::Id& inTextureUnit) { glActiveTexture(inTextureUnit); }
+void GL::BindTextureUnit(const GL::Size &inTextureUnit, const GL::Id& inTextureId) { glBindTextureUnit(inTextureUnit, inTextureId); }
+
+void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }
+
 void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
 
 void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }

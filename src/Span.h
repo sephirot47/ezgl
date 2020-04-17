@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Macros.h"
 #include <array>
 #include <cstdint>
 #include <vector>
@@ -9,12 +10,14 @@ namespace egl
 template <typename T>
 struct Span
 {
+public:
   using ValueType = T;
   using ConstIterator = const T*;
 
   Span(const T* inData, const std::size_t inNumberOfElements) : mData(inData), mNumberOfElements(inNumberOfElements)
   {
-    EXPECTS(inNumberOfElements >= 1 || inData == nullptr);
+    if (inData == nullptr)
+      EXPECTS(inNumberOfElements == 0);
   }
 
   ConstIterator begin() const { return mData; }
@@ -26,7 +29,7 @@ struct Span
   std::size_t GetNumberOfElements() const { return mNumberOfElements; }
   std::size_t GetSizeInBytes() const { return mNumberOfElements * sizeof(T); }
 
-public:
+private:
   const T* mData = nullptr;
   const std::size_t mNumberOfElements = 0;
 };

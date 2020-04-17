@@ -288,13 +288,6 @@ constexpr T Sign(const T& inValue)
 {
   return (inValue < 0 ? static_cast<T>(-1) : static_cast<T>(1));
 }
-
-template <typename T>
-constexpr bool VeryEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
-{
-  return Abs(inLHS - inRHS) < inEpsilon;
-}
-
 template <typename T>
 constexpr auto Dot(const T& inLHS, const T& inRHS)
 {
@@ -327,6 +320,31 @@ constexpr auto Length(const T& inV)
 {
   return std::sqrt(SqLength(inV));
 }
+template <typename T>
+constexpr auto SqDistance(const T& inLHS, const T& inRHS)
+{
+  const auto diff = (inRHS - inLHS);
+  return SqLength(diff, diff);
+}
+
+template <typename T>
+constexpr auto Distance(const T& inLHS, const T& inRHS)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return Abs(inLHS - inRHS);
+  }
+  else
+  {
+    return std::sqrt(SqDistance(inLHS, inRHS));
+  }
+}
+
+template <typename T>
+constexpr bool VeryEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
+{
+  return Distance(inLHS, inRHS) < inEpsilon;
+}
 
 template <typename T>
 constexpr bool IsNormalized(const T& inV)
@@ -351,19 +369,6 @@ template <typename T>
     return inV;
   const auto length = std::sqrt(sq_length);
   return inV / length;
-}
-
-template <typename T>
-constexpr auto SqDistance(const T& inLHS, const T& inRHS)
-{
-  const auto diff = (inRHS - inLHS);
-  return SqLength(diff, diff);
-}
-
-template <typename T, std::size_t N>
-constexpr auto Distance(const T& inLHS, const T& inRHS)
-{
-  return std::sqrt(SqDistance(inLHS, inRHS));
 }
 
 template <typename T>
@@ -712,6 +717,23 @@ constexpr auto Random(const T& inMin, const T& inMax)
   }
 }
 
+template <typename T>
+constexpr auto RandomSign()
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return (rand() % 2 == 0) ? static_cast<T>(1) : static_cast<T>(-1);
+  }
+  else
+  {
+    using ValueType = typename T::ValueType;
+    T result;
+    for (auto& value : result)
+      value = RandomSign<ValueType>();
+    return result;
+  }
+}
+
 template <typename T, std::size_t N>
 constexpr SquareMat<T, N> Diagonal(const T& inDiagonalValue)
 {
@@ -744,6 +766,12 @@ constexpr Quat<T> FromEulerAngles(const Vec3<T>& inEulerAnglesRads)
   const auto qy = Quat<T>::AngleAxis(inEulerAnglesRads[1], Up<Vec3<T>>());
   const auto qz = Quat<T>::AngleAxis(inEulerAnglesRads[2], Forward<Vec3<T>>());
   return Normalized(qz * qy * qx);
+}
+
+template <typename T, std::size_t N>
+constexpr Vec<T, N> FromTo(const Vec<T, N>& inFrom, const Vec<T, N>& inTo)
+{
+  return (inTo - inFrom);
 }
 
 template <typename T>

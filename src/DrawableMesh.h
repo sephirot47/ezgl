@@ -13,6 +13,7 @@ class DrawableMesh : public Mesh
 public:
   static constexpr GL::Id PositionAttribLocation() { return 0; }
   static constexpr GL::Id NormalAttribLocation() { return 1; }
+  static constexpr GL::Id TextureCoordinateAttribLocation() { return 2; }
 
   DrawableMesh() = default;
   DrawableMesh(const DrawableMesh&) = delete;

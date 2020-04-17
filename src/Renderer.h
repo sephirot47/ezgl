@@ -5,6 +5,7 @@
 #include "DrawableMesh.h"
 #include "Math.h"
 #include "Segment.h"
+#include "Texture2D.h"
 #include "ShaderProgram.h"
 #include <cstdint>
 #include <memory>
@@ -50,6 +51,8 @@ public:
   void SetModelMatrix(const Mat4f& inModelMatrix);
   void ResetModelMatrix();
 
+  void SetTexture(const std::shared_ptr<Texture2D> &inTexture);
+
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);
   void Scale(const Vec3f& inScale);
@@ -84,6 +87,7 @@ public:
 private:
   struct State
   {
+    std::shared_ptr<Texture2D> mTexture = nullptr;
     std::shared_ptr<Camera> mCamera = std::make_shared<Camera>();
     Mat4f mModelMatrix = Identity<Mat4f>();
     Color4f mColor = One<Color4f>();

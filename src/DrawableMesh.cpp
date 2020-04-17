@@ -55,13 +55,31 @@ void DrawableMesh::UpdateVAOs()
         corners_normals_pool.reserve(GetNumberOfCorners());
         for (Mesh::CornerId corner_id = 0; corner_id < GetNumberOfCorners(); ++corner_id)
         {
-          const auto &corner_normal = GetCornerNormal(corner_id);
+          const auto& corner_normal = GetCornerNormal(corner_id);
           corners_normals_pool.push_back(corner_normal);
         }
       }
       corners_normals_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_normals_pool));
     }
     mVAO.AddVBO(corners_normals_pool_vbo, DrawableMesh::NormalAttribLocation(), VAOVertexAttribT<Vec3f>());
+  }
+
+  // Create corners texture coordinates VBO
+  {
+    std::shared_ptr<VBO> corners_texture_coordinates_pool_vbo;
+    {
+      std::vector<Vec2f> corners_texture_coordinates_pool;
+      {
+        corners_texture_coordinates_pool.reserve(GetNumberOfCorners());
+        for (Mesh::CornerId corner_id = 0; corner_id < GetNumberOfCorners(); ++corner_id)
+        {
+          const auto& corner_texture_coordinates = GetCornerTextureCoordinates(corner_id);
+          corners_texture_coordinates_pool.push_back(corner_texture_coordinates);
+        }
+      }
+      corners_texture_coordinates_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_texture_coordinates_pool));
+    }
+    mVAO.AddVBO(corners_texture_coordinates_pool_vbo, DrawableMesh::TextureCoordinateAttribLocation(), VAOVertexAttribT<Vec2f>());
   }
 }
 

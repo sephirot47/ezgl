@@ -3,6 +3,7 @@
 #include "DrawableMesh.h"
 #include "EBO.h"
 #include "FileUtils.h"
+#include "Image2D.h"
 #include "Macros.h"
 #include "Math.h"
 #include "Mesh.h"
@@ -13,6 +14,8 @@
 #include "ShaderProgram.h"
 #include "Span.h"
 #include "StreamOperators.h"
+#include "Texture.h"
+#include "Texture2D.h"
 #include "VAO.h"
 #include "VAOVertexAttrib.h"
 #include "VBO.h"
@@ -77,19 +80,37 @@ int main()
 
   DrawableMesh test_mesh;
   // test_mesh.Read("monkey.obj");
-  // test_mesh = DrawableMeshFactory::GetCone(32);
-  // test_mesh = DrawableMeshFactory::GetCube();
-  // test_mesh = DrawableMeshFactory::GetHemisphere(99, 99);
-  test_mesh = DrawableMeshFactory::GetSphere(20, 20);
+  test_mesh = DrawableMeshFactory::GetCone(32);
+  test_mesh = DrawableMeshFactory::GetCube();
+  // test_mesh = DrawableMeshFactory::GetHemisphere(20, 20);
+  // test_mesh = DrawableMeshFactory::GetSphere(20, 20);
   // test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj");
+  test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.ply");
+  // test_mesh.Read("/home/sephirot47/ezgl/build/test_mesh.ply");
+
+  const auto texture = std::make_shared<Texture2D>();
+  {
+    Image2D<Color4f> image;
+    // image.Read("/home/sephirot47/Downloads/checkerboard.jpg");
+    // image.Read("/home/sephirot47/Downloads/bricks.png");
+    // image.Read("/home/sephirot47/Downloads/rainbow.jpeg");
+    image.Read("/home/sephirot47/Downloads/bricks2.jpg");
+    texture->SetData(image.GetWidth(),
+        image.GetHeight(),
+        GL::ETextureInputFormat::RGBA,
+        GL::ETextureInputComponentFormat::FLOAT,
+        image.GetData(),
+        GL::ETextureInternalFormat::RGBA8,
+        0);
+  }
 
   Renderer renderer;
 
-  Vec3f obj_pos = Vec3f(0.0f, 0.0f, 0.0f);
+  Vec3f obj_pos = Zero<Vec3f>();
   const auto camera = std::make_shared<Camera>();
   {
-    camera->SetPosition(Vec3f(5.0f, 0.0f, 8.0f) * 1.0f);
-    camera->LookAtPoint(obj_pos, Up<Vec3f>());
+    camera->SetPosition(Vec3f(0, 0, 10) * 0.8f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
+    camera->LookAtPoint(obj_pos);
 
     PerspectiveParameters perspective_params;
     perspective_params.mZFar = 1000.0f;
@@ -106,6 +127,9 @@ int main()
   {
     renderer.PushState();
 
+    // camera->SetPosition(RandomSign<Vec3f>() * Random(All<Vec3f>(3.0f), All<Vec3f>(10.0f)));
+    // camera->LookAtPoint(obj_pos);
+
     renderer.ClearBackground(Pink());
     renderer.ClearDepth();
 
@@ -115,28 +139,30 @@ int main()
 
     renderer.Scale(All<Vec3f>(10.0f));
     renderer.SetLineWidth(3.0f);
-    renderer.DrawAxes();
+    // renderer.DrawAxes();
 
     // renderer.Rotate(q);
+    renderer.SetTexture(nullptr); // texture);
     renderer.Scale(All<Vec3f>(0.5f));
-    renderer.SetColor(Red());
+    renderer.SetColor(White());
     renderer.SetLightSpecularExponent(120.0f);
     renderer.DrawMesh(test_mesh);
 
     renderer.SetColor(Blue());
-    renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     renderer.SetPointSize(4.0f);
     renderer.SetColor(Red());
-    renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+    // renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     window->SwapBuffers();
     window->PollEvents();
 
-    camera_controller_fly.Update(30ms);
+    const auto delta_time = 30ms;
+    camera_controller_fly.Update(delta_time);
 
     time += 0.03;
-    std::this_thread::sleep_for(30ms);
+    std::this_thread::sleep_for(delta_time);
 
     renderer.PopState();
   }

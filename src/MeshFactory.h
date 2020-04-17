@@ -12,13 +12,13 @@ public:
   GMeshFactory() = delete;
 
   static TMesh GetCube();
-  static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
-  static TMesh GetHemisphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY);
-  static TMesh GetCone(const std::size_t inNumVerticesX);
-  static TMesh GetCylinder(const std::size_t inNumVerticesX);
+  static TMesh GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
+  static TMesh GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
+  static TMesh GetCone(const std::size_t inNumLatitudes);
+  static TMesh GetCylinder(const std::size_t inNumLatitudes);
 
 private:
-  static TMesh GetSphere(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY, const bool inIsHemisphere);
+  static TMesh GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const bool inIsHemisphere);
   static  void ConsolidateMesh(TMesh& ioMesh);
 };
 

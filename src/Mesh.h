@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Macros.h"
-#include "Math.h"
 #include "Mat.h"
+#include "Math.h"
 #include "MeshIterators.h"
 #include "Range.h"
 #include "Vec.h"
@@ -37,11 +37,20 @@ public:
 
     bool operator==(const Edge& inRHS) const { return (((*this)[0] == inRHS[0]) && ((*this)[1] == inRHS[1])); }
     bool operator!=(const Edge& inRHS) const { return !(*this == inRHS); }
+    bool operator<(const Edge& inRHS) const { return (*this)[0] < inRHS[0] || ((*this)[0] == inRHS[0] && (*this)[1] < inRHS[1]);  }
     const Mesh::VertexId& operator[](std::size_t inVertexInternalIdFrom0To1) const
     {
       EXPECTS(inVertexInternalIdFrom0To1 == 0 || inVertexInternalIdFrom0To1 == 1);
       return inVertexInternalIdFrom0To1 == 0 ? mVerticesIds.first : mVerticesIds.second;
     }
+
+    struct Hash
+    {
+      std::size_t operator()(const Edge& inEdge) const
+      {
+        return std::hash<Mesh::VertexId>()(inEdge[0]) ^ std::hash<Mesh::VertexId>()(inEdge[1]);
+      }
+    };
 
   private:
     const std::pair<Mesh::VertexId, Mesh::VertexId> mVerticesIds = std::make_pair(Mesh::InvalidId, Mesh::InvalidId);
@@ -49,13 +58,15 @@ public:
 
   struct VertexData
   {
-    std::vector<Mesh::FaceId> mNeighborFacesId;
+    Mesh::FaceId mFaceId = Mesh::InvalidId;
     Vec3f mPosition = Zero<Vec3f>();
   };
 
   struct CornerData
   {
+    Mesh::CornerId mOppositeCornedId = Mesh::InvalidId;
     Vec3f mNormal = Zero<Vec3f>();
+    Vec2f mTextureCoordinates = Zero<Vec2f>();
   };
 
   struct FaceData
@@ -78,15 +89,45 @@ public:
   void ComputeFaceNormals();
   void ComputeCornerNormals(const float inMinEdgeAngleToSmooth);
   void ComputeNormals(const float inMinEdgeAngleToSmooth);
+  void ComputeOppositeCornerIds();
   void Clear();
 
-  void SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f &inFaceNormal);
-  void SetCornerNormal(const Mesh::CornerId inCornerId, const Vec3f &inCornerNormal);
-  const Vec3f& GetFaceNormal(const Mesh::CornerId &inCornerId);
-  const Vec3f& GetCornerNormal(const Mesh::FaceId &inFaceId);
-
   void SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition);
-  void Transform(const Mat4f &inTransform);
+  void SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f& inFaceNormal);
+  void SetCornerNormal(const Mesh::CornerId inCornerId, const Vec3f& inCornerNormal);
+  void SetCornerTextureCoordinates(const Mesh::CornerId& inCornerId, const Vec2f& inTextureCoordinates);
+  const Vec3f& GetVertexPosition(const Mesh::VertexId& inVertexId);
+  const Vec3f& GetFaceNormal(const Mesh::CornerId& inCornerId);
+  const Vec3f& GetCornerNormal(const Mesh::FaceId& inFaceId);
+  const Vec2f& GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId);
+  Mesh::VertexId GetVertexIdFromCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::VertexId GetVertexIdFromFaceIdAndInternalCornerId(const Mesh::FaceId inFaceId,
+      const Mesh::InternalCornerId inInternalCornerId) const;
+  Mesh::FaceId GetFaceIdFromCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetOppositeCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::FaceId GetOppositeFaceId(const Mesh::CornerId inCornerId) const;
+  std::array<Mesh::Edge, 3> GetFaceEdges(const Mesh::FaceId inFaceId) const;
+  std::array<Mesh::CornerId, 3> GetFaceCornersIds(const Mesh::FaceId inFaceId) const;
+  std::array<Mesh::VertexId, 3> GetFaceVerticesIds(const Mesh::FaceId inFaceId) const;
+  std::array<Mesh::CornerId, 2> GetFaceOtherCornerIds(const Mesh::FaceId inFaceId,
+      const Mesh::CornerId inCornerId) const;
+  std::array<Mesh::VertexId, 2> GetFaceOtherVertexIds(const Mesh::FaceId inFaceId,
+      const Mesh::VertexId inVertexId) const;
+  Mesh::CornerId GetFaceOtherCornerId(const Mesh::FaceId inFaceId,
+      const Mesh::CornerId inCornerId0,
+      const Mesh::CornerId inCornerId1) const;
+  Mesh::VertexId GetFaceOtherVertexId(const Mesh::FaceId inFaceId,
+      const Mesh::VertexId inVertexId0,
+      const Mesh::VertexId inVertexId1) const;
+  Mesh::CornerId GetCornerIdFromFaceIdAndVertexId(const Mesh::FaceId inFaceId, const Mesh::VertexId inVertexId) const;
+  Mesh::CornerId GetPreviousCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetNextCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetNextAdjacentCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetPreviousAdjacentCornerId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetNextAdjacentFaceId(const Mesh::CornerId inCornerId) const;
+  Mesh::CornerId GetPreviousAdjacentFaceId(const Mesh::CornerId inCornerId) const;
+
+  void Transform(const Mat4f& inTransform);
 
   static bool IsValid(const Mesh::Id inId);
   static bool IsValid(const std::optional<Mesh::Id> inOptionalId);
@@ -98,14 +139,16 @@ public:
   std::size_t GetNumberOfCorners() const;
 
   // Circulators
-  CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
-  CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorEnd() const;
-  Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
+  // CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
+  // CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorEnd() const;
+  // Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
+  std::vector<Mesh::VertexId> GetNeighborVerticesIds(const Mesh::VertexId inVertexId) const;
 
   virtual void Read(const std::filesystem::path& inMeshPath);
   void Write(const std::filesystem::path& inMeshPath) const;
 
 private:
+  bool mOppositeCornerIdsComputed = false;
   std::vector<Mesh::VertexData> mVerticesData;
   std::vector<Mesh::CornerData> mCornersData;
   std::vector<Mesh::FaceData> mFacesData;

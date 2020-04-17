@@ -27,7 +27,7 @@ Renderer::Renderer()
   mStateStack.push(DefaultState);
   ApplyState(GetCurrentState());
 
-  mCone = DrawableMeshFactory::GetCone(32);
+  // mCone = DrawableMeshFactory::GetCone(32);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -80,6 +80,8 @@ void Renderer::ResetCamera() { GetCurrentState().mCamera = DefaultState.mCamera;
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix) { GetCurrentState().mModelMatrix = inModelMatrix; }
 void Renderer::ResetModelMatrix() { GetCurrentState().mModelMatrix = DefaultState.mModelMatrix; }
+
+void Renderer::SetTexture(const std::shared_ptr<Texture2D>& inTexture) { GetCurrentState().mTexture = inTexture; }
 
 void Renderer::Translate(const Vec3f& inTranslation)
 {
@@ -212,7 +214,11 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   const auto camera_world_position = GetCurrentState().mCamera->GetPosition();
   const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetOrientation());
 
+  if (const auto& texture = GetCurrentState().mTexture)
+    texture->BindToTextureUnit(0);
+
   ioShaderProgram.Bind();
+  ioShaderProgram.SetUniformSafe("UTexture", 0);
   ioShaderProgram.SetUniformSafe("UColor", GetCurrentState().mColor);
   ioShaderProgram.SetUniformSafe("UModel", model_matrix);
   ioShaderProgram.SetUniformSafe("UNormal", normal_matrix);

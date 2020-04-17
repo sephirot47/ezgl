@@ -22,4 +22,25 @@ GL::Enum GL::EnumCast(const T& inGLEnum)
 {
   return static_cast<GL::Enum>(inGLEnum);
 }
+
+template <typename T>
+void GL::TexImage2D(const GL::ETextureTarget& inTextureTarget,
+    const GL::Size& inWidth,
+    const GL::Size& inHeight,
+    const GL::ETextureInputFormat& inInputFormat,
+    const GL::ETextureInputComponentFormat& inInputComponentFormat,
+    const Span<T>& inData,
+    const GL::ETextureInternalFormat& inInternalFormat,
+    const GL::Int& inMipMapLevel)
+{
+  glTexImage2D(GL::EnumCast(inTextureTarget),
+      inMipMapLevel,
+      GL::EnumCast(inInternalFormat),
+      inWidth,
+      inHeight,
+      0,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputComponentFormat),
+      inData.GetData());
+}
 }
