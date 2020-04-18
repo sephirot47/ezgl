@@ -19,7 +19,7 @@ public:
 
 private:
   static TMesh GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const bool inIsHemisphere);
-  static  void ConsolidateMesh(TMesh& ioMesh);
+  static  void ConsolidateMesh(TMesh& ioMesh, const bool inUpdateNormals = true);
 };
 
 using MeshFactory = GMeshFactory<Mesh>;

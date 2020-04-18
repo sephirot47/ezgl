@@ -141,82 +141,6 @@ TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumLatitudes,
     }
   }
 
-  // Set texture coordinates
-  for (Mesh::CornerId corner_id = 0; corner_id < sphere.GetNumberOfCorners(); ++corner_id)
-  {
-    const auto face_id = sphere.GetFaceIdFromCornerId(corner_id);
-    const auto vertex_id = sphere.GetVertexIdFromCornerId(corner_id);
-    const auto corner_position = sphere.GetVertexPosition(vertex_id);
-    const auto x = corner_position[0];
-    const auto y = corner_position[1];
-    const auto z = corner_position[2];
-    const auto angle_y = vertex_id_to_angles_y.at(vertex_id);
-    const auto angle_z = vertex_id_to_angles_z.at(vertex_id);
-    auto u = (angle_y + FullCircleRads<float>()) / FullCircleRads<float>();
-    auto v = (angle_z + QuarterCircleRads<float>()) / HalfCircleRads<float>();
-
-    const auto corner_texture_coordinates = Vec2f { u, v };
-    sphere.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
-  }
-
-  // Fix texture coordinates seams
-  for (Mesh::CornerId corner_id = 0; corner_id < sphere.GetNumberOfCorners(); ++corner_id)
-  {
-    const auto vertex_id = sphere.GetVertexIdFromCornerId(corner_id);
-    const auto is_pole_vertex = (vertex_id == 0 || vertex_id >= (sphere.GetNumberOfVertices() - 1));
-    if (is_pole_vertex)
-      continue;
-
-    const auto corner_texture_coordinates = sphere.GetCornerTextureCoordinates(corner_id);
-    if (!VeryEqual(corner_texture_coordinates[0], 0.0f))
-      continue;
-
-    const auto face_id = sphere.GetFaceIdFromCornerId(corner_id);
-    for (const auto other_corner_id : sphere.GetFaceCornersIds(face_id))
-    {
-      const auto other_corner_texture_coordinates = sphere.GetCornerTextureCoordinates(other_corner_id);
-      if (Distance(corner_texture_coordinates[0], other_corner_texture_coordinates[0]) >= (1.1f / inNumLongitudes))
-      {
-        const auto new_corner_texture_coordinates = Vec2f { 1.0f, corner_texture_coordinates[1] };
-        sphere.SetCornerTextureCoordinates(corner_id, new_corner_texture_coordinates);
-        break;
-      }
-    }
-  }
-
-  // Fix texture coordinates at poles
-  for (Mesh::CornerId corner_id = 0; corner_id < sphere.GetNumberOfCorners(); ++corner_id)
-  {
-    const auto vertex_id = sphere.GetVertexIdFromCornerId(corner_id);
-    const auto is_south_pole = (vertex_id == 0);
-    const auto is_north_pole = (vertex_id == (sphere.GetNumberOfVertices() - 1));
-    if (!is_south_pole && !is_north_pole)
-      continue;
-
-    const auto face_id = sphere.GetFaceIdFromCornerId(corner_id);
-    const auto corner_texture_coordinates = sphere.GetCornerTextureCoordinates(corner_id);
-    const auto other_face_corner_ids = sphere.GetFaceOtherCornerIds(face_id, corner_id);
-
-    auto other_corner_texture_coordinate_0 = sphere.GetCornerTextureCoordinates(other_face_corner_ids[0]);
-    auto other_corner_texture_coordinate_1 = sphere.GetCornerTextureCoordinates(other_face_corner_ids[1]);
-    if (Distance(other_corner_texture_coordinate_0[0], other_corner_texture_coordinate_1[0])
-        >= (1.1f / inNumLongitudes))
-    {
-      if (other_corner_texture_coordinate_0[0] == 1)
-        other_corner_texture_coordinate_0[0] = 0;
-      else
-        other_corner_texture_coordinate_1[0] = 0;
-    }
-
-    const auto new_corner_texture_coordinate_u
-        = (other_corner_texture_coordinate_0[0] + other_corner_texture_coordinate_1[0]) * 0.5f;
-    const auto new_corner_texture_coordinate_v = (is_south_pole ? 1.0f : 0.0f);
-    sphere.SetCornerTextureCoordinates(other_face_corner_ids[0], other_corner_texture_coordinate_0);
-    sphere.SetCornerTextureCoordinates(other_face_corner_ids[1], other_corner_texture_coordinate_1);
-    sphere.SetCornerTextureCoordinates(corner_id,
-        Vec2f { new_corner_texture_coordinate_u, new_corner_texture_coordinate_v });
-  }
-
   ConsolidateMesh(sphere);
   return sphere;
 }
@@ -277,11 +201,15 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
 }
 
 template <typename TMesh>
-void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh)
+void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh, const bool inUpdateNormals)
 {
   constexpr auto max_smooth_angle = DegreeToRad(45.0f);
   ioMesh.ComputeOppositeCornerIds();
-  ioMesh.ComputeNormals(max_smooth_angle);
+
+  if (inUpdateNormals)
+  {
+    ioMesh.ComputeNormals(max_smooth_angle);
+  }
 
   if constexpr (std::is_same_v<TMesh, DrawableMesh>)
   {

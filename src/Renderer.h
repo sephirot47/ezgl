@@ -112,7 +112,9 @@ private:
   ShaderProgram mUnshadedShaderProgram;
   ShaderProgram mShadedShaderProgram;
 
+  // Resources
   DrawableMesh mCone;
+  std::shared_ptr<Texture2D> mWhiteTexture;
 
   static const State DefaultState;
   State& GetCurrentState();

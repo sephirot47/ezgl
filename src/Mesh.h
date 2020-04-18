@@ -142,10 +142,14 @@ public:
   // CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorBegin(const Mesh::VertexId inVertexId) const;
   // CirculatorVertexNeighborFaceIds GetVertexNeighborFaceIdsCirculatorEnd() const;
   // Range<CirculatorVertexNeighborFaceIds> AllVertexNeighborFaceIds(const Mesh::VertexId inVertexId) const;
+
+  std::vector<Mesh::CornerId> GetNeighborCornersIds(const Mesh::VertexId inVertexId) const;
   std::vector<Mesh::VertexId> GetNeighborVerticesIds(const Mesh::VertexId inVertexId) const;
+  std::vector<Mesh::FaceId> GetNeighborFacesIds(const Mesh::VertexId inVertexId) const;
+  std::vector<Mesh::CornerId> GetVertexCornersIds(const Mesh::VertexId inVertexId) const;
 
   virtual void Read(const std::filesystem::path& inMeshPath);
-  void Write(const std::filesystem::path& inMeshPath) const;
+  void Write(const std::filesystem::path& inMeshPath, const bool inPreserveVerticesIds = false) const;
 
 private:
   bool mOppositeCornerIdsComputed = false;

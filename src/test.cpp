@@ -80,36 +80,33 @@ int main()
 
   DrawableMesh test_mesh;
   // test_mesh.Read("monkey.obj");
-  test_mesh = DrawableMeshFactory::GetCone(32);
-  test_mesh = DrawableMeshFactory::GetCube();
+  test_mesh = DrawableMeshFactory::GetCone(62);
+  // test_mesh = DrawableMeshFactory::GetCube();
+  // test_mesh = DrawableMeshFactory::GetCylinder(32);
   // test_mesh = DrawableMeshFactory::GetHemisphere(20, 20);
   // test_mesh = DrawableMeshFactory::GetSphere(20, 20);
   // test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj");
-  test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.ply");
-  // test_mesh.Read("/home/sephirot47/ezgl/build/test_mesh.ply");
+  test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.ply", false);
+  test_mesh.Write("/home/sephirot47/ezgl/build/test_mesh.obj", false);
+  // test_mesh.Read("/home/sephirot47/ezgl/build/untitled.ply");
+  // PEEK(test_mesh.GetNeighborFacesIds(33));
+  // PEEK(test_mesh.GetVertexIdFromCornerId(test_mesh.GetOppositeCornerId(test_mesh.GetCornerIdFromFaceIdAndVertexId(3, 4))));
+  // exit(0);
 
-  const auto texture = std::make_shared<Texture2D>();
-  {
-    Image2D<Color4f> image;
-    // image.Read("/home/sephirot47/Downloads/checkerboard.jpg");
-    // image.Read("/home/sephirot47/Downloads/bricks.png");
-    // image.Read("/home/sephirot47/Downloads/rainbow.jpeg");
-    image.Read("/home/sephirot47/Downloads/bricks2.jpg");
-    texture->SetData(image.GetWidth(),
-        image.GetHeight(),
-        GL::ETextureInputFormat::RGBA,
-        GL::ETextureInputComponentFormat::FLOAT,
-        image.GetData(),
-        GL::ETextureInternalFormat::RGBA8,
-        0);
-  }
+  Image2D<Color4f> image;
+  // image.Read("/home/sephirot47/Downloads/checkerboard.jpg");
+  // image.Read("/home/sephirot47/Downloads/bricks.png");
+  // image.Read("/home/sephirot47/Downloads/rainbow.jpeg");
+  image.Read("/home/sephirot47/Downloads/bricks2.jpg");
+
+  const auto texture = std::make_shared<Texture2D>(image);
 
   Renderer renderer;
 
   Vec3f obj_pos = Zero<Vec3f>();
   const auto camera = std::make_shared<Camera>();
   {
-    camera->SetPosition(Vec3f(0, 0, 10) * 0.8f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
+    camera->SetPosition(Vec3f(10, 10, -10) * 0.8f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
     camera->LookAtPoint(obj_pos);
 
     PerspectiveParameters perspective_params;
@@ -139,20 +136,22 @@ int main()
 
     renderer.Scale(All<Vec3f>(10.0f));
     renderer.SetLineWidth(3.0f);
-    // renderer.DrawAxes();
+    renderer.DrawAxes();
 
     // renderer.Rotate(q);
     renderer.SetTexture(nullptr); // texture);
     renderer.Scale(All<Vec3f>(0.5f));
     renderer.SetColor(White());
+    renderer.SetColor(Blue());
     renderer.SetLightSpecularExponent(120.0f);
     renderer.DrawMesh(test_mesh);
 
     renderer.SetColor(Blue());
     // renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
-    renderer.SetPointSize(4.0f);
+    renderer.SetPointSize(10.0f);
     renderer.SetColor(Red());
+    renderer.DrawPoint(test_mesh.GetVertexPosition(4));
     // renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     window->SwapBuffers();

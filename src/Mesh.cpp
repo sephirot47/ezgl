@@ -1,13 +1,10 @@
 #include "Mesh.h"
 #include "Macros.h"
 #include "Math.h"
+#include "MeshIO.h"
 #include "MeshIterators.h"
 #include "StreamOperators.h"
 #include <algorithm>
-#include <assimp/Exporter.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 #include <cassert>
 #include <unordered_map>
 #include <utility>
@@ -233,22 +230,30 @@ Mesh::CornerId Mesh::GetCornerIdFromFaceIdAndVertexId(const Mesh::FaceId inFaceI
 
 Mesh::CornerId Mesh::GetPreviousCornerId(const Mesh::CornerId inCornerId) const
 {
-  return GetFaceIdFromCornerId(inCornerId) * 3 + ((inCornerId + 2) % 3);
+  return (GetFaceIdFromCornerId(inCornerId) * 3) + ((inCornerId + 2) % 3);
 }
 
 Mesh::CornerId Mesh::GetNextCornerId(const Mesh::CornerId inCornerId) const
 {
-  return GetFaceIdFromCornerId(inCornerId) * 3 + ((inCornerId + 1) % 3);
+  return (GetFaceIdFromCornerId(inCornerId) * 3) + ((inCornerId + 1) % 3);
 }
 
 Mesh::CornerId Mesh::GetNextAdjacentCornerId(const Mesh::CornerId inCornerId) const
 {
-  return GetOppositeCornerId(GetNextCornerId(inCornerId));
+  EXPECTS(inCornerId < GetNumberOfCorners());
+  auto opposite_of_next_corner_id = GetOppositeCornerId(GetNextCornerId(inCornerId));
+  if (opposite_of_next_corner_id == Mesh::InvalidId)
+    return Mesh::InvalidId;
+  return GetNextCornerId(opposite_of_next_corner_id);
 }
 
 Mesh::CornerId Mesh::GetPreviousAdjacentCornerId(const Mesh::CornerId inCornerId) const
 {
-  return GetOppositeCornerId(GetPreviousCornerId(inCornerId));
+  EXPECTS(inCornerId < GetNumberOfCorners());
+  auto opposite_of_previous_corner_id = GetOppositeCornerId(GetPreviousCornerId(inCornerId));
+  if (opposite_of_previous_corner_id == Mesh::InvalidId)
+    return Mesh::InvalidId;
+  return GetPreviousCornerId(opposite_of_previous_corner_id);
 }
 
 Mesh::CornerId Mesh::GetNextAdjacentFaceId(const Mesh::CornerId inCornerId) const
@@ -301,24 +306,85 @@ Range<Mesh::CirculatorVertexNeighborFaceIds> Mesh::AllVertexNeighborFaceIds(cons
 }
 */
 
+std::vector<Mesh::CornerId> Mesh::GetNeighborCornersIds(const Mesh::VertexId inVertexId) const
+{
+  EXPECTS(inVertexId < GetNumberOfVertices());
+
+  const auto corner_ids = GetVertexCornersIds(inVertexId);
+
+  std::vector<Mesh::VertexId> neighbor_corners_ids;
+  neighbor_corners_ids.reserve(corner_ids.size() * 2);
+
+  for (const auto& corner_id : corner_ids)
+  {
+    const auto next_corner_id = GetNextCornerId(corner_id);
+    const auto next_next_corner_id = GetNextCornerId(next_corner_id);
+    neighbor_corners_ids.push_back(next_corner_id);
+    neighbor_corners_ids.push_back(next_next_corner_id);
+  }
+
+  return neighbor_corners_ids;
+}
+
 std::vector<Mesh::VertexId> Mesh::GetNeighborVerticesIds(const Mesh::VertexId inVertexId) const
 {
   EXPECTS(inVertexId < GetNumberOfVertices());
 
-  std::vector<Mesh::VertexId> neighbor_vertices;
-  neighbor_vertices.reserve(6);
+  const auto corner_ids = GetVertexCornersIds(inVertexId);
+
+  std::vector<Mesh::VertexId> neighbor_vertices_ids;
+  neighbor_vertices_ids.reserve(corner_ids.size());
+
+  std::transform(corner_ids.cbegin(),
+      corner_ids.cend(),
+      std::back_inserter(neighbor_vertices_ids),
+      [this](const Mesh::CornerId& inCornerId) {
+        const auto next_corner_id = GetNextCornerId(inCornerId);
+        const auto vertex_id = GetVertexIdFromCornerId(next_corner_id);
+        return vertex_id;
+      });
+
+  return neighbor_vertices_ids;
+}
+
+std::vector<Mesh::FaceId> Mesh::GetNeighborFacesIds(const Mesh::VertexId inVertexId) const
+{
+  EXPECTS(inVertexId < GetNumberOfVertices());
+
+  const auto corner_ids = GetVertexCornersIds(inVertexId);
+
+  std::vector<Mesh::FaceId> neighbor_face_ids;
+  neighbor_face_ids.reserve(corner_ids.size());
+
+  std::transform(corner_ids.cbegin(),
+      corner_ids.cend(),
+      std::back_inserter(neighbor_face_ids),
+      [this](const Mesh::CornerId& inCornerId) {
+        const auto face_id = GetFaceIdFromCornerId(inCornerId);
+        return face_id;
+      });
+
+  return neighbor_face_ids;
+}
+
+std::vector<Mesh::CornerId> Mesh::GetVertexCornersIds(const Mesh::VertexId inVertexId) const
+{
+  EXPECTS(inVertexId < GetNumberOfVertices());
+
+  std::vector<Mesh::CornerId> corner_ids;
+  corner_ids.reserve(6);
 
   const auto& vertex_data = mVerticesData.at(inVertexId);
-  auto neighbor_face_id = vertex_data.mFaceId;
+  const auto start_neighbor_corner_id = GetCornerIdFromFaceIdAndVertexId(vertex_data.mFaceId, inVertexId);
+
+  auto neighbor_corner_id = start_neighbor_corner_id;
   do
   {
-    const auto neighbor_corner_id = GetCornerIdFromFaceIdAndVertexId(neighbor_face_id, inVertexId);
-    neighbor_face_id = GetNextAdjacentFaceId(neighbor_corner_id);
-    const auto neighbor_vertex_id = GetVertexIdFromCornerId(GetPreviousCornerId(neighbor_corner_id));
-    neighbor_vertices.push_back(neighbor_vertex_id);
-  } while (neighbor_face_id != Mesh::InvalidId && neighbor_face_id != vertex_data.mFaceId);
+    corner_ids.push_back(neighbor_corner_id);
+    neighbor_corner_id = GetNextAdjacentCornerId(neighbor_corner_id);
+  } while (neighbor_corner_id != Mesh::InvalidId && neighbor_corner_id != start_neighbor_corner_id);
 
-  return neighbor_vertices;
+  return corner_ids;
 }
 
 bool Mesh::IsValid(const Mesh::Id inId) { return inId != Mesh::InvalidId; }
@@ -366,29 +432,16 @@ void Mesh::ComputeCornerNormals(const float inMinEdgeAngleToSmooth)
     const auto& face_normal = mFacesData.at(face_id).mNormal;
     assert(IsNormalized(face_normal));
 
+    const auto neighbor_face_ids = GetNeighborFacesIds(vertex_id);
     auto normal_sum = Zero<Vec3f>();
+    for (const auto& neighbor_face_id : neighbor_face_ids)
     {
-      const auto& vertex_data = mVerticesData.at(vertex_id);
-      auto neighbor_face_id = vertex_data.mFaceId;
-      do
-      {
-        const auto neighbor_corner_id = GetCornerIdFromFaceIdAndVertexId(neighbor_face_id, vertex_id);
-        if (face_id == neighbor_face_id)
-        {
-          normal_sum += face_normal;
-        }
-        else
-        {
-          const auto neighbor_face_normal = mFacesData.at(neighbor_face_id).mNormal;
-          assert(IsNormalized(neighbor_face_normal));
+      const auto& neighbor_face_normal = mFacesData.at(neighbor_face_id).mNormal;
+      assert(IsNormalized(neighbor_face_normal));
 
-          const auto edge_dot = Dot(face_normal, neighbor_face_normal);
-          if (edge_dot >= min_edge_dot_to_smooth)
-            normal_sum += neighbor_face_normal;
-        }
-        neighbor_face_id = GetNextAdjacentFaceId(neighbor_corner_id);
-
-      } while (neighbor_face_id != Mesh::InvalidId && neighbor_face_id != vertex_data.mFaceId);
+      const auto edge_dot = Dot(face_normal, neighbor_face_normal);
+      if (edge_dot >= min_edge_dot_to_smooth)
+        normal_sum += neighbor_face_normal;
     }
 
     const auto corner_normal = NormalizedSafe(normal_sum);
@@ -440,8 +493,6 @@ void Mesh::ComputeOppositeCornerIds()
     const auto& adjacent_faces_pair = edge_to_adjacent_faces_kv_pair.second;
     const auto& first_adjacent_face = adjacent_faces_pair.first;
     const auto& second_adjacent_face = adjacent_faces_pair.second;
-    assert(first_adjacent_face != Mesh::InvalidId && second_adjacent_face != Mesh::InvalidId);
-
     if (first_adjacent_face == Mesh::InvalidId || second_adjacent_face == Mesh::InvalidId)
       continue;
 
@@ -479,7 +530,6 @@ void Mesh::ComputeOppositeCornerIds()
     if (boundary_face_id == Mesh::InvalidId)
       continue;
 
-    const auto boundary_face_vertices_id = GetFaceVerticesIds(boundary_face_id);
     for (const auto& boundary_face_vertex_id : { edge[0], edge[1] })
     {
       const auto boundary_face_corner_id = GetCornerIdFromFaceIdAndVertexId(boundary_face_id, boundary_face_vertex_id);
@@ -492,172 +542,11 @@ void Mesh::ComputeOppositeCornerIds()
   }
 }
 
-void Mesh::Read(const std::filesystem::path& inMeshPath)
+void Mesh::Read(const std::filesystem::path& inMeshPath) { MeshIO::Read(inMeshPath, *this); }
+
+void Mesh::Write(const std::filesystem::path& inMeshPath, const bool inPreserveVerticesIds) const
 {
-  Assimp::Importer importer;
-  const auto* scene_ptr
-      = importer.ReadFile(inMeshPath.string(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-
-  if (!scene_ptr)
-    THROW_EXCEPTION("Error loading mesh from '" << inMeshPath.string() << "': " << importer.GetErrorString());
-
-  const auto& scene = *scene_ptr;
-
-  if (scene.mNumMeshes == 0)
-    THROW_EXCEPTION("Error loading mesh from '" << inMeshPath.string() << "': the file contains no mesh.");
-
-  const auto AiVector3DToVec3f
-      = [](const aiVector3D& inAiVector3D) { return Vec3f(inAiVector3D.x, inAiVector3D.y, inAiVector3D.z); };
-
-  const auto& ai_mesh = *(scene.mMeshes[0]);
-  Clear();
-
-  // Create vertices
-  for (Mesh::VertexId vertex_id = 0; vertex_id < ai_mesh.mNumVertices; ++vertex_id)
-  {
-    const auto ai_vertex_position = ai_mesh.mVertices[vertex_id];
-    const auto vertex_position = AiVector3DToVec3f(ai_vertex_position);
-    AddVertex(vertex_position);
-  }
-
-  // Create faces
-  for (Mesh::FaceId face_id = 0; face_id < ai_mesh.mNumFaces; ++face_id)
-  {
-    const auto ai_face = ai_mesh.mFaces[face_id];
-    EXPECTS(ai_face.mNumIndices == 3);
-    AddFace(ai_face.mIndices[0], ai_face.mIndices[1], ai_face.mIndices[2]);
-  }
-
-  // Assign corner properties
-  for (Mesh::CornerId corner_id = 0; corner_id < GetNumberOfCorners(); ++corner_id)
-  {
-    const auto face_id = (corner_id / 3);
-    const auto internal_corner_id = (corner_id % 3);
-    const auto vertex_id = mFacesData.at(face_id).mVerticesIds.at(internal_corner_id);
-
-    // Normal
-    if (ai_mesh.mNormals != nullptr)
-    {
-      const auto ai_corner_normal = ai_mesh.mNormals[vertex_id];
-      const auto corner_normal = NormalizedSafe(AiVector3DToVec3f(ai_corner_normal));
-      SetCornerNormal(corner_id, corner_normal);
-    }
-
-    // Texture coordinate
-    if (ai_mesh.mTextureCoords[0] != nullptr)
-    {
-      const auto ai_corner_texture_coordinates = ai_mesh.mTextureCoords[0][vertex_id];
-      const auto corner_texture_coordinates = XY(AiVector3DToVec3f(ai_corner_texture_coordinates));
-      SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
-    }
-  }
-
-  ComputeOppositeCornerIds();
-}
-
-void Mesh::Write(const std::filesystem::path& inMeshPath) const
-{
-  EXPECTS(!inMeshPath.extension().string().empty());
-
-  constexpr auto preserve_vertices_ids = true;
-
-  aiScene ai_scene;
-
-  ai_scene.mNumMaterials = 1;
-  ai_scene.mMaterials = new aiMaterial*[ai_scene.mNumMaterials];
-  ai_scene.mMaterials[0] = new aiMaterial();
-
-  ai_scene.mNumMeshes = 1;
-  ai_scene.mMeshes = new aiMesh*[ai_scene.mNumMeshes];
-  ai_scene.mMeshes[0] = new aiMesh();
-  auto& ai_mesh = *ai_scene.mMeshes[0];
-  {
-    const auto Vec3fToAiVector3D
-        = [](const Vec3f& inVector) { return aiVector3D(inVector[0], inVector[1], inVector[2]); };
-    const auto Vec2fToAiVector3D = [](const Vec2f& inVector) { return aiVector3D(inVector[0], inVector[1], 0); };
-
-    ai_mesh.mMaterialIndex = 0;
-
-    ai_mesh.mNumFaces = GetNumberOfFaces();
-    ai_mesh.mFaces = new aiFace[ai_mesh.mNumFaces];
-    for (Mesh::FaceId face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
-    {
-      aiFace& ai_face = ai_mesh.mFaces[face_id];
-      ai_face.mNumIndices = 3;
-      ai_face.mIndices = new unsigned int[ai_face.mNumIndices];
-
-      const auto& face_data = mFacesData.at(face_id);
-      if (preserve_vertices_ids)
-      {
-        ai_face.mIndices[0] = face_data.mVerticesIds[0];
-        ai_face.mIndices[1] = face_data.mVerticesIds[1];
-        ai_face.mIndices[2] = face_data.mVerticesIds[2];
-      }
-      else
-      {
-        ai_face.mIndices[0] = face_id * 3 + 0;
-        ai_face.mIndices[1] = face_id * 3 + 1;
-        ai_face.mIndices[2] = face_id * 3 + 2;
-      }
-    }
-
-    if (preserve_vertices_ids)
-    {
-      ai_mesh.mNumVertices = GetNumberOfVertices();
-      ai_mesh.mVertices = new aiVector3D[GetNumberOfVertices()];
-      for (Mesh::VertexId vertex_id = 0; vertex_id < GetNumberOfVertices(); ++vertex_id)
-      {
-        ai_mesh.mVertices[vertex_id] = Vec3fToAiVector3D(GetVerticesData().at(vertex_id).mPosition);
-      }
-    }
-    else
-    {
-      ai_mesh.mNumVertices = GetNumberOfCorners();
-      ai_mesh.mVertices = new aiVector3D[GetNumberOfCorners()];
-
-      ai_mesh.mNumUVComponents[0] = 2;
-      ai_mesh.mTextureCoords[0] = new aiVector3D[GetNumberOfCorners()];
-      ai_mesh.mNormals = new aiVector3D[GetNumberOfCorners()];
-
-      for (Mesh::CornerId corner_id = 0; corner_id < GetNumberOfCorners(); ++corner_id)
-      {
-        const auto vertex_id = GetVertexIdFromCornerId(corner_id);
-        ai_mesh.mVertices[corner_id] = Vec3fToAiVector3D(GetVerticesData().at(vertex_id).mPosition);
-        ai_mesh.mNormals[corner_id] = Vec3fToAiVector3D(GetCornersData().at(corner_id).mNormal);
-        ai_mesh.mTextureCoords[0][corner_id] = Vec2fToAiVector3D(GetCornersData().at(corner_id).mTextureCoordinates);
-      }
-    }
-  }
-
-  ai_scene.mRootNode = new aiNode();
-  {
-    ai_scene.mRootNode->mNumMeshes = 1;
-    ai_scene.mRootNode->mMeshes = new unsigned int[ai_scene.mRootNode->mNumMeshes];
-    ai_scene.mRootNode->mMeshes[0] = 0;
-  }
-
-  Assimp::Exporter exporter;
-
-  const auto get_format_id_from_extension = [&exporter](const std::string_view extension) {
-    std::string lower_case_extension;
-    std::transform(extension.cbegin(), extension.cend(), std::back_inserter(lower_case_extension), ::tolower);
-
-    for (std::size_t i = 0; i < exporter.GetExportFormatCount(); ++i)
-    {
-      const auto format_description = exporter.GetExportFormatDescription(i);
-      if (lower_case_extension == format_description->fileExtension)
-        return format_description->id;
-    }
-
-    THROW_EXCEPTION("Can't export mesh with file extension '" << lower_case_extension << "'");
-  };
-
-  const auto extension = inMeshPath.extension().string().substr(1); // Get extension without "."
-  const auto format_id = get_format_id_from_extension(extension);
-
-  const auto export_result = exporter.Export(&ai_scene, format_id, inMeshPath.string());
-  if (export_result != aiReturn_SUCCESS)
-    THROW_EXCEPTION("Error when exporting mesh to " << inMeshPath << ": " << exporter.GetErrorString());
+  MeshIO::Write(*this, inMeshPath, inPreserveVerticesIds);
 }
 
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::Edge& inRHS)

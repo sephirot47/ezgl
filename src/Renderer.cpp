@@ -8,6 +8,7 @@
 #include "MeshFactory.h"
 #include "ProjectionParametersVariant.h"
 #include "ShaderProgram.h"
+#include "TextureFactory.h"
 
 namespace egl
 {
@@ -27,7 +28,8 @@ Renderer::Renderer()
   mStateStack.push(DefaultState);
   ApplyState(GetCurrentState());
 
-  // mCone = DrawableMeshFactory::GetCone(32);
+  mWhiteTexture = TextureFactory::GetWhiteTexture();
+  mCone = DrawableMeshFactory::GetCone(32);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -216,6 +218,8 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 
   if (const auto& texture = GetCurrentState().mTexture)
     texture->BindToTextureUnit(0);
+  else
+    mWhiteTexture->BindToTextureUnit(0);
 
   ioShaderProgram.Bind();
   ioShaderProgram.SetUniformSafe("UTexture", 0);

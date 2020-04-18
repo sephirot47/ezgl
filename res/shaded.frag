@@ -19,32 +19,25 @@ layout(location = 0) out vec4 out_color;
 
 void main()
 {
-    vec3 cam_pos = UCameraWorldPosition;
+  vec3 cam_pos = UCameraWorldPosition;
 
-    vec3 light_dir = normalize(vec3(-1.0, -1.0, 0.0));
-    vec3 world_normal = normalize(in_world_normal);
+  vec3 light_dir = normalize(vec3(0.0, -1.0, 0.0));
+  vec3 world_normal = normalize(in_world_normal);
 
-    vec4 material_color = UColor * texture(UTexture, in_texture_coordinate);
+  vec4 material_color = UColor * texture(UTexture, in_texture_coordinate);
 
-    float diffuse_intensity = max(dot(-light_dir, world_normal), 0);
+  float diffuse_intensity = max(dot(-light_dir, world_normal), 0);
 
-    vec3 light_reflected_dir = normalize(reflect(light_dir, world_normal));
-    vec3 world_fragment_position_to_cam_dir = normalize(cam_pos - in_world_position);
-    float specular_intensity = max(dot(light_reflected_dir, world_fragment_position_to_cam_dir), 0);
-    specular_intensity = pow(specular_intensity, ULightSpecularExponent);
+  vec3 light_reflected_dir = normalize(reflect(light_dir, world_normal));
+  vec3 world_fragment_position_to_cam_dir = normalize(cam_pos - in_world_position);
+  float specular_intensity = max(dot(light_reflected_dir, world_fragment_position_to_cam_dir), 0);
+  specular_intensity = pow(specular_intensity, ULightSpecularExponent);
 
-    vec4 lighted_color = vec4(0);
-    lighted_color += ULightAmbientColor * material_color;
-    lighted_color += diffuse_intensity * ULightDiffuseColor * material_color;
-    lighted_color += specular_intensity * ULightSpecularColor;
-    lighted_color.a = material_color.a;
-    if (UColor == vec4(0, 0, 1, 1))
-    {
-        out_color = material_color; // lighted_color;
-    }
-    else
-    {
-        out_color = vec4(in_texture_coordinate.rrr, 1); // material_color; // lighted_color;
-        out_color = material_color; // lighted_color;
-    }
+  vec4 lighted_color = vec4(0);
+  lighted_color += ULightAmbientColor * material_color;
+  lighted_color += diffuse_intensity * ULightDiffuseColor * material_color;
+  lighted_color += specular_intensity * ULightSpecularColor;
+  lighted_color.a = material_color.a;
+  out_color = vec4(in_world_normal, 1);
+  out_color = lighted_color;
 }
