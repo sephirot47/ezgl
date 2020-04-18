@@ -319,6 +319,9 @@ public:
   static void PointSize(const float inPointSize);
   static void LineWidth(const float inLineWidth);
 
+  static void Viewport(const int inX, const int inY, const int inWidth, const int inHeight);
+  static void Viewport(const Vec2i &inXY, const Vec2i &inSize);
+
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();
   static void BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId);

@@ -46,18 +46,26 @@ bool Camera::IsPerspective() const
   return (mProjectionParametersVariant.index() == PerspectiveParameters::VariantIndex);
 }
 
-const OrthographicParameters& Camera::GetOrthographicParameters() const
+OrthographicParameters& Camera::GetOrthographicParameters()
 {
   EXPECTS(IsOrthographic());
-  const auto& orthographic_parameters = std::get<OrthographicParameters>(mProjectionParametersVariant);
-  return orthographic_parameters;
+  return std::get<OrthographicParameters>(mProjectionParametersVariant);
+}
+
+PerspectiveParameters& Camera::GetPerspectiveParameters()
+{
+  EXPECTS(IsPerspective());
+  return std::get<PerspectiveParameters>(mProjectionParametersVariant);
+}
+
+const OrthographicParameters& Camera::GetOrthographicParameters() const
+{
+  return const_cast<Camera&>(*this).GetOrthographicParameters();
 }
 
 const PerspectiveParameters& Camera::GetPerspectiveParameters() const
 {
-  EXPECTS(IsPerspective());
-  const auto& perspective_parameters = std::get<PerspectiveParameters>(mProjectionParametersVariant);
-  return perspective_parameters;
+  return const_cast<Camera&>(*this).GetPerspectiveParameters();
 }
 
 Mat4f Camera::GetModelMatrix() const

@@ -11,6 +11,12 @@ Image2D<T>::Image2D()
 }
 
 template <typename T>
+Image2D<T>::Image2D(const std::filesystem::path& inImagePath)
+{
+  Read(inImagePath);
+}
+
+template <typename T>
 Image2D<T>::Image2D(const std::size_t inWidth, const std::size_t inHeight, const T& inFillValue)
 {
   Create(inWidth, inHeight);

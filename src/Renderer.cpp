@@ -14,22 +14,30 @@ namespace egl
 {
 
 const Renderer::State Renderer::DefaultState;
+bool Renderer::sStaticResourcesInited = false;
+std::unique_ptr<ShaderProgram> Renderer::sUnshadedShaderProgram;
+std::unique_ptr<ShaderProgram> Renderer::sShadedShaderProgram;
+std::unique_ptr<DrawableMesh> Renderer::sCone;
+std::shared_ptr<Texture2D> Renderer::sWhiteTexture;
 
 Renderer::Renderer()
-    : mUnshadedShaderProgram {
-        VertexShader { GetFileContents("../res/unshaded.vert") },
-        FragmentShader { GetFileContents("../res/unshaded.frag") },
-      },
-      mShadedShaderProgram {
-          VertexShader { GetFileContents("../res/shaded.vert") },
-          FragmentShader { GetFileContents("../res/shaded.frag") },
-        }
 {
   mStateStack.push(DefaultState);
   ApplyState(GetCurrentState());
 
-  mWhiteTexture = TextureFactory::GetWhiteTexture();
-  mCone = DrawableMeshFactory::GetCone(32);
+  if (!sStaticResourcesInited)
+  {
+    sUnshadedShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/unshaded.vert") },
+        FragmentShader { GetFileContents("../res/unshaded.frag") });
+
+    sShadedShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/shaded.vert") },
+        FragmentShader { GetFileContents("../res/shaded.frag") });
+
+    sCone = std::make_unique<DrawableMesh>(DrawableMeshFactory::GetCone(32));
+    sWhiteTexture = TextureFactory::GetWhiteTexture();
+
+    sStaticResourcesInited = true;
+  }
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -162,7 +170,7 @@ void Renderer::ApplyState(const State& inStateToApply)
 
 void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType)
 {
-  UseShaderProgram(mShadedShaderProgram);
+  UseShaderProgram(*sShadedShaderProgram);
 
   inDrawableMesh.Bind();
 
@@ -188,7 +196,7 @@ void Renderer::DrawAxes()
   DrawArrow(Segment3f { Zero<Vec3f>(), Up<Vec3f>() });
 
   SetColor(Blue());
-  DrawArrow(Segment3f { Zero<Vec3f>(), Forward<Vec3f>() });
+  DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 
   PopState();
 }
@@ -201,7 +209,7 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
   Translate(inArrowSegment.GetToPoint());
   Rotate(LookInDirection(Direction(inArrowSegment)));
   Scale(Vec3f { 0.05f, 0.05f, 0.08f });
-  DrawMesh(mCone);
+  DrawMesh(*sCone);
 
   PopState();
 }
@@ -219,7 +227,7 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   if (const auto& texture = GetCurrentState().mTexture)
     texture->BindToTextureUnit(0);
   else
-    mWhiteTexture->BindToTextureUnit(0);
+    sWhiteTexture->BindToTextureUnit(0);
 
   ioShaderProgram.Bind();
   ioShaderProgram.SetUniformSafe("UTexture", 0);

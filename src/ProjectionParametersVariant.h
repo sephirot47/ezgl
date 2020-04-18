@@ -21,7 +21,7 @@ struct PerspectiveParameters
   float mAngleOfViewRads = HalfPi<float>();
   float mAspectRatio = 1.0f;
   float mZNear = 0.05f;
-  float mZFar = 1.0f;
+  float mZFar = 1000.0f;
 };
 
 using ProjectionParametersVariant = std::variant<OrthographicParameters, PerspectiveParameters>;

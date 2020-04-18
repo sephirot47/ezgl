@@ -2,6 +2,7 @@
 #include "Macros.h"
 #include <GL/glew.h>
 #include <algorithm>
+#include <thread>
 
 namespace egl
 {
@@ -78,6 +79,54 @@ bool Window::ShouldClose() const { return glfwWindowShouldClose(mHandle); }
 void Window::SwapBuffers() { glfwSwapBuffers(mHandle); }
 
 void Window::PollEvents() { glfwPollEvents(); }
+
+void Window::SetInterFrameRestTime(const TimeDuration& inInterFrameRestTime)
+{
+  mInterFrameRestTime = inInterFrameRestTime;
+}
+
+Vec2i Window::GetSize() const
+{
+  Vec2i size;
+  glfwGetWindowSize(mHandle, &size[0], &size[1]);
+  return size;
+}
+
+Vec2i Window::GetFramebufferSize() const
+{
+  Vec2i framebuffer_size;
+  glfwGetFramebufferSize(mHandle, &framebuffer_size[0], &framebuffer_size[1]);
+  return framebuffer_size;
+}
+
+float Window::GetFramebufferAspectRatio() const
+{
+  const auto framebuffer_size = GetFramebufferSize();
+  return static_cast<float>(framebuffer_size[0]) / framebuffer_size[1];
+}
+
+Vec2i Window::GetPosition() const
+{
+  Vec2i position;
+  glfwGetWindowPos(mHandle, &position[0], &position[1]);
+  return position;
+}
+
+void Window::Loop(const Window::LoopCallback& inLoopCallback)
+{
+  auto previous_time = Now();
+  while (!ShouldClose())
+  {
+    const auto delta_time = (Now() - previous_time);
+    previous_time = Now();
+    inLoopCallback(delta_time);
+
+    SwapBuffers();
+    PollEvents();
+
+    std::this_thread::sleep_for(mInterFrameRestTime);
+  }
+}
 
 void Window::SetInputEventCallback(const Window::InputEventCallback& inInputEventCallback)
 {

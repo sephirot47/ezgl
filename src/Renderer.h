@@ -85,6 +85,13 @@ public:
   void DrawArrow(const Segment3f& inArrowSegment);
 
 private:
+  // Static resources
+  static bool sStaticResourcesInited;
+  static std::unique_ptr<ShaderProgram> sUnshadedShaderProgram;
+  static std::unique_ptr<ShaderProgram> sShadedShaderProgram;
+  static std::unique_ptr<DrawableMesh> sCone;
+  static std::shared_ptr<Texture2D> sWhiteTexture;
+
   struct State
   {
     std::shared_ptr<Texture2D> mTexture = nullptr;
@@ -107,14 +114,7 @@ private:
     Color4f mLightSpecularColor = WithValue(White(), 0.7f);
     float mLightSpecularExponent = 120.0f;
   };
-
   std::stack<State> mStateStack;
-  ShaderProgram mUnshadedShaderProgram;
-  ShaderProgram mShadedShaderProgram;
-
-  // Resources
-  DrawableMesh mCone;
-  std::shared_ptr<Texture2D> mWhiteTexture;
 
   static const State DefaultState;
   State& GetCurrentState();

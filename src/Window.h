@@ -2,6 +2,7 @@
 
 #include "GL.h"
 #include "Input.h"
+#include "Time.h"
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -44,10 +45,21 @@ public:
   void SwapBuffers();
   void PollEvents();
 
+  void SetInterFrameRestTime(const TimeDuration &inInterFrameRestTime);
+
+  Vec2i GetSize() const;
+  Vec2i GetFramebufferSize() const;
+  Vec2i GetPosition() const;
+  float GetFramebufferAspectRatio() const;
+
+  // Loop callback
+  using LoopCallback = std::function<void(const DeltaTime)>;
+  void Loop(const Window::LoopCallback& inLoopCallback);
+
   // Input callbacks
   using InputEventCallback = std::function<void(const InputEvent&)>;
-  void SetInputEventCallback(const InputEventCallback& inInputEventCallback);
-  const InputEventCallback& GetInputEventCallback() const;
+  void SetInputEventCallback(const Window::InputEventCallback& inInputEventCallback);
+  const Window::InputEventCallback& GetInputEventCallback() const;
 
   // Input listeners
   void AddInputListener(InputListener* inInputListener);
@@ -63,6 +75,7 @@ private:
   GLFWwindow* mHandle = nullptr;
   InputEventCallback mInputEventCallback;
   std::vector<InputListener*> mInputListeners;
+  TimeDuration mInterFrameRestTime = 1ms;
 };
 
 class InputListener

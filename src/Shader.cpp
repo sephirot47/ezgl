@@ -5,12 +5,19 @@
 
 namespace egl
 {
-Shader::Shader(const GL::EShaderType inShaderType, const std::string_view inSourceCode)
-    : mGLId(GL::CreateShader(inShaderType))
+Shader::Shader(GL::EShaderType inShaderType) : mGLId(GL::CreateShader(inShaderType)), mShaderType(inShaderType)
 {
   if (mGLId == 0)
     THROW_EXCEPTION("Error creating shader of type " << GL::EnumCast(inShaderType));
+}
 
+Shader::Shader(const GL::EShaderType inShaderType, const std::string_view inSourceCode) : Shader(inShaderType)
+{
+  Compile(inSourceCode);
+}
+
+void Shader::Compile(const std::string_view inSourceCode)
+{
   GL::ShaderSource(mGLId, inSourceCode);
   GL::CompileShader(mGLId);
 

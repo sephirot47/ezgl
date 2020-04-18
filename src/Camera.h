@@ -30,6 +30,8 @@ public:
 
   bool IsOrthographic() const;
   bool IsPerspective() const;
+  OrthographicParameters& GetOrthographicParameters();
+  PerspectiveParameters& GetPerspectiveParameters();
   const OrthographicParameters& GetOrthographicParameters() const;
   const PerspectiveParameters& GetPerspectiveParameters() const;
 

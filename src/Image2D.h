@@ -11,6 +11,7 @@ class Image2D
 {
 public:
   Image2D();
+  explicit Image2D(const std::filesystem::path &inImagePath);
   Image2D(const std::size_t inWidth, const std::size_t inHeight, const T &inFillValue);
   Image2D(const Image2D& inImage2D) = default;
   Image2D& operator=(const Image2D& inImage2D) = default;

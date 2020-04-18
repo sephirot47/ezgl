@@ -158,7 +158,7 @@ constexpr TColor WithValue(const TColor& inColor, const typename TColor::ValueTy
   return new_color;
 }
 
-template <typename T>
+template <typename T = Vec3f>
 constexpr auto Right()
 {
   if constexpr (IsVec_v<T>)
@@ -173,7 +173,7 @@ constexpr auto Right()
     static_assert("Not implemented for this type");
   }
 }
-template <typename T>
+template <typename T = Vec3f>
 constexpr auto Up()
 {
   if constexpr (IsVec_v<T>)
@@ -188,7 +188,7 @@ constexpr auto Up()
     static_assert("Not implemented for this type");
   }
 }
-template <typename T>
+template <typename T = Vec3f>
 constexpr auto Forward()
 {
   if constexpr (IsVec_v<T>)
@@ -203,17 +203,17 @@ constexpr auto Forward()
     static_assert("Not implemented for this type");
   }
 }
-template <typename T>
+template <typename T = Vec3f>
 constexpr T Left()
 {
   return -Right<T>();
 }
-template <typename T>
+template <typename T = Vec3f>
 constexpr T Down()
 {
   return -Up<T>();
 }
-template <typename T>
+template <typename T = Vec3f>
 constexpr T Back()
 {
   return -Forward<T>();

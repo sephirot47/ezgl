@@ -21,7 +21,7 @@ void main()
 {
   vec3 cam_pos = UCameraWorldPosition;
 
-  vec3 light_dir = normalize(vec3(0.0, 0.0, 1.0));
+  vec3 light_dir = normalize(vec3(0.0, 0.0, -1.0));
   vec3 world_normal = normalize(in_world_normal);
 
   vec4 material_color = UColor * texture(UTexture, in_texture_coordinate);

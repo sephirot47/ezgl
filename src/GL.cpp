@@ -11,6 +11,15 @@ void GL::PointSize(const float inPointSize) { glPointSize(inPointSize); }
 
 void GL::LineWidth(const float inLineWidth) { glLineWidth(inLineWidth); }
 
+void GL::Viewport(const int inX, const int inY, const int inWidth, const int inHeight)
+{
+  EXPECTS(inWidth >= 0);
+  EXPECTS(inHeight >= 0);
+  glViewport(inX, inY, inWidth, inHeight);
+}
+
+void GL::Viewport(const Vec2i& inXY, const Vec2i& inSize) { GL::Viewport(inXY[0], inXY[1], inSize[0], inSize[1]); }
+
 void GL::SetEnabled(const GL::Enablable inEnablable, const bool inEnabled)
 {
   if (inEnabled)
@@ -89,19 +98,25 @@ GL::Id GL::GenTexture()
   return new_texture_id;
 }
 
-GL::Id GL::CreateTexture(const GL::ETextureTarget &inTextureTarget)
+GL::Id GL::CreateTexture(const GL::ETextureTarget& inTextureTarget)
 {
   GL::Id new_texture_id = 0;
   glCreateTextures(GL::EnumCast(inTextureTarget), 1, &new_texture_id);
   return new_texture_id;
 }
 
-void GL::BindTexture(const GL::ETextureTarget &inTextureTarget, const GL::Id& inTextureId) { glBindTexture(GL::EnumCast(inTextureTarget), inTextureId); }
+void GL::BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& inTextureId)
+{
+  glBindTexture(GL::EnumCast(inTextureTarget), inTextureId);
+}
 
 void GL::GenerateTextureMipMap(const GL::Id& inTextureId) { glGenerateTextureMipmap(inTextureId); }
 
 void GL::ActiveTexture(const GL::Id& inTextureUnit) { glActiveTexture(inTextureUnit); }
-void GL::BindTextureUnit(const GL::Size &inTextureUnit, const GL::Id& inTextureId) { glBindTextureUnit(inTextureUnit, inTextureId); }
+void GL::BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId)
+{
+  glBindTextureUnit(inTextureUnit, inTextureId);
+}
 
 void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }
 
