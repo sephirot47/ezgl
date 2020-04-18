@@ -81,7 +81,7 @@ int main()
   DrawableMesh test_mesh;
   // test_mesh.Read("monkey.obj");
   // test_mesh = DrawableMeshFactory::GetCone(62);
-  test_mesh = DrawableMeshFactory::GetPlane(2, 2);
+  test_mesh = DrawableMeshFactory::GetTorus(20, 20, 0.5f);
   // test_mesh = DrawableMeshFactory::GetCube();
   // test_mesh = DrawableMeshFactory::GetCylinder(32);
   // test_mesh = DrawableMeshFactory::GetHemisphere(20, 20);
@@ -150,7 +150,7 @@ int main()
     renderer.SetColor(Blue());
     renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
-    renderer.SetPointSize(10.0f);
+    renderer.SetPointSize(1.0f);
     renderer.SetColor(Red());
     renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 

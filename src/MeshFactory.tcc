@@ -197,6 +197,60 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
 }
 
 template <typename TMesh>
+TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
+    const std::size_t inNumLongitudes,
+    const float inHoleSize)
+{
+  EXPECTS(inNumLatitudes >= 3);
+  EXPECTS(inNumLongitudes >= 3);
+  EXPECTS (inHoleSize >= 0.0001f && inHoleSize <= 0.999f);
+
+  const auto hole_radius = (inHoleSize * 0.5f);
+  const auto torus_radius = (1.0f - inHoleSize) * 0.5f;
+  const auto angle_longitude_increment = (FullCircleRads<float>() / inNumLongitudes);
+  const auto angle_latitude_increment = (FullCircleRads<float>() / inNumLatitudes);
+
+  TMesh torus;
+
+  auto angle_longitude = 0.0f;
+  for (Mesh::VertexId longitude = 0; longitude < inNumLongitudes; ++longitude)
+  {
+    auto angle_latitude = 0.0f;
+    for (Mesh::VertexId latitude = 0; latitude < inNumLatitudes; ++latitude)
+    {
+      const auto longitude_rotation = AngleAxis(angle_longitude, Forward<Vec3f>());
+      const auto longitude_center_offset = (hole_radius + torus_radius) * (longitude_rotation * Down<Vec3f>());
+      const auto latitude_circle_position_local = Vec3f { 0.0f, std::sin(angle_latitude), std::cos(angle_latitude) };
+      const auto latitude_circle_position_global = longitude_center_offset + longitude_rotation * (torus_radius * latitude_circle_position_local);
+      torus.AddVertex(latitude_circle_position_global);
+      angle_latitude += angle_latitude_increment;
+    }
+    angle_longitude += angle_longitude_increment;
+  }
+
+  for (Mesh::VertexId longitude = 0; longitude < inNumLongitudes; ++longitude)
+  {
+    for (Mesh::VertexId latitude = 0; latitude < inNumLatitudes; ++latitude)
+    {
+      const auto current_longitude_current_latitude_vertex_id = (longitude * inNumLatitudes + latitude);
+      const auto current_longitude_next_latitude_vertex_id = (longitude * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
+      const auto next_longitude_current_latitude_vertex_id = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + latitude);
+      const auto next_longitude_next_latitude_vertex_id = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
+      torus.AddFace(current_longitude_current_latitude_vertex_id,
+          current_longitude_next_latitude_vertex_id,
+          next_longitude_current_latitude_vertex_id);
+      torus.AddFace(next_longitude_current_latitude_vertex_id,
+          current_longitude_next_latitude_vertex_id,
+          next_longitude_next_latitude_vertex_id);
+    }
+  }
+
+  ConsolidateMesh(torus);
+
+  return torus;
+}
+
+template <typename TMesh>
 TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY)
 {
   EXPECTS(inNumVerticesX >= 2);
@@ -222,12 +276,12 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
   {
     for (Mesh::VertexId y = 0; y < (inNumVerticesY - 1); ++y)
     {
-      const auto current_x_current_y = (y * inNumVerticesX + x);
-      const auto next_x_current_y = (y * inNumVerticesX + (x + 1));
-      const auto current_x_next_y = ((y + 1) * inNumVerticesX + x);
-      const auto next_x_next_y = ((y + 1) * inNumVerticesX + (x + 1));
-      plane.AddFace(current_x_current_y, next_x_next_y, next_x_current_y);
-      plane.AddFace(current_x_current_y, current_x_next_y, next_x_next_y);
+      const auto current_x_current_y_vertex_id = (y * inNumVerticesX + x);
+      const auto next_x_current_y_vertex_id = (y * inNumVerticesX + (x + 1));
+      const auto current_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + x);
+      const auto next_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + (x + 1));
+      plane.AddFace(current_x_current_y_vertex_id, next_x_next_y_vertex_id, next_x_current_y_vertex_id);
+      plane.AddFace(current_x_current_y_vertex_id, current_x_next_y_vertex_id, next_x_next_y_vertex_id);
     }
   }
 
