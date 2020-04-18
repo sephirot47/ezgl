@@ -19,7 +19,7 @@ public:
   VAO(const VAO& inRHS) = delete;
   VAO& operator=(const VAO& inRHS) = delete;
   VAO(VAO&& ioRHS) noexcept;
-  VAO& operator=(VAO&& ioRHS) noexcept;
+  VAO& operator=(VAO&& ioRHS) = delete;
   ~VAO();
 
   void Bind() const;

@@ -11,14 +11,12 @@ class EBO
 {
 public:
   EBO();
-
   template <typename T>
   explicit EBO(const Span<T>& inData);
-
   EBO(const EBO& inRHS) = delete;
   EBO& operator=(const EBO& inRHS) = delete;
   EBO(EBO&& ioRHS) noexcept;
-  EBO& operator=(EBO&& ioRHS) noexcept;
+  EBO& operator=(EBO&& ioRHS) = delete;
   ~EBO();
 
   void Bind() const;

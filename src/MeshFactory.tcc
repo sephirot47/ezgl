@@ -149,7 +149,7 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
   TMesh cylinder;
 
   // Forward and back circle vertices
-  for (bool forward : { true, false })
+  for (const auto  forward : { true, false })
   {
     for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
     {
@@ -178,7 +178,7 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
   }
 
   // Cap vertices
-  for (bool forward : { true, false })
+  for (const auto forward : { true, false })
   {
     for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
     {

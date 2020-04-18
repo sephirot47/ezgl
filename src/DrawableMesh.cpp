@@ -7,11 +7,11 @@
 
 namespace egl
 {
-void DrawableMesh::Bind() const { mVAO.Bind(); }
+void DrawableMesh::Bind() const { mVAO->Bind(); }
 
 void DrawableMesh::UpdateVAOs()
 {
-  mVAO.Bind();
+  mVAO->Bind();
 
   // Create vertices ids EBO
   std::shared_ptr<EBO> vertices_ids_ebo;
@@ -22,7 +22,7 @@ void DrawableMesh::UpdateVAOs()
       std::iota(face_vertices_ids.begin(), face_vertices_ids.end(), 0); // 0, 1, 2, 3, 4, ...
     }
     vertices_ids_ebo = std::make_shared<EBO>(MakeSpan(face_vertices_ids));
-    mVAO.SetEBO(vertices_ids_ebo);
+    mVAO->SetEBO(vertices_ids_ebo);
   }
 
   // Create corners positions VBO
@@ -43,7 +43,7 @@ void DrawableMesh::UpdateVAOs()
       }
       corners_positions_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_positions_pool));
     }
-    mVAO.AddVBO(corners_positions_pool_vbo, DrawableMesh::PositionAttribLocation(), VAOVertexAttribT<Vec3f>());
+    mVAO->AddVBO(corners_positions_pool_vbo, DrawableMesh::PositionAttribLocation(), VAOVertexAttribT<Vec3f>());
   }
 
   // Create corners normals VBO
@@ -61,7 +61,7 @@ void DrawableMesh::UpdateVAOs()
       }
       corners_normals_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_normals_pool));
     }
-    mVAO.AddVBO(corners_normals_pool_vbo, DrawableMesh::NormalAttribLocation(), VAOVertexAttribT<Vec3f>());
+    mVAO->AddVBO(corners_normals_pool_vbo, DrawableMesh::NormalAttribLocation(), VAOVertexAttribT<Vec3f>());
   }
 
   // Create corners texture coordinates VBO
@@ -79,7 +79,9 @@ void DrawableMesh::UpdateVAOs()
       }
       corners_texture_coordinates_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_texture_coordinates_pool));
     }
-    mVAO.AddVBO(corners_texture_coordinates_pool_vbo, DrawableMesh::TextureCoordinateAttribLocation(), VAOVertexAttribT<Vec2f>());
+    mVAO->AddVBO(corners_texture_coordinates_pool_vbo,
+        DrawableMesh::TextureCoordinateAttribLocation(),
+        VAOVertexAttribT<Vec2f>());
   }
 }
 

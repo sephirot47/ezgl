@@ -11,7 +11,7 @@ public:
   Texture(const Texture& inRHS) = delete;
   Texture& operator=(const Texture& inRHS) = delete;
   Texture(Texture&& ioRHS) noexcept;
-  Texture& operator=(Texture&& ioRHS) noexcept;
+  Texture& operator=(Texture&& ioRHS) = delete;
   virtual ~Texture();
 
   void Bind() const;

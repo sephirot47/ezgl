@@ -8,19 +8,10 @@ Texture::Texture(const GL::ETextureTarget inTarget) : mGLId(GL::CreateTexture(in
     THROW_EXCEPTION("Error creating Texture");
 }
 
-Texture::Texture(Texture&& ioRHS) noexcept { *this = std::move(ioRHS); }
-
-Texture& Texture::operator=(Texture&& ioRHS) noexcept
+Texture::Texture(Texture&& ioRHS) noexcept
 {
-  if (this == &ioRHS)
-    return *this;
-
-  if (mGLId != 0)
-    GL::DeleteVertexArray(mGLId);
-
-  mGLId = ioRHS.mGLId;
-  ioRHS.mGLId = 0;
-  return *this;
+  EXPECTS(mGLId == 0);
+  std::swap(mGLId, ioRHS.mGLId);
 }
 
 Texture::~Texture()

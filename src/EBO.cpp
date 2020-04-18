@@ -10,19 +10,10 @@ EBO::EBO() : mGLId(GL::CreateBuffer())
     THROW_EXCEPTION("Error creating EBO");
 }
 
-EBO::EBO(EBO&& ioRHS) noexcept { *this = std::move(ioRHS); }
-
-EBO& EBO::operator=(EBO&& ioRHS) noexcept
+EBO::EBO(EBO&& ioRHS) noexcept
 {
-  if (this == &ioRHS)
-    return *this;
-
-  if (mGLId != 0)
-    GL::DeleteVertexArray(mGLId);
-
-  mGLId = ioRHS.mGLId;
-  ioRHS.mGLId = 0;
-  return *this;
+  EXPECTS(mGLId == 0);
+  std::swap(mGLId, ioRHS.mGLId);
 }
 
 EBO::~EBO()

@@ -13,23 +13,14 @@ VAO::VAO() : mGLId(GL::CreateVertexArray())
     THROW_EXCEPTION("Error creating VAO");
 }
 
-VAO::VAO(VAO&& ioRHS) noexcept { *this = std::move(ioRHS); }
-
-VAO& VAO::operator=(VAO&& ioRHS) noexcept
+VAO::VAO(VAO&& ioRHS) noexcept
 {
-  if (this == &ioRHS)
-    return *this;
+  EXPECTS(mGLId == 0);
 
-  if (mGLId != 0)
-    GL::DeleteVertexArray(mGLId);
-
-  mGLId = ioRHS.mGLId;
-  ioRHS.mGLId = 0;
+  std::swap(mGLId, ioRHS.mGLId);
 
   mEBO = std::move(ioRHS.mEBO);
   mVBOs = std::move(ioRHS.mVBOs);
-
-  return *this;
 }
 
 VAO::~VAO()
@@ -39,15 +30,12 @@ VAO::~VAO()
 }
 
 void VAO::Bind() const { GL::BindVertexArray(mGLId); }
-
 void VAO::UnBind() const { GL::BindVertexArray(0); }
-
 bool VAO::IsBound() const
 {
   const auto bound_id = GetBoundGLId();
   return bound_id != 0 && bound_id == mGLId;
 }
-
 GL::Id VAO::GetBoundGLId()
 {
   const auto bound_id = GL::GetInteger(GL::EBufferBindingType::VERTEX_ARRAY);

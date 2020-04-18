@@ -11,14 +11,12 @@ class VBO
 {
 public:
   VBO();
-
   template <typename T>
   VBO(const Span<T>& inData);
-
   VBO(const VBO& inRHS) = delete;
   VBO& operator=(const VBO& inRHS) = delete;
   VBO(VBO&& ioRHS) noexcept;
-  VBO& operator=(VBO&& ioRHS) noexcept;
+  VBO& operator=(VBO&& ioRHS) = delete;
   ~VBO();
 
   void Bind() const;

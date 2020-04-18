@@ -18,8 +18,8 @@ public:
   DrawableMesh() = default;
   DrawableMesh(const DrawableMesh&) = delete;
   DrawableMesh& operator=(const DrawableMesh&) = delete;
+  DrawableMesh(DrawableMesh&&) noexcept = default;
   DrawableMesh& operator=(DrawableMesh&&) = default;
-  DrawableMesh(DrawableMesh&&) = default;
   virtual ~DrawableMesh() = default;
 
   void Bind() const;
@@ -28,6 +28,6 @@ public:
   void Read(const std::filesystem::path& inMeshPath) final;
 
 private:
-  VAO mVAO;
+  std::unique_ptr<VAO> mVAO = std::make_unique<VAO>();
 };
 }

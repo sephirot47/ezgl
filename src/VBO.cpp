@@ -10,19 +10,10 @@ VBO::VBO() : mGLId(GL::CreateBuffer())
     THROW_EXCEPTION("Error creating VBO");
 }
 
-VBO::VBO(VBO&& ioRHS) noexcept { *this = std::move(ioRHS); }
-
-VBO& VBO::operator=(VBO&& ioRHS) noexcept
+VBO::VBO(VBO&& ioRHS) noexcept
 {
-  if (this == &ioRHS)
-    return *this;
-
-  if (mGLId != 0)
-    GL::DeleteVertexArray(mGLId);
-
-  mGLId = ioRHS.mGLId;
-  ioRHS.mGLId = 0;
-  return *this;
+  EXPECTS(mGLId == 0);
+  std::swap(mGLId, ioRHS.mGLId);
 }
 
 VBO::~VBO()
