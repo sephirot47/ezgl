@@ -23,6 +23,10 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
     const Mesh::VertexId& inFaceVertexId1,
     const Mesh::VertexId& inFaceVertexId2)
 {
+  EXPECTS(inFaceVertexId0 < GetNumberOfVertices());
+  EXPECTS(inFaceVertexId1 < GetNumberOfVertices());
+  EXPECTS(inFaceVertexId2 < GetNumberOfVertices());
+
   // Add face
   mFacesData.emplace_back();
   const auto new_face_id = mFacesData.size() - 1;

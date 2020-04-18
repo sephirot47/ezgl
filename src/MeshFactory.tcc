@@ -30,10 +30,6 @@ TMesh GMeshFactory<TMesh>::GetCube()
   cube.AddFace(0, 6, 4); // Z-
   cube.AddFace(0, 2, 6); // Z-
 
-  cube.SetCornerTextureCoordinates(0, Vec2f(0.0f, 0.0f));
-  cube.SetCornerTextureCoordinates(1, Vec2f(0.5f, 0.5f));
-  cube.SetCornerTextureCoordinates(2, Vec2f(1.0f, 0.5f));
-
   ConsolidateMesh(cube);
   return cube;
 }
@@ -198,6 +194,53 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
 
   ConsolidateMesh(cylinder);
   return cylinder;
+}
+
+template <typename TMesh>
+TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY)
+{
+  EXPECTS(inNumVerticesX >= 2);
+  EXPECTS(inNumVerticesY >= 2);
+
+  TMesh plane;
+
+  const auto stride_x = (inNumVerticesX - 1);
+  const auto stride_y = (inNumVerticesY - 1);
+  for (Mesh::VertexId y = 0; y < inNumVerticesY; ++y)
+  {
+    for (Mesh::VertexId x = 0; x < inNumVerticesX; ++x)
+    {
+      const auto position_x = (static_cast<float>(x) / stride_x) - 0.5f;
+      const auto position_y = (static_cast<float>(y) / stride_y) - 0.5f;
+      const auto position_z = 0.0f;
+      const auto vertex_position = Vec3f { position_x, position_y, position_z };
+      plane.AddVertex(vertex_position);
+    }
+  }
+
+  for (Mesh::VertexId x = 0; x < (inNumVerticesX - 1); ++x)
+  {
+    for (Mesh::VertexId y = 0; y < (inNumVerticesY - 1); ++y)
+    {
+      const auto current_x_current_y = (y * inNumVerticesX + x);
+      const auto next_x_current_y = (y * inNumVerticesX + (x + 1));
+      const auto current_x_next_y = ((y + 1) * inNumVerticesX + x);
+      const auto next_x_next_y = ((y + 1) * inNumVerticesX + (x + 1));
+      plane.AddFace(current_x_current_y, next_x_next_y, next_x_current_y);
+      plane.AddFace(current_x_current_y, current_x_next_y, next_x_next_y);
+    }
+  }
+
+  for (Mesh::CornerId corner_id = 0; corner_id < plane.GetNumberOfCorners(); ++corner_id)
+  {
+    const auto vertex_id = plane.GetVertexIdFromCornerId(corner_id);
+    const auto vertex_position = plane.GetVertexPosition(vertex_id);
+    const auto corner_texture_coordinates = XY(vertex_position) * 0.5f + 0.5f;
+    plane.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
+  }
+
+  ConsolidateMesh(plane);
+  return plane;
 }
 
 template <typename TMesh>
