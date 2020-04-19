@@ -34,17 +34,20 @@ void CameraControllerFly::Update(const DeltaTime& inDeltaTime)
     {
       if (mWantsToMoveForward)
         fly_direction_local += Forward<Vec3f>();
-      else if (mWantsToMoveBack)
+
+      if (mWantsToMoveBack)
         fly_direction_local += Back<Vec3f>();
 
       if (mWantsToMoveRight)
         fly_direction_local += Right<Vec3f>();
-      else if (mWantsToMoveLeft)
+
+      if (mWantsToMoveLeft)
         fly_direction_local += Left<Vec3f>();
 
       if (mWantsToMoveDown)
         fly_direction_local += Down<Vec3f>();
-      else if (mWantsToMoveUp)
+
+      if (mWantsToMoveUp)
         fly_direction_local += Up<Vec3f>();
 
       fly_direction_local = NormalizedSafe(fly_direction_local);
