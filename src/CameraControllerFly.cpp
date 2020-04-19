@@ -12,7 +12,7 @@ void CameraControllerFly::SetCamera(const std::shared_ptr<Camera>& inCamera)
   mCamera = inCamera;
   if (inCamera)
   {
-    mCurrentRotationAngle = YX(AngleAxis(inCamera->GetOrientation()));
+    mCurrentRotationAngle = YX(AngleAxis(inCamera->GetRotation()));
   }
 }
 
@@ -57,7 +57,7 @@ void CameraControllerFly::Update(const DeltaTime& inDeltaTime)
     }
 
     const auto camera_old_position = camera->GetPosition();
-    const auto fly_direction_world = camera->GetOrientation() * fly_direction_local;
+    const auto fly_direction_world = camera->GetRotation() * fly_direction_local;
     const auto fly_speed_deltaed = fly_speed * inDeltaTime.count();
     const auto fly_displacement = (fly_direction_world * fly_speed_deltaed);
     const auto camera_new_position = camera_old_position + fly_displacement;
@@ -75,19 +75,19 @@ void CameraControllerFly::Update(const DeltaTime& inDeltaTime)
   // Rotation
   if (mWantsToRotate)
   {
-    auto new_orientation = Identity<Quatf>();
+    auto new_rotation = Identity<Quatf>();
     {
       mCurrentRotationAngle -= current_mouse_speed;
       mCurrentRotationAngle[1] = Clamp(mCurrentRotationAngle[1], RotationAngleYLimit[0], RotationAngleYLimit[1]);
 
       const auto current_rotation_angle_x = mCurrentRotationAngle[0];
       const auto current_rotation_angle_y = mCurrentRotationAngle[1];
-      const auto orientation_x = AngleAxis(current_rotation_angle_x, Up<Vec3f>());
-      const auto new_orientation_right = orientation_x * Right<Vec3f>();
-      const auto orientation_y = AngleAxis(current_rotation_angle_y, new_orientation_right);
-      new_orientation = (orientation_y * orientation_x);
+      const auto rotation_x = AngleAxis(current_rotation_angle_x, Up<Vec3f>());
+      const auto new_rotation_right = rotation_x * Right<Vec3f>();
+      const auto rotation_y = AngleAxis(current_rotation_angle_y, new_rotation_right);
+      new_rotation = (rotation_y * rotation_x);
     }
-    camera->SetOrientation(new_orientation);
+    camera->SetRotation(new_rotation);
   }
 
   // Panning
@@ -96,7 +96,7 @@ void CameraControllerFly::Update(const DeltaTime& inDeltaTime)
     const auto pan_speed = PanSpeed;
     const auto camera_old_position = camera->GetPosition();
     const auto pan_displacement_local = (current_mouse_speed * pan_speed) * Vec2f(-1.0f, 1.0f);
-    const auto pan_displacement_world = (camera->GetOrientation() * XY0(pan_displacement_local));
+    const auto pan_displacement_world = (camera->GetRotation() * XY0(pan_displacement_local));
     const auto camera_new_position = camera_old_position + pan_displacement_world;
     camera->SetPosition(camera_new_position);
   }

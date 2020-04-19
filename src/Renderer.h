@@ -5,10 +5,11 @@
 #include "DrawableMesh.h"
 #include "Math.h"
 #include "Segment.h"
-#include "Texture2D.h"
 #include "ShaderProgram.h"
+#include "Texture2D.h"
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <stack>
 
 namespace egl
@@ -46,12 +47,14 @@ public:
   void SetLineWidth(const float inLineWidth);
 
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
+  const Camera* GetCamera() const;
+  Camera* GetCamera();
   void ResetCamera();
 
   void SetModelMatrix(const Mat4f& inModelMatrix);
   void ResetModelMatrix();
 
-  void SetTexture(const std::shared_ptr<Texture2D> &inTexture);
+  void SetTexture(const std::shared_ptr<Texture2D>& inTexture);
 
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);

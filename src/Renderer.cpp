@@ -86,6 +86,8 @@ void Renderer::SetLineWidth(const float inLineWidth)
 }
 
 void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
+const Camera* Renderer::GetCamera() const { return GetCurrentState().mCamera.get(); }
+Camera* Renderer::GetCamera() { return GetCurrentState().mCamera.get(); }
 void Renderer::ResetCamera() { GetCurrentState().mCamera = DefaultState.mCamera; }
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix) { GetCurrentState().mModelMatrix = inModelMatrix; }
@@ -222,7 +224,7 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   const auto projection_matrix = GetCurrentState().mCamera->GetProjectionMatrix();
   const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
   const auto camera_world_position = GetCurrentState().mCamera->GetPosition();
-  const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetOrientation());
+  const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetRotation());
 
   if (const auto& texture = GetCurrentState().mTexture)
     texture->BindToTextureUnit(0);

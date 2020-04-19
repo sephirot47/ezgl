@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Span.h"
+#include "Math.h"
 #include <filesystem>
 #include <vector>
 
 namespace egl
 {
-template <typename T>
+template <typename T = Color4f>
 class Image2D
 {
 public:

@@ -38,8 +38,7 @@ int main()
   const auto window = std::make_shared<Window>();
 
   const auto test_mesh = DrawableMeshFactory::GetTorus(20, 20, 0.5f);
-  const auto image = Image2D<Color4f> { "/home/sephirot47/Downloads/bricks2.jpg" };
-  const auto texture = std::make_shared<Texture2D>(image);
+  const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
   const auto camera = std::make_shared<Camera>();
   camera->SetPosition(Vec3f(10, 10, 10) * 0.8f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
@@ -49,45 +48,37 @@ int main()
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
 
-  Renderer renderer;
-  renderer.SetCamera(camera);
   auto time = TimeDuration { 0 };
-  window->Loop([&](const DeltaTime& inDeltaTime) {
-    renderer.PushState();
-
+  window->EasyRenderLoop([&](const DeltaTime& inDeltaTime, Renderer& ioRenderer) {
     time += inDeltaTime;
 
-    renderer.ClearBackground(Pink());
-    renderer.ClearDepth();
-
-    GL::Viewport(Zero<Vec2i>(), window->GetFramebufferSize());
-    camera->GetPerspectiveParameters().mAspectRatio = window->GetFramebufferAspectRatio();
+    ioRenderer.ClearBackground(Pink());
+    ioRenderer.SetCamera(camera);
 
     const auto q = AngleAxis(time.count() * (0.5f * time.count()), Normalized(Vec3f { 0.0f, 0.0f, 1.0f }));
-    // renderer.Rotate(q);
-    renderer.Scale(All<Vec3f>(10.0f));
-    renderer.SetLineWidth(3.0f);
-    renderer.DrawAxes();
+    // ioRenderer.Rotate(q);
+    ioRenderer.Scale(All<Vec3f>(10.0f));
+    ioRenderer.SetLineWidth(3.0f);
+    ioRenderer.DrawAxes();
 
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
-    renderer.Translate(obj_pos);
-    renderer.Rotate(q);
-    renderer.SetTexture(nullptr);
-    renderer.Scale(All<Vec3f>(0.5f));
-    renderer.SetColor(White());
-    renderer.SetLightSpecularExponent(120.0f);
-    renderer.DrawMesh(test_mesh);
+    ioRenderer.Translate(obj_pos);
+    ioRenderer.Rotate(q);
+    ioRenderer.SetTexture(nullptr);
+    ioRenderer.Scale(All<Vec3f>(0.5f));
+    ioRenderer.SetColor(White());
+    ioRenderer.SetLightSpecularExponent(120.0f);
+    ioRenderer.DrawMesh(test_mesh);
+    ioRenderer.DrawAxes();
 
-    renderer.SetColor(Blue());
-    renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+    ioRenderer.SetColor(Blue());
+    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
-    renderer.SetPointSize(1.0f);
-    renderer.SetColor(Red());
-    renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+    ioRenderer.SetPointSize(1.0f);
+    ioRenderer.SetColor(Red());
+    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     camera_controller_fly.Update(inDeltaTime);
-
-    renderer.PopState();
   });
   return EXIT_SUCCESS;
 }

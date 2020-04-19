@@ -14,6 +14,7 @@ class GLFWwindow;
 namespace egl
 {
 struct InputListener;
+class Renderer;
 
 class Window
 {
@@ -45,7 +46,7 @@ public:
   void SwapBuffers();
   void PollEvents();
 
-  void SetInterFrameRestTime(const TimeDuration &inInterFrameRestTime);
+  void SetInterFrameRestTime(const TimeDuration& inInterFrameRestTime);
 
   Vec2i GetSize() const;
   Vec2i GetFramebufferSize() const;
@@ -55,6 +56,8 @@ public:
   // Loop callback
   using LoopCallback = std::function<void(const DeltaTime)>;
   void Loop(const Window::LoopCallback& inLoopCallback);
+  using EasyRenderLoopCallback = std::function<void(const DeltaTime, Renderer&)>;
+  void EasyRenderLoop(const Window::EasyRenderLoopCallback& inEasyRenderLoopCallback);
 
   // Input callbacks
   using InputEventCallback = std::function<void(const InputEvent&)>;

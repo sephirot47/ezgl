@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Math.h"
+#include "Transformation.h"
 #include "ProjectionParametersVariant.h"
 
 namespace egl
@@ -16,14 +17,14 @@ public:
   ~Camera() = default;
 
   void SetPosition(const Vec3f& inPosition);
-  void SetOrientation(const Quatf& inOrientation);
+  void SetRotation(const Quatf& inRotation);
   void SetPerspectiveParameters(const PerspectiveParameters& inPerspectiveParameters);
   void SetOrthographicParameters(const OrthographicParameters& inOrthographicParameters);
 
   void LookAtPoint(const Vec3f& inPointToLookAt, const Vec3f& inUpNormalized = Up<Vec3f>());
 
   const Vec3f& GetPosition() const;
-  const Quatf& GetOrientation() const;
+  const Quatf& GetRotation() const;
   Vec3f GetForward() const;
   Vec3f GetRight() const;
   Vec3f GetUp() const;
@@ -40,8 +41,7 @@ public:
   Mat4f GetProjectionMatrix() const;
 
 private:
-  Vec3f mPosition = Zero<Vec3f>();
-  Quatf mOrientation = Identity<Quatf>();
+  Transformation mTransformation;
   ProjectionParametersVariant mProjectionParametersVariant;
 };
 }

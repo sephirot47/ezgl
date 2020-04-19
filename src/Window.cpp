@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Macros.h"
+#include "Renderer.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <thread>
@@ -126,6 +127,27 @@ void Window::Loop(const Window::LoopCallback& inLoopCallback)
 
     std::this_thread::sleep_for(mInterFrameRestTime);
   }
+}
+
+void Window::EasyRenderLoop(const Window::EasyRenderLoopCallback& inEasyRenderLoopCallback)
+{
+  Renderer renderer;
+  Loop([&](const DeltaTime& inDeltaTime) {
+    renderer.PushState();
+    renderer.ClearBackground(Black());
+    renderer.ClearDepth();
+
+    GL::Viewport(Zero<Vec2i>(), GetFramebufferSize());
+
+    inEasyRenderLoopCallback(inDeltaTime, renderer);
+
+    if (const auto camera = renderer.GetCamera())
+    {
+      camera->GetPerspectiveParameters().mAspectRatio = GetFramebufferAspectRatio();
+    }
+
+    renderer.PopState();
+  });
 }
 
 void Window::SetInputEventCallback(const Window::InputEventCallback& inInputEventCallback)

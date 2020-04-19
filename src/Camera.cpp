@@ -10,9 +10,13 @@ Camera::Camera()
   SetPerspectiveParameters(default_perspective_parameters);
 }
 
-void Camera::SetPosition(const Vec3f& inPosition) { mPosition = inPosition; }
+void Camera::SetPosition(const Vec3f& inPosition) { mTransformation.SetPosition(inPosition); }
 
-void Camera::SetOrientation(const Quatf& inOrientation) { mOrientation = Normalized(inOrientation); }
+void Camera::SetRotation(const Quatf& inRotation)
+{
+  EXPECTS(IsNormalized(inRotation));
+  mTransformation.SetRotation(inRotation);
+}
 
 void Camera::SetPerspectiveParameters(const PerspectiveParameters& inPerspectiveParameters)
 {
@@ -27,14 +31,15 @@ void Camera::SetOrthographicParameters(const OrthographicParameters& inOrthograp
 void Camera::LookAtPoint(const Vec3f& inPointToLookAt, const Vec3f& inUpNormalized)
 {
   EXPECTS(IsNormalized(inUpNormalized));
-  EXPECTS(inPointToLookAt != mPosition);
-  const auto forward_normalized = Normalized(inPointToLookAt - mPosition);
-  mOrientation = LookInDirection(forward_normalized, inUpNormalized);
+  EXPECTS(inPointToLookAt != GetPosition());
+  const auto forward_normalized = Normalized(inPointToLookAt - GetPosition());
+  const auto new_rotation = LookInDirection(forward_normalized, inUpNormalized);
+  mTransformation.SetRotation(new_rotation);
 }
 
-const Vec3f& Camera::GetPosition() const { return mPosition; }
+const Vec3f& Camera::GetPosition() const { return mTransformation.GetPosition(); }
 
-const Quatf& Camera::GetOrientation() const { return mOrientation; }
+const Quatf& Camera::GetRotation() const { return mTransformation.GetRotation(); }
 
 bool Camera::IsOrthographic() const
 {
@@ -68,17 +73,9 @@ const PerspectiveParameters& Camera::GetPerspectiveParameters() const
   return const_cast<Camera&>(*this).GetPerspectiveParameters();
 }
 
-Mat4f Camera::GetModelMatrix() const
-{
-  const auto model_matrix = TranslationMat4(mPosition) * RotationMat4(mOrientation);
-  return model_matrix;
-}
+Mat4f Camera::GetModelMatrix() const { return mTransformation.GetMatrix(); }
 
-Mat4f Camera::GetViewMatrix() const
-{
-  const auto view_matrix = RotationMat4(-mOrientation) * TranslationMat4(-mPosition);
-  return view_matrix;
-}
+Mat4f Camera::GetViewMatrix() const { return mTransformation.GetInverseMatrix(); }
 
 Mat4f Camera::GetProjectionMatrix() const
 {
