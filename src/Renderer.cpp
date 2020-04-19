@@ -94,6 +94,11 @@ void Renderer::SetLineWidth(const float inLineWidth)
   GL::LineWidth(inLineWidth);
 }
 
+void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
+{
+  GetCurrentState().mOverrideShaderProgram = inShaderProgram;
+}
+
 void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
 std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState().mCamera; }
 std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState().mCamera; }
@@ -239,41 +244,45 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
 
 void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 {
-  const auto& model_matrix = GetCurrentState().mModelMatrix;
-  const auto view_matrix = GetCurrentState().mCamera->GetViewMatrix();
-  const auto normal_matrix = NormalMat4(model_matrix);
-  const auto projection_matrix = GetCurrentState().mCamera->GetProjectionMatrix();
-  const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
-  const auto camera_world_position = GetCurrentState().mCamera->GetPosition();
-  const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetRotation());
+  auto& current_state = GetCurrentState();
+  auto& shader_program
+      = (current_state.mOverrideShaderProgram ? *current_state.mOverrideShaderProgram : ioShaderProgram);
 
-  ioShaderProgram.Bind();
-  GetMaterial().Bind(ioShaderProgram);
-  ioShaderProgram.SetUniformSafe("UModel", model_matrix);
-  ioShaderProgram.SetUniformSafe("UNormal", normal_matrix);
-  ioShaderProgram.SetUniformSafe("UView", view_matrix);
-  ioShaderProgram.SetUniformSafe("UCameraWorldPosition", camera_world_position);
-  ioShaderProgram.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
-  ioShaderProgram.SetUniformSafe("USceneAmbientColor", GetCurrentState().mSceneAmbientColor);
-  ioShaderProgram.SetUniformSafe("UProjection", projection_view_model_matrix);
-  ioShaderProgram.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
+  const auto& model_matrix = current_state.mModelMatrix;
+  const auto view_matrix = current_state.mCamera->GetViewMatrix();
+  const auto normal_matrix = NormalMat4(model_matrix);
+  const auto projection_matrix = current_state.mCamera->GetProjectionMatrix();
+  const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
+  const auto camera_world_position = current_state.mCamera->GetPosition();
+  const auto camera_world_direction = Direction(current_state.mCamera->GetRotation());
+
+  shader_program.Bind();
+  GetMaterial().Bind(shader_program);
+  shader_program.SetUniformSafe("UModel", model_matrix);
+  shader_program.SetUniformSafe("UNormal", normal_matrix);
+  shader_program.SetUniformSafe("UView", view_matrix);
+  shader_program.SetUniformSafe("UCameraWorldPosition", camera_world_position);
+  shader_program.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
+  shader_program.SetUniformSafe("USceneAmbientColor", current_state.mSceneAmbientColor);
+  shader_program.SetUniformSafe("UProjection", projection_view_model_matrix);
+  shader_program.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
 
   // Lights
   if (GetMaterial().IsLightingEnabled())
   {
     // Directional lights
-    ioShaderProgram.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
-    const auto& directional_lights = GetCurrentState().mDirectionalLights;
+    shader_program.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
+    const auto& directional_lights = current_state.mDirectionalLights;
     mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
     mDirectionalLightsUBO.BindToBindingPoint(0);
-    ioShaderProgram.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
+    shader_program.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
 
     // Point lights
-    ioShaderProgram.SetUniformBlockBindingSafe("UBlockPointLights", 1);
-    const auto& point_lights = GetCurrentState().mPointLights;
+    shader_program.SetUniformBlockBindingSafe("UBlockPointLights", 1);
+    const auto& point_lights = current_state.mPointLights;
     mPointLightsUBO.BufferSubData(MakeSpan(point_lights));
     mPointLightsUBO.BindToBindingPoint(1);
-    ioShaderProgram.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
+    shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
   }
 }
 }

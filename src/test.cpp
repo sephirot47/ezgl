@@ -76,7 +76,7 @@ int main()
     ioRenderer.DrawMesh(test_mesh);
     ioRenderer.DrawAxes();
 
-    ioRenderer.GetMaterial().SetDiffuseColor(Blue());
+    ioRenderer.GetMaterial().SetDiffuseColor(Blue());;
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     ioRenderer.SetPointSize(1.0f);

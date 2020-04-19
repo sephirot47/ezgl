@@ -50,6 +50,8 @@ public:
   void SetPointSize(const float inPointSize);
   void SetLineWidth(const float inLineWidth);
 
+  void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram> &inShaderProgram);
+
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
   std::shared_ptr<const Camera> GetCamera() const;
   std::shared_ptr<Camera> GetCamera();
@@ -105,6 +107,7 @@ private:
     Mat4f mModelMatrix = Identity<Mat4f>();
 
     Material mMaterial;
+    std::shared_ptr<ShaderProgram> mOverrideShaderProgram;
 
     bool mDepthEnabled = true;
     bool mCullFaceEnabled = true;
