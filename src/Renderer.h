@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Color.h"
 #include "DrawableMesh.h"
+#include "Material.h"
 #include "Math.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
@@ -47,27 +48,24 @@ public:
   void SetLineWidth(const float inLineWidth);
 
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
-  const Camera* GetCamera() const;
-  Camera* GetCamera();
+  std::shared_ptr<const Camera> GetCamera() const;
+  std::shared_ptr<Camera> GetCamera();
   void ResetCamera();
 
   void SetModelMatrix(const Mat4f& inModelMatrix);
-  void ResetModelMatrix();
-
-  void SetTexture(const std::shared_ptr<Texture2D>& inTexture);
-
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);
   void Scale(const Vec3f& inScale);
   void Scale(const float inScale);
+  void ResetModelMatrix();
 
-  void SetColor(const Color4f& inColor);
-  void ResetColor();
+  void SetMaterial(const Material& inMaterial);
+  const Material& GetMaterial() const;
+  Material& GetMaterial();
+  void ResetMaterial();
 
-  void SetLightAmbientColor(const Color4f& inLightAmbientColor);
-  void SetLightDiffuseColor(const Color4f& inLightDiffuseColor);
-  void SetLightSpecularColor(const Color4f& inLightSpecularColor);
-  void SetLightSpecularExponent(const float inSpecularExponent);
+  void SetSceneAmbientColor(const Color4f& inSceneAmbientColor);
+  void SetLightColor(const Color4f& inLightColor);
 
   void PushState();
   void PopState();
@@ -90,17 +88,17 @@ public:
 private:
   // Static resources
   static bool sStaticResourcesInited;
-  static std::unique_ptr<ShaderProgram> sUnshadedShaderProgram;
-  static std::unique_ptr<ShaderProgram> sShadedShaderProgram;
+  static std::unique_ptr<ShaderProgram> sOnlyColorShaderProgram;
+  static std::unique_ptr<ShaderProgram> sMeshShaderProgram;
   static std::unique_ptr<DrawableMesh> sCone;
   static std::shared_ptr<Texture2D> sWhiteTexture;
 
   struct State
   {
-    std::shared_ptr<Texture2D> mTexture = nullptr;
     std::shared_ptr<Camera> mCamera = std::make_shared<Camera>();
     Mat4f mModelMatrix = Identity<Mat4f>();
-    Color4f mColor = One<Color4f>();
+
+    Material mMaterial;
 
     bool mDepthEnabled = true;
     bool mCullFaceEnabled = true;
@@ -112,10 +110,8 @@ private:
     float mPointSize = 5.0f;
     float mLineWidth = 1.0f;
 
-    Color4f mLightAmbientColor = WithValue(White(), 0.1f);
-    Color4f mLightDiffuseColor = WithValue(White(), 1.0f);
-    Color4f mLightSpecularColor = WithValue(White(), 0.7f);
-    float mLightSpecularExponent = 120.0f;
+    Color4f mSceneAmbientColor = WithValue(White(), 0.1f);
+    Color4f mLightColor = WithValue(White(), 1.0f);
   };
   std::stack<State> mStateStack;
 

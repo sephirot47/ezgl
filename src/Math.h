@@ -753,9 +753,9 @@ constexpr auto Identity()
     using ValueType = typename T::ValueType;
     return Diagonal<ValueType, T::NumRows>(static_cast<ValueType>(1));
   }
-  else if constexpr (IsQuat_v<T>)
+  else
   {
-    return T { 0, 0, 0, 1 };
+    return T {};
   }
 }
 

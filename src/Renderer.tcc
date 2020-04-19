@@ -15,7 +15,7 @@ void Renderer::DrawPoints(const Span<Vec<T, N>>& inPoints)
 {
   constexpr auto PositionAttribLocation = 0;
 
-  UseShaderProgram(*sUnshadedShaderProgram);
+  UseShaderProgram(*sOnlyColorShaderProgram);
 
   const auto vbo = std::make_shared<VBO>(inPoints);
 
@@ -37,7 +37,7 @@ void Renderer::DrawSegments(const Span<Segment<T, N>>& inSegments)
 {
   constexpr auto PositionAttribLocation = 0;
 
-  UseShaderProgram(*sUnshadedShaderProgram);
+  UseShaderProgram(*sOnlyColorShaderProgram);
 
   std::vector<Vec<T, N>> segment_points;
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);

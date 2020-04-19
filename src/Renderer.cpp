@@ -15,8 +15,8 @@ namespace egl
 
 const Renderer::State Renderer::DefaultState;
 bool Renderer::sStaticResourcesInited = false;
-std::unique_ptr<ShaderProgram> Renderer::sUnshadedShaderProgram;
-std::unique_ptr<ShaderProgram> Renderer::sShadedShaderProgram;
+std::unique_ptr<ShaderProgram> Renderer::sOnlyColorShaderProgram;
+std::unique_ptr<ShaderProgram> Renderer::sMeshShaderProgram;
 std::unique_ptr<DrawableMesh> Renderer::sCone;
 std::shared_ptr<Texture2D> Renderer::sWhiteTexture;
 
@@ -27,11 +27,11 @@ Renderer::Renderer()
 
   if (!sStaticResourcesInited)
   {
-    sUnshadedShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/unshaded.vert") },
-        FragmentShader { GetFileContents("../res/unshaded.frag") });
+    sOnlyColorShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/OnlyColor.vert") },
+        FragmentShader { GetFileContents("../res/OnlyColor.frag") });
 
-    sShadedShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/shaded.vert") },
-        FragmentShader { GetFileContents("../res/shaded.frag") });
+    sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/Mesh.vert") },
+        FragmentShader { GetFileContents("../res/Mesh.frag") });
 
     sCone = std::make_unique<DrawableMesh>(DrawableMeshFactory::GetCone(32));
     sWhiteTexture = TextureFactory::GetWhiteTexture();
@@ -86,15 +86,11 @@ void Renderer::SetLineWidth(const float inLineWidth)
 }
 
 void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
-const Camera* Renderer::GetCamera() const { return GetCurrentState().mCamera.get(); }
-Camera* Renderer::GetCamera() { return GetCurrentState().mCamera.get(); }
+std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState().mCamera; }
+std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState().mCamera; }
 void Renderer::ResetCamera() { GetCurrentState().mCamera = DefaultState.mCamera; }
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix) { GetCurrentState().mModelMatrix = inModelMatrix; }
-void Renderer::ResetModelMatrix() { GetCurrentState().mModelMatrix = DefaultState.mModelMatrix; }
-
-void Renderer::SetTexture(const std::shared_ptr<Texture2D>& inTexture) { GetCurrentState().mTexture = inTexture; }
-
 void Renderer::Translate(const Vec3f& inTranslation)
 {
   GetCurrentState().mModelMatrix = GetCurrentState().mModelMatrix * TranslationMat4(inTranslation);
@@ -108,29 +104,19 @@ void Renderer::Scale(const Vec3f& inScale)
   GetCurrentState().mModelMatrix = GetCurrentState().mModelMatrix * ScaleMat4(inScale);
 }
 void Renderer::Scale(const float inScale) { Scale(Vec3f { inScale }); }
+void Renderer::ResetModelMatrix() { GetCurrentState().mModelMatrix = DefaultState.mModelMatrix; }
 
-void Renderer::SetColor(const Color4f& inColor) { GetCurrentState().mColor = inColor; }
-void Renderer::ResetColor() { GetCurrentState().mColor = DefaultState.mColor; }
+void Renderer::SetMaterial(const Material& inMaterial) { GetCurrentState().mMaterial = inMaterial; }
+const Material& Renderer::GetMaterial() const { return GetCurrentState().mMaterial; }
+Material& Renderer::GetMaterial() { return GetCurrentState().mMaterial; }
+void Renderer::ResetMaterial() { GetCurrentState().mMaterial = Material(); }
 
-void Renderer::SetLightAmbientColor(const Color4f& inLightAmbientColor)
+void Renderer::SetSceneAmbientColor(const Color4f& inSceneAmbientColor)
 {
-  GetCurrentState().mLightAmbientColor = inLightAmbientColor;
+  GetCurrentState().mSceneAmbientColor = inSceneAmbientColor;
 }
 
-void Renderer::SetLightDiffuseColor(const Color4f& inLightDiffuseColor)
-{
-  GetCurrentState().mLightDiffuseColor = inLightDiffuseColor;
-}
-
-void Renderer::SetLightSpecularColor(const Color4f& inLightSpecularColor)
-{
-  GetCurrentState().mLightSpecularColor = inLightSpecularColor;
-}
-
-void Renderer::SetLightSpecularExponent(const float inSpecularExponent)
-{
-  GetCurrentState().mLightSpecularExponent = inSpecularExponent;
-}
+void Renderer::SetLightColor(const Color4f& inLightColor) { GetCurrentState().mLightColor = inLightColor; }
 
 void Renderer::PushState() { mStateStack.push(GetCurrentState()); }
 
@@ -172,7 +158,7 @@ void Renderer::ApplyState(const State& inStateToApply)
 
 void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType)
 {
-  UseShaderProgram(*sShadedShaderProgram);
+  UseShaderProgram(*sMeshShaderProgram);
 
   inDrawableMesh.Bind();
 
@@ -190,14 +176,15 @@ void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDra
 void Renderer::DrawAxes()
 {
   PushState();
+  ResetMaterial();
 
-  SetColor(Red());
+  GetMaterial().SetDiffuseColor(Red());
   DrawArrow(Segment3f { Zero<Vec3f>(), Right<Vec3f>() });
 
-  SetColor(Green());
+  GetMaterial().SetDiffuseColor(Green());
   DrawArrow(Segment3f { Zero<Vec3f>(), Up<Vec3f>() });
 
-  SetColor(Blue());
+  GetMaterial().SetDiffuseColor(Blue());
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 
   PopState();
@@ -226,23 +213,15 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   const auto camera_world_position = GetCurrentState().mCamera->GetPosition();
   const auto camera_world_direction = Direction(GetCurrentState().mCamera->GetRotation());
 
-  if (const auto& texture = GetCurrentState().mTexture)
-    texture->BindToTextureUnit(0);
-  else
-    sWhiteTexture->BindToTextureUnit(0);
-
   ioShaderProgram.Bind();
-  ioShaderProgram.SetUniformSafe("UTexture", 0);
-  ioShaderProgram.SetUniformSafe("UColor", GetCurrentState().mColor);
+  GetMaterial().Bind(ioShaderProgram);
   ioShaderProgram.SetUniformSafe("UModel", model_matrix);
   ioShaderProgram.SetUniformSafe("UNormal", normal_matrix);
   ioShaderProgram.SetUniformSafe("UView", view_matrix);
   ioShaderProgram.SetUniformSafe("UCameraWorldPosition", camera_world_position);
   ioShaderProgram.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
-  ioShaderProgram.SetUniformSafe("ULightAmbientColor", GetCurrentState().mLightAmbientColor);
-  ioShaderProgram.SetUniformSafe("ULightDiffuseColor", GetCurrentState().mLightDiffuseColor);
-  ioShaderProgram.SetUniformSafe("ULightSpecularColor", GetCurrentState().mLightSpecularColor);
-  ioShaderProgram.SetUniformSafe("ULightSpecularExponent", GetCurrentState().mLightSpecularExponent);
+  ioShaderProgram.SetUniformSafe("USceneAmbientColor", GetCurrentState().mSceneAmbientColor);
+  ioShaderProgram.SetUniformSafe("ULightColor", GetCurrentState().mLightColor);
   ioShaderProgram.SetUniformSafe("UProjection", projection_view_model_matrix);
   ioShaderProgram.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
 }

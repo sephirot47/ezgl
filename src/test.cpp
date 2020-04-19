@@ -5,6 +5,7 @@
 #include "FileUtils.h"
 #include "Image2D.h"
 #include "Macros.h"
+#include "Material.h"
 #include "Math.h"
 #include "Mesh.h"
 #include "MeshFactory.h"
@@ -37,7 +38,7 @@ int main()
 
   const auto window = std::make_shared<Window>();
 
-  const auto test_mesh = DrawableMeshFactory::GetTorus(20, 20, 0.5f);
+  const auto test_mesh = DrawableMeshFactory::GetTorus(3, 3, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
   const auto camera = std::make_shared<Camera>();
@@ -64,18 +65,19 @@ int main()
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
     ioRenderer.Translate(obj_pos);
     ioRenderer.Rotate(q);
-    ioRenderer.SetTexture(nullptr);
+    ioRenderer.GetMaterial().SetTexture(nullptr);
     ioRenderer.Scale(All<Vec3f>(0.5f));
-    ioRenderer.SetColor(White());
-    ioRenderer.SetLightSpecularExponent(120.0f);
+    ioRenderer.GetMaterial().SetDiffuseColor(White());
+    ioRenderer.GetMaterial().SetLightingEnabled(false);
+    ioRenderer.GetMaterial().SetSpecularExponent(120.0f);
     ioRenderer.DrawMesh(test_mesh);
     ioRenderer.DrawAxes();
 
-    ioRenderer.SetColor(Blue());
+    ioRenderer.GetMaterial().SetDiffuseColor(Blue());
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     ioRenderer.SetPointSize(1.0f);
-    ioRenderer.SetColor(Red());
+    ioRenderer.GetMaterial().SetDiffuseColor(Red());
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     camera_controller_fly.Update(inDeltaTime);
