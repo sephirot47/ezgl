@@ -322,7 +322,7 @@ public:
   static void LineWidth(const float inLineWidth);
 
   static void Viewport(const int inX, const int inY, const int inWidth, const int inHeight);
-  static void Viewport(const Vec2i &inXY, const Vec2i &inSize);
+  static void Viewport(const Vec2i& inXY, const Vec2i& inSize);
 
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();
@@ -330,6 +330,8 @@ public:
   static void BindBufferBase(const GL::EBufferType inBufferType, const GL::Id inBindingPoint, const GL::Id inBufferId);
   template <typename T>
   static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint);
+  template <typename T>
+  static void BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset);
   static GL::EBufferBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void DeleteBuffer(const GL::Id inBufferId);
 
@@ -347,8 +349,8 @@ public:
   static void DeleteVertexArray(const GL::Id inVAOId);
 
   static GL::Id GenTexture();
-  static GL::Id CreateTexture(const GL::ETextureTarget &inTextureTarget);
-  static void BindTexture(const GL::ETextureTarget &inTextureTarget, const GL::Id& inTextureId);
+  static GL::Id CreateTexture(const GL::ETextureTarget& inTextureTarget);
+  static void BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& inTextureId);
   template <typename T>
   static void TexImage2D(const GL::ETextureTarget& inTextureTarget,
       const GL::Size& inWidth,
@@ -386,6 +388,7 @@ public:
   static void LinkProgram(const GL::Id inShaderProgramId);
   static GL::Id GetAttribLocation(const GL::Id inShaderProgramId, const std::string_view inAttribName);
   static GL::Id GetUniformLocation(const GL::Id inShaderProgramId, const std::string_view inUniformName);
+  static GL::Id GetUniformBlockIndex(const GL::Id inShaderProgramId, const std::string_view inUniformBlockName);
   static void Uniform(const GL::Id inUniformLocation, bool inValue);
   static void Uniform(const GL::Id inUniformLocation, int8_t inValue);
   static void Uniform(const GL::Id inUniformLocation, int16_t inValue);
@@ -407,6 +410,8 @@ public:
   static void Uniform(const GL::Id inUniformLocation, const Mat3d& inValue);
   static void Uniform(const GL::Id inUniformLocation, const Mat4f& inValue);
   static void Uniform(const GL::Id inUniformLocation, const Mat4d& inValue);
+  static void
+  UniformBlockBinding(const GL::Id inShaderProgramId, const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint);
   static void DeleteProgram(const GL::Id inShaderProgramId);
 
   template <typename T>

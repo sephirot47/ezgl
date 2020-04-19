@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "Camera.h"
+#include "DirectionalLight.h"
 #include "DrawableMesh.h"
 #include "FileUtils.h"
 #include "GL.h"
@@ -9,6 +10,7 @@
 #include "ProjectionParametersVariant.h"
 #include "ShaderProgram.h"
 #include "TextureFactory.h"
+#include "UBO.h"
 
 namespace egl
 {
@@ -22,9 +24,11 @@ std::shared_ptr<Texture2D> Renderer::sWhiteTexture;
 
 Renderer::Renderer()
 {
+  // Init state
   mStateStack.push(DefaultState);
   ApplyState(GetCurrentState());
 
+  // Init static resources
   if (!sStaticResourcesInited)
   {
     sOnlyColorShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/OnlyColor.vert") },
@@ -38,6 +42,9 @@ Renderer::Renderer()
 
     sStaticResourcesInited = true;
   }
+
+  // Init lights
+  mDirectionalLightsUBO.BufferDataEmpty(MaxNumberOfDirectionalLights * sizeof(GLSLDirectionalLight));
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -111,13 +118,21 @@ const Material& Renderer::GetMaterial() const { return GetCurrentState().mMateri
 Material& Renderer::GetMaterial() { return GetCurrentState().mMaterial; }
 void Renderer::ResetMaterial() { GetCurrentState().mMaterial = Material(); }
 
-void Renderer::SetSceneAmbientColor(const Color4f& inSceneAmbientColor)
+void Renderer::SetSceneAmbientColor(const Color3f& inSceneAmbientColor)
 {
   GetCurrentState().mSceneAmbientColor = inSceneAmbientColor;
 }
 
-void Renderer::SetLightColor(const Color4f& inLightColor) { GetCurrentState().mLightColor = inLightColor; }
+void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor)
+{
+  EXPECTS(IsNormalized(inDirection));
 
+  GLSLDirectionalLight directional_light;
+  directional_light.mDirection = inDirection;
+  directional_light.mColor = inColor;
+
+  GetCurrentState().mDirectionalLights.push_back(directional_light);
+}
 void Renderer::PushState() { mStateStack.push(GetCurrentState()); }
 
 void Renderer::PopState()
@@ -221,8 +236,20 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   ioShaderProgram.SetUniformSafe("UCameraWorldPosition", camera_world_position);
   ioShaderProgram.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
   ioShaderProgram.SetUniformSafe("USceneAmbientColor", GetCurrentState().mSceneAmbientColor);
-  ioShaderProgram.SetUniformSafe("ULightColor", GetCurrentState().mLightColor);
   ioShaderProgram.SetUniformSafe("UProjection", projection_view_model_matrix);
   ioShaderProgram.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
+
+  // Lights
+  if (GetMaterial().IsLightingEnabled())
+  {
+    ioShaderProgram.SetUniformBlockBindingSafe("UBlockLights", 0);
+
+    // Directional lights
+    const auto& directional_lights = GetCurrentState().mDirectionalLights;
+    mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
+    mDirectionalLightsUBO.BindToBindingPoint(0);
+
+    ioShaderProgram.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
+  }
 }
 }

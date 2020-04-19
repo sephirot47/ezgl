@@ -2,12 +2,14 @@
 
 #include "Camera.h"
 #include "Color.h"
+#include "DirectionalLight.h"
 #include "DrawableMesh.h"
 #include "Material.h"
 #include "Math.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "UBO.h"
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -64,8 +66,8 @@ public:
   Material& GetMaterial();
   void ResetMaterial();
 
-  void SetSceneAmbientColor(const Color4f& inSceneAmbientColor);
-  void SetLightColor(const Color4f& inLightColor);
+  void SetSceneAmbientColor(const Color3f& inSceneAmbientColor);
+  void AddDirectionalLight(const Vec3f &inDirection, const Color3f &inColor);
 
   void PushState();
   void PopState();
@@ -110,10 +112,17 @@ private:
     float mPointSize = 5.0f;
     float mLineWidth = 1.0f;
 
-    Color4f mSceneAmbientColor = WithValue(White(), 0.1f);
-    Color4f mLightColor = WithValue(White(), 1.0f);
+    Color3f mSceneAmbientColor = WithValue(White<Color3f>(), 0.1f);
+
+    // std::vector<GLSLPointLight> mPointLights;
+    std::vector<GLSLDirectionalLight> mDirectionalLights;
   };
   std::stack<State> mStateStack;
+
+  static constexpr auto MaxNumberOfDirectionalLights = 100;
+  static constexpr auto MaxNumberOfPointLights = 100;
+  UBO mDirectionalLightsUBO;
+  UBO mPointLightsUBO;
 
   static const State DefaultState;
   State& GetCurrentState();

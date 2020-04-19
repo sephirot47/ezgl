@@ -2,12 +2,18 @@
 
 struct DirectionalLight
 {
-  vec3 Direction;
-  vec3 Color;
+  vec3 mDirection;
+  float PADDING_0;
+
+  vec3 mColor;
+  float PADDING_1;
 };
 
-layout (std140, binding = 0) uniform UDirectionalLights {
-  DirectionalLight lights[100];
+const int MAX_NUMBER_OF_DIRECTIONAL_LIGHTS = 100;
+uniform int UNumberOfDirectionalLights;
+layout(std140, binding = 0) uniform UBlockLights
+{
+  DirectionalLight UDirectionalLights[MAX_NUMBER_OF_DIRECTIONAL_LIGHTS];
 };
 
 uniform mat4 UView;
@@ -20,8 +26,7 @@ uniform float UMaterialSpecularIntensity;
 uniform float UMaterialSpecularExponent;
 uniform bool UMaterialLightingEnabled;
 
-uniform vec4 USceneAmbientColor;
-uniform vec4 ULightColor;
+uniform vec3 USceneAmbientColor;
 
 layout(location = 0) in vec3 in_world_position;
 layout(location = 1) in vec3 in_world_normal;
@@ -35,25 +40,26 @@ void main()
   if (UMaterialLightingEnabled)
   {
     vec3 cam_pos = UCameraWorldPosition;
-
-    vec3 world_normal = normalize(in_world_normal);
-    vec3 light_dir = normalize(vec3(0.0, 0.0, -1.0));
-
-    float diffuse_intensity = max(dot(-light_dir, world_normal), 0);
-
-    vec3 light_reflected_dir = normalize(reflect(light_dir, world_normal));
     vec3 world_fragment_position_to_cam_dir = normalize(cam_pos - in_world_position);
-    float specular_intensity = max(dot(light_reflected_dir, world_fragment_position_to_cam_dir), 0);
-    specular_intensity = pow(specular_intensity, UMaterialSpecularExponent);
-    specular_intensity *= UMaterialSpecularIntensity;
+    vec3 world_normal = normalize(in_world_normal);
 
-    vec4 lighted_color = vec4(0);
-    lighted_color += USceneAmbientColor * material_color;
-    lighted_color += diffuse_intensity * ULightColor * material_color;
-    lighted_color += specular_intensity * ULightColor;
-    lighted_color.a = material_color.a;
-    // out_color = vec4(in_world_normal, 1);
-    out_color = lighted_color;
+    vec3 color_lighted = (USceneAmbientColor * material_color.rgb);
+    for (int i = 0; i < UNumberOfDirectionalLights; ++i)
+    {
+      vec3 light_dir = UDirectionalLights[i].mDirection;
+      vec3 light_color = UDirectionalLights[i].mColor;
+
+      float diffuse_intensity = max(dot(-light_dir, world_normal), 0);
+
+      vec3 light_reflected_dir = normalize(reflect(light_dir, world_normal));
+      float specular_intensity = max(dot(light_reflected_dir, world_fragment_position_to_cam_dir), 0);
+      specular_intensity = pow(specular_intensity, UMaterialSpecularExponent);
+      specular_intensity *= UMaterialSpecularIntensity;
+
+      color_lighted += diffuse_intensity * light_color * material_color.rgb;
+      color_lighted += specular_intensity * light_color;
+    }
+    out_color = vec4(color_lighted, material_color.a);
   }
   else
   {

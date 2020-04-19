@@ -6,14 +6,21 @@ template <typename T>
 void GL::BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint)
 {
   EXPECTS(inBufferId != 0);
-  GL_SAFE_CALL(glNamedBufferData(inBufferId, inData.GetSizeInBytes(), inData.GetData(), GL::EnumCast(inAccessHint)));
+  glNamedBufferData(inBufferId, inData.GetSizeInBytes(), inData.GetData(), GL::EnumCast(inAccessHint));
+}
+
+template <typename T>
+void GL::BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset)
+{
+  EXPECTS(inBufferId != 0);
+  glNamedBufferSubData(inBufferId, inOffset, inData.GetSizeInBytes(), inData.GetData());
 }
 
 template <typename T>
 GL::Int GL::GetInteger(const T& inGLEnum)
 {
   GL::Int result = 0;
-  GL_SAFE_CALL(glGetIntegerv(GL::EnumCast(inGLEnum), &result));
+  glGetIntegerv(GL::EnumCast(inGLEnum), &result);
   return result;
 }
 

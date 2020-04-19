@@ -27,19 +27,23 @@ public:
 
   std::optional<GL::Id> GetAttribLocation(const std::string_view inAttribName) const;
   std::optional<GL::Id> GetUniformLocation(const std::string_view inUniformName) const;
+  std::optional<GL::Id> GetUniformBlockIndex(const std::string_view inUniformBlockName) const;
   GL::Id GetGLId() const;
 
   template <typename T>
   void SetUniform(const GL::Id inUniformLocation, const T& inValue);
   template <typename T>
-  void SetUniform(const std::string_view inName, const T& inValue);
+  void SetUniform(const std::string_view inUniformName, const T& inValue);
   template <typename T>
-  void SetUniformSafe(const std::string_view inName, const T& inValue);
+  void SetUniformSafe(const std::string_view inUniformName, const T& inValue);
+  void SetUniformBlockBinding(const std::string_view inUniformBlockName, const GL::Id inBindingPoint);
+  void SetUniformBlockBinding(const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint);
+  void SetUniformBlockBindingSafe(const std::string_view inUniformBlockName, const GL::Id inBindingPoint);
 
 private:
   GL::Id mGLId = 0;
 
-  GL::Id GetUniformLocationWithException(const ShaderProgram& inShaderProgram, const std::string_view inName);
+  GL::Id GetUniformLocationWithException(const ShaderProgram& inShaderProgram, const std::string_view inUniformName);
 };
 }
 

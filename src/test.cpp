@@ -56,6 +56,12 @@ int main()
     ioRenderer.ClearBackground(Pink());
     ioRenderer.SetCamera(camera);
 
+    ioRenderer.AddDirectionalLight(Down<Vec3f>(), Green<Color3f>());
+    ioRenderer.AddDirectionalLight(Right<Vec3f>(), Red<Color3f>());
+    ioRenderer.AddDirectionalLight(Left<Vec3f>(), Blue<Color3f>());
+    ioRenderer.AddDirectionalLight(Up<Vec3f>(), Yellow<Color3f>());
+    ioRenderer.AddDirectionalLight(Back<Vec3f>(), Orange<Color3f>());
+
     const auto q = AngleAxis(time.count() * (0.5f * time.count()), Normalized(Vec3f { 0.0f, 0.0f, 1.0f }));
     // ioRenderer.Rotate(q);
     ioRenderer.Scale(All<Vec3f>(10.0f));

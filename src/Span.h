@@ -14,11 +14,7 @@ public:
   using ValueType = T;
   using ConstIterator = const T*;
 
-  Span(const T* inData, const std::size_t inNumberOfElements) : mData(inData), mNumberOfElements(inNumberOfElements)
-  {
-    if (inData == nullptr)
-      EXPECTS(inNumberOfElements == 0);
-  }
+  Span(const T* inData, const std::size_t inNumberOfElements) : mData(inData), mNumberOfElements(inNumberOfElements) {}
 
   ConstIterator begin() const { return mData; }
   ConstIterator end() const { return mData + mNumberOfElements; }

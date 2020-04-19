@@ -39,4 +39,6 @@ GL::Id Buffer::GetBoundGLId(const GL::EBufferType inBufferType)
   return static_cast<GL::Id>(bound_id);
 }
 
+void Buffer::BufferDataEmpty(const GL::Size inSizeInBytes) { BufferData(Span<uint8_t>(nullptr, inSizeInBytes)); }
+
 }

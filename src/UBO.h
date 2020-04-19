@@ -11,7 +11,7 @@ public:
   template <typename T>
   explicit UBO(const Span<T>& inData);
 
-  void BindBufferBase(const GL::Id inBindingPoint);
+  void BindToBindingPoint(const GL::Id inBindingPoint);
 };
 }
 

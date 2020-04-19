@@ -219,6 +219,11 @@ GL::Id GL::GetUniformLocation(const GL::Id inShaderProgramId, const std::string_
   return glGetUniformLocation(inShaderProgramId, inUniformName.data());
 }
 
+GL::Id GL::GetUniformBlockIndex(const GL::Id inShaderProgramId, const std::string_view inUniformBlockName)
+{
+  return glGetUniformBlockIndex(inShaderProgramId, inUniformBlockName.data());
+}
+
 void GL::DeleteProgram(const GL::Id inShaderProgramId) { glDeleteProgram(inShaderProgramId); }
 
 void GL::Uniform(const GL::Id inUniformLocation, bool inValue)
@@ -315,6 +320,13 @@ void GL::Uniform(const GL::Id inUniformLocation, const Mat4f& inValue)
 void GL::Uniform(const GL::Id inUniformLocation, const Mat4d& inValue)
 {
   glUniformMatrix4dv(inUniformLocation, 1, true, inValue.Data());
+}
+
+void GL::UniformBlockBinding(const GL::Id inShaderProgramId,
+    const GL::Id inUniformBlockIndex,
+    const GL::Id inBindingPoint)
+{
+  glUniformBlockBinding(inShaderProgramId, inUniformBlockIndex, inBindingPoint);
 }
 
 void GLAPIENTRY GL::ErrorCallback(GL::Enum inSource,
