@@ -6,6 +6,7 @@
 #include "DrawableMesh.h"
 #include "Material.h"
 #include "Math.h"
+#include "PointLight.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
@@ -67,7 +68,10 @@ public:
   void ResetMaterial();
 
   void SetSceneAmbientColor(const Color3f& inSceneAmbientColor);
-  void AddDirectionalLight(const Vec3f &inDirection, const Color3f &inColor);
+  void AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor);
+  void ClearDirectionalLights();
+  void AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor);
+  void ClearPointLights();
 
   void PushState();
   void PopState();
@@ -114,8 +118,8 @@ private:
 
     Color3f mSceneAmbientColor = WithValue(White<Color3f>(), 0.1f);
 
-    // std::vector<GLSLPointLight> mPointLights;
     std::vector<GLSLDirectionalLight> mDirectionalLights;
+    std::vector<GLSLPointLight> mPointLights;
   };
   std::stack<State> mStateStack;
 

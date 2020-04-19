@@ -7,6 +7,7 @@
 #include "GLTypeTraits.h"
 #include "Math.h"
 #include "MeshFactory.h"
+#include "PointLight.h"
 #include "ProjectionParametersVariant.h"
 #include "ShaderProgram.h"
 #include "TextureFactory.h"
@@ -45,6 +46,7 @@ Renderer::Renderer()
 
   // Init lights
   mDirectionalLightsUBO.BufferDataEmpty(MaxNumberOfDirectionalLights * sizeof(GLSLDirectionalLight));
+  mPointLightsUBO.BufferDataEmpty(MaxNumberOfPointLights * sizeof(GLSLPointLight));
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -133,6 +135,23 @@ void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inCo
 
   GetCurrentState().mDirectionalLights.push_back(directional_light);
 }
+
+void Renderer::ClearDirectionalLights() { GetCurrentState().mDirectionalLights.clear(); }
+
+void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor)
+{
+  EXPECTS(inRange > 0.0f);
+
+  GLSLPointLight point_light;
+  point_light.mPosition = inPosition;
+  point_light.mRange = inRange;
+  point_light.mColor = inColor;
+
+  GetCurrentState().mPointLights.push_back(point_light);
+}
+
+void Renderer::ClearPointLights() { GetCurrentState().mPointLights.clear(); }
+
 void Renderer::PushState() { mStateStack.push(GetCurrentState()); }
 
 void Renderer::PopState()
@@ -242,14 +261,19 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   // Lights
   if (GetMaterial().IsLightingEnabled())
   {
-    ioShaderProgram.SetUniformBlockBindingSafe("UBlockLights", 0);
-
     // Directional lights
+    ioShaderProgram.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
     const auto& directional_lights = GetCurrentState().mDirectionalLights;
     mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
     mDirectionalLightsUBO.BindToBindingPoint(0);
-
     ioShaderProgram.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
+
+    // Point lights
+    ioShaderProgram.SetUniformBlockBindingSafe("UBlockPointLights", 1);
+    const auto& point_lights = GetCurrentState().mPointLights;
+    mPointLightsUBO.BufferSubData(MakeSpan(point_lights));
+    mPointLightsUBO.BindToBindingPoint(1);
+    ioShaderProgram.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
   }
 }
 }
