@@ -1,28 +1,17 @@
 #pragma once
 
-#include "GL.h"
+#include "Buffer.h"
 
 namespace egl
 {
-class UBO
+class UBO : public Buffer
 {
 public:
   UBO();
-
   template <typename T>
   explicit UBO(const Span<T>& inData);
 
-  void Bind() const;
-  void UnBind() const;
-
-  void BufferData();
-  template <typename T>
-  void BufferData(const Span<T>& inData);
-
   void BindBufferBase(const GL::Id inBindingPoint);
-
-private:
-  GL::Id mGLId = 0;
 };
 }
 
