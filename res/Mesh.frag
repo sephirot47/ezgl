@@ -1,11 +1,20 @@
 #version 430 core
 
+struct DirectionalLight
+{
+  vec3 Direction;
+  vec3 Color;
+};
+
+layout (std140, binding = 0) uniform UDirectionalLights {
+  DirectionalLight lights[100];
+};
+
 uniform mat4 UView;
 uniform vec3 UCameraWorldPosition;
 uniform vec3 UCameraWorldDirection;
 
 uniform sampler2D UMaterialTexture;
-uniform float UMaterialDiffuseIntensity;
 uniform vec4 UMaterialDiffuseColor;
 uniform float UMaterialSpecularIntensity;
 uniform float UMaterialSpecularExponent;

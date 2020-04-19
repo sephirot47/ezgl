@@ -52,6 +52,24 @@ void GL::BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId)
   glBindBuffer(GL::EnumCast(inBufferType), inBufferId);
 }
 
+void GL::BindBufferBase(const GL::EBufferType inBufferType, const GL::Id inBindingPoint, const GL::Id inBufferId)
+{
+  glBindBufferBase(GL::EnumCast(inBufferType), inBindingPoint, inBufferId);
+}
+
+GL::EBufferBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
+{
+  switch (inBufferType)
+  {
+  case GL::EBufferType::ARRAY_BUFFER: return GL::EBufferBindingType::ARRAY_BUFFER;
+  case GL::EBufferType::ELEMENT_ARRAY: return GL::EBufferBindingType::ELEMENT_ARRAY;
+  case GL::EBufferType::UNIFORM_BUFFER: return GL::EBufferBindingType::UNIFORM_BUFFER;
+  case GL::EBufferType::VERTEX_ARRAY: return GL::EBufferBindingType::VERTEX_ARRAY;
+  }
+  assert(false);
+  return static_cast<GL::EBufferBindingType>(-1);
+}
+
 void GL::DeleteBuffer(const GL::Id inBufferId) { glDeleteBuffers(1, &inBufferId); }
 
 GL::Id GL::GenVertexArray()

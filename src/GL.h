@@ -49,14 +49,16 @@ public:
   {
     ARRAY_BUFFER = GL_ARRAY_BUFFER,
     ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER,
-    VERTEX_ARRAY = GL_VERTEX_ARRAY
+    UNIFORM_BUFFER = GL_UNIFORM_BUFFER,
+    VERTEX_ARRAY = GL_VERTEX_ARRAY,
   };
 
   enum class EBufferBindingType
   {
     ARRAY_BUFFER = GL_ARRAY_BUFFER_BINDING,
     ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER_BINDING,
-    VERTEX_ARRAY = GL_VERTEX_ARRAY_BINDING
+    UNIFORM_BUFFER = GL_UNIFORM_BUFFER_BINDING,
+    VERTEX_ARRAY = GL_VERTEX_ARRAY_BINDING,
   };
 
   enum class EAccessHint
@@ -325,8 +327,10 @@ public:
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();
   static void BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId);
+  static void BindBufferBase(const GL::EBufferType inBufferType, const GL::Id inBindingPoint, const GL::Id inBufferId);
   template <typename T>
   static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint);
+  static GL::EBufferBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void DeleteBuffer(const GL::Id inBufferId);
 
   static GL::Id GenVertexArray();

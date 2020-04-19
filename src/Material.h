@@ -35,7 +35,6 @@ private:
    std::shared_ptr<Texture2D> mTexture = nullptr;
 
   bool mLightingEnabled = true;;
-  float mDiffuseIntensity = 1.0f;
   Color4f mDiffuseColor = White();
   float mSpecularIntensity = 1.0f;
   float mSpecularExponent = 60.0f;

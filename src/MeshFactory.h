@@ -16,7 +16,7 @@ public:
   static TMesh GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
   static TMesh GetCone(const std::size_t inNumLatitudes);
   static TMesh GetCylinder(const std::size_t inNumLatitudes);
-  static TMesh GetTorus(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const float inHoleSize);
+  static TMesh GetTorus(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const float inHoleSize = 0.5f);
   static TMesh GetPlane(const std::size_t inNumVerticesX = 2, const std::size_t inNumVerticesY = 2);
 
 private:

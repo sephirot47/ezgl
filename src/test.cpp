@@ -38,7 +38,7 @@ int main()
 
   const auto window = std::make_shared<Window>();
 
-  const auto test_mesh = DrawableMeshFactory::GetTorus(3, 3, 0.5f);
+  const auto test_mesh = DrawableMeshFactory::GetTorus(25, 25, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
   const auto camera = std::make_shared<Camera>();
@@ -60,6 +60,7 @@ int main()
     // ioRenderer.Rotate(q);
     ioRenderer.Scale(All<Vec3f>(10.0f));
     ioRenderer.SetLineWidth(3.0f);
+    ioRenderer.SetCullFaceEnabled(false);
     ioRenderer.DrawAxes();
 
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
@@ -68,7 +69,7 @@ int main()
     ioRenderer.GetMaterial().SetTexture(nullptr);
     ioRenderer.Scale(All<Vec3f>(0.5f));
     ioRenderer.GetMaterial().SetDiffuseColor(White());
-    ioRenderer.GetMaterial().SetLightingEnabled(false);
+    ioRenderer.GetMaterial().SetLightingEnabled(true);
     ioRenderer.GetMaterial().SetSpecularExponent(120.0f);
     ioRenderer.DrawMesh(test_mesh);
     ioRenderer.DrawAxes();

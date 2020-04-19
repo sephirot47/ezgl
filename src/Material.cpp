@@ -5,9 +5,6 @@
 
 namespace egl
 {
-void Material::SetDiffuseIntensity(const float inDiffuseIntensity) { mDiffuseIntensity = inDiffuseIntensity; }
-float Material::GetDiffuseIntensity() const { return mDiffuseIntensity; }
-
 void Material::SetDiffuseColor(const Color4f& inDiffuseColor) { mDiffuseColor = inDiffuseColor; }
 Color4f Material::GetDiffuseColor() const { return mDiffuseColor; }
 
@@ -35,7 +32,6 @@ void Material::Bind(ShaderProgram& ioShaderProgram)
   ioShaderProgram.SetUniformSafe("UMaterialDiffuseColor", mDiffuseColor);
   if (mLightingEnabled)
   {
-    ioShaderProgram.SetUniformSafe("UMaterialDiffuseIntensity", mDiffuseIntensity);
     ioShaderProgram.SetUniformSafe("UMaterialSpecularIntensity", mSpecularIntensity);
     ioShaderProgram.SetUniformSafe("UMaterialSpecularExponent", mSpecularExponent);
   }
