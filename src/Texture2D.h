@@ -9,16 +9,16 @@ namespace egl
 template <typename T>
 class Image2D;
 
-class Texture2D : public Texture
+class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D, GL::EBindingType::TEXTURE_2D>
 {
 public:
   Texture2D(const int inWidth, const int inHeight, const GL::ETextureInternalFormat inInternalFormat);
   explicit Texture2D(const Image2D<Color4f>& inImage2D);
   Texture2D(Texture2D&& ioRHS) noexcept = default;
   Texture2D& operator=(Texture2D&& ioRHS) = default;
-  ~Texture2D() = default;
+  ~Texture2D() override = default;
 
-  void Resize(const Vec2i &inSize);
+  void Resize(const Vec2i& inSize);
   void Resize(const int inWidth, const int inHeight);
 
   template <typename T>
@@ -34,7 +34,8 @@ public:
       const GL::ETextureInternalFormat& inInternalFormat = GL::ETextureInternalFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
-  void SetEmptyData(const GL::Size inWidth, const GL::Size inHeight,
+  void SetEmptyData(const GL::Size inWidth,
+      const GL::Size inHeight,
       const GL::ETextureInternalFormat& inInternalFormat = GL::ETextureInternalFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
@@ -42,8 +43,6 @@ public:
   GL::Size GetHeight() const;
   const Vec2i& GetSize() const;
   GL::ETextureInternalFormat GetInternalFormat() const;
-  bool IsBound() const;
-  static GL::Id GetBoundGLId();
 
   Image2D<Color4f> GetImage(const bool inInvertY = false, const int inMipmapLevel = 0) const;
 

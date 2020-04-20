@@ -4,7 +4,7 @@
 
 namespace egl
 {
-Texture2D::Texture2D() : Texture(GL::ETextureTarget::TEXTURE_2D)
+Texture2D::Texture2D() : Texture()
 {
   GL_BIND_GUARD(GL::EBindingType::TEXTURE_2D);
   Bind();
@@ -66,16 +66,6 @@ GL::Size Texture2D::GetWidth() const { return mSize[0]; }
 GL::Size Texture2D::GetHeight() const { return mSize[1]; }
 const Vec2i& Texture2D::GetSize() const { return mSize; }
 GL::ETextureInternalFormat Texture2D::GetInternalFormat() const { return mInternalFormat; }
-bool Texture2D::IsBound() const
-{
-  const auto bound_id = GetBoundGLId();
-  return bound_id != 0 && bound_id == GetGLId();
-}
-GL::Id Texture2D::GetBoundGLId()
-{
-  const auto bound_id = GL::GetInteger(GL::EBindingType::TEXTURE_2D);
-  return static_cast<GL::Id>(bound_id);
-}
 
 Image2D<Color4f> Texture2D::GetImage(const bool inInvertY, const int inMipmapLevel) const
 {

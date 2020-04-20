@@ -1,31 +1,28 @@
 #pragma once
 
-#include "GL.h"
+#include "GLBindableObject.h"
 
 namespace egl
 {
-class Texture
+template <GL::ETextureTarget TTextureTarget, GL::EBindingType TBindingType>
+class Texture : public GLBindableObject<TBindingType>
 {
-public:
-  Texture(const GL::ETextureTarget inTarget);
-  Texture(const Texture& inRHS) = delete;
-  Texture& operator=(const Texture& inRHS) = delete;
-  Texture(Texture&& ioRHS) noexcept;
-  Texture& operator=(Texture&& ioRHS) = delete;
-  virtual ~Texture();
+  // For the moment only Texture2D supported
+  static_assert((TTextureTarget == GL::ETextureTarget::TEXTURE_2D && TBindingType == GL::EBindingType::TEXTURE_2D));
 
-  void Bind() const;
+public:
+  static constexpr auto TextureTarget = TTextureTarget;
+
+  Texture() = default;
+  Texture(Texture&& ioRHS) noexcept = default;
+  virtual ~Texture() override = default;
+
   void BindToTextureUnit(const GL::Size& inTextureUnit) const;
-  void UnBind() const;
 
   void GenerateMipMap();
 
-  GL::Id GetGLId() const;
-  GL::ETextureTarget GetTextureTarget() const;
-
-private:
-  GL::Id mGLId = 0;
-  const GL::ETextureTarget mTextureTarget = GL::ETextureTarget::TEXTURE_2D;
+  using GLBindableObject<TBindingType>::GetGLId;
+  GL::ETextureTarget GetTextureTarget() const { return TTextureTarget; }
 };
 
 }
