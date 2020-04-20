@@ -10,48 +10,26 @@ namespace egl
 {
 ShaderProgram::ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader)
 {
-  mGLId = GL::CreateProgram();
-  if (mGLId == 0)
-    THROW_EXCEPTION("Error creating ShaderProgram");
-
-  GL::AttachShader(mGLId, inVertexShader.GetGLId());
-  GL::AttachShader(mGLId, inFragmentShader.GetGLId());
-  GL::LinkProgram(mGLId);
-}
-
-ShaderProgram::~ShaderProgram() { GL::DeleteProgram(mGLId); }
-
-void ShaderProgram::Bind() const { GL::UseProgram(mGLId); }
-
-void ShaderProgram::UnBind() const { GL::UseProgram(0); }
-
-bool ShaderProgram::IsBound() const
-{
-  const auto bound_id = GetBoundGLId();
-  return bound_id != 0 && bound_id == mGLId;
-}
-
-GL::Id ShaderProgram::GetBoundGLId()
-{
-  const auto bound_id = GL::GetInteger(GL::EShaderProgramEnum::CURRENT_PROGRAM);
-  return static_cast<GL::Id>(bound_id);
+  GL::AttachShader(GetGLId(), inVertexShader.GetGLId());
+  GL::AttachShader(GetGLId(), inFragmentShader.GetGLId());
+  GL::LinkProgram(GetGLId());
 }
 
 std::optional<GL::Id> ShaderProgram::GetAttribLocation(const std::string_view inAttribName) const
 {
-  const auto attrib_location = GL::GetAttribLocation(mGLId, inAttribName);
+  const auto attrib_location = GL::GetAttribLocation(GetGLId(), inAttribName);
   return (attrib_location != GL::InvalidId) ? std::make_optional(attrib_location) : std::nullopt;
 }
 
 std::optional<GL::Id> ShaderProgram::GetUniformLocation(const std::string_view inUniformName) const
 {
-  const auto uniform_location = GL::GetUniformLocation(mGLId, inUniformName);
+  const auto uniform_location = GL::GetUniformLocation(GetGLId(), inUniformName);
   return (uniform_location != GL::InvalidId) ? std::make_optional(uniform_location) : std::nullopt;
 }
 
 std::optional<GL::Id> ShaderProgram::GetUniformBlockIndex(const std::string_view inUniformBlockName) const
 {
-  const auto uniform_block_index = GL::GetUniformBlockIndex(mGLId, inUniformBlockName);
+  const auto uniform_block_index = GL::GetUniformBlockIndex(GetGLId(), inUniformBlockName);
   return (uniform_block_index != GL::InvalidId) ? std::make_optional(uniform_block_index) : std::nullopt;
 }
 
@@ -59,15 +37,15 @@ void ShaderProgram::SetUniformBlockBinding(const std::string_view inUniformBlock
 {
   const auto uniform_block_index = GetUniformBlockIndex(inUniformBlockName);
   if (!uniform_block_index.has_value())
-    THROW_EXCEPTION(
-        "Uniform block with name '" << inUniformBlockName << "' does not exist in shader program with id " << mGLId);
+    THROW_EXCEPTION("Uniform block with name '" << inUniformBlockName << "' does not exist in shader program with id "
+                                                << GetGLId());
   SetUniformBlockBinding(*uniform_block_index, inBindingPoint);
 }
 
 void ShaderProgram::SetUniformBlockBinding(const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint)
 {
   EXPECTS(inUniformBlockIndex != GL::InvalidId);
-  GL::UniformBlockBinding(mGLId, inUniformBlockIndex, inBindingPoint);
+  GL::UniformBlockBinding(GetGLId(), inUniformBlockIndex, inBindingPoint);
 }
 
 void ShaderProgram::SetUniformBlockBindingSafe(const std::string_view inUniformBlockName, const GL::Id inBindingPoint)
@@ -77,8 +55,6 @@ void ShaderProgram::SetUniformBlockBindingSafe(const std::string_view inUniformB
     return;
   SetUniformBlockBinding(*uniform_block_index, inBindingPoint);
 }
-
-GL::Id ShaderProgram::GetGLId() const { return mGLId; }
 
 GL::Id ShaderProgram::GetUniformLocationWithException(const ShaderProgram& inShaderProgram,
     const std::string_view inUniformName)

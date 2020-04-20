@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GL.h"
+#include "GLBindableObject.h"
 #include "Mat.h"
 #include "Shader.h"
 #include "Vec.h"
@@ -10,25 +11,18 @@
 
 namespace egl
 {
-class ShaderProgram
+class ShaderProgram : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
 {
 public:
-  ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);
-  ShaderProgram(const ShaderProgram& inRHS) = delete;
-  ShaderProgram& operator=(const ShaderProgram& inRHS) = delete;
-  ShaderProgram(ShaderProgram&& ioRHS) = default;
-  ShaderProgram& operator=(ShaderProgram&& ioRHS) = delete;
-  ~ShaderProgram();
+  using GLBindableObject<GL::EBindingType::SHADER_PROGRAM>::GetGLId;
 
-  void Bind() const;
-  void UnBind() const;
-  bool IsBound() const;
-  static GL::Id GetBoundGLId();
+  ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);
+  ShaderProgram(ShaderProgram&& ioRHS) = default;
+  ~ShaderProgram() = default;
 
   std::optional<GL::Id> GetAttribLocation(const std::string_view inAttribName) const;
   std::optional<GL::Id> GetUniformLocation(const std::string_view inUniformName) const;
   std::optional<GL::Id> GetUniformBlockIndex(const std::string_view inUniformBlockName) const;
-  GL::Id GetGLId() const;
 
   template <typename T>
   void SetUniform(const GL::Id inUniformLocation, const T& inValue);
@@ -41,8 +35,6 @@ public:
   void SetUniformBlockBindingSafe(const std::string_view inUniformBlockName, const GL::Id inBindingPoint);
 
 private:
-  GL::Id mGLId = 0;
-
   GL::Id GetUniformLocationWithException(const ShaderProgram& inShaderProgram, const std::string_view inUniformName);
 };
 }
