@@ -7,46 +7,11 @@
 
 namespace egl
 {
-VAO::VAO() : mGLId(GL::CreateVertexArray())
-{
-  if (mGLId == 0)
-    THROW_EXCEPTION("Error creating VAO");
-}
-
-VAO::VAO(VAO&& ioRHS) noexcept
-{
-  EXPECTS(mGLId == 0);
-
-  std::swap(mGLId, ioRHS.mGLId);
-
-  mEBO = std::move(ioRHS.mEBO);
-  mVBOs = std::move(ioRHS.mVBOs);
-}
-
-VAO::~VAO()
-{
-  if (mGLId != 0)
-    GL::DeleteVertexArray(mGLId);
-}
-
-void VAO::Bind() const { GL::BindVertexArray(mGLId); }
-void VAO::UnBind() const { GL::BindVertexArray(0); }
-bool VAO::IsBound() const
-{
-  const auto bound_id = GetBoundGLId();
-  return bound_id != 0 && bound_id == mGLId;
-}
-GL::Id VAO::GetBoundGLId()
-{
-  const auto bound_id = GL::GetInteger(GL::EBindingType::VERTEX_ARRAY);
-  return static_cast<GL::Id>(bound_id);
-}
-
 void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
     const GL::Id inAttribLocation,
     const VAOVertexAttrib& inVertexAttrib)
 {
-  // GL_BIND_GUARD(GL::EBindingType::VBO); // First VBO so that the guard is released the latest
+  GL_BIND_GUARD(GL::EBindingType::VBO); // First VBO so that the guard is released the latest
   GL_BIND_GUARD(GL::EBindingType::VAO);
   Bind();
 
@@ -57,7 +22,7 @@ void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
 
 void VAO::SetEBO(const std::shared_ptr<EBO>& inEBO)
 {
-  // GL_BIND_GUARD(GL::EBindingType::EBO); // First EBO so that the guard is released the latest
+  GL_BIND_GUARD(GL::EBindingType::EBO); // First EBO so that the guard is released the latest
   GL_BIND_GUARD(GL::EBindingType::VAO);
   Bind();
 
@@ -94,6 +59,4 @@ void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)
 const std::shared_ptr<EBO>& VAO::GetEBO() const { return mEBO; }
 
 const std::vector<std::shared_ptr<VBO>>& VAO::GetVBOs() const { return mVBOs; }
-
-GL::Id VAO::GetGLId() const { return mGLId; }
 }

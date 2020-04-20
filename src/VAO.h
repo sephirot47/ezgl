@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GL.h"
+#include "GLObject.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -12,20 +13,12 @@ class EBO;
 class VAOVertexAttrib;
 class VBO;
 
-class VAO
+class VAO : public GLObject<GL::EBindingType::VAO>
 {
 public:
-  VAO();
-  VAO(const VAO& inRHS) = delete;
-  VAO& operator=(const VAO& inRHS) = delete;
-  VAO(VAO&& ioRHS) noexcept;
-  VAO& operator=(VAO&& ioRHS) = delete;
-  ~VAO();
-
-  void Bind() const;
-  void UnBind() const;
-  bool IsBound() const;
-  static GL::Id GetBoundGLId();
+  VAO() = default;
+  VAO(VAO&& ioRHS) noexcept = default;
+  ~VAO() override = default;
 
   void AddVBO(const std::shared_ptr<VBO>& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
   void SetEBO(const std::shared_ptr<EBO>& inEBO);
@@ -35,10 +28,8 @@ public:
 
   const std::shared_ptr<EBO>& GetEBO() const;
   const std::vector<std::shared_ptr<VBO>>& GetVBOs() const;
-  GL::Id GetGLId() const;
 
 private:
-  GL::Id mGLId = 0;
   std::shared_ptr<EBO> mEBO;
   std::vector<std::shared_ptr<VBO>> mVBOs;
 };

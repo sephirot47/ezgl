@@ -195,7 +195,7 @@ void GL::RenderbufferStorage(const GL::ETextureInternalFormat inInternalFormat,
 
 void GL::BindRenderbuffer(const GL::Id inRenderbufferId) { glBindRenderbuffer(GL_RENDERBUFFER, inRenderbufferId); }
 
-void GL::DeleteRenderBuffer(const GL::Id inRenderbufferId) { glDeleteRenderbuffers(1, &inRenderbufferId); }
+void GL::DeleteRenderbuffer(const GL::Id inRenderbufferId) { glDeleteRenderbuffers(1, &inRenderbufferId); }
 
 void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
 void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }

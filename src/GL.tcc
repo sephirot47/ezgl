@@ -73,6 +73,121 @@ std::vector<T> GL::GetTextureImage(const GL::Id inTextureId,
 }
 
 template <GL::EBindingType TBindingType>
+GL::Id GL::Create()
+{
+  if constexpr (TBindingType == GL::EBindingType::ARRAY_BUFFER)
+  {
+    return GL::CreateBuffer();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
+  {
+    return GL::CreateProgram();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::ELEMENT_ARRAY)
+  {
+    return GL::CreateBuffer();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
+  {
+    return GL::CreateFramebuffer();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::RENDERBUFFER)
+  {
+    return GL::CreateRenderbuffer();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D)
+  {
+    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_1D);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D_ARRAY)
+  {
+    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_1D_ARRAY);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
+  {
+    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D_ARRAY)
+  {
+    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D_ARRAY);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_3D)
+  {
+    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_3D);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::UNIFORM_BUFFER)
+  {
+    return GL::CreateBuffer();
+  }
+  else if constexpr (TBindingType == GL::EBindingType::VERTEX_ARRAY)
+  {
+    return GL::CreateVertexArray();
+  }
+  else
+  {
+    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
+  }
+  return GL::InvalidId;
+}
+
+template <GL::EBindingType TBindingType>
+void GL::Delete(const GL::Id inId)
+{
+  if constexpr (TBindingType == GL::EBindingType::ARRAY_BUFFER)
+  {
+    GL::DeleteBuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
+  {
+    GL::DeleteProgram(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::ELEMENT_ARRAY)
+  {
+    GL::DeleteBuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
+  {
+    GL::DeleteFramebuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::RENDERBUFFER)
+  {
+    GL::DeleteRenderbuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D)
+  {
+    GL::DeleteTexture(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D_ARRAY)
+  {
+    GL::DeleteTexture(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
+  {
+    GL::DeleteTexture(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D_ARRAY)
+  {
+    GL::DeleteTexture(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_3D)
+  {
+    GL::DeleteTexture(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::UNIFORM_BUFFER)
+  {
+    GL::DeleteBuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::VERTEX_ARRAY)
+  {
+    GL::DeleteVertexArray(inId);
+  }
+  else
+  {
+    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
+  }
+}
+
+template <GL::EBindingType TBindingType>
 void GL::Bind(const GL::Id inId)
 {
   if constexpr (TBindingType == GL::EBindingType::ARRAY_BUFFER)
@@ -125,8 +240,6 @@ void GL::Bind(const GL::Id inId)
   }
   else
   {
-    // Always static_assert (condition is always false). In order for it not to fire always, we have to do this hack,
-    // so that the static_assert is dependent on template and not 'static_assert(false, "...")' (this won't work)
     static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
   }
 }
@@ -138,7 +251,7 @@ void GL::UnBind()
 }
 
 template <GL::EBindingType TBindingType>
-GL::BindGuard<TBindingType>::BindGuard() : mPreviouslyBoundId(GL::GetInteger(TBindingType))
+GL::BindGuard<TBindingType>::BindGuard() : mPreviouslyBoundId(GL::GetBoundGLId(TBindingType))
 {
 }
 

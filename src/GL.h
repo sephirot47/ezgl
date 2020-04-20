@@ -452,7 +452,7 @@ public:
       const GL::Size inWidth,
       const GL::Size inHeight);
   static void BindRenderbuffer(const GL::Id inRenderbufferId);
-  static void DeleteRenderBuffer(const GL::Id inRenderbufferId);
+  static void DeleteRenderbuffer(const GL::Id inRenderbufferId);
 
   static void ClearColor(const Color4f& inColor);
   static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);
@@ -521,11 +521,18 @@ public:
   template <typename T>
   static GL::Enum EnumCast(const T& inGLEnum);
 
+  // Generic Create/Delete
+  template <GL::EBindingType TBindingType>
+  static GL::Id Create();
+  template <GL::EBindingType TBindingType>
+  static void Delete(const GL::Id inId);
+
   // Generic Bind/UnBind
   template <GL::EBindingType TBindingType>
   static void Bind(const GL::Id inId);
   template <GL::EBindingType TBindingType>
   static void UnBind();
+  static GL::Id GetBoundGLId(const GL::EBindingType inBindingType) { return GL::GetInteger(inBindingType); }
 
   template <GL::EBindingType TBindingType>
   class BindGuard
