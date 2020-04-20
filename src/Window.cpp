@@ -186,9 +186,7 @@ void CallInputEventCallback(GLFWwindow* inGLFWWindow, const TInputEvent& inInput
 void Window::AddInputListener(InputListener* inInputListener) { mInputListeners.push_back(inInputListener); }
 void Window::RemoveInputListener(InputListener* inInputListener)
 {
-  PEEK(inInputListener);
   mInputListeners.erase(std::find(mInputListeners.cbegin(), mInputListeners.cend(), inInputListener));
-  PEEK(mInputListeners.size());
 }
 const std::vector<InputListener*>& Window::GetInputListeners() const { return mInputListeners; }
 

@@ -3,41 +3,8 @@
 namespace egl
 {
 Framebuffer::Framebuffer() : Framebuffer(1, 1) {}
-
 Framebuffer::Framebuffer(const Vec2i& inSize) : Framebuffer(inSize[0], inSize[1]) {}
-
-Framebuffer::Framebuffer(const int inWidth, const int inHeight) : mGLId(GL::CreateFramebuffer())
-{
-  if (mGLId == 0)
-    THROW_EXCEPTION("Error creating Framebuffer");
-
-  Resize(inWidth, inHeight);
-}
-
-Framebuffer::Framebuffer(Framebuffer&& ioRHS)
-{
-  EXPECTS(mGLId == 0);
-  std::swap(mGLId, ioRHS.mGLId);
-}
-
-Framebuffer::~Framebuffer()
-{
-  if (mGLId != 0)
-    GL::DeleteFramebuffer(mGLId);
-}
-
-void Framebuffer::Bind() const { GL::BindFramebuffer(mGLId); }
-void Framebuffer::UnBind() const { GL::BindFramebuffer(0); }
-bool Framebuffer::IsBound() const
-{
-  const auto bound_id = GetBoundGLId();
-  return bound_id != 0 && bound_id == mGLId;
-}
-GL::Id Framebuffer::GetBoundGLId()
-{
-  const auto bound_id = GL::GetInteger(GL::EBindingType::FRAMEBUFFER);
-  return static_cast<GL::Id>(bound_id);
-}
+Framebuffer::Framebuffer(const int inWidth, const int inHeight) { Resize(inWidth, inHeight); }
 
 void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
     const std::shared_ptr<Texture2D>& inTexture)
@@ -146,7 +113,6 @@ std::optional<GL::Id> Framebuffer::GetCreatedRenderbufferId() const
 }
 
 const Vec2i& Framebuffer::GetSize() const { return mSize; }
-GL::Id Framebuffer::GetGLId() const { return mGLId; }
 
 std::size_t Framebuffer::GetColorAttachmentIndex(const GL::EFramebufferAttachment inColorAttachment)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GL.h"
+#include "GLBindableObject.h"
 #include "Math.h"
 #include "Texture2D.h"
 #include <array>
@@ -10,28 +10,23 @@
 
 namespace egl
 {
-class Framebuffer
+class Framebuffer : public GLBindableObject<GL::EBindingType::FRAMEBUFFER>
 {
 public:
   Framebuffer();
-  explicit Framebuffer(const Vec2i &inSize);
+  explicit Framebuffer(const Vec2i& inSize);
   Framebuffer(const int inWidth, const int inHeight);
-  Framebuffer(const Framebuffer& inRHS) = delete;
-  Framebuffer& operator=(const Framebuffer& inRHS) = delete;
   Framebuffer(Framebuffer&& ioRHS);
-  Framebuffer& operator=(Framebuffer&& ioRHS) = delete;
-  ~Framebuffer();
+  ~Framebuffer() override = default;
 
-  void Bind() const;
-  void UnBind() const;
-  bool IsBound() const;
-  static GL::Id GetBoundGLId();
+  using GLBindableObject<GL::EBindingType::FRAMEBUFFER>::GetGLId;
 
   void SetAttachment(const GL::EFramebufferAttachment inAttachment, const std::shared_ptr<Texture2D>& inTexture);
-  void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment, const GL::ETextureInternalFormat inInternalFormat);
+  void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
+      const GL::ETextureInternalFormat inInternalFormat);
   void SetRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
       const std::shared_ptr<Texture2D>& inTexture);
-  void Resize(const Vec2i &inSize);
+  void Resize(const Vec2i& inSize);
   void Resize(const int inWidth, const int inHeight);
 
   void CheckFramebufferIsComplete() const;
@@ -39,10 +34,8 @@ public:
   std::optional<GL::Id> GetCreatedRenderbufferId() const;
 
   const Vec2i& GetSize() const;
-  GL::Id GetGLId() const;
 
 private:
-  GL::Id mGLId = 0;
   Vec2i mSize = Zero<Vec2i>();
 
   static constexpr auto MaxNumColorAttachments = (GL_COLOR_ATTACHMENT15 - GL_COLOR_ATTACHMENT0 + 1);

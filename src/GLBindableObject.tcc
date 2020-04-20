@@ -11,7 +11,7 @@ void GLBindableObject<TBindingType>::Bind() const
 template <GL::EBindingType TBindingType>
 void GLBindableObject<TBindingType>::UnBind() const
 {
-  GL::UnBind<TBindingType>(GetGLId());
+  GL::UnBind<TBindingType>();
 }
 
 template <GL::EBindingType TBindingType>
