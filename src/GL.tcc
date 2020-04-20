@@ -219,45 +219,21 @@ GL::BindGuard<TBindingType>::~BindGuard()
   GL::Bind<TBindingType>(mPreviouslyBoundId);
 }
 
-template <GL::EBindingType TBindingType>
-constexpr GL::EObjectType GL::GetObjectType()
-{
-  if constexpr (TBindingType == GL::EBindingType::VBO)
-  {
-    return GL::EObjectType::VBO;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
-  {
-    return GL::EObjectType::SHADER_PROGRAM;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::EBO)
-  {
-    return GL::EObjectType::EBO;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
-  {
-    return GL::EObjectType::FRAMEBUFFER;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
-  {
-    return GL::EObjectType::TEXTURE_2D;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::UBO)
-  {
-    return GL::EObjectType::UBO;
-  }
-  else if constexpr (TBindingType == GL::EBindingType::VAO)
-  {
-    return GL::EObjectType::VAO;
-  }
-  else
-  {
-    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
-  }
-  return GL::EObjectType::FRAGMENT_SHADER;
-}
-
 // clang-format off
+// template <> void GL::Bind<GL::EBindingType::VBO>(const GL::Id inId) { GL::BindBuffer(GL::EBufferType::VBO, inId); }
+
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::EBO>() { return GL::EObjectType::EBO; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::FRAMEBUFFER>() { return GL::EObjectType::FRAMEBUFFER; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::SHADER_PROGRAM>() { return GL::EObjectType::SHADER_PROGRAM; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_1D>() { return GL::EObjectType::TEXTURE_1D; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_1D_ARRAY>() { return GL::EObjectType::TEXTURE_1D_ARRAY; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_2D>() { return GL::EObjectType::TEXTURE_2D; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_2D_ARRAY>() { return GL::EObjectType::TEXTURE_2D_ARRAY; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_3D>() { return GL::EObjectType::TEXTURE_3D; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::UBO>() { return GL::EObjectType::UBO; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::VBO>() { return GL::EObjectType::VBO; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::VAO>() { return GL::EObjectType::VAO; }
+
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::VERTEX>() { return GL::EObjectType::VERTEX_SHADER; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::FRAGMENT>() { return GL::EObjectType::FRAGMENT_SHADER; }
 // clang-format on
