@@ -61,9 +61,7 @@ public:
   {
     EBO,
     FRAMEBUFFER,
-    VERTEX_SHADER,
-    FRAGMENT_SHADER,
-    SHADER_PROGRAM,
+    RENDERBUFFER,
     TEXTURE_1D,
     TEXTURE_1D_ARRAY,
     TEXTURE_2D,
@@ -72,6 +70,9 @@ public:
     VAO,
     VBO,
     UBO,
+    SHADER_PROGRAM,
+    FRAGMENT_SHADER,
+    VERTEX_SHADER,
   };
 
   enum class EBindingType
