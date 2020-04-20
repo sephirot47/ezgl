@@ -39,6 +39,7 @@ public:
   std::optional<GL::Id> GetCreatedRenderbufferId() const;
 
   const Vec2i& GetSize() const;
+  GL::Id GetGLId() const;
 
 private:
   GL::Id mGLId = 0;

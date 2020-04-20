@@ -50,24 +50,15 @@ int main()
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
 
-  const auto render_texture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::RGBA8);
-
-  Framebuffer framebuffer(window->GetSize());
-  framebuffer.Bind();
-  framebuffer.SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture);
-  framebuffer.CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_ATTACHMENT,
-      GL::ETextureInternalFormat::DEPTH_COMPONENT);
-  framebuffer.CheckFramebufferIsComplete();
-  framebuffer.UnBind();
+  const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
   auto time = TimeDuration { 0 };
   window->EasyRenderLoop([&](const DeltaTime& inDeltaTime, Renderer& ioRenderer) {
     time += inDeltaTime;
 
+    render_texture->Resize(window->GetSize());
     if (window->IsKeyPressed(Key::X))
-    {
-      framebuffer.Bind();
-    }
+      ioRenderer.SetRenderTexture(render_texture);
 
     ioRenderer.ClearDepth();
     ioRenderer.ClearBackground(Pink());
@@ -99,28 +90,29 @@ int main()
     ioRenderer.GetMaterial().SetDiffuseColor(Red());
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
-    framebuffer.UnBind();
-
     if (window->IsKeyPressed(Key::X))
     {
+      ioRenderer.SetRenderTexture(nullptr);
+
       ioRenderer.ResetState();
 
       const auto new_camera = std::make_shared<Camera>();
       new_camera->SetPosition(Back<Vec3f>() * 8.0f);
       new_camera->LookAtPoint(Zero<Vec3f>());
+
       ioRenderer.SetCamera(new_camera);
       ioRenderer.ClearDepth();
       ioRenderer.ClearBackground(Black());
 
       ioRenderer.ResetMaterial();
+      ioRenderer.Rotate(AngleAxis(0.5f, Forward()));
       ioRenderer.Scale(All<Vec3f>(14.0f));
       ioRenderer.GetMaterial().SetLightingEnabled(false);
       ioRenderer.GetMaterial().SetTexture(render_texture);
-      ioRenderer.DrawMesh(DrawableMeshFactory::GetPlane(5, 5));
+      ioRenderer.DrawMesh(DrawableMeshFactory::GetPlane());
     }
 
     camera_controller_fly.Update(inDeltaTime);
-    // exit(0);
   });
   return EXIT_SUCCESS;
 }

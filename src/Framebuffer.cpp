@@ -44,16 +44,12 @@ void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
     const std::shared_ptr<Texture2D>& inTexture)
 {
   EXPECTS(IsBound());
-  EXPECTS(inTexture);
-
-  inTexture->Resize(mSize);
 
   if (IsColorAttachment(inAttachment))
   {
     const auto color_attachment_index = GetColorAttachmentIndex(inAttachment);
     mColorTextures.at(color_attachment_index) = inTexture;
-
-    GL::FramebufferTexture2D(inAttachment, GL::ETextureTarget::TEXTURE_2D, inTexture->GetGLId());
+    GL::FramebufferTexture2D(inAttachment, GL::ETextureTarget::TEXTURE_2D, inTexture ? inTexture->GetGLId() : 0);
   }
   else
   {
@@ -62,7 +58,7 @@ void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
 
     mRenderbufferTexture = inTexture;
     mRenderbufferAttachment = inAttachment;
-    GL::FramebufferRenderbuffer(inAttachment, inTexture->GetGLId());
+    GL::FramebufferRenderbuffer(inAttachment, inTexture ? inTexture->GetGLId() : 0);
   }
 }
 
@@ -92,6 +88,11 @@ void Framebuffer::Resize(const Vec2i& inSize) { Resize(inSize[0], inSize[1]); }
 void Framebuffer::Resize(const int inWidth, const int inHeight)
 {
   EXPECTS(IsBound());
+  EXPECTS(inWidth >= 1);
+  EXPECTS(inHeight >= 1);
+
+  if (Vec2i(inWidth, inHeight) == mSize)
+    return;
 
   mSize = Vec2i(inWidth, inHeight);
   for (auto& texture : mColorTextures)
@@ -138,6 +139,7 @@ std::optional<GL::Id> Framebuffer::GetCreatedRenderbufferId() const
 }
 
 const Vec2i& Framebuffer::GetSize() const { return mSize; }
+GL::Id Framebuffer::GetGLId() const { return mGLId; }
 
 std::size_t Framebuffer::GetColorAttachmentIndex(const GL::EFramebufferAttachment inColorAttachment)
 {

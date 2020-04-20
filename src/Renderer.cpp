@@ -47,6 +47,12 @@ Renderer::Renderer()
   // Init lights
   mDirectionalLightsUBO.BufferDataEmpty(MaxNumberOfDirectionalLights * sizeof(GLSLDirectionalLight));
   mPointLightsUBO.BufferDataEmpty(MaxNumberOfPointLights * sizeof(GLSLPointLight));
+
+  mRenderTextureFramebuffer = std::make_unique<Framebuffer>(1, 1);
+  mRenderTextureFramebuffer->Bind();
+  mRenderTextureFramebuffer->CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
+      GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+  mRenderTextureFramebuffer->UnBind();
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -99,6 +105,26 @@ void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& in
   GetCurrentState().mOverrideShaderProgram = inShaderProgram;
 }
 
+void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
+{
+  const auto previously_bound_framebuffer = Framebuffer::GetBoundGLId();
+  mRenderTextureFramebuffer->Bind();
+  mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
+  GetCurrentState().mRenderTexture = inRenderTexture;
+
+  if (inRenderTexture)
+  {
+    mRenderTextureFramebuffer->Resize(inRenderTexture->GetSize());
+  }
+  else
+  {
+    if (previously_bound_framebuffer == mRenderTextureFramebuffer->GetGLId())
+      mRenderTextureFramebuffer->UnBind();
+    else
+      GL::BindFramebuffer(previously_bound_framebuffer);
+  }
+}
+
 void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
 std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState().mCamera; }
 std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState().mCamera; }
@@ -135,7 +161,7 @@ void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inCo
   EXPECTS(IsNormalized(inDirection));
 
   GLSLDirectionalLight directional_light;
-  directional_light.mDirection = inDirection;
+  directional_light.mDirection = NormalizedSafe(XYZ(GetCurrentState().mModelMatrix * XYZ0(inDirection)));
   directional_light.mColor = inColor;
 
   GetCurrentState().mDirectionalLights.push_back(directional_light);
@@ -148,7 +174,7 @@ void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const
   EXPECTS(inRange > 0.0f);
 
   GLSLPointLight point_light;
-  point_light.mPosition = inPosition;
+  point_light.mPosition = XYZ(GetCurrentState().mModelMatrix * XYZ1(inPosition));
   point_light.mRange = inRange;
   point_light.mColor = inColor;
 
@@ -187,6 +213,11 @@ const Renderer::State& Renderer::GetCurrentState() const
 
 void Renderer::ApplyState(const State& inStateToApply)
 {
+  if (const auto& render_texture = GetCurrentState().mRenderTexture)
+  {
+    SetRenderTexture(render_texture);
+  }
+
   GL::SetEnabled(GL::Enablable::DEPTH_TEST, inStateToApply.mDepthEnabled);
   GL::SetEnabled(GL::Enablable::CULL_FACE, inStateToApply.mCullFaceEnabled);
   GL::SetEnabled(GL::Enablable::BLEND, inStateToApply.mBlendEnabled);

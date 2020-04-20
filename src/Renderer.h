@@ -4,6 +4,7 @@
 #include "Color.h"
 #include "DirectionalLight.h"
 #include "DrawableMesh.h"
+#include "Framebuffer.h"
 #include "Material.h"
 #include "Math.h"
 #include "PointLight.h"
@@ -50,7 +51,9 @@ public:
   void SetPointSize(const float inPointSize);
   void SetLineWidth(const float inLineWidth);
 
-  void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram> &inShaderProgram);
+  void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram);
+
+  void SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture);
 
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
   std::shared_ptr<const Camera> GetCamera() const;
@@ -108,6 +111,7 @@ private:
 
     Material mMaterial;
     std::shared_ptr<ShaderProgram> mOverrideShaderProgram;
+    std::shared_ptr<Texture2D> mRenderTexture;
 
     bool mDepthEnabled = true;
     bool mCullFaceEnabled = true;
@@ -130,6 +134,8 @@ private:
   static constexpr auto MaxNumberOfPointLights = 100;
   UBO mDirectionalLightsUBO;
   UBO mPointLightsUBO;
+
+  std::unique_ptr<Framebuffer> mRenderTextureFramebuffer;
 
   static const State DefaultState;
   State& GetCurrentState();

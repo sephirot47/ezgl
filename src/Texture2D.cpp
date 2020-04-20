@@ -27,7 +27,9 @@ void Texture2D::Resize(const int inWidth, const int inHeight)
   EXPECTS(inWidth >= 1);
   EXPECTS(inHeight >= 1);
 
-  mSize = Vec2i(inWidth, inHeight);
+  if (Vec2i(inWidth, inHeight) == mSize)
+    return;
+
   SetEmptyData(inWidth, inHeight, GetInternalFormat(), 0);
 }
 
