@@ -53,12 +53,18 @@ public:
     VERTEX_ARRAY = GL_VERTEX_ARRAY,
   };
 
-  enum class EBufferBindingType
+  enum class EBindingType
   {
     ARRAY_BUFFER = GL_ARRAY_BUFFER_BINDING,
     ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER_BINDING,
     UNIFORM_BUFFER = GL_UNIFORM_BUFFER_BINDING,
     VERTEX_ARRAY = GL_VERTEX_ARRAY_BINDING,
+    TEXTURE_1D = GL_TEXTURE_BINDING_1D,
+    TEXTURE_1D_ARRAY = GL_TEXTURE_BINDING_1D_ARRAY,
+    TEXTURE_2D = GL_TEXTURE_BINDING_2D,
+    TEXTURE_2D_ARRAY = GL_TEXTURE_BINDING_2D_ARRAY,
+    TEXTURE_3D = GL_TEXTURE_BINDING_3D,
+    FRAMEBUFFER = GL_FRAMEBUFFER_BINDING,
   };
 
   enum class EAccessHint
@@ -337,6 +343,29 @@ public:
     DEPTH_STENCIL_ATTACHMENT = GL_DEPTH_STENCIL_ATTACHMENT,
   };
 
+  enum class ETextureParameter
+  {
+    DEPTH_STENCIL_TEXTURE_MODE = GL_DEPTH_STENCIL_TEXTURE_MODE,
+    TEXTURE_BASE_LEVEL = GL_TEXTURE_BASE_LEVEL,
+    TEXTURE_BORDER_COLOR = GL_TEXTURE_BORDER_COLOR,
+    TEXTURE_COMPARE_FUNC = GL_TEXTURE_COMPARE_FUNC,
+    TEXTURE_COMPARE_MODE = GL_TEXTURE_COMPARE_MODE,
+    TEXTURE_LOD_BIAS = GL_TEXTURE_LOD_BIAS,
+    TEXTURE_MIN_FILTER = GL_TEXTURE_MIN_FILTER,
+    TEXTURE_MAG_FILTER = GL_TEXTURE_MAG_FILTER,
+    TEXTURE_MIN_LOD = GL_TEXTURE_MIN_LOD,
+    TEXTURE_MAX_LOD = GL_TEXTURE_MAX_LOD,
+    TEXTURE_MAX_LEVEL = GL_TEXTURE_MAX_LEVEL,
+    TEXTURE_SWIZZLE_R = GL_TEXTURE_SWIZZLE_R,
+    TEXTURE_SWIZZLE_G = GL_TEXTURE_SWIZZLE_G,
+    TEXTURE_SWIZZLE_B = GL_TEXTURE_SWIZZLE_B,
+    TEXTURE_SWIZZLE_A = GL_TEXTURE_SWIZZLE_A,
+    TEXTURE_SWIZZLE_RGBA = GL_TEXTURE_SWIZZLE_RGBA,
+    TEXTURE_WRAP_S = GL_TEXTURE_WRAP_S,
+    TEXTURE_WRAP_T = GL_TEXTURE_WRAP_T,
+    TEXTURE_WRAP_R = GL_TEXTURE_WRAP_R,
+  };
+
   static void Enable(const GL::Enablable inEnablable);
   static void Disable(const GL::Enablable inEnablable);
   static void SetEnabled(const GL::Enablable inEnablable, const bool inEnabled);
@@ -357,7 +386,7 @@ public:
   static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint);
   template <typename T>
   static void BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset);
-  static GL::EBufferBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
+  static GL::EBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void DeleteBuffer(const GL::Id inBufferId);
 
   static GL::Id GenVertexArray();
@@ -391,6 +420,9 @@ public:
       const GL::EDataType inDataTypeToConvertTo,
       const GL::Size inNumberOfTexelsToRead,
       const GL::Int inMipmapLevel = 0);
+  void TextureParameteri(const GL::Id inTextureId,
+      const GL::ETextureParameter inTextureParameter,
+      const GL::Int inParameter);
   static void GenerateTextureMipMap(const GL::Id& inTextureId);
   static void ActiveTexture(const GL::Id& inTextureUnit);
   static void BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId);
@@ -481,7 +513,26 @@ public:
   template <typename T>
   static GL::Enum EnumCast(const T& inGLEnum);
 
-  GL() = delete;
+  // Generic Bind/UnBind
+  template <GL::EBindingType TBindingType>
+  static void Bind(const GL::Id inId);
+  template <GL::EBindingType TBindingType>
+  static void UnBind();
+
+  template <GL::EBindingType TBindingType>
+  class BindGuard
+  {
+  public:
+    BindGuard();
+    ~BindGuard();
+
+  private:
+    const GL::Id mPreviouslyBoundId = 0;
+  };
+
+#define GL_BIND_GUARD(GL_BINDING_TYPE) const GL::BindGuard<GL_BINDING_TYPE> ANONYMOUS_VARIABLE_NAME();
+
+  GL() = delete; // Static class
 };
 
 // clang-format off

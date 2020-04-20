@@ -25,18 +25,15 @@ std::shared_ptr<Texture2D> Renderer::sWhiteTexture;
 
 Renderer::Renderer()
 {
-  // Init state
-  mStateStack.push(DefaultState);
-  ApplyState(GetCurrentState());
-
   // Init static resources
   if (!sStaticResourcesInited)
   {
-    sOnlyColorShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/OnlyColor.vert") },
-        FragmentShader { GetFileContents("../res/OnlyColor.frag") });
+    sOnlyColorShaderProgram
+        = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/OnlyColor.vert") },
+            FragmentShader { std::filesystem::path("../res/OnlyColor.frag") });
 
-    sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { GetFileContents("../res/Mesh.vert") },
-        FragmentShader { GetFileContents("../res/Mesh.frag") });
+    sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
+        FragmentShader { std::filesystem::path("../res/Mesh.frag") });
 
     sCone = std::make_unique<DrawableMesh>(DrawableMeshFactory::GetCone(32));
     sWhiteTexture = TextureFactory::GetWhiteTexture();
@@ -48,11 +45,16 @@ Renderer::Renderer()
   mDirectionalLightsUBO.BufferDataEmpty(MaxNumberOfDirectionalLights * sizeof(GLSLDirectionalLight));
   mPointLightsUBO.BufferDataEmpty(MaxNumberOfPointLights * sizeof(GLSLPointLight));
 
-  mRenderTextureFramebuffer = std::make_unique<Framebuffer>(1, 1);
+  // Init render texture
+  mRenderTextureFramebuffer = std::make_unique<Framebuffer>();
   mRenderTextureFramebuffer->Bind();
   mRenderTextureFramebuffer->CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
       GL::ETextureInternalFormat::DEPTH24_STENCIL8);
   mRenderTextureFramebuffer->UnBind();
+
+  // Init state
+  mStateStack.push(DefaultState);
+  ApplyState(GetCurrentState());
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -108,6 +110,7 @@ void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& in
 void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
 {
   const auto previously_bound_framebuffer = Framebuffer::GetBoundGLId();
+
   mRenderTextureFramebuffer->Bind();
   mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
   GetCurrentState().mRenderTexture = inRenderTexture;
@@ -213,17 +216,13 @@ const Renderer::State& Renderer::GetCurrentState() const
 
 void Renderer::ApplyState(const State& inStateToApply)
 {
-  if (const auto& render_texture = GetCurrentState().mRenderTexture)
-  {
-    SetRenderTexture(render_texture);
-  }
-
   GL::SetEnabled(GL::Enablable::DEPTH_TEST, inStateToApply.mDepthEnabled);
   GL::SetEnabled(GL::Enablable::CULL_FACE, inStateToApply.mCullFaceEnabled);
   GL::SetEnabled(GL::Enablable::BLEND, inStateToApply.mBlendEnabled);
   GL::BlendFunc(inStateToApply.mBlendSourceFactor, inStateToApply.mBlendDestFactor);
   GL::PointSize(inStateToApply.mPointSize);
   GL::LineWidth(inStateToApply.mLineWidth);
+  SetRenderTexture(inStateToApply.mRenderTexture);
 }
 
 void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType)

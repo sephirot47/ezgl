@@ -38,7 +38,7 @@ bool VAO::IsBound() const
 }
 GL::Id VAO::GetBoundGLId()
 {
-  const auto bound_id = GL::GetInteger(GL::EBufferBindingType::VERTEX_ARRAY);
+  const auto bound_id = GL::GetInteger(GL::EBindingType::VERTEX_ARRAY);
   return static_cast<GL::Id>(bound_id);
 }
 

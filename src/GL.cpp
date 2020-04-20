@@ -57,17 +57,17 @@ void GL::BindBufferBase(const GL::EBufferType inBufferType, const GL::Id inBindi
   glBindBufferBase(GL::EnumCast(inBufferType), inBindingPoint, inBufferId);
 }
 
-GL::EBufferBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
+GL::EBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
 {
   switch (inBufferType)
   {
-  case GL::EBufferType::ARRAY_BUFFER: return GL::EBufferBindingType::ARRAY_BUFFER;
-  case GL::EBufferType::ELEMENT_ARRAY: return GL::EBufferBindingType::ELEMENT_ARRAY;
-  case GL::EBufferType::UNIFORM_BUFFER: return GL::EBufferBindingType::UNIFORM_BUFFER;
-  case GL::EBufferType::VERTEX_ARRAY: return GL::EBufferBindingType::VERTEX_ARRAY;
+  case GL::EBufferType::ARRAY_BUFFER: return GL::EBindingType::ARRAY_BUFFER;
+  case GL::EBufferType::ELEMENT_ARRAY: return GL::EBindingType::ELEMENT_ARRAY;
+  case GL::EBufferType::UNIFORM_BUFFER: return GL::EBindingType::UNIFORM_BUFFER;
+  case GL::EBufferType::VERTEX_ARRAY: return GL::EBindingType::VERTEX_ARRAY;
   }
   assert(false);
-  return static_cast<GL::EBufferBindingType>(-1);
+  return static_cast<GL::EBindingType>(-1);
 }
 
 void GL::DeleteBuffer(const GL::Id inBufferId) { glDeleteBuffers(1, &inBufferId); }
@@ -386,6 +386,13 @@ void GL::UniformBlockBinding(const GL::Id inShaderProgramId,
     const GL::Id inBindingPoint)
 {
   glUniformBlockBinding(inShaderProgramId, inUniformBlockIndex, inBindingPoint);
+}
+
+void GL::TextureParameteri(const GL::Id inTextureId,
+    const GL::ETextureParameter inTextureParameter,
+    const GL::Int inParameter)
+{
+  glTextureParameteri(inTextureId, GL::EnumCast(inTextureParameter), inParameter);
 }
 
 void GLAPIENTRY GL::ErrorCallback(GL::Enum inSource,

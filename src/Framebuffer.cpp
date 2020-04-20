@@ -11,7 +11,6 @@ Framebuffer::Framebuffer(const int inWidth, const int inHeight) : mGLId(GL::Crea
   if (mGLId == 0)
     THROW_EXCEPTION("Error creating Framebuffer");
 
-  Bind();
   Resize(inWidth, inHeight);
 }
 
@@ -36,14 +35,15 @@ bool Framebuffer::IsBound() const
 }
 GL::Id Framebuffer::GetBoundGLId()
 {
-  const auto bound_id = GL::GetInteger(GL_FRAMEBUFFER_BINDING);
+  const auto bound_id = GL::GetInteger(GL::EBindingType::FRAMEBUFFER);
   return static_cast<GL::Id>(bound_id);
 }
 
 void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
     const std::shared_ptr<Texture2D>& inTexture)
 {
-  EXPECTS(IsBound());
+  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
+  Bind();
 
   if (IsColorAttachment(inAttachment))
   {
@@ -65,8 +65,6 @@ void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
 void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
     const GL::ETextureInternalFormat inInternalFormat)
 {
-  EXPECTS(IsBound());
-
   if (mRenderbufferTexture != nullptr)
     THROW_EXCEPTION("Can't create a Renderbuffer because a texture has been attached before as Renderbuffer.");
 
@@ -77,9 +75,13 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
     THROW_EXCEPTION(
         "Incorrect attachment for Renderbuffer. It must not be a color attachment, but a depth/stencil one.");
 
+  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
+  Bind();
+
   mCreatedRenderbufferId = GL::CreateRenderbuffer();
   mCreatedRenderbufferInternalFormat = inInternalFormat;
   GL::BindRenderbuffer(mCreatedRenderbufferId);
+
   GL::RenderbufferStorage(inInternalFormat, mSize[0], mSize[1]);
   GL::FramebufferRenderbuffer(inRenderbufferAttachment, mCreatedRenderbufferId);
 }
@@ -87,7 +89,6 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
 void Framebuffer::Resize(const Vec2i& inSize) { Resize(inSize[0], inSize[1]); }
 void Framebuffer::Resize(const int inWidth, const int inHeight)
 {
-  EXPECTS(IsBound());
   EXPECTS(inWidth >= 1);
   EXPECTS(inHeight >= 1);
 
@@ -103,6 +104,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 
   if (mCreatedRenderbufferId != GL::InvalidId)
   {
+    GL::BindRenderbuffer(mCreatedRenderbufferId);
     GL::RenderbufferStorage(mCreatedRenderbufferInternalFormat, mSize[0], mSize[1]);
   }
   else if (mRenderbufferTexture)
@@ -113,8 +115,9 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 
 void Framebuffer::CheckFramebufferIsComplete() const
 {
-  EXPECTS(IsBound());
+  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
 
+  Bind();
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     THROW_EXCEPTION("Framebuffer is not complete.");
 }

@@ -1,17 +1,23 @@
 #include "Shader.h"
+#include "FileUtils.h"
 #include "GL.h"
 #include "Macros.h"
 #include <iostream>
 
 namespace egl
 {
-Shader::Shader(GL::EShaderType inShaderType) : mGLId(GL::CreateShader(inShaderType)), mShaderType(inShaderType)
+Shader::Shader(const GL::EShaderType inShaderType) : mGLId(GL::CreateShader(inShaderType)), mShaderType(inShaderType)
 {
   if (mGLId == 0)
     THROW_EXCEPTION("Error creating shader of type " << GL::EnumCast(inShaderType));
 }
 
-Shader::Shader(const GL::EShaderType inShaderType, const std::string_view inSourceCode) : Shader(inShaderType)
+Shader::Shader(const GL::EShaderType inShaderType, const std::filesystem::path& inSourceCodePath)
+    : Shader(inShaderType, GetFileContents(inSourceCodePath))
+{
+}
+
+Shader::Shader(const GL::EShaderType inShaderType, const std::string& inSourceCode) : Shader(inShaderType)
 {
   Compile(inSourceCode);
 }

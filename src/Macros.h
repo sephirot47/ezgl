@@ -22,5 +22,9 @@
 #define PRINT(EXPR) std::cout << EXPR << std::endl;
 #define PEEK(EXPR) std::cout << #EXPR << ": " << EXPR << std::endl;
 
+#define _CONCAT_(x,y) x ## y
+#define CONCAT(x,y) _CONCAT_(x,y)
+#define ANONYMOUS_VARIABLE_NAME() CONCAT(_anonymous_variable, __LINE__)
+
 #define EXPECTS(EXPR) assert(EXPR)
 #define ENSURES(EXPR) assert(EXPR)

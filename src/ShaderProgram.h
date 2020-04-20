@@ -16,8 +16,8 @@ public:
   ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);
   ShaderProgram(const ShaderProgram& inRHS) = delete;
   ShaderProgram& operator=(const ShaderProgram& inRHS) = delete;
-  ShaderProgram(ShaderProgram&& inRHS) = default;
-  ShaderProgram& operator=(ShaderProgram&& inRHS) = default;
+  ShaderProgram(ShaderProgram&& ioRHS) = default;
+  ShaderProgram& operator=(ShaderProgram&& ioRHS) = delete;
   ~ShaderProgram();
 
   void Bind() const;

@@ -60,6 +60,13 @@ int main()
     if (window->IsKeyPressed(Key::X))
       ioRenderer.SetRenderTexture(render_texture);
 
+    Framebuffer framebuffer(1, 1);
+    framebuffer.CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
+        GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+
+    if (window->IsKeyPressed(Key::X))
+      ioRenderer.SetRenderTexture(render_texture);
+
     ioRenderer.ClearDepth();
     ioRenderer.ClearBackground(Pink());
     ioRenderer.SetCamera(camera);
@@ -92,9 +99,8 @@ int main()
 
     if (window->IsKeyPressed(Key::X))
     {
-      ioRenderer.SetRenderTexture(nullptr);
-
       ioRenderer.ResetState();
+      ioRenderer.SetRenderTexture(nullptr);
 
       const auto new_camera = std::make_shared<Camera>();
       new_camera->SetPosition(Back<Vec3f>() * 8.0f);
