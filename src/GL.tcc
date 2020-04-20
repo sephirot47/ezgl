@@ -72,118 +72,76 @@ std::vector<T> GL::GetTextureImage(const GL::Id inTextureId,
   return result;
 }
 
-template <GL::EBindingType TBindingType>
+template <GL::EObjectType TObjectType>
 GL::Id GL::Create()
 {
-  if constexpr (TBindingType == GL::EBindingType::ARRAY_BUFFER)
+  if constexpr (TObjectType == GL::EObjectType::EBO || TObjectType == GL::EObjectType::UBO
+      || TObjectType == GL::EObjectType::VBO)
   {
     return GL::CreateBuffer();
   }
-  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
+  else if constexpr (TObjectType == GL::EObjectType::FRAGMENT_SHADER)
   {
-    return GL::CreateProgram();
+    return GL::CreateShader(GL::EShaderType::FRAGMENT);
   }
-  else if constexpr (TBindingType == GL::EBindingType::ELEMENT_ARRAY)
-  {
-    return GL::CreateBuffer();
-  }
-  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
+  else if constexpr (TObjectType == GL::EObjectType::FRAMEBUFFER)
   {
     return GL::CreateFramebuffer();
   }
-  else if constexpr (TBindingType == GL::EBindingType::RENDERBUFFER)
+  else if constexpr (TObjectType == GL::EObjectType::SHADER_PROGRAM)
   {
-    return GL::CreateRenderbuffer();
+    return GL::CreateProgram();
   }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D)
-  {
-    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_1D);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D_ARRAY)
-  {
-    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_1D_ARRAY);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
+  else if constexpr (TObjectType == GL::EObjectType::TEXTURE_2D)
   {
     return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D);
   }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D_ARRAY)
-  {
-    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D_ARRAY);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_3D)
-  {
-    return GL::CreateTexture(GL::ETextureTarget::TEXTURE_3D);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::UNIFORM_BUFFER)
-  {
-    return GL::CreateBuffer();
-  }
-  else if constexpr (TBindingType == GL::EBindingType::VERTEX_ARRAY)
+  else if constexpr (TObjectType == GL::EObjectType::VAO)
   {
     return GL::CreateVertexArray();
   }
+  else if constexpr (TObjectType == GL::EObjectType::VERTEX_SHADER)
+  {
+    return GL::CreateShader(GL::EShaderType::VERTEX);
+  }
   else
   {
-    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
+    static_assert(std::is_same_v<TObjectType, 99999999>, "Don't know how to bind this buffer type.");
   }
   return GL::InvalidId;
 }
 
-template <GL::EBindingType TBindingType>
+template <GL::EObjectType TObjectType>
 void GL::Delete(const GL::Id inId)
 {
-  if constexpr (TBindingType == GL::EBindingType::ARRAY_BUFFER)
+  if constexpr (TObjectType == GL::EObjectType::EBO || TObjectType == GL::EObjectType::UBO
+      || TObjectType == GL::EObjectType::VBO)
   {
     GL::DeleteBuffer(inId);
   }
-  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
-  {
-    GL::DeleteProgram(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::ELEMENT_ARRAY)
-  {
-    GL::DeleteBuffer(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
+  else if constexpr (TObjectType == GL::EObjectType::FRAMEBUFFER)
   {
     GL::DeleteFramebuffer(inId);
   }
-  else if constexpr (TBindingType == GL::EBindingType::RENDERBUFFER)
+  else if constexpr (TObjectType == GL::EObjectType::SHADER_PROGRAM)
   {
-    GL::DeleteRenderbuffer(inId);
+    GL::DeleteProgram(inId);
   }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D)
-  {
-    GL::DeleteTexture(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D_ARRAY)
+  else if constexpr (TObjectType == GL::EObjectType::TEXTURE_2D)
   {
     GL::DeleteTexture(inId);
   }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
-  {
-    GL::DeleteTexture(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D_ARRAY)
-  {
-    GL::DeleteTexture(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_3D)
-  {
-    GL::DeleteTexture(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::UNIFORM_BUFFER)
-  {
-    GL::DeleteBuffer(inId);
-  }
-  else if constexpr (TBindingType == GL::EBindingType::VERTEX_ARRAY)
+  else if constexpr (TObjectType == GL::EObjectType::VAO)
   {
     GL::DeleteVertexArray(inId);
   }
+  else if constexpr (TObjectType == GL::EObjectType::FRAGMENT_SHADER || TObjectType == GL::EObjectType::VERTEX_SHADER)
+  {
+    GL::DeleteShader(inId);
+  }
   else
   {
-    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
+    static_assert(std::is_same_v<TObjectType, 99999999>, "Don't know how to bind this buffer type.");
   }
 }
 
@@ -260,4 +218,43 @@ GL::BindGuard<TBindingType>::~BindGuard()
 {
   GL::Bind<TBindingType>(mPreviouslyBoundId);
 }
+
+template <GL::EBindingType TBindingType>
+constexpr GL::EObjectType GL::GetObjectType()
+{
+  if constexpr (TBindingType == GL::EBindingType::VBO)
+  {
+    return GL::EObjectType::VBO;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
+  {
+    return GL::EObjectType::SHADER_PROGRAM;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::EBO)
+  {
+    return GL::EObjectType::EBO;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
+  {
+    return GL::EObjectType::FRAMEBUFFER;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::TEXTURE_2D)
+  {
+    return GL::EObjectType::TEXTURE_2D;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::UBO)
+  {
+    return GL::EObjectType::UBO;
+  }
+  else if constexpr (TBindingType == GL::EBindingType::VAO)
+  {
+    return GL::EObjectType::VAO;
+  }
+  else
+  {
+    static_assert(std::is_same_v<TBindingType, 99999999>, "Don't know how to bind this buffer type.");
+  }
+  return GL::EObjectType::FRAGMENT_SHADER;
+}
+
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GL.h"
-#include "GLObject.h"
+#include "GLBindableObject.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -13,7 +13,7 @@ class EBO;
 class VAOVertexAttrib;
 class VBO;
 
-class VAO : public GLObject<GL::EBindingType::VAO>
+class VAO : public GLBindableObject<GL::EBindingType::VAO>
 {
 public:
   VAO() = default;

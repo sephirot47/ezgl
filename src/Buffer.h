@@ -1,13 +1,13 @@
 #pragma once
 
-#include "GL.h"
+#include "GLBindableObject.h"
 #include "GLObject.h"
 #include "Span.h"
 
 namespace egl
 {
 template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
-class Buffer : public GLObject<TBindingType>
+class Buffer : public GLBindableObject<TBindingType>
 {
 public:
   static constexpr auto BufferType = TBufferType;

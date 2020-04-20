@@ -20,7 +20,7 @@ template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
 template <typename T>
 void Buffer<TBindingType, TBufferType>::BufferData(const Span<T>& inData)
 {
-  GL::BufferData(GLObject<TBindingType>::GetGLId(), inData, GL::EAccessHint::STATIC_DRAW);
+  GL::BufferData(GLBindableObject<TBindingType>::GetGLId(), inData, GL::EAccessHint::STATIC_DRAW);
   mInitialized = true;
 }
 
@@ -31,6 +31,6 @@ void Buffer<TBindingType, TBufferType>::BufferSubData(const Span<T>& inData, con
   if (!mInitialized)
     THROW_EXCEPTION("Before using BufferSubData, you must initialize the Buffer by calling BufferData");
 
-  GL::BufferSubData(GLObject<TBindingType>::GetGLId(), inData, inOffset);
+  GL::BufferSubData(GLBindableObject<TBindingType>::GetGLId(), inData, inOffset);
 }
 }

@@ -57,6 +57,19 @@ public:
     UBO = GL_UNIFORM_BUFFER,
   };
 
+  enum class EObjectType
+  {
+    EBO,
+    FRAMEBUFFER,
+    VERTEX_SHADER,
+    FRAGMENT_SHADER,
+    SHADER_PROGRAM,
+    TEXTURE_2D,
+    VAO,
+    VBO,
+    UBO,
+  };
+
   enum class EBindingType
   {
     ARRAY_BUFFER = GL_ARRAY_BUFFER_BINDING,
@@ -527,9 +540,9 @@ public:
   static GL::Enum EnumCast(const T& inGLEnum);
 
   // Generic Create/Delete
-  template <GL::EBindingType TBindingType>
+  template <GL::EObjectType TObjectType>
   static GL::Id Create();
-  template <GL::EBindingType TBindingType>
+  template <GL::EObjectType TObjectType>
   static void Delete(const GL::Id inId);
 
   // Generic Bind/UnBind
@@ -538,6 +551,9 @@ public:
   template <GL::EBindingType TBindingType>
   static void UnBind();
   static GL::Id GetBoundGLId(const GL::EBindingType inBindingType) { return GL::GetInteger(inBindingType); }
+
+  template <GL::EBindingType TBindingType>
+  static constexpr GL::EObjectType GetObjectType();
 
   template <GL::EBindingType TBindingType>
   class BindGuard

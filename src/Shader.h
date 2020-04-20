@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GL.h"
+#include "GLObject.h"
 #include <cstdint>
 #include <filesystem>
 #include <string>
