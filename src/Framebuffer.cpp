@@ -80,6 +80,8 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
 
   mCreatedRenderbufferId = GL::CreateRenderbuffer();
   mCreatedRenderbufferInternalFormat = inInternalFormat;
+
+  GL_BIND_GUARD(GL::EBindingType::RENDERBUFFER);
   GL::BindRenderbuffer(mCreatedRenderbufferId);
 
   GL::RenderbufferStorage(inInternalFormat, mSize[0], mSize[1]);
@@ -104,7 +106,9 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 
   if (mCreatedRenderbufferId != GL::InvalidId)
   {
+    GL_BIND_GUARD(GL::EBindingType::RENDERBUFFER);
     GL::BindRenderbuffer(mCreatedRenderbufferId);
+
     GL::RenderbufferStorage(mCreatedRenderbufferInternalFormat, mSize[0], mSize[1]);
   }
   else if (mRenderbufferTexture)
@@ -116,8 +120,8 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 void Framebuffer::CheckFramebufferIsComplete() const
 {
   GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
-
   Bind();
+
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     THROW_EXCEPTION("Framebuffer is not complete.");
 }

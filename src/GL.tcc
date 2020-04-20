@@ -79,6 +79,10 @@ void GL::Bind(const GL::Id inId)
   {
     GL::BindBuffer(GL::EBufferType::ARRAY_BUFFER, inId);
   }
+  else if constexpr (TBindingType == GL::EBindingType::CURRENT_PROGRAM)
+  {
+    GL::UseProgram(inId);
+  }
   else if constexpr (TBindingType == GL::EBindingType::ELEMENT_ARRAY)
   {
     GL::BindBuffer(GL::EBufferType::ELEMENT_ARRAY, inId);
@@ -86,6 +90,10 @@ void GL::Bind(const GL::Id inId)
   else if constexpr (TBindingType == GL::EBindingType::FRAMEBUFFER)
   {
     GL::BindFramebuffer(inId);
+  }
+  else if constexpr (TBindingType == GL::EBindingType::RENDERBUFFER)
+  {
+    GL::BindRenderbuffer(inId);
   }
   else if constexpr (TBindingType == GL::EBindingType::TEXTURE_1D)
   {
@@ -113,7 +121,7 @@ void GL::Bind(const GL::Id inId)
   }
   else if constexpr (TBindingType == GL::EBindingType::VERTEX_ARRAY)
   {
-    GL::BindBuffer(GL::EBufferType::VERTEX_ARRAY, inId);
+    GL::BindVertexArray(inId);
   }
   else
   {

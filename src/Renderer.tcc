@@ -20,8 +20,8 @@ void Renderer::DrawPoints(const Span<Vec<T, N>>& inPoints)
   const auto vbo = std::make_shared<VBO>(inPoints);
 
   VAO vao;
-  vao.Bind();
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec3f>());
+  vao.Bind();
 
   GL::DrawArrays(GL::EPrimitivesMode::POINTS, 1);
 }
@@ -49,8 +49,8 @@ void Renderer::DrawSegments(const Span<Segment<T, N>>& inSegments)
   const auto vbo = std::make_shared<VBO>(MakeSpan(segment_points));
 
   VAO vao;
-  vao.Bind();
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec<T, N>>());
+  vao.Bind();
 
   GL::DrawArrays(GL::EPrimitivesMode::LINES, 2);
 }

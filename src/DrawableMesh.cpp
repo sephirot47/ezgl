@@ -11,8 +11,6 @@ void DrawableMesh::Bind() const { mVAO->Bind(); }
 
 void DrawableMesh::UpdateVAOs()
 {
-  mVAO->Bind();
-
   // Create vertices ids EBO
   std::shared_ptr<EBO> vertices_ids_ebo;
   {

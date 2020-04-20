@@ -64,7 +64,6 @@ GL::EBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
   case GL::EBufferType::ARRAY_BUFFER: return GL::EBindingType::ARRAY_BUFFER;
   case GL::EBufferType::ELEMENT_ARRAY: return GL::EBindingType::ELEMENT_ARRAY;
   case GL::EBufferType::UNIFORM_BUFFER: return GL::EBindingType::UNIFORM_BUFFER;
-  case GL::EBufferType::VERTEX_ARRAY: return GL::EBindingType::VERTEX_ARRAY;
   }
   assert(false);
   return static_cast<GL::EBindingType>(-1);

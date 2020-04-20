@@ -47,10 +47,8 @@ Renderer::Renderer()
 
   // Init render texture
   mRenderTextureFramebuffer = std::make_unique<Framebuffer>();
-  mRenderTextureFramebuffer->Bind();
   mRenderTextureFramebuffer->CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
       GL::ETextureInternalFormat::DEPTH24_STENCIL8);
-  mRenderTextureFramebuffer->UnBind();
 
   // Init state
   mStateStack.push(DefaultState);
@@ -287,6 +285,7 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
   const auto camera_world_direction = Direction(current_state.mCamera->GetRotation());
 
   shader_program.Bind();
+
   GetMaterial().Bind(shader_program);
   shader_program.SetUniformSafe("UModel", model_matrix);
   shader_program.SetUniformSafe("UNormal", normal_matrix);

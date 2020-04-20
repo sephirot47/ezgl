@@ -46,17 +46,20 @@ void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
     const GL::Id inAttribLocation,
     const VAOVertexAttrib& inVertexAttrib)
 {
-  EXPECTS(IsBound());
+  // GL_BIND_GUARD(GL::EBindingType::VBO); // First VBO so that the guard is released the latest
+  GL_BIND_GUARD(GL::EBindingType::VAO);
+  Bind();
 
   mVBOs.push_back(inVBO);
-
   inVBO->Bind();
   AddVertexAttrib(inAttribLocation, inVertexAttrib);
 }
 
 void VAO::SetEBO(const std::shared_ptr<EBO>& inEBO)
 {
-  EXPECTS(IsBound());
+  // GL_BIND_GUARD(GL::EBindingType::EBO); // First EBO so that the guard is released the latest
+  GL_BIND_GUARD(GL::EBindingType::VAO);
+  Bind();
 
   mEBO = inEBO;
   inEBO->Bind();
@@ -64,8 +67,11 @@ void VAO::SetEBO(const std::shared_ptr<EBO>& inEBO)
 
 void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib)
 {
-  EXPECTS(IsBound());
   EXPECTS(inVertexAttrib.mNumComponents > 0);
+
+  GL_BIND_GUARD(GL::EBindingType::VAO);
+  Bind();
+
   GL::EnableVertexAttribArray(inAttribLocation);
   GL::VertexAttribPointer(inAttribLocation,
       inVertexAttrib.mNumComponents,
@@ -77,8 +83,11 @@ void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& 
 
 void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)
 {
-  EXPECTS(IsBound());
   EXPECTS(inAttribLocation > 0);
+
+  GL_BIND_GUARD(GL::EBindingType::VAO);
+  Bind();
+
   GL::DisableVertexAttribArray(inAttribLocation);
 }
 
