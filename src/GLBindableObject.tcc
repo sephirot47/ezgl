@@ -25,10 +25,4 @@ GL::Id GLBindableObject<TBindingType>::GetBoundGLId()
 {
   return GL::GetBoundGLId(TBindingType);
 }
-
-template <GL::EBindingType TBindingType>
-GL::Id GLBindableObject<TBindingType>::GetGLId() const
-{
-  return GLObjectBase::GetGLId();
-}
 }

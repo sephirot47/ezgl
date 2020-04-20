@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FileUtils.h"
 #include "GL.h"
 #include "GLObject.h"
 #include <cstdint>
@@ -9,49 +10,27 @@
 
 namespace egl
 {
-class Shader
+template <GL::EShaderType TShaderType, GL::EObjectType TShaderObjectType>
+class Shader : public GLObject<TShaderObjectType>
 {
-public:
-  GL::Id GetGLId() const { return mGLId; }
+  static_assert((TShaderType == GL::EShaderType::VERTEX && TShaderObjectType == GL::EObjectType::VERTEX_SHADER)
+      || (TShaderType == GL::EShaderType::FRAGMENT && TShaderObjectType == GL::EObjectType::FRAGMENT_SHADER));
 
-protected:
-  explicit Shader(const GL::EShaderType inShaderType);
-  explicit Shader(const GL::EShaderType inShaderType, const std::filesystem::path& inSourceCodePath);
-  explicit Shader(const GL::EShaderType inShaderType, const std::string& inSourceCode);
-  Shader(const Shader& inRHS) = delete;
-  Shader& operator=(const Shader& inRHS) = delete;
+public:
+  using GLObject<TShaderObjectType>::GetGLId;
+
+  Shader() = default;
+  explicit Shader(const std::filesystem::path& inSourceCodePath);
+  explicit Shader(const std::string& inSourceCode);
   Shader(Shader&& inRHS) noexcept = default;
-  Shader& operator=(Shader&& inRHS) = delete;
-  virtual ~Shader();
+  virtual ~Shader() = default;
 
   void Compile(const std::string_view inSourceCode);
-
-private:
-  GL::Id mGLId = 0;
-  GL::EShaderType mShaderType = GL::EShaderType::VERTEX;
+  static constexpr GL::EShaderType GetShaderType() { return TShaderType; }
 };
 
-class VertexShader : public Shader
-{
-public:
-  explicit VertexShader() : Shader(GL::EShaderType::VERTEX) {}
-  explicit VertexShader(const std::string& inSourceCode) : Shader(GL::EShaderType::VERTEX, inSourceCode) {}
-  explicit VertexShader(const std::filesystem::path& inSourceCodePath)
-      : Shader(GL::EShaderType::VERTEX, inSourceCodePath)
-  {
-  }
-  VertexShader(VertexShader&& inRHS) noexcept = default;
-};
-
-class FragmentShader : public Shader
-{
-public:
-  explicit FragmentShader() : Shader(GL::EShaderType::FRAGMENT) {}
-  explicit FragmentShader(const std::string& inSourceCode) : Shader(GL::EShaderType::FRAGMENT, inSourceCode) {}
-  explicit FragmentShader(const std::filesystem::path& inSourceCodePath)
-      : Shader(GL::EShaderType::FRAGMENT, inSourceCodePath)
-  {
-  }
-  FragmentShader(FragmentShader&& inRHS) noexcept = default;
-};
+using VertexShader = Shader<GL::EShaderType::VERTEX, GL::EObjectType::VERTEX_SHADER>;
+using FragmentShader = Shader<GL::EShaderType::FRAGMENT, GL::EObjectType::FRAGMENT_SHADER>;
 }
+
+#include "Shader.tcc"

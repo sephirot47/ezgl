@@ -12,6 +12,7 @@ public:
   static constexpr auto ObjectType = GL::GetObjectType<TBindingType>();
   static constexpr auto BindingType = TBindingType;
   using GLObjectBase = GLObject<ObjectType>;
+  using GLObjectBase::GetGLId;
 
   GLBindableObject() = default;
   GLBindableObject(GLBindableObject&& ioRHS) noexcept = default;
@@ -21,8 +22,6 @@ public:
   void UnBind() const;
   bool IsBound() const;
   static GL::Id GetBoundGLId();
-
-  GL::Id GetGLId() const;
 };
 }
 
