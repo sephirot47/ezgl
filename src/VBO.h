@@ -5,12 +5,12 @@
 namespace egl
 {
 
-class VBO : public Buffer
+class VBO : public Buffer<GL::EBindingType::VBO, GL::EBufferType::VBO>
 {
 public:
   VBO();
   template <typename T>
-  VBO(const Span<T>& inData);
+  explicit VBO(const Span<T>& inData);
 };
 }
 

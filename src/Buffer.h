@@ -1,26 +1,22 @@
 #pragma once
 
 #include "GL.h"
+#include "GLObject.h"
 #include "Span.h"
 
 namespace egl
 {
-class Buffer
+template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
+class Buffer : public GLObject<TBindingType>
 {
 public:
-  Buffer(const GL::EBufferType inBufferType);
-  template <typename T>
-  Buffer(const GL::EBufferType inBufferType, const Span<T>& inData);
-  Buffer(const Buffer& inRHS) = delete;
-  Buffer& operator=(const Buffer& inRHS) = delete;
-  Buffer(Buffer&& ioRHS) noexcept;
-  Buffer& operator=(Buffer&& ioRHS) = delete;
-  ~Buffer();
+  static constexpr auto BufferType = TBufferType;
 
-  void Bind() const;
-  void UnBind() const;
-  bool IsBound() const;
-  static GL::Id GetBoundGLId(const GL::EBufferType inBufferType);
+  Buffer() = default;
+  template <typename T>
+  explicit Buffer(const Span<T>& inData);
+  Buffer(Buffer&& ioRHS) noexcept = default;
+  virtual ~Buffer() = default;
 
   void BufferDataEmpty(const GL::Size inSizeInBytes);
   template <typename T>
@@ -28,12 +24,8 @@ public:
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
 
-  GL::Id GetGLId() const { return mGLId; }
-
 private:
-  const GL::EBufferType mBufferType = GL::EBufferType::ARRAY_BUFFER;
   bool mInitialized = false;
-  GL::Id mGLId = 0;
 };
 }
 

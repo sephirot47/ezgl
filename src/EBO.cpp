@@ -4,5 +4,5 @@
 
 namespace egl
 {
-EBO::EBO() : Buffer(GL::EBufferType::ELEMENT_ARRAY) {}
+EBO::EBO() : Buffer<GL::EBindingType::EBO, GL::EBufferType::EBO>() {}
 }
