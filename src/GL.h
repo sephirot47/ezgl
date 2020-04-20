@@ -552,7 +552,10 @@ public:
   static void UnBind();
   static GL::Id GetBoundGLId(const GL::EBindingType inBindingType) { return GL::GetInteger(inBindingType); }
 
+  // Type conversions
   template <GL::EBindingType TBindingType>
+  static constexpr GL::EObjectType GetObjectType();
+  template <GL::EShaderType TShaderType>
   static constexpr GL::EObjectType GetObjectType();
 
   template <GL::EBindingType TBindingType>

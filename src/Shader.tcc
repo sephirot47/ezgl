@@ -2,20 +2,19 @@
 
 namespace egl
 {
-template <GL::EShaderType TShaderType, GL::EObjectType TShaderObjectType>
-Shader<TShaderType, TShaderObjectType>::Shader(const std::filesystem::path& inSourceCodePath)
-    : Shader(GetFileContents(inSourceCodePath))
+template <GL::EShaderType TShaderType>
+Shader<TShaderType>::Shader(const std::filesystem::path& inSourceCodePath) : Shader(GetFileContents(inSourceCodePath))
 {
 }
 
-template <GL::EShaderType TShaderType, GL::EObjectType TShaderObjectType>
-Shader<TShaderType, TShaderObjectType>::Shader(const std::string& inSourceCode) : Shader()
+template <GL::EShaderType TShaderType>
+Shader<TShaderType>::Shader(const std::string& inSourceCode) : Shader()
 {
   Compile(inSourceCode);
 }
 
-template <GL::EShaderType TShaderType, GL::EObjectType TShaderObjectType>
-void Shader<TShaderType, TShaderObjectType>::Compile(const std::string_view inSourceCode)
+template <GL::EShaderType TShaderType>
+void Shader<TShaderType>::Compile(const std::string_view inSourceCode)
 {
   GL::ShaderSource(GetGLId(), inSourceCode);
   GL::CompileShader(GetGLId());

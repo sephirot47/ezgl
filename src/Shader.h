@@ -10,14 +10,12 @@
 
 namespace egl
 {
-template <GL::EShaderType TShaderType, GL::EObjectType TShaderObjectType>
-class Shader : public GLObject<TShaderObjectType>
+template <GL::EShaderType TShaderType>
+class Shader : public GLObject<GL::GetObjectType<TShaderType>()>
 {
-  static_assert((TShaderType == GL::EShaderType::VERTEX && TShaderObjectType == GL::EObjectType::VERTEX_SHADER)
-      || (TShaderType == GL::EShaderType::FRAGMENT && TShaderObjectType == GL::EObjectType::FRAGMENT_SHADER));
-
 public:
-  using GLObject<TShaderObjectType>::GetGLId;
+  static constexpr auto GLObjectType = GL::GetObjectType<TShaderType>();
+  using GLObject<GLObjectType>::GetGLId;
 
   Shader() = default;
   explicit Shader(const std::filesystem::path& inSourceCodePath);
@@ -29,8 +27,8 @@ public:
   static constexpr GL::EShaderType GetShaderType() { return TShaderType; }
 };
 
-using VertexShader = Shader<GL::EShaderType::VERTEX, GL::EObjectType::VERTEX_SHADER>;
-using FragmentShader = Shader<GL::EShaderType::FRAGMENT, GL::EObjectType::FRAGMENT_SHADER>;
+using VertexShader = Shader<GL::EShaderType::VERTEX>;
+using FragmentShader = Shader<GL::EShaderType::FRAGMENT>;
 }
 
 #include "Shader.tcc"

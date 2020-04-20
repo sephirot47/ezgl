@@ -257,4 +257,9 @@ constexpr GL::EObjectType GL::GetObjectType()
   return GL::EObjectType::FRAGMENT_SHADER;
 }
 
+// clang-format off
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::VERTEX>() { return GL::EObjectType::VERTEX_SHADER; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::FRAGMENT>() { return GL::EObjectType::FRAGMENT_SHADER; }
+// clang-format on
+
 }
