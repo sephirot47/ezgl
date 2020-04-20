@@ -4,14 +4,12 @@
 
 namespace egl
 {
-template <GL::ETextureTarget TTextureTarget, GL::EBindingType TBindingType>
-class Texture : public GLBindableObject<TBindingType>
+template <GL::ETextureTarget TTextureTarget>
+class Texture : public GLBindableObject<GL::GetBindingType<TTextureTarget>()>
 {
-  // For the moment only Texture2D supported
-  static_assert((TTextureTarget == GL::ETextureTarget::TEXTURE_2D && TBindingType == GL::EBindingType::TEXTURE_2D));
-
 public:
   static constexpr auto TextureTarget = TTextureTarget;
+  static constexpr auto BindingType = GL::GetBindingType<TTextureTarget>();
 
   Texture() = default;
   Texture(Texture&& ioRHS) noexcept = default;
@@ -21,7 +19,7 @@ public:
 
   void GenerateMipMap();
 
-  using GLBindableObject<TBindingType>::GetGLId;
+  using GLBindableObject<BindingType>::GetGLId;
   GL::ETextureTarget GetTextureTarget() const { return TTextureTarget; }
 };
 

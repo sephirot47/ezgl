@@ -557,11 +557,25 @@ public:
   static void UnBind();
   static GL::Id GetBoundGLId(const GL::EBindingType inBindingType) { return GL::GetInteger(inBindingType); }
 
-  // Type conversions
+  // To ObjectType conversions
   template <GL::EBindingType TBindingType>
   static constexpr GL::EObjectType GetObjectType();
   template <GL::EShaderType TShaderType>
   static constexpr GL::EObjectType GetObjectType();
+  template <GL::ETextureTarget TTextureTarget>
+  static constexpr GL::EObjectType GetObjectType();
+  template <GL::EBufferType TBufferType>
+  static constexpr GL::EObjectType GetObjectType();
+
+  // To BindingType conversions
+  template <GL::EObjectType TObjectType>
+  static constexpr GL::EBindingType GetBindingType();
+  template <GL::EShaderType TShaderType>
+  static constexpr GL::EBindingType GetBindingType();
+  template <GL::ETextureTarget TTextureTarget>
+  static constexpr GL::EBindingType GetBindingType();
+  template <GL::EBufferType TBufferType>
+  static constexpr GL::EBindingType GetBindingType();
 
   template <GL::EBindingType TBindingType>
   class BindGuard

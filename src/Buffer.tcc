@@ -3,34 +3,34 @@
 
 namespace egl
 {
-template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
+template <GL::EBufferType TBufferType>
 template <typename T>
-Buffer<TBindingType, TBufferType>::Buffer(const Span<T>& inData) : Buffer()
+Buffer<TBufferType>::Buffer(const Span<T>& inData) : Buffer()
 {
   BufferData(inData);
 }
 
-template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
-void Buffer<TBindingType, TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes)
+template <GL::EBufferType TBufferType>
+void Buffer<TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes)
 {
   BufferData(Span<uint8_t>(nullptr, inSizeInBytes));
 }
 
-template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
+template <GL::EBufferType TBufferType>
 template <typename T>
-void Buffer<TBindingType, TBufferType>::BufferData(const Span<T>& inData)
+void Buffer<TBufferType>::BufferData(const Span<T>& inData)
 {
-  GL::BufferData(GLBindableObject<TBindingType>::GetGLId(), inData, GL::EAccessHint::STATIC_DRAW);
+  GL::BufferData(GetGLId(), inData, GL::EAccessHint::STATIC_DRAW);
   mInitialized = true;
 }
 
-template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
+template <GL::EBufferType TBufferType>
 template <typename T>
-void Buffer<TBindingType, TBufferType>::BufferSubData(const Span<T>& inData, const GL::Size inOffset)
+void Buffer<TBufferType>::BufferSubData(const Span<T>& inData, const GL::Size inOffset)
 {
   if (!mInitialized)
     THROW_EXCEPTION("Before using BufferSubData, you must initialize the Buffer by calling BufferData");
 
-  GL::BufferSubData(GLBindableObject<TBindingType>::GetGLId(), inData, inOffset);
+  GL::BufferSubData(GetGLId(), inData, inOffset);
 }
 }

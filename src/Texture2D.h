@@ -9,7 +9,7 @@ namespace egl
 template <typename T>
 class Image2D;
 
-class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D, GL::EBindingType::TEXTURE_2D>
+class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D>
 {
 public:
   Texture2D(const int inWidth, const int inHeight, const GL::ETextureInternalFormat inInternalFormat);

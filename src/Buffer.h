@@ -6,11 +6,13 @@
 
 namespace egl
 {
-template <GL::EBindingType TBindingType, GL::EBufferType TBufferType>
-class Buffer : public GLBindableObject<TBindingType>
+template <GL::EBufferType TBufferType>
+class Buffer : public GLBindableObject<GL::GetBindingType<TBufferType>()>
 {
 public:
   static constexpr auto BufferType = TBufferType;
+  static constexpr auto ObjectType = GL::GetObjectType<BufferType>();
+  static constexpr auto BindingType = GL::GetBindingType<BufferType>();
 
   Buffer() = default;
   template <typename T>
@@ -23,6 +25,8 @@ public:
   void BufferData(const Span<T>& inData);
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
+
+  using GLBindableObject<BindingType>::GetGLId;
 
 private:
   bool mInitialized = false;

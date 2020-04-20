@@ -4,5 +4,5 @@
 
 namespace egl
 {
-VBO::VBO() : Buffer<GL::EBindingType::VBO, GL::EBufferType::VBO>() {}
+VBO::VBO() : Buffer<GL::EBufferType::VBO>() {}
 }

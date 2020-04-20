@@ -2,10 +2,10 @@
 
 namespace egl
 {
-UBO::UBO() : Buffer<GL::EBindingType::UBO, GL::EBufferType::UBO>() {}
+UBO::UBO() : Buffer<GL::EBufferType::UBO>() {}
 
 void UBO::BindToBindingPoint(const GL::Id inBindingPoint)
 {
-  GL::BindBufferBase(GL::EBufferType::UNIFORM_BUFFER, inBindingPoint, GetGLId());
+  GL::BindBufferBase(GL::EBufferType::UBO, inBindingPoint, GetGLId());
 }
 }

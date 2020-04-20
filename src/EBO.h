@@ -4,7 +4,7 @@
 
 namespace egl
 {
-class EBO : public Buffer<GL::EBindingType::EBO, GL::EBufferType::EBO>
+class EBO : public Buffer<GL::EBufferType::EBO>
 {
 public:
   EBO();
