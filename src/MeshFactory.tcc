@@ -149,7 +149,7 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
   TMesh cylinder;
 
   // Forward and back circle vertices
-  for (const auto  forward : { true, false })
+  for (const auto forward : { true, false })
   {
     for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
     {
@@ -203,7 +203,7 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
 {
   EXPECTS(inNumLatitudes >= 3);
   EXPECTS(inNumLongitudes >= 3);
-  EXPECTS (inHoleSize >= 0.0001f && inHoleSize <= 0.999f);
+  EXPECTS(inHoleSize >= 0.0001f && inHoleSize <= 0.999f);
 
   const auto hole_radius = (inHoleSize * 0.5f);
   const auto torus_radius = (1.0f - inHoleSize) * 0.5f;
@@ -221,7 +221,8 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
       const auto longitude_rotation = AngleAxis(angle_longitude, Forward<Vec3f>());
       const auto longitude_center_offset = (hole_radius + torus_radius) * (longitude_rotation * Down<Vec3f>());
       const auto latitude_circle_position_local = Vec3f { 0.0f, std::sin(angle_latitude), std::cos(angle_latitude) };
-      const auto latitude_circle_position_global = longitude_center_offset + longitude_rotation * (torus_radius * latitude_circle_position_local);
+      const auto latitude_circle_position_global
+          = longitude_center_offset + longitude_rotation * (torus_radius * latitude_circle_position_local);
       torus.AddVertex(latitude_circle_position_global);
       angle_latitude += angle_latitude_increment;
     }
@@ -233,9 +234,12 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
     for (Mesh::VertexId latitude = 0; latitude < inNumLatitudes; ++latitude)
     {
       const auto current_longitude_current_latitude_vertex_id = (longitude * inNumLatitudes + latitude);
-      const auto current_longitude_next_latitude_vertex_id = (longitude * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
-      const auto next_longitude_current_latitude_vertex_id = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + latitude);
-      const auto next_longitude_next_latitude_vertex_id = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
+      const auto current_longitude_next_latitude_vertex_id
+          = (longitude * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
+      const auto next_longitude_current_latitude_vertex_id
+          = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + latitude);
+      const auto next_longitude_next_latitude_vertex_id
+          = (((longitude + 1) % inNumLongitudes) * inNumLatitudes + ((latitude + 1) % inNumLatitudes));
       torus.AddFace(current_longitude_current_latitude_vertex_id,
           current_longitude_next_latitude_vertex_id,
           next_longitude_current_latitude_vertex_id);
@@ -272,16 +276,16 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
     }
   }
 
-  for (Mesh::VertexId x = 0; x < (inNumVerticesX - 1); ++x)
+  for (Mesh::VertexId y = 0; y < (inNumVerticesY - 1); ++y)
   {
-    for (Mesh::VertexId y = 0; y < (inNumVerticesY - 1); ++y)
+    for (Mesh::VertexId x = 0; x < (inNumVerticesX - 1); ++x)
     {
       const auto current_x_current_y_vertex_id = (y * inNumVerticesX + x);
       const auto next_x_current_y_vertex_id = (y * inNumVerticesX + (x + 1));
       const auto current_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + x);
       const auto next_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + (x + 1));
-      plane.AddFace(current_x_current_y_vertex_id, next_x_next_y_vertex_id, next_x_current_y_vertex_id);
-      plane.AddFace(current_x_current_y_vertex_id, current_x_next_y_vertex_id, next_x_next_y_vertex_id);
+      plane.AddFace(current_x_current_y_vertex_id, next_x_current_y_vertex_id, next_x_next_y_vertex_id);
+      plane.AddFace(current_x_current_y_vertex_id, next_x_next_y_vertex_id, current_x_next_y_vertex_id);
     }
   }
 
@@ -289,7 +293,7 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
   {
     const auto vertex_id = plane.GetVertexIdFromCornerId(corner_id);
     const auto vertex_position = plane.GetVertexPosition(vertex_id);
-    const auto corner_texture_coordinates = XY(vertex_position) * 0.5f + 0.5f;
+    const auto corner_texture_coordinates = XY(vertex_position) + 0.5f;
     plane.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
   }
 

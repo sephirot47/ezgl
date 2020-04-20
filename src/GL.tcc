@@ -50,4 +50,25 @@ void GL::TexImage2D(const GL::ETextureTarget& inTextureTarget,
       GL::EnumCast(inInputComponentFormat),
       inData.GetData());
 }
+
+template <typename T>
+std::vector<T> GL::GetTextureImage(const GL::Id inTextureId,
+    const GL::ETextureInputFormat inFormatToConvertTo,
+    const GL::EDataType inDataTypeToConvertTo,
+    const GL::Size inNumberOfTexelsToRead,
+    const GL::Int inMipmapLevel)
+{
+  std::vector<T> result;
+  result.resize(inNumberOfTexelsToRead);
+
+  const auto read_size_in_bytes = result.size() * sizeof(T);
+  glGetTextureImage(inTextureId,
+      inMipmapLevel,
+      GL::EnumCast(inFormatToConvertTo),
+      GL::EnumCast(inDataTypeToConvertTo),
+      read_size_in_bytes,
+      result.data());
+
+  return result;
+}
 }

@@ -3,6 +3,7 @@
 #include "DrawableMesh.h"
 #include "EBO.h"
 #include "FileUtils.h"
+#include "Framebuffer.h"
 #include "Image2D.h"
 #include "Macros.h"
 #include "Material.h"
@@ -42,17 +43,33 @@ int main()
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
   const auto camera = std::make_shared<Camera>();
-  camera->SetPosition(Vec3f(10, 10, 10) * 0.8f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
+  camera->SetPosition(Back<Vec3f>() * 8.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
   camera->LookAtPoint(Zero<Vec3f>());
 
   CameraControllerFly camera_controller_fly;
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
 
+  const auto render_texture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::RGBA8);
+
+  Framebuffer framebuffer(window->GetSize());
+  framebuffer.Bind();
+  framebuffer.SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture);
+  framebuffer.CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_ATTACHMENT,
+      GL::ETextureInternalFormat::DEPTH_COMPONENT);
+  framebuffer.CheckFramebufferIsComplete();
+  framebuffer.UnBind();
+
   auto time = TimeDuration { 0 };
   window->EasyRenderLoop([&](const DeltaTime& inDeltaTime, Renderer& ioRenderer) {
     time += inDeltaTime;
 
+    if (window->IsKeyPressed(Key::X))
+    {
+      framebuffer.Bind();
+    }
+
+    ioRenderer.ClearDepth();
     ioRenderer.ClearBackground(Pink());
     ioRenderer.SetCamera(camera);
 
@@ -60,30 +77,50 @@ int main()
 
     const auto q = AngleAxis(time.count() * (0.5f * time.count()), Normalized(Vec3f { 0.0f, 0.0f, 1.0f }));
     // ioRenderer.Rotate(q);
-    ioRenderer.Scale(All<Vec3f>(10.0f));
+    // ioRenderer.Scale(All<Vec3f>(10.0f));
     ioRenderer.SetLineWidth(3.0f);
-    ioRenderer.SetCullFaceEnabled(false);
     ioRenderer.DrawAxes();
 
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
     ioRenderer.Translate(obj_pos);
     ioRenderer.Rotate(q);
     ioRenderer.GetMaterial().SetTexture(nullptr);
-    ioRenderer.Scale(All<Vec3f>(0.5f));
+    ioRenderer.Scale(All<Vec3f>(5.0f));
     ioRenderer.GetMaterial().SetDiffuseColor(White());
     ioRenderer.GetMaterial().SetLightingEnabled(true);
     ioRenderer.GetMaterial().SetSpecularExponent(120.0f);
     ioRenderer.DrawMesh(test_mesh);
     ioRenderer.DrawAxes();
 
-    ioRenderer.GetMaterial().SetDiffuseColor(Blue());;
+    ioRenderer.GetMaterial().SetDiffuseColor(Blue());
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     ioRenderer.SetPointSize(1.0f);
     ioRenderer.GetMaterial().SetDiffuseColor(Red());
     ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
+    framebuffer.UnBind();
+
+    if (window->IsKeyPressed(Key::X))
+    {
+      ioRenderer.ResetState();
+
+      const auto new_camera = std::make_shared<Camera>();
+      new_camera->SetPosition(Back<Vec3f>() * 8.0f);
+      new_camera->LookAtPoint(Zero<Vec3f>());
+      ioRenderer.SetCamera(new_camera);
+      ioRenderer.ClearDepth();
+      ioRenderer.ClearBackground(Black());
+
+      ioRenderer.ResetMaterial();
+      ioRenderer.Scale(All<Vec3f>(14.0f));
+      ioRenderer.GetMaterial().SetLightingEnabled(false);
+      ioRenderer.GetMaterial().SetTexture(render_texture);
+      ioRenderer.DrawMesh(DrawableMeshFactory::GetPlane(5, 5));
+    }
+
     camera_controller_fly.Update(inDeltaTime);
+    // exit(0);
   });
   return EXIT_SUCCESS;
 }

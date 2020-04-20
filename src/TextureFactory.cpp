@@ -12,8 +12,7 @@ std::shared_ptr<Texture2D> TextureFactory::GetWhiteTexture()
   {
     const Image2D<Color4f> white_image(1, 1, White<Color4f>());
 
-    white_texture = std::make_shared<Texture2D>();
-    white_texture->SetData(white_image);
+    white_texture = std::make_shared<Texture2D>(white_image);
   }
   return white_texture;
 }

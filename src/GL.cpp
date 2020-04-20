@@ -138,8 +138,67 @@ void GL::BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureI
 
 void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }
 
-void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
+GL::Id GL::GenFramebuffer()
+{
+  GL::Id new_framebuffer_id = 0;
+  glGenFramebuffers(1, &new_framebuffer_id);
+  return new_framebuffer_id;
+}
 
+GL::Id GL::CreateFramebuffer()
+{
+  GL::Id new_framebuffer_id = 0;
+  glGenFramebuffers(1, &new_framebuffer_id);
+  return new_framebuffer_id;
+}
+
+void GL::BindFramebuffer(const GL::Id inFramebufferId) { glBindFramebuffer(GL_FRAMEBUFFER, inFramebufferId); }
+
+void GL::FramebufferRenderbuffer(const GL::EFramebufferAttachment inAttachment, const GL::Id inRenderbufferId)
+{
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL::EnumCast(inAttachment), GL_RENDERBUFFER, inRenderbufferId);
+}
+
+void GL::FramebufferTexture2D(const GL::EFramebufferAttachment inAttachment,
+    const GL::ETextureTarget inTextureTarget,
+    const GL::Id inTextureId,
+    const GL::Size inMipmapLevel)
+{
+  glFramebufferTexture2D(GL_FRAMEBUFFER,
+      GL::EnumCast(inAttachment),
+      GL::EnumCast(inTextureTarget),
+      inTextureId,
+      inMipmapLevel);
+}
+
+void GL::DeleteFramebuffer(const GL::Id inFramebufferId) { glDeleteFramebuffers(1, &inFramebufferId); }
+
+GL::Id GL::GenRenderbuffer()
+{
+  GL::Id new_renderbuffer_id = 0;
+  glGenRenderbuffers(1, &new_renderbuffer_id);
+  return new_renderbuffer_id;
+}
+
+GL::Id GL::CreateRenderbuffer()
+{
+  GL::Id new_renderbuffer_id = 0;
+  glCreateRenderbuffers(1, &new_renderbuffer_id);
+  return new_renderbuffer_id;
+}
+
+void GL::RenderbufferStorage(const GL::ETextureInternalFormat inInternalFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight)
+{
+  glRenderbufferStorage(GL_RENDERBUFFER, GL::EnumCast(inInternalFormat), inWidth, inHeight);
+}
+
+void GL::BindRenderbuffer(const GL::Id inRenderbufferId) { glBindRenderbuffer(GL_RENDERBUFFER, inRenderbufferId); }
+
+void GL::DeleteRenderBuffer(const GL::Id inRenderbufferId) { glDeleteRenderbuffers(1, &inRenderbufferId); }
+
+void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
 void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }
 
 void GL::DrawElements(const GL::EPrimitivesMode inPrimitivesMode,

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Span.h"
 #include "Math.h"
+#include "Span.h"
 #include <filesystem>
 #include <vector>
 
@@ -12,8 +12,8 @@ class Image2D
 {
 public:
   Image2D();
-  explicit Image2D(const std::filesystem::path &inImagePath);
-  Image2D(const std::size_t inWidth, const std::size_t inHeight, const T &inFillValue);
+  explicit Image2D(const std::filesystem::path& inImagePath);
+  Image2D(const std::size_t inWidth, const std::size_t inHeight, const T& inFillValue);
   Image2D(const Image2D& inImage2D) = default;
   Image2D& operator=(const Image2D& inImage2D) = default;
   Image2D(Image2D&& inImage2D) = default;
@@ -21,13 +21,13 @@ public:
   ~Image2D() = default;
 
   void Create(const std::size_t inWidth, const std::size_t inHeight);
-  void Fill(const T &inValue);
+  void Fill(const T& inValue);
 
   T& Get(const std::size_t inX, const std::size_t inY);
   const T& Get(const std::size_t inX, const std::size_t inY) const;
 
-  void Read(const std::filesystem::path &inPath);
-  void Write(const std::filesystem::path &inPath);
+  void Read(const std::filesystem::path& inPath);
+  void Write(const std::filesystem::path& inPath) const;
 
   Span<T> GetData() const;
   std::size_t GetWidth() const;

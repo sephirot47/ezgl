@@ -171,8 +171,6 @@ public:
 
   enum class ETextureInternalFormat
   {
-    DEPTH_COMPONENT = GL_DEPTH_COMPONENT,
-    DEPTH_STENCIL = GL_DEPTH_STENCIL,
     RED = GL_RED,
     RG = GL_RG,
     RGB = GL_RGB,
@@ -252,6 +250,10 @@ public:
     COMPRESSED_SRGB_ALPHA_BPTC_UNORM = GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM,
     COMPRESSED_RGB_BPTC_SIGNED_FLOAT = GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT,
     COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT = GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT,
+    DEPTH_COMPONENT = GL_DEPTH_COMPONENT,
+    DEPTH_STENCIL = GL_DEPTH_STENCIL,
+    DEPTH24_STENCIL8 = GL_DEPTH24_STENCIL8,
+    DEPTH32F_STENCIL8 = GL_DEPTH32F_STENCIL8,
   };
 
   enum class ETextureInputFormat
@@ -312,6 +314,29 @@ public:
     TEXTURE_2D_MULTISAMPLE_ARRAY = GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
   };
 
+  enum class EFramebufferAttachment
+  {
+    COLOR_ATTACHMENT0 = GL_COLOR_ATTACHMENT0,
+    COLOR_ATTACHMENT1 = GL_COLOR_ATTACHMENT1,
+    COLOR_ATTACHMENT2 = GL_COLOR_ATTACHMENT2,
+    COLOR_ATTACHMENT3 = GL_COLOR_ATTACHMENT3,
+    COLOR_ATTACHMENT4 = GL_COLOR_ATTACHMENT4,
+    COLOR_ATTACHMENT5 = GL_COLOR_ATTACHMENT5,
+    COLOR_ATTACHMENT6 = GL_COLOR_ATTACHMENT6,
+    COLOR_ATTACHMENT7 = GL_COLOR_ATTACHMENT7,
+    COLOR_ATTACHMENT8 = GL_COLOR_ATTACHMENT8,
+    COLOR_ATTACHMENT9 = GL_COLOR_ATTACHMENT9,
+    COLOR_ATTACHMENT10 = GL_COLOR_ATTACHMENT10,
+    COLOR_ATTACHMENT11 = GL_COLOR_ATTACHMENT11,
+    COLOR_ATTACHMENT12 = GL_COLOR_ATTACHMENT12,
+    COLOR_ATTACHMENT13 = GL_COLOR_ATTACHMENT13,
+    COLOR_ATTACHMENT14 = GL_COLOR_ATTACHMENT14,
+    COLOR_ATTACHMENT15 = GL_COLOR_ATTACHMENT15,
+    DEPTH_ATTACHMENT = GL_DEPTH_ATTACHMENT,
+    STENCIL_ATTACHMENT = GL_STENCIL_ATTACHMENT,
+    DEPTH_STENCIL_ATTACHMENT = GL_DEPTH_STENCIL_ATTACHMENT,
+  };
+
   static void Enable(const GL::Enablable inEnablable);
   static void Disable(const GL::Enablable inEnablable);
   static void SetEnabled(const GL::Enablable inEnablable, const bool inEnabled);
@@ -360,10 +385,34 @@ public:
       const Span<T>& inData,
       const GL::ETextureInternalFormat& inInternalFormat,
       const GL::Int& inMipMapLevel = 0);
+  template <typename T>
+  static std::vector<T> GetTextureImage(const GL::Id inTextureId,
+      const GL::ETextureInputFormat inFormatToConvertTo,
+      const GL::EDataType inDataTypeToConvertTo,
+      const GL::Size inNumberOfTexelsToRead,
+      const GL::Int inMipmapLevel = 0);
   static void GenerateTextureMipMap(const GL::Id& inTextureId);
   static void ActiveTexture(const GL::Id& inTextureUnit);
   static void BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId);
   static void DeleteTexture(const GL::Id& inTextureId);
+
+  static GL::Id GenFramebuffer();
+  static GL::Id CreateFramebuffer();
+  static void BindFramebuffer(const GL::Id inFramebufferId);
+  static void FramebufferRenderbuffer(const GL::EFramebufferAttachment inAttachment, const GL::Id inRenderbufferId);
+  static void FramebufferTexture2D(const GL::EFramebufferAttachment inAttachment,
+      const GL::ETextureTarget inTextureTarget,
+      const GL::Id inTextureId,
+      const GL::Size inMipmapLevel = 0);
+  static void DeleteFramebuffer(const GL::Id inFramebufferId);
+
+  static GL::Id GenRenderbuffer();
+  static GL::Id CreateRenderbuffer();
+  static void RenderbufferStorage(const GL::ETextureInternalFormat inInternalFormat,
+      const GL::Size inWidth,
+      const GL::Size inHeight);
+  static void BindRenderbuffer(const GL::Id inRenderbufferId);
+  static void DeleteRenderBuffer(const GL::Id inRenderbufferId);
 
   static void ClearColor(const Color4f& inColor);
   static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);

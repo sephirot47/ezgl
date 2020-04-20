@@ -13,7 +13,18 @@ void Texture2D::SetData(const GL::Size& inWidth,
     const GL::Int& inMipMapLevel)
 {
   Bind();
-  GL::TexImage2D(GetTextureTarget(), inWidth, inHeight, inInputFormat, inInputComponentFormat, inData, inInternalFormat, inMipMapLevel);
+
+  mSize = Vec2i(inWidth, inHeight);
+  mInternalFormat = inInternalFormat;
+
+  GL::TexImage2D(GetTextureTarget(),
+      inWidth,
+      inHeight,
+      inInputFormat,
+      inInputComponentFormat,
+      inData,
+      inInternalFormat,
+      inMipMapLevel);
 }
 
 }

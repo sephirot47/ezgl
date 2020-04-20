@@ -56,7 +56,7 @@ void Image2D<T>::Read(const std::filesystem::path& inPath)
 }
 
 template <typename T>
-void Image2D<T>::Write(const std::filesystem::path& inPath)
+void Image2D<T>::Write(const std::filesystem::path& inPath) const
 {
   ImageIO::Write(*this, inPath);
 }
