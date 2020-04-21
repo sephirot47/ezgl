@@ -39,27 +39,33 @@ public:
   Renderer& operator=(Renderer&& inRHS) = default;
   ~Renderer() = default;
 
+  // Clears
   void ClearBackground(const Color4f& inClearColor);
   void ClearDepth();
 
+  // Depth, Cull and Blend
   void SetDepthTestEnabled(const bool inDepthTestEnabled);
   void SetCullFaceEnabled(const bool inCullFaceEnabled);
   void SetBlendEnabled(const bool inBlendEnabled);
-
   void SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor);
 
+  // Point and Line properties
   void SetPointSize(const float inPointSize);
   void SetLineWidth(const float inLineWidth);
 
+  // Override ShaderProgram
   void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram);
 
+  // RenderTexture
   void SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture);
 
+  // Camera
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
+  void ResetCamera();
   std::shared_ptr<const Camera> GetCamera() const;
   std::shared_ptr<Camera> GetCamera();
-  void ResetCamera();
 
+  // Transformation
   void SetModelMatrix(const Mat4f& inModelMatrix);
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);
@@ -67,31 +73,25 @@ public:
   void Scale(const float inScale);
   void ResetModelMatrix();
 
+  // Materials
   void SetMaterial(const Material& inMaterial);
   const Material& GetMaterial() const;
-  Material& GetMaterial();
   void ResetMaterial();
+  Material& GetMaterial();
 
+  // Lighting
   void SetSceneAmbientColor(const Color3f& inSceneAmbientColor);
   void AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor);
-  void ClearDirectionalLights();
   void AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor);
+  void ClearDirectionalLights();
   void ClearPointLights();
 
+  // All state
   void PushState();
   void PopState();
   void ResetState();
 
-  template <typename T, std::size_t N>
-  void DrawSegment(const Segment<T, N>& inSegment);
-  template <typename T, std::size_t N>
-  void DrawSegments(const Span<Segment<T, N>>& inSegments);
-
-  template <typename T, std::size_t N>
-  void DrawPoint(const Vec<T, N>& inPoint);
-  template <typename T, std::size_t N>
-  void DrawPoints(const Span<Vec<T, N>>& inPoints);
-
+  // Draw - 3D
   void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawVAOElements(const VAO& inVAO,
       const GL::Size inNumberOfElementsToDraw,
@@ -100,9 +100,18 @@ public:
       const GL::Size inNumberOfPrimitivesToDraw,
       const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES,
       const GL::Size inBeginPrimitiveIndex = 0);
-
-  void DrawAxes();
   void DrawArrow(const Segment3f& inArrowSegment);
+  void DrawAxes();
+  void DrawPoint(const Vec3f& inPoint);
+  void DrawPoints(const Span<Vec3f>& inPoints);
+  void DrawSegment(const Segment3f& inSegment);
+  void DrawSegments(const Span<Segment3f>& inSegments);
+
+  // Draw - 2D (z = 0.0)
+  void DrawPoint(const Vec2f& inPoint);
+  void DrawPoints(const Span<Vec2f>& inPoints);
+  void DrawSegment(const Segment2f& inSegment);
+  void DrawSegments(const Span<Segment2f>& inSegments);
 
 private:
   // Static resources
@@ -158,6 +167,17 @@ private:
   const State& GetCurrentState() const;
   void ApplyState(const State& inStateToApply);
 
+  // Draw - Generic (3D and 2D)
+  template <typename T, std::size_t N>
+  void DrawSegmentGeneric(const Segment<T, N>& inSegment);
+  template <typename T, std::size_t N>
+  void DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments);
+  template <typename T, std::size_t N>
+  void DrawPointGeneric(const Vec<T, N>& inPoint);
+  template <typename T, std::size_t N>
+  void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
+
+  // Helpers
   using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material>;
   [[nodiscard]] UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
 };

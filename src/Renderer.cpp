@@ -221,6 +221,8 @@ void Renderer::ApplyState(const State& inStateToApply)
   SetRenderTexture(inStateToApply.mRenderTexture);
 }
 
+// Draw - 3D ========================================================================================
+
 void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType)
 {
   if (inDrawType == EDrawType::WIREFRAME)
@@ -273,6 +275,19 @@ void Renderer::DrawVAOArrays(const VAO& inVAO,
   DrawVAOArraysOrElements(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, draw_arrays, inBeginPrimitiveIndex);
 }
 
+void Renderer::DrawArrow(const Segment3f& inArrowSegment)
+{
+  PushState();
+
+  DrawSegment(inArrowSegment);
+  Translate(inArrowSegment.GetToPoint());
+  Rotate(LookInDirection(Direction(inArrowSegment)));
+  Scale(Vec3f { 0.05f, 0.05f, 0.08f });
+  DrawMesh(*sCone);
+
+  PopState();
+}
+
 void Renderer::DrawAxes()
 {
   PushState();
@@ -290,18 +305,19 @@ void Renderer::DrawAxes()
   PopState();
 }
 
-void Renderer::DrawArrow(const Segment3f& inArrowSegment)
-{
-  PushState();
+void Renderer::DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint); }
+void Renderer::DrawPoints(const Span<Vec3f>& inPoints) { DrawPointsGeneric(inPoints); }
+void Renderer::DrawSegment(const Segment3f& inSegment) { DrawSegmentGeneric(inSegment); }
+void Renderer::DrawSegments(const Span<Segment3f>& inSegments) { DrawSegmentsGeneric(inSegments); }
 
-  DrawSegment(inArrowSegment);
-  Translate(inArrowSegment.GetToPoint());
-  Rotate(LookInDirection(Direction(inArrowSegment)));
-  Scale(Vec3f { 0.05f, 0.05f, 0.08f });
-  DrawMesh(*sCone);
+// Draw - 2D ========================================================================================
 
-  PopState();
-}
+void Renderer::DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint); }
+void Renderer::DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints); }
+void Renderer::DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment); }
+void Renderer::DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+
+// Helpers ========================================================================================
 
 Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 {
