@@ -6,7 +6,7 @@ namespace egl
 {
 Texture2D::Texture2D() : Texture()
 {
-  GL_BIND_GUARD(GL::EBindingType::TEXTURE_2D);
+  GL_BIND_GUARD(Texture2D);
   Bind();
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);

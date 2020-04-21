@@ -10,7 +10,7 @@ Framebuffer::Framebuffer(const int inWidth, const int inHeight) { Resize(inWidth
 void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
     const std::shared_ptr<Texture2D>& inTexture)
 {
-  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
+  GL_BIND_GUARD(Framebuffer);
   Bind();
 
   if (IsColorAttachment(inAttachment))
@@ -43,7 +43,7 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
     THROW_EXCEPTION(
         "Incorrect attachment for Renderbuffer. It must not be a color attachment, but a depth/stencil one.");
 
-  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
+  GL_BIND_GUARD(Framebuffer);
   Bind();
 
   mCreatedRenderbufferId = GL::CreateRenderbuffer();
@@ -87,7 +87,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 
 void Framebuffer::CheckFramebufferIsComplete() const
 {
-  GL_BIND_GUARD(GL::EBindingType::FRAMEBUFFER);
+  GL_BIND_GUARD(Framebuffer);
   Bind();
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)

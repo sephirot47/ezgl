@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLBindableObject.h"
+#include "GLGuard.h"
 #include "GLObject.h"
 #include "Span.h"
 

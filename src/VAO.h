@@ -2,6 +2,7 @@
 
 #include "GL.h"
 #include "GLBindableObject.h"
+#include "GLGuard.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -16,6 +17,8 @@ class VBO;
 class VAO : public GLBindableObject<GL::EBindingType::VAO>
 {
 public:
+  using GLBindGuardType = GLBindGuard<GL::EBindingType::VAO>;
+
   VAO() = default;
   VAO(VAO&& ioRHS) noexcept = default;
   ~VAO() override = default;

@@ -12,6 +12,8 @@ class Image2D;
 class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D>
 {
 public:
+  using GLBindGuardType = GLBindGuard<GL::EBindingType::TEXTURE_2D>;
+
   Texture2D(const int inWidth, const int inHeight, const GL::ETextureInternalFormat inInternalFormat);
   explicit Texture2D(const Image2D<Color4f>& inImage2D);
   Texture2D(Texture2D&& ioRHS) noexcept = default;

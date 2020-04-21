@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLBindableObject.h"
+#include "GLGuard.h"
 
 namespace egl
 {

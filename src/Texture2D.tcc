@@ -13,7 +13,7 @@ void Texture2D::SetData(const GL::Size& inWidth,
     const GL::ETextureInternalFormat& inInternalFormat,
     const GL::Int& inMipMapLevel)
 {
-  GL_BIND_GUARD(GL::EBindingType::TEXTURE_2D);
+  GL_BIND_GUARD(Texture2D);
   Bind();
 
   mSize = Vec2i(inWidth, inHeight);

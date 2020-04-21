@@ -12,6 +12,8 @@ namespace egl
 class DrawableMesh : public Mesh
 {
 public:
+  using GLBindGuardType = GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>;
+
   static constexpr GL::Id PositionAttribLocation() { return 0; }
   static constexpr GL::Id NormalAttribLocation() { return 1; }
   static constexpr GL::Id TextureCoordinateAttribLocation() { return 2; }
@@ -31,16 +33,5 @@ public:
 private:
   std::unique_ptr<VAO> mVAO = std::make_unique<VAO>();
 };
-
-template <>
-struct GLGuardReturnType<DrawableMesh>
-{
-  using type = GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>;
-};
-template <>
-inline GLGuardReturnType_t<DrawableMesh> GetGLGuard<DrawableMesh>()
-{
-  return GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>();
-}
 
 }

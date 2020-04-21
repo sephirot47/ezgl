@@ -24,24 +24,16 @@ private:
 };
 
 template <GL::EBindingType TBindingType>
-auto GetGLGuard()
+decltype(auto) GetGLBindGuard()
 {
-  return GLComplexGuard<GLBindGuard<TBindingType>>();
+  return GLBindGuard<TBindingType>();
 }
 
 template <typename T>
-struct GLGuardReturnType
+decltype(auto) GetGLBindGuard()
 {
-  using type = T;
-};
-template <typename T>
-using GLGuardReturnType_t = typename GLGuardReturnType<T>::type;
-
-template <typename T>
-GLGuardReturnType_t<T> GetGLGuard()
-{
-  static_assert(std::is_same_v<T, T>, "GLGuard not specialized for this type.");
+  return typename T::GLBindGuardType {};
 }
 
-#define GL_BIND_GUARD(TYPE) const auto ANONYMOUS_VARIABLE_NAME() = GetGLGuard<TYPE>();
+#define GL_BIND_GUARD(TYPE) const auto ANONYMOUS_VARIABLE_NAME() = GetGLBindGuard<TYPE>();
 }

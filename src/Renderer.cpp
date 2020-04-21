@@ -228,7 +228,7 @@ void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDra
 {
   UseShaderProgram(*sMeshShaderProgram);
 
-  GL_BIND_GUARD(DrawableMesh);
+  GL_BIND_GUARD(VAO);
   inDrawableMesh.Bind();
 
   if (inDrawType == EDrawType::WIREFRAME)

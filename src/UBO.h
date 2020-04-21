@@ -7,6 +7,8 @@ namespace egl
 class UBO : public Buffer<GL::EBufferType::UBO>
 {
 public:
+  using GLBindGuardType = GLBindGuard<GL::EBindingType::UBO>;
+
   UBO();
   template <typename T>
   explicit UBO(const Span<T>& inData);

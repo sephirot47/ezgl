@@ -13,6 +13,8 @@ namespace egl
 class Framebuffer : public GLBindableObject<GL::EBindingType::FRAMEBUFFER>
 {
 public:
+  using GLBindGuardType = GLBindGuard<GL::EBindingType::FRAMEBUFFER>;
+
   Framebuffer();
   explicit Framebuffer(const Vec2i& inSize);
   Framebuffer(const int inWidth, const int inHeight);
