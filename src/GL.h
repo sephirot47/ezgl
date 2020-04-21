@@ -577,19 +577,6 @@ public:
   template <GL::EBufferType TBufferType>
   static constexpr GL::EBindingType GetBindingType();
 
-  template <GL::EBindingType TBindingType>
-  class BindGuard
-  {
-  public:
-    BindGuard();
-    ~BindGuard();
-
-  private:
-    const GL::Id mPreviouslyBoundId = 0;
-  };
-
-#define GL_BIND_GUARD(GL_BINDING_TYPE) const GL::BindGuard<GL_BINDING_TYPE> ANONYMOUS_VARIABLE_NAME();
-
   GL() = delete; // Static class
 };
 

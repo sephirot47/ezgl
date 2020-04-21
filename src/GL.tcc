@@ -78,17 +78,6 @@ void GL::UnBind()
   GL::Bind<TBindingType>(0);
 }
 
-template <GL::EBindingType TBindingType>
-GL::BindGuard<TBindingType>::BindGuard() : mPreviouslyBoundId(GL::GetBoundGLId(TBindingType))
-{
-}
-
-template <GL::EBindingType TBindingType>
-GL::BindGuard<TBindingType>::~BindGuard()
-{
-  GL::Bind<TBindingType>(mPreviouslyBoundId);
-}
-
 // clang-format off
 
 template <> inline GL::Id GL::Create<GL::EObjectType::EBO>() { return GL::CreateBuffer(); }

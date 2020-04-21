@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EBO.h"
+#include "GLGuard.h"
 #include "Mesh.h"
 #include "VAO.h"
 #include "VBO.h"
@@ -30,4 +31,16 @@ public:
 private:
   std::unique_ptr<VAO> mVAO = std::make_unique<VAO>();
 };
+
+template <>
+struct GLGuardReturnType<DrawableMesh>
+{
+  using type = GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>;
+};
+template <>
+inline GLGuardReturnType_t<DrawableMesh> GetGLGuard<DrawableMesh>()
+{
+  return GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>();
+}
+
 }

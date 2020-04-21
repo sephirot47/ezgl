@@ -1,6 +1,7 @@
 #include "VAO.h"
 #include "EBO.h"
 #include "GL.h"
+#include "GLGuard.h"
 #include "Macros.h"
 #include "VBO.h"
 #include <GL/glew.h>

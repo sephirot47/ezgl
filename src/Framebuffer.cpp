@@ -1,4 +1,5 @@
 #include "Framebuffer.h"
+#include "GLGuard.h"
 
 namespace egl
 {

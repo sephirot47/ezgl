@@ -1,4 +1,5 @@
 #include "GL.h"
+#include "GLGuard.h"
 #include "Texture2D.h"
 
 namespace egl

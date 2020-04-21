@@ -4,6 +4,7 @@
 #include "DrawableMesh.h"
 #include "FileUtils.h"
 #include "GL.h"
+#include "GLGuard.h"
 #include "GLTypeTraits.h"
 #include "Math.h"
 #include "MeshFactory.h"
@@ -227,6 +228,7 @@ void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDra
 {
   UseShaderProgram(*sMeshShaderProgram);
 
+  GL_BIND_GUARD(DrawableMesh);
   inDrawableMesh.Bind();
 
   if (inDrawType == EDrawType::WIREFRAME)
