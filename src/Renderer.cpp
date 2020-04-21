@@ -108,22 +108,19 @@ void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& in
 
 void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
 {
-  const auto previously_bound_framebuffer = Framebuffer::GetBoundGLId();
-
-  mRenderTextureFramebuffer->Bind();
   mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
   GetCurrentState().mRenderTexture = inRenderTexture;
 
   if (inRenderTexture)
   {
+    mRenderTextureFramebuffer->Bind(); // Leave it bound so that next draw calls are to this framebuffer
     mRenderTextureFramebuffer->Resize(inRenderTexture->GetSize());
   }
   else
   {
-    if (previously_bound_framebuffer == mRenderTextureFramebuffer->GetGLId())
+    // If we want no render texture, then unbind framebuffer so that we do not draw into this framebuffer anymore
+    if (mRenderTextureFramebuffer->IsBound())
       mRenderTextureFramebuffer->UnBind();
-    else
-      GL::BindFramebuffer(previously_bound_framebuffer);
   }
 }
 
@@ -226,9 +223,9 @@ void Renderer::ApplyState(const State& inStateToApply)
 
 void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType)
 {
-  UseShaderProgram(*sMeshShaderProgram);
+  const auto use_shader_program_bind_guard = UseShaderProgram(*sMeshShaderProgram);
 
-  GL_BIND_GUARD(VAO);
+  GL_BIND_GUARD_VAR(inDrawableMesh);
   inDrawableMesh.Bind();
 
   if (inDrawType == EDrawType::WIREFRAME)
@@ -272,8 +269,10 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
   PopState();
 }
 
-void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
+Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 {
+  Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
+
   auto& current_state = GetCurrentState();
   auto& shader_program
       = (current_state.mOverrideShaderProgram ? *current_state.mOverrideShaderProgram : ioShaderProgram);
@@ -315,5 +314,7 @@ void Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
     mPointLightsUBO.BindToBindingPoint(1);
     shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
   }
+
+  return use_shader_program_bind_guard;
 }
 }

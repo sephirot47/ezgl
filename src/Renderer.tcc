@@ -37,7 +37,7 @@ void Renderer::DrawSegments(const Span<Segment<T, N>>& inSegments)
 {
   constexpr auto PositionAttribLocation = 0;
 
-  UseShaderProgram(*sOnlyColorShaderProgram);
+  const auto use_shader_program_bind_guard = UseShaderProgram(*sOnlyColorShaderProgram);
 
   std::vector<Vec<T, N>> segment_points;
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);
@@ -48,6 +48,7 @@ void Renderer::DrawSegments(const Span<Segment<T, N>>& inSegments)
   }
   const auto vbo = std::make_shared<VBO>(MakeSpan(segment_points));
 
+  GL_BIND_GUARD(VAO);
   VAO vao;
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec<T, N>>());
   vao.Bind();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GLGuard.h"
 #include "Math.h"
 #include <memory>
 
@@ -11,6 +12,8 @@ class ShaderProgram;
 class Material
 {
 public:
+  using GLBindGuardType = GLNoOpGuard;
+
   void SetDiffuseIntensity(const float inDiffuseIntensity);
   float GetDiffuseIntensity() const;
 
@@ -23,20 +26,22 @@ public:
   void SetSpecularExponent(const float inSpecularExponent);
   float GetSpecularExponent() const;
 
-  void SetTexture(const std::shared_ptr<Texture2D> &inTexture);
+  void SetTexture(const std::shared_ptr<Texture2D>& inTexture);
   const std::shared_ptr<Texture2D> GetTexture() const;
 
   void SetLightingEnabled(const bool inLightingEnabled);
   bool IsLightingEnabled() const;
 
-  void Bind(ShaderProgram &ioShaderProgram);
+  void Bind(ShaderProgram& ioShaderProgram);
 
 private:
-   std::shared_ptr<Texture2D> mTexture = nullptr;
+  std::shared_ptr<Texture2D> mTexture = nullptr;
 
-  bool mLightingEnabled = true;;
+  bool mLightingEnabled = true;
+  ;
   Color4f mDiffuseColor = White();
   float mSpecularIntensity = 1.0f;
   float mSpecularExponent = 60.0f;
 };
+
 }

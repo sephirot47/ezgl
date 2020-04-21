@@ -2,6 +2,7 @@
 
 #include "GL.h"
 #include "GLBindableObject.h"
+#include "GLGuard.h"
 #include "Mat.h"
 #include "Shader.h"
 #include "Vec.h"
@@ -14,6 +15,7 @@ namespace egl
 class ShaderProgram : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
 {
 public:
+  using GLBindGuardType = GLBindGuard<GL::EBindingType::SHADER_PROGRAM>;
   using GLBindableObject<GL::EBindingType::SHADER_PROGRAM>::GetGLId;
 
   ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);

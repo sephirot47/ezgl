@@ -8,6 +8,8 @@ file(GLOB SRC_FILES "src/*.cpp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")
 
+add_compile_options("-Werror")
+
 add_executable(test.exe "${SRC_FILES}")
 target_include_directories(test.exe PUBLIC "${CMAKE_BINARY_DIR}/third_party/assimp/include")
 

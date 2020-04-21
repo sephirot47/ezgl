@@ -142,7 +142,8 @@ private:
   const State& GetCurrentState() const;
   void ApplyState(const State& inStateToApply);
 
-  void UseShaderProgram(ShaderProgram& ioShaderProgram);
+  using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material>;
+  [[nodiscard]] UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
 };
 }
 

@@ -12,7 +12,7 @@ namespace egl
 class DrawableMesh : public Mesh
 {
 public:
-  using GLBindGuardType = GLComplexGuard<GLBindGuard<GL::EBindingType::VAO>>;
+  using GLBindGuardType = GLCompositeGuard<VAO>;
 
   static constexpr GL::Id PositionAttribLocation() { return 0; }
   static constexpr GL::Id NormalAttribLocation() { return 1; }
