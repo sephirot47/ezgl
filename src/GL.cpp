@@ -200,22 +200,22 @@ void GL::DeleteRenderbuffer(const GL::Id inRenderbufferId) { glDeleteRenderbuffe
 void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
 void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }
 
-void GL::DrawElements(const GL::EPrimitivesMode inPrimitivesMode,
+void GL::DrawElements(const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inNumberOfPrimitives,
     const GL::EDataType inIndicesDataType,
     const GL::Size inBeginPrimiviteIndex)
 {
-  glDrawElements(GL::EnumCast(inPrimitivesMode),
+  glDrawElements(GL::EnumCast(inPrimitivesType),
       inNumberOfPrimitives,
       GL::EnumCast(inIndicesDataType),
       reinterpret_cast<const void*>(inBeginPrimiviteIndex));
 }
 
-void GL::DrawArrays(const GL::EPrimitivesMode inPrimitivesMode,
+void GL::DrawArrays(const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inNumberOfPrimitives,
     const GL::Size inBeginPrimiviteIndex)
 {
-  glDrawArrays(GL::EnumCast(inPrimitivesMode), inBeginPrimiviteIndex, inNumberOfPrimitives);
+  glDrawArrays(GL::EnumCast(inPrimitivesType), inBeginPrimiviteIndex, inNumberOfPrimitives);
 }
 
 GL::Id GL::CreateShader(const GL::EShaderType inShaderType)

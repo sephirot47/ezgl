@@ -155,7 +155,7 @@ public:
     DOUBLE_MAT4 = GL_DOUBLE_MAT4,
   };
 
-  enum class EPrimitivesMode
+  enum class EPrimitivesType
   {
     TRIANGLES = GL_TRIANGLES,
     LINES = GL_LINES,
@@ -479,11 +479,11 @@ public:
 
   static void ClearColor(const Color4f& inColor);
   static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);
-  static void DrawElements(const GL::EPrimitivesMode inPrimitivesMode,
+  static void DrawElements(const GL::EPrimitivesType inPrimitivesType,
       const GL::Size inNumberOfPrimitives,
       const GL::EDataType inIndicesDataType,
       const GL::Size inBeginPrimiviteIndex = 0);
-  static void DrawArrays(const GL::EPrimitivesMode inPrimitivesMode,
+  static void DrawArrays(const GL::EPrimitivesType inPrimitivesType,
       const GL::Size inNumberOfPrimitives,
       const GL::Size inBeginPrimiviteIndex = 0);
 

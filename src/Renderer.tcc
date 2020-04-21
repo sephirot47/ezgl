@@ -23,7 +23,7 @@ void Renderer::DrawPoints(const Span<Vec<T, N>>& inPoints)
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec3f>());
   vao.Bind();
 
-  GL::DrawArrays(GL::EPrimitivesMode::POINTS, 1);
+  GL::DrawArrays(GL::EPrimitivesType::POINTS, 1);
 }
 
 template <typename T, std::size_t N>
@@ -53,6 +53,6 @@ void Renderer::DrawSegments(const Span<Segment<T, N>>& inSegments)
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec<T, N>>());
   vao.Bind();
 
-  GL::DrawArrays(GL::EPrimitivesMode::LINES, 2);
+  GL::DrawArrays(GL::EPrimitivesType::LINES, 2);
 }
 }

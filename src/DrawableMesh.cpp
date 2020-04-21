@@ -7,7 +7,11 @@
 
 namespace egl
 {
-void DrawableMesh::Bind() const { mVAO->Bind(); }
+void DrawableMesh::Bind() const
+{
+  EXPECTS(mVAO);
+  mVAO->Bind();
+}
 
 void DrawableMesh::UpdateVAOs()
 {
@@ -81,6 +85,12 @@ void DrawableMesh::UpdateVAOs()
         DrawableMesh::TextureCoordinateAttribLocation(),
         VAOVertexAttribT<Vec2f>());
   }
+}
+
+const VAO& DrawableMesh::GetVAO() const
+{
+  EXPECTS(mVAO);
+  return *mVAO;
 }
 
 void DrawableMesh::Read(const std::filesystem::path& inMeshPath)

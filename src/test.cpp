@@ -52,6 +52,8 @@ int main()
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
+  const auto circle = DrawableMeshFactory::GetCircleSection(40, FullCircleRads());
+
   auto time = TimeDuration { 0 };
   window->EasyRenderLoop([&](const DeltaTime& inDeltaTime, Renderer& ioRenderer) {
     time += inDeltaTime;
@@ -81,21 +83,23 @@ int main()
 
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
     ioRenderer.Translate(obj_pos);
-    ioRenderer.Rotate(q);
+    UNUSED(q);
+    // ioRenderer.Rotate(q);
     ioRenderer.GetMaterial().SetTexture(nullptr);
     ioRenderer.Scale(All<Vec3f>(5.0f));
     ioRenderer.GetMaterial().SetDiffuseColor(White());
     ioRenderer.GetMaterial().SetLightingEnabled(true);
     ioRenderer.GetMaterial().SetSpecularExponent(120.0f);
-    ioRenderer.DrawMesh(test_mesh);
+    // ioRenderer.DrawMesh(test_mesh);
+    ioRenderer.DrawMesh(circle);
     ioRenderer.DrawAxes();
 
     ioRenderer.GetMaterial().SetDiffuseColor(Blue());
-    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+    // ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     ioRenderer.SetPointSize(1.0f);
     ioRenderer.GetMaterial().SetDiffuseColor(Red());
-    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+    // ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     if (window->IsKeyPressed(Key::X))
     {

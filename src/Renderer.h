@@ -92,7 +92,15 @@ public:
   template <typename T, std::size_t N>
   void DrawPoints(const Span<Vec<T, N>>& inPoints);
 
-  void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType = Renderer::EDrawType::SOLID);
+  void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawVAOElements(const VAO& inVAO,
+      const GL::Size inNumberOfElementsToDraw,
+      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
+  void DrawVAOArrays(const VAO& inVAO,
+      const GL::Size inNumberOfPrimitivesToDraw,
+      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES,
+      const GL::Size inBeginPrimitiveIndex = 0);
+
   void DrawAxes();
   void DrawArrow(const Segment3f& inArrowSegment);
 
@@ -137,6 +145,14 @@ private:
 
   std::unique_ptr<Framebuffer> mRenderTextureFramebuffer;
 
+  // Draw helpers
+  void DrawVAOArraysOrElements(const VAO& inVAO,
+      const GL::Size inNumberOfElementsToDraw,
+      const GL::EPrimitivesType inPrimitivesType,
+      const bool inDrawArrays,
+      const GL::Size inBeginArraysPrimitiveIndex);
+
+  // State
   static const State DefaultState;
   State& GetCurrentState();
   const State& GetCurrentState() const;

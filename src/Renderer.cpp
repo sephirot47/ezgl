@@ -221,22 +221,56 @@ void Renderer::ApplyState(const State& inStateToApply)
   SetRenderTexture(inStateToApply.mRenderTexture);
 }
 
-void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType& inDrawType)
+void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType)
 {
-  const auto use_shader_program_bind_guard = UseShaderProgram(*sMeshShaderProgram);
-
-  GL_BIND_GUARD_VAR(inDrawableMesh);
-  inDrawableMesh.Bind();
-
   if (inDrawType == EDrawType::WIREFRAME)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-  static constexpr auto ElementIdType = GLTypeTraits<Mesh::VertexId>::GLType;
-  const auto primitives_mode
-      = (inDrawType == EDrawType::POINTS) ? GL::EPrimitivesMode::POINTS : GL::EPrimitivesMode::TRIANGLES;
-  GL::DrawElements(primitives_mode, inDrawableMesh.GetNumberOfCorners(), ElementIdType);
+  const auto primitives_type
+      = (inDrawType == EDrawType::POINTS) ? GL::EPrimitivesType::POINTS : GL::EPrimitivesType::TRIANGLES;
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  DrawVAOElements(inDrawableMesh.GetVAO(), inDrawableMesh.GetNumberOfCorners(), primitives_type);
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // TODO: Restore this properly
+}
+
+void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
+    const GL::Size inNumberOfElementsToDraw,
+    const GL::EPrimitivesType inPrimitivesType,
+    const bool inDrawArrays,
+    const GL::Size inBeginArraysPrimitiveIndex)
+{
+  const auto use_shader_program_bind_guard = UseShaderProgram(*sMeshShaderProgram);
+
+  GL_BIND_GUARD_VAR(inVAO);
+  inVAO.Bind();
+
+  if (inDrawArrays)
+  {
+    GL::DrawArrays(inPrimitivesType, inNumberOfElementsToDraw, inBeginArraysPrimitiveIndex);
+  }
+  else
+  {
+    static constexpr auto ElementIdType = GLTypeTraits<Mesh::VertexId>::GLType;
+    GL::DrawElements(inPrimitivesType, inNumberOfElementsToDraw, ElementIdType);
+  }
+}
+
+void Renderer::DrawVAOElements(const VAO& inVAO,
+    const GL::Size inNumberOfElementsToDraw,
+    const GL::EPrimitivesType inPrimitivesType)
+{
+  constexpr auto draw_arrays = false;
+  DrawVAOArraysOrElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType, draw_arrays, 0);
+}
+
+void Renderer::DrawVAOArrays(const VAO& inVAO,
+    const GL::Size inNumberOfPrimitivesToDraw,
+    const GL::EPrimitivesType inPrimitivesType,
+    const GL::Size inBeginPrimitiveIndex)
+{
+  constexpr auto draw_arrays = false;
+  DrawVAOArraysOrElements(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, draw_arrays, inBeginPrimitiveIndex);
 }
 
 void Renderer::DrawAxes()

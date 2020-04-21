@@ -219,37 +219,37 @@ constexpr T Back()
   return -Forward<T>();
 }
 
-template <typename T>
+template <typename T = float>
 constexpr T Pi()
 {
   return static_cast<T>(3.14159265358979323846);
 }
-template <typename T>
+template <typename T = float>
 constexpr T QuarterPi()
 {
   return Pi<T>() / 4;
 }
-template <typename T>
+template <typename T = float>
 constexpr T HalfPi()
 {
   return Pi<T>() / 2;
 }
-template <typename T>
+template <typename T = float>
 constexpr T TwoPi()
 {
   return Pi<T>() * 2;
 }
-template <typename T>
+template <typename T = float>
 constexpr T FullCircleRads()
 {
   return TwoPi<T>();
 }
-template <typename T>
+template <typename T = float>
 constexpr T HalfCircleRads()
 {
   return FullCircleRads<T>() / 2;
 }
-template <typename T>
+template <typename T = float>
 constexpr T QuarterCircleRads()
 {
   return FullCircleRads<T>() / 4;
@@ -734,6 +734,15 @@ constexpr auto RandomSign()
   }
 }
 
+template <typename T>
+constexpr T Map(const T& inValue, const T& inSourceBegin, const T& inSourceEnd, const T& inTargetBegin, const T& inTargetEnd)
+{
+  const auto source_range = (inSourceEnd - inSourceBegin);
+  const auto target_range = (inTargetEnd - inTargetBegin);
+  const auto source_progress = ((inValue - inSourceBegin) / source_range);
+  return (source_progress * target_range) + inTargetBegin;
+}
+
 template <typename T, std::size_t N>
 constexpr SquareMat<T, N> Diagonal(const T& inDiagonalValue)
 {
@@ -809,6 +818,12 @@ template <typename T>
 constexpr bool VeryPerpendicular(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
 {
   return VeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(0));
+}
+
+template <typename T>
+constexpr bool Between(const T&inValue, const T&inMin, const T&inMax)
+{
+  return (inValue >= inMin) && (inValue <= inMax);
 }
 
 template <typename T>

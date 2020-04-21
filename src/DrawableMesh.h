@@ -28,6 +28,8 @@ public:
   void Bind() const;
   void UpdateVAOs();
 
+  const VAO& GetVAO() const;
+
   void Read(const std::filesystem::path& inMeshPath) final;
 
 private:

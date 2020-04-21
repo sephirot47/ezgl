@@ -68,7 +68,7 @@ TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumLatitudes,
   // Add vertices
   const auto angle_z_increment
       = -(HalfCircleRads<float>() / (inNumLatitudes - (inIsHemisphere ? 2 : 1))) / (inIsHemisphere ? 2 : 1);
-  const auto angle_y_increment = -FullCircleRads<float>() / inNumLongitudes;
+  const auto angle_y_increment = -FullCircleRads() / inNumLongitudes;
   auto angle_z = (inIsHemisphere ? 0.0f : QuarterCircleRads<float>());
   std::vector<float> vertex_id_to_angles_y(inNumLongitudes * inNumLatitudes, 0.0f);
   std::vector<float> vertex_id_to_angles_z(inNumLongitudes * inNumLatitudes, 0.0f);
@@ -154,7 +154,7 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
     for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
     {
       const auto progression = (static_cast<float>(i) / inNumVerticesX);
-      const auto angle = FullCircleRads<float>() * progression;
+      const auto angle = Map(progression, 0.0f, 1.0f, 0.0f, FullCircleRads());
       const auto x = std::cos(angle) * 0.5f;
       const auto y = std::sin(angle) * 0.5f;
       const auto z = (forward ? -0.5f : 0.5f);
@@ -207,8 +207,8 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
 
   const auto hole_radius = (inHoleSize * 0.5f);
   const auto torus_radius = (1.0f - inHoleSize) * 0.5f;
-  const auto angle_longitude_increment = (FullCircleRads<float>() / inNumLongitudes);
-  const auto angle_latitude_increment = (FullCircleRads<float>() / inNumLatitudes);
+  const auto angle_longitude_increment = (FullCircleRads() / inNumLongitudes);
+  const auto angle_latitude_increment = (FullCircleRads() / inNumLatitudes);
 
   TMesh torus;
 
@@ -268,8 +268,10 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
   {
     for (Mesh::VertexId x = 0; x < inNumVerticesX; ++x)
     {
-      const auto position_x = (static_cast<float>(x) / stride_x) - 0.5f;
-      const auto position_y = (static_cast<float>(y) / stride_y) - 0.5f;
+      const auto progression_x = (static_cast<float>(x) / stride_x);
+      const auto position_x = Map(progression_x, 0.0f, 1.0f, -0.5f, 0.5f);
+      const auto progression_y = (static_cast<float>(y) / stride_y);
+      const auto position_y = Map(progression_y, 0.0f, 1.0f, -0.5f, 0.5f);
       const auto position_z = 0.0f;
       const auto vertex_position = Vec3f { position_x, position_y, position_z };
       plane.AddVertex(vertex_position);
@@ -293,12 +295,52 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
   {
     const auto vertex_id = plane.GetVertexIdFromCornerId(corner_id);
     const auto vertex_position = plane.GetVertexPosition(vertex_id);
-    const auto corner_texture_coordinates = XY(vertex_position) + 0.5f;
+    const auto corner_texture_coordinates
+        = Map(XY(vertex_position), Vec2f { -0.5f }, Vec2f { 0.5f }, Vec2f { 0.0f }, Vec2f { 1.0f });
     plane.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
   }
 
   ConsolidateMesh(plane);
   return plane;
+}
+
+template <typename TMesh>
+TMesh GMeshFactory<TMesh>::GetCircleSection(const std::size_t inNumVertices, const float inSectionAngleRads)
+{
+  EXPECTS(inNumVertices >= 3);
+  EXPECTS(Between(inSectionAngleRads, 0.0f, FullCircleRads()));
+
+  bool isFullCircle = (inSectionAngleRads == FullCircleRads());
+
+  TMesh circle_section;
+  {
+    const auto center_vertex = Zero<Vec3f>();
+    circle_section.AddVertex(center_vertex);
+  }
+
+  for (Mesh::VertexId i = 0; i < inNumVertices; ++i)
+  {
+    const auto progress = (static_cast<float>(i) / (isFullCircle ? inNumVertices : (inNumVertices - 1)));
+    const auto angle = Map(progress, 0.0f, 1.0f, 0.0f, inSectionAngleRads);
+    const auto circle_position = Vec3f { std::cos(angle), std::sin(angle), 0.0f };
+    circle_section.AddVertex(circle_position);
+  }
+
+  for (Mesh::VertexId i = 0; i < (isFullCircle ? inNumVertices : (inNumVertices - 1)); ++i)
+  {
+    const auto current_i = (i + 1);
+    const auto next_i = ((i + 1) % inNumVertices) + 1;
+    circle_section.AddFace(0, current_i, next_i);
+  }
+
+  ConsolidateMesh(circle_section);
+  return circle_section;
+}
+
+template <typename TMesh>
+TMesh GMeshFactory<TMesh>::GetCircle(const std::size_t inNumVertices)
+{
+  return GetCircleSection(inNumVertices, FullCircleRads());
 }
 
 template <typename TMesh>
