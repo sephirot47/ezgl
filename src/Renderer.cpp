@@ -49,8 +49,8 @@ Renderer::Renderer()
       GL::ETextureInternalFormat::DEPTH24_STENCIL8);
 
   // Init state
-  mStateStacks.ApplyToAll<PushDefaultValueToAllStacksFunctor>(*this);
-  // PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mStateStacks);
+  mState.PushAllDefaultValues();
+  // PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mState);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -63,50 +63,50 @@ void Renderer::ClearDepth() { GL::ClearBuffer(GL::EBufferBitFlags::DEPTH); }
 
 void Renderer::SetDepthTestEnabled(const bool inDepthTestEnabled)
 {
-  GetCurrentState<ERendererStateId::DEPTH_ENABLED>() = inDepthTestEnabled;
+  mState.GetCurrent<ERendererStateId::DEPTH_ENABLED>() = inDepthTestEnabled;
   GL::SetEnabled(GL::Enablable::DEPTH_TEST, inDepthTestEnabled);
 }
 
 void Renderer::SetCullFaceEnabled(const bool inCullFaceEnabled)
 {
-  GetCurrentState<ERendererStateId::CULL_FACE_ENABLED>() = inCullFaceEnabled;
+  mState.GetCurrent<ERendererStateId::CULL_FACE_ENABLED>() = inCullFaceEnabled;
   GL::SetEnabled(GL::Enablable::CULL_FACE, inCullFaceEnabled);
 }
 
 void Renderer::SetBlendEnabled(const bool inBlendEnabled)
 {
-  GetCurrentState<ERendererStateId::BLEND_ENABLED>() = inBlendEnabled;
+  mState.GetCurrent<ERendererStateId::BLEND_ENABLED>() = inBlendEnabled;
   GL::SetEnabled(GL::Enablable::BLEND, inBlendEnabled);
 }
 
 void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
 {
-  GetCurrentState<ERendererStateId::BLEND_SOURCE_FACTOR>() = inBlendSourceFactor;
-  GetCurrentState<ERendererStateId::BLEND_DEST_FACTOR>() = inBlendDestFactor;
+  mState.GetCurrent<ERendererStateId::BLEND_SOURCE_FACTOR>() = inBlendSourceFactor;
+  mState.GetCurrent<ERendererStateId::BLEND_DEST_FACTOR>() = inBlendDestFactor;
   GL::BlendFunc(inBlendSourceFactor, inBlendDestFactor);
 }
 
 void Renderer::SetPointSize(const float inPointSize)
 {
-  GetCurrentState<ERendererStateId::POINT_SIZE>() = inPointSize;
+  mState.GetCurrent<ERendererStateId::POINT_SIZE>() = inPointSize;
   GL::PointSize(inPointSize);
 }
 
 void Renderer::SetLineWidth(const float inLineWidth)
 {
-  GetCurrentState<ERendererStateId::LINE_WIDTH>() = inLineWidth;
+  mState.GetCurrent<ERendererStateId::LINE_WIDTH>() = inLineWidth;
   GL::LineWidth(inLineWidth);
 }
 
 void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
 {
-  GetCurrentState<ERendererStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
+  mState.GetCurrent<ERendererStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
 void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
 {
   mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
-  GetCurrentState<ERendererStateId::RENDER_TEXTURE>() = inRenderTexture;
+  mState.GetCurrent<ERendererStateId::RENDER_TEXTURE>() = inRenderTexture;
 
   if (inRenderTexture)
   {
@@ -123,39 +123,39 @@ void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTextur
 
 void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera)
 {
-  GetCurrentState<ERendererStateId::CAMERA>() = inCamera;
+  mState.GetCurrent<ERendererStateId::CAMERA>() = inCamera;
 }
-std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState<ERendererStateId::CAMERA>(); }
-std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState<ERendererStateId::CAMERA>(); }
+std::shared_ptr<const Camera> Renderer::GetCamera() const { return mState.GetCurrent<ERendererStateId::CAMERA>(); }
+std::shared_ptr<Camera> Renderer::GetCamera() { return mState.GetCurrent<ERendererStateId::CAMERA>(); }
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix)
 {
-  GetCurrentState<ERendererStateId::MODEL_MATRIX>() = inModelMatrix;
+  mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() = inModelMatrix;
 }
 void Renderer::Translate(const Vec3f& inTranslation)
 {
-  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
-      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * TranslationMat4(inTranslation);
+  mState.GetCurrent<ERendererStateId::MODEL_MATRIX>()
+      = mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() * TranslationMat4(inTranslation);
 }
 void Renderer::Rotate(const Quatf& inRotation)
 {
-  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
-      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * RotationMat4(inRotation);
+  mState.GetCurrent<ERendererStateId::MODEL_MATRIX>()
+      = mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() * RotationMat4(inRotation);
 }
 void Renderer::Scale(const Vec3f& inScale)
 {
-  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
-      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * ScaleMat4(inScale);
+  mState.GetCurrent<ERendererStateId::MODEL_MATRIX>()
+      = mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() * ScaleMat4(inScale);
 }
 void Renderer::Scale(const float inScale) { Scale(Vec3f { inScale }); }
 
-void Renderer::SetMaterial(const Material& inMaterial) { GetCurrentState<ERendererStateId::MATERIAL>() = inMaterial; }
-const Material& Renderer::GetMaterial() const { return GetCurrentState<ERendererStateId::MATERIAL>(); }
-Material& Renderer::GetMaterial() { return GetCurrentState<ERendererStateId::MATERIAL>(); }
+void Renderer::SetMaterial(const Material& inMaterial) { mState.GetCurrent<ERendererStateId::MATERIAL>() = inMaterial; }
+const Material& Renderer::GetMaterial() const { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
+Material& Renderer::GetMaterial() { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
 
 void Renderer::SetSceneAmbientColor(const Color3f& inSceneAmbientColor)
 {
-  GetCurrentState<ERendererStateId::SCENE_AMBIENT_COLOR>() = inSceneAmbientColor;
+  mState.GetCurrent<ERendererStateId::SCENE_AMBIENT_COLOR>() = inSceneAmbientColor;
 }
 
 void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor)
@@ -164,35 +164,34 @@ void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inCo
 
   GLSLDirectionalLight directional_light;
   directional_light.mDirection
-      = NormalizedSafe(XYZ(GetCurrentState<ERendererStateId::MODEL_MATRIX>() * XYZ0(inDirection)));
+      = NormalizedSafe(XYZ(mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() * XYZ0(inDirection)));
   directional_light.mColor = inColor;
 
-  GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>().push_back(directional_light);
+  mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>().push_back(directional_light);
 }
 
-void Renderer::ClearDirectionalLights() { GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>().clear(); }
+void Renderer::ClearDirectionalLights() { mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>().clear(); }
 
 void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor)
 {
   EXPECTS(inRange > 0.0f);
 
   GLSLPointLight point_light;
-  point_light.mPosition = XYZ(GetCurrentState<ERendererStateId::MODEL_MATRIX>() * XYZ1(inPosition));
+  point_light.mPosition = XYZ(mState.GetCurrent<ERendererStateId::MODEL_MATRIX>() * XYZ1(inPosition));
   point_light.mRange = inRange;
   point_light.mColor = inColor;
 
-  GetCurrentState<ERendererStateId::POINT_LIGHTS>().push_back(point_light);
+  mState.GetCurrent<ERendererStateId::POINT_LIGHTS>().push_back(point_light);
 }
 
-void Renderer::ClearPointLights() { GetCurrentState<ERendererStateId::POINT_LIGHTS>().clear(); }
+void Renderer::ClearPointLights() { mState.GetCurrent<ERendererStateId::POINT_LIGHTS>().clear(); }
 
-void Renderer::PushState() { mStateStacks.ApplyToAll<PushStateFunctor>(); }
+void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState()
 {
-  mStateStacks.ApplyToAll<PopStateFunctor>();
-  ApplyCurrentState();
+  mState.PopAll();
+  mState.ApplyCurrentState();
 }
-void Renderer::ApplyCurrentState() { mStateStacks.ApplyToAll<ApplyCurrentStateFunctor>(*this); }
 
 void Renderer::ResetState()
 {
@@ -270,7 +269,7 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
 void Renderer::DrawAxes()
 {
   PushState();
-  ResetCurrentState<ERendererStateId::MATERIAL>();
+  mState.Reset<ERendererStateId::MATERIAL>();
 
   GetMaterial().SetDiffuseColor(Red());
   DrawArrow(Segment3f { Zero<Vec3f>(), Right<Vec3f>() });
@@ -302,11 +301,11 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
 {
   Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
 
-  auto& current_override_shader_program = GetCurrentState<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
+  auto& current_override_shader_program = mState.GetCurrent<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
   auto& shader_program = (current_override_shader_program ? *current_override_shader_program : ioShaderProgram);
 
-  const auto& model_matrix = GetCurrentState<ERendererStateId::MODEL_MATRIX>();
-  const auto& current_camera = GetCurrentState<ERendererStateId::CAMERA>();
+  const auto& model_matrix = mState.GetCurrent<ERendererStateId::MODEL_MATRIX>();
+  const auto& current_camera = mState.GetCurrent<ERendererStateId::CAMERA>();
   const auto view_matrix = current_camera->GetViewMatrix();
   const auto normal_matrix = NormalMat4(model_matrix);
   const auto projection_matrix = current_camera->GetProjectionMatrix();
@@ -322,7 +321,7 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
   shader_program.SetUniformSafe("UView", view_matrix);
   shader_program.SetUniformSafe("UCameraWorldPosition", camera_world_position);
   shader_program.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
-  shader_program.SetUniformSafe("USceneAmbientColor", GetCurrentState<ERendererStateId::SCENE_AMBIENT_COLOR>());
+  shader_program.SetUniformSafe("USceneAmbientColor", mState.GetCurrent<ERendererStateId::SCENE_AMBIENT_COLOR>());
   shader_program.SetUniformSafe("UProjection", projection_view_model_matrix);
   shader_program.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
 
@@ -331,14 +330,14 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
   {
     // Directional lights
     shader_program.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
-    const auto& directional_lights = GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>();
+    const auto& directional_lights = mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>();
     mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
     mDirectionalLightsUBO.BindToBindingPoint(0);
     shader_program.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
 
     // Point lights
     shader_program.SetUniformBlockBindingSafe("UBlockPointLights", 1);
-    const auto& point_lights = GetCurrentState<ERendererStateId::POINT_LIGHTS>();
+    const auto& point_lights = mState.GetCurrent<ERendererStateId::POINT_LIGHTS>();
     mPointLightsUBO.BufferSubData(MakeSpan(point_lights));
     mPointLightsUBO.BindToBindingPoint(1);
     shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));

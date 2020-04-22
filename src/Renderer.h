@@ -8,10 +8,10 @@
 #include "Material.h"
 #include "Math.h"
 #include "PointLight.h"
+#include "RendererStateStacks.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
-#include "TupleOfStacks.h"
 #include "UBO.h"
 #include <any>
 #include <cstdint>
@@ -24,47 +24,6 @@ namespace egl
 {
 class DrawableMesh;
 class ShaderProgram;
-
-// Renderer state id enum
-enum class ERendererStateId
-{
-  CAMERA,
-  MODEL_MATRIX,
-  MATERIAL,
-  OVERRIDE_SHADER_PROGRAM,
-  RENDER_TEXTURE,
-  DEPTH_ENABLED,
-  CULL_FACE_ENABLED,
-  BLEND_ENABLED,
-  BLEND_SOURCE_FACTOR,
-  BLEND_DEST_FACTOR,
-  POINT_SIZE,
-  LINE_WIDTH,
-  SCENE_AMBIENT_COLOR,
-  DIRECTIONAL_LIGHTS,
-  POINT_LIGHTS
-};
-
-// clang-format off
-template <ERendererStateId TStateId> struct RendererStateStackValueType { using Type = void; };
-template <ERendererStateId TStateId>
-using RendererStateStackValueType_t = typename RendererStateStackValueType<TStateId>::Type;
-template <> struct RendererStateStackValueType<ERendererStateId::CAMERA> { using Type = std::shared_ptr<Camera>; };
-template <> struct RendererStateStackValueType<ERendererStateId::MODEL_MATRIX> { using Type = Mat4f; };
-template <> struct RendererStateStackValueType<ERendererStateId::MATERIAL> { using Type = Material; };
-template <> struct RendererStateStackValueType<ERendererStateId::OVERRIDE_SHADER_PROGRAM> { using Type = std::shared_ptr<ShaderProgram>; };
-template <> struct RendererStateStackValueType<ERendererStateId::RENDER_TEXTURE> { using Type = std::shared_ptr<Texture2D>; };
-template <> struct RendererStateStackValueType<ERendererStateId::DEPTH_ENABLED> { using Type = bool; };
-template <> struct RendererStateStackValueType<ERendererStateId::CULL_FACE_ENABLED> { using Type = bool; };
-template <> struct RendererStateStackValueType<ERendererStateId::BLEND_ENABLED> { using Type = bool; };
-template <> struct RendererStateStackValueType<ERendererStateId::BLEND_SOURCE_FACTOR> { using Type = GL::EBlendFactor; };
-template <> struct RendererStateStackValueType<ERendererStateId::BLEND_DEST_FACTOR> { using Type = GL::EBlendFactor; };
-template <> struct RendererStateStackValueType<ERendererStateId::POINT_SIZE> { using Type = float; };
-template <> struct RendererStateStackValueType<ERendererStateId::LINE_WIDTH> { using Type = float; };
-template <> struct RendererStateStackValueType<ERendererStateId::SCENE_AMBIENT_COLOR> { using Type = Color3f; };
-template <> struct RendererStateStackValueType<ERendererStateId::DIRECTIONAL_LIGHTS> { using Type = std::vector<GLSLDirectionalLight>; };
-template <> struct RendererStateStackValueType<ERendererStateId::POINT_LIGHTS> { using Type = std::vector<GLSLPointLight>; };
-// clang-format on
 
 class Renderer
 {
@@ -132,6 +91,13 @@ public:
   void PopState();
   void ResetState();
 
+  // State generics
+  template <ERendererStateId TStateId>
+  const auto& GetCurrent() const
+  {
+    return mState.GetCurrent<TStateId>();
+  }
+
   // Draw - 3D
   void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawVAOElements(const VAO& inVAO,
@@ -162,123 +128,8 @@ private:
   static std::unique_ptr<DrawableMesh> sCone;
   static std::shared_ptr<Texture2D> sWhiteTexture;
 
-  // State ===================
-
-  template <ERendererStateId TStateId>
-  std::stack<RendererStateStackValueType_t<TStateId>>& GetStateStack()
-  {
-    auto& state_stack = mStateStacks.GetStack<TStateId>();
-    return state_stack;
-  }
-
-  template <ERendererStateId TStateId>
-  const std::stack<RendererStateStackValueType_t<TStateId>>& GetStateStack() const
-  {
-    return const_cast<Renderer&>(*this).GetStateStack<TStateId>();
-  }
-
-  template <ERendererStateId TStateId>
-  auto& GetCurrentState()
-  {
-    auto& state_stack = GetStateStack<TStateId>();
-    EXPECTS(state_stack.size() >= 1);
-    return state_stack.top();
-  }
-
-  template <ERendererStateId TStateId>
-  const auto& GetCurrentState() const
-  {
-    return const_cast<Renderer&>(*this).GetCurrentState<TStateId>();
-  }
-
-  template <ERendererStateId TStateId>
-  void ApplyState(const RendererStateStackValueType_t<TStateId>& inValue);
-
-  // State stack values
-  template <ERendererStateId TStateId>
-  static RendererStateStackValueType_t<TStateId> GetDefaultStateValue();
-
-  using StateStacksTupleType = TupleOfStacks<ERendererStateId,
-      RendererStateStackValueType_t<ERendererStateId::CAMERA>,
-      RendererStateStackValueType_t<ERendererStateId::MODEL_MATRIX>,
-      RendererStateStackValueType_t<ERendererStateId::MATERIAL>,
-      RendererStateStackValueType_t<ERendererStateId::OVERRIDE_SHADER_PROGRAM>,
-      RendererStateStackValueType_t<ERendererStateId::RENDER_TEXTURE>,
-      RendererStateStackValueType_t<ERendererStateId::DEPTH_ENABLED>,
-      RendererStateStackValueType_t<ERendererStateId::CULL_FACE_ENABLED>,
-      RendererStateStackValueType_t<ERendererStateId::BLEND_ENABLED>,
-      RendererStateStackValueType_t<ERendererStateId::BLEND_SOURCE_FACTOR>,
-      RendererStateStackValueType_t<ERendererStateId::BLEND_DEST_FACTOR>,
-      RendererStateStackValueType_t<ERendererStateId::POINT_SIZE>,
-      RendererStateStackValueType_t<ERendererStateId::LINE_WIDTH>,
-      RendererStateStackValueType_t<ERendererStateId::SCENE_AMBIENT_COLOR>,
-      RendererStateStackValueType_t<ERendererStateId::DIRECTIONAL_LIGHTS>,
-      RendererStateStackValueType_t<ERendererStateId::POINT_LIGHTS>>;
-  StateStacksTupleType mStateStacks;
-
-  template <ERendererStateId TStateId>
-  struct PushStateFunctor
-  {
-    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack) const { ioStack.push(ioStack.top()); }
-  };
-
-  template <ERendererStateId TStateId>
-  struct PopStateFunctor
-  {
-    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack) const { ioStack.pop(); }
-  };
-
-  template <ERendererStateId TStateId>
-  struct ApplyCurrentStateFunctor
-  {
-    void operator()(const StateStacksTupleType::StackType<TStateId>& inStack, Renderer& ioRenderer) const
-    {
-      EXPECTS(inStack.size() >= 1);
-      ioRenderer.ApplyState<TStateId>(inStack.top());
-    }
-  };
-
-  template <ERendererStateId TStateId>
-  struct PushDefaultValueToAllStacksFunctor
-  {
-    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack, Renderer& ioRenderer) const
-    {
-      const auto default_stack_value = ioRenderer.GetDefaultStateValue<TStateId>();
-      ioStack.push(default_stack_value);
-    }
-  };
-
-  template <typename TTuple, ERendererStateId TStateId>
-  void PushDefaultValueToAllStateStacks(TTuple& inTuple)
-  {
-    if constexpr (static_cast<int>(TStateId) < std::tuple_size<TTuple>())
-    {
-      auto& state_stack = std::get<static_cast<int>(TStateId)>(inTuple);
-      state_stack.push(GetDefaultStateValue<TStateId>());
-      PushDefaultValueToAllStateStacks<TTuple, static_cast<ERendererStateId>(static_cast<int>(TStateId) + 1)>(inTuple);
-    }
-  }
-
-  template <typename TTuple, ERendererStateId TStateId>
-  void ApplyAllStateStacks(const TTuple& inTuple)
-  {
-    if constexpr (static_cast<int>(TStateId) < std::tuple_size<TTuple>())
-    {
-      const auto& state_stack_current_top_element = GetCurrentState<TStateId>();
-      ApplyState<TStateId>(state_stack_current_top_element);
-      ApplyAllStateStacks<TTuple, static_cast<ERendererStateId>(static_cast<int>(TStateId) + 1)>(inTuple);
-    }
-  }
-
-  void ApplyCurrentState();
-
-  template <ERendererStateId TStateId>
-  void ResetCurrentState()
-  {
-    GetCurrentState<TStateId>() = GetDefaultStateValue<TStateId>();
-  }
-
-  // ==========================
+  // State
+  RendererStateStacks<Renderer> mState { *this };
 
   // Lights
   static constexpr auto MaxNumberOfDirectionalLights = 100;
