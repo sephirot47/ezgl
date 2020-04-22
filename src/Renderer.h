@@ -222,6 +222,32 @@ private:
     void operator()(StateStacksTupleType::StackType<TStateId>& ioStack) const { ioStack.push(ioStack.top()); }
   };
 
+  template <ERendererStateId TStateId>
+  struct PopStateFunctor
+  {
+    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack) const { ioStack.pop(); }
+  };
+
+  template <ERendererStateId TStateId>
+  struct ApplyCurrentStateFunctor
+  {
+    void operator()(const StateStacksTupleType::StackType<TStateId>& inStack, Renderer& ioRenderer) const
+    {
+      EXPECTS(inStack.size() >= 1);
+      ioRenderer.ApplyState<TStateId>(inStack.top());
+    }
+  };
+
+  template <ERendererStateId TStateId>
+  struct PushDefaultValueToAllStacksFunctor
+  {
+    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack, Renderer& ioRenderer) const
+    {
+      const auto default_stack_value = ioRenderer.GetDefaultStateValue<TStateId>();
+      ioStack.push(default_stack_value);
+    }
+  };
+
   template <typename TTuple, ERendererStateId TStateId>
   void PushDefaultValueToAllStateStacks(TTuple& inTuple)
   {
@@ -243,6 +269,8 @@ private:
       ApplyAllStateStacks<TTuple, static_cast<ERendererStateId>(static_cast<int>(TStateId) + 1)>(inTuple);
     }
   }
+
+  void ApplyCurrentState();
 
   template <ERendererStateId TStateId>
   void ResetCurrentState()
