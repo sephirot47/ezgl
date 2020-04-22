@@ -58,18 +58,6 @@ void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
 }
 
 // clang-format off
-/*
-void Renderer::ApplyState(const State& inStateToApply)
-{
-  GL::SetEnabled(GL::Enablable::DEPTH_TEST, inStateToApply.mDepthEnabled);
-  GL::SetEnabled(GL::Enablable::CULL_FACE, inStateToApply.mCullFaceEnabled);
-  GL::SetEnabled(GL::Enablable::BLEND, inStateToApply.mBlendEnabled);
-  GL::BlendFunc(inStateToApply.mBlendSourceFactor, inStateToApply.mBlendDestFactor);
-  GL::PointSize(inStateToApply.mPointSize);
-  GL::LineWidth(inStateToApply.mLineWidth);
-  SetRenderTexture(inStateToApply.mRenderTexture);
-}
-*/
 
 // State appliers
 template <> inline void Renderer::ApplyState<ERendererStateId::CAMERA>(const std::shared_ptr<Camera>& ) { }

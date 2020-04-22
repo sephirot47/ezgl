@@ -11,6 +11,7 @@
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "TupleOfStacks.h"
 #include "UBO.h"
 #include <any>
 #include <cstdint>
@@ -166,7 +167,7 @@ private:
   template <ERendererStateId TStateId>
   std::stack<RendererStateStackValueType_t<TStateId>>& GetStateStack()
   {
-    auto& state_stack = std::get<static_cast<int>(TStateId)>(mStateStacks);
+    auto& state_stack = mStateStacks.GetStack<TStateId>();
     return state_stack;
   }
 
@@ -197,22 +198,29 @@ private:
   template <ERendererStateId TStateId>
   static RendererStateStackValueType_t<TStateId> GetDefaultStateValue();
 
-  using StateStacksTupleType = std::tuple<std::stack<RendererStateStackValueType_t<ERendererStateId::CAMERA>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::MODEL_MATRIX>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::MATERIAL>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::OVERRIDE_SHADER_PROGRAM>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::RENDER_TEXTURE>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::DEPTH_ENABLED>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::CULL_FACE_ENABLED>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_ENABLED>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_SOURCE_FACTOR>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_DEST_FACTOR>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::POINT_SIZE>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::LINE_WIDTH>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::SCENE_AMBIENT_COLOR>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::DIRECTIONAL_LIGHTS>>,
-      std::stack<RendererStateStackValueType_t<ERendererStateId::POINT_LIGHTS>>>;
+  using StateStacksTupleType = TupleOfStacks<ERendererStateId,
+      RendererStateStackValueType_t<ERendererStateId::CAMERA>,
+      RendererStateStackValueType_t<ERendererStateId::MODEL_MATRIX>,
+      RendererStateStackValueType_t<ERendererStateId::MATERIAL>,
+      RendererStateStackValueType_t<ERendererStateId::OVERRIDE_SHADER_PROGRAM>,
+      RendererStateStackValueType_t<ERendererStateId::RENDER_TEXTURE>,
+      RendererStateStackValueType_t<ERendererStateId::DEPTH_ENABLED>,
+      RendererStateStackValueType_t<ERendererStateId::CULL_FACE_ENABLED>,
+      RendererStateStackValueType_t<ERendererStateId::BLEND_ENABLED>,
+      RendererStateStackValueType_t<ERendererStateId::BLEND_SOURCE_FACTOR>,
+      RendererStateStackValueType_t<ERendererStateId::BLEND_DEST_FACTOR>,
+      RendererStateStackValueType_t<ERendererStateId::POINT_SIZE>,
+      RendererStateStackValueType_t<ERendererStateId::LINE_WIDTH>,
+      RendererStateStackValueType_t<ERendererStateId::SCENE_AMBIENT_COLOR>,
+      RendererStateStackValueType_t<ERendererStateId::DIRECTIONAL_LIGHTS>,
+      RendererStateStackValueType_t<ERendererStateId::POINT_LIGHTS>>;
   StateStacksTupleType mStateStacks;
+
+  template <ERendererStateId TStateId>
+  struct PushStateFunctor
+  {
+    void operator()(StateStacksTupleType::StackType<TStateId>& ioStack) const { ioStack.push(ioStack.top()); }
+  };
 
   template <typename TTuple, ERendererStateId TStateId>
   void PushDefaultValueToAllStateStacks(TTuple& inTuple)

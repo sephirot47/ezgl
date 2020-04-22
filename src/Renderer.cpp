@@ -49,7 +49,7 @@ Renderer::Renderer()
       GL::ETextureInternalFormat::DEPTH24_STENCIL8);
 
   // Init state
-  PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mStateStacks);
+  // PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mStateStacks);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -187,24 +187,17 @@ void Renderer::ClearPointLights() { GetCurrentState<ERendererStateId::POINT_LIGH
 
 void Renderer::PushState()
 {
-  std::apply([](auto&... state_stack) { (..., [&]() { state_stack.push(state_stack.top()); }()); }, mStateStacks);
+  mStateStacks.Apply<PushStateFunctor>();
+  // std::apply([](auto&... state_stack) { (..., [&]() { state_stack.push(state_stack.top()); }()); }, mStateStacks);
 }
 
 void Renderer::PopState()
 {
   // Pop all
-  std::apply([](auto&... state_stack) { (..., state_stack.pop()); }, mStateStacks);
-  /*
-  std::apply(
-      [](auto& state_stack) {
-        EXPECTS(state_stack.size() >= 2);
-        state_stack.pop();
-      },
-      mStateStacks);
-      */
+  // std::apply([](auto&... state_stack) { (..., state_stack.pop()); }, mStateStacks);
 
   // Apply new current state after pop, by applying the current state of each stack
-  ApplyAllStateStacks<decltype(mStateStacks), static_cast<ERendererStateId>(0)>(mStateStacks);
+  // ApplyAllStateStacks<decltype(mStateStacks), static_cast<ERendererStateId>(0)>(mStateStacks);
 }
 
 void Renderer::ResetState()
