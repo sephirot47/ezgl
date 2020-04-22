@@ -12,15 +12,58 @@
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 #include "UBO.h"
+#include <any>
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <stack>
+#include <tuple>
 
 namespace egl
 {
 class DrawableMesh;
 class ShaderProgram;
+
+// Renderer state id enum
+enum class ERendererStateId
+{
+  CAMERA,
+  MODEL_MATRIX,
+  MATERIAL,
+  OVERRIDE_SHADER_PROGRAM,
+  RENDER_TEXTURE,
+  DEPTH_ENABLED,
+  CULL_FACE_ENABLED,
+  BLEND_ENABLED,
+  BLEND_SOURCE_FACTOR,
+  BLEND_DEST_FACTOR,
+  POINT_SIZE,
+  LINE_WIDTH,
+  SCENE_AMBIENT_COLOR,
+  DIRECTIONAL_LIGHTS,
+  POINT_LIGHTS
+};
+
+// clang-format off
+template <ERendererStateId TStateId> struct RendererStateStackValueType { using Type = void; };
+template <ERendererStateId TStateId>
+using RendererStateStackValueType_t = typename RendererStateStackValueType<TStateId>::Type;
+template <> struct RendererStateStackValueType<ERendererStateId::CAMERA> { using Type = std::shared_ptr<Camera>; };
+template <> struct RendererStateStackValueType<ERendererStateId::MODEL_MATRIX> { using Type = Mat4f; };
+template <> struct RendererStateStackValueType<ERendererStateId::MATERIAL> { using Type = Material; };
+template <> struct RendererStateStackValueType<ERendererStateId::OVERRIDE_SHADER_PROGRAM> { using Type = std::shared_ptr<ShaderProgram>; };
+template <> struct RendererStateStackValueType<ERendererStateId::RENDER_TEXTURE> { using Type = std::shared_ptr<Texture2D>; };
+template <> struct RendererStateStackValueType<ERendererStateId::DEPTH_ENABLED> { using Type = bool; };
+template <> struct RendererStateStackValueType<ERendererStateId::CULL_FACE_ENABLED> { using Type = bool; };
+template <> struct RendererStateStackValueType<ERendererStateId::BLEND_ENABLED> { using Type = bool; };
+template <> struct RendererStateStackValueType<ERendererStateId::BLEND_SOURCE_FACTOR> { using Type = GL::EBlendFactor; };
+template <> struct RendererStateStackValueType<ERendererStateId::BLEND_DEST_FACTOR> { using Type = GL::EBlendFactor; };
+template <> struct RendererStateStackValueType<ERendererStateId::POINT_SIZE> { using Type = float; };
+template <> struct RendererStateStackValueType<ERendererStateId::LINE_WIDTH> { using Type = float; };
+template <> struct RendererStateStackValueType<ERendererStateId::SCENE_AMBIENT_COLOR> { using Type = Color3f; };
+template <> struct RendererStateStackValueType<ERendererStateId::DIRECTIONAL_LIGHTS> { using Type = std::vector<GLSLDirectionalLight>; };
+template <> struct RendererStateStackValueType<ERendererStateId::POINT_LIGHTS> { using Type = std::vector<GLSLPointLight>; };
+// clang-format on
 
 class Renderer
 {
@@ -61,7 +104,6 @@ public:
 
   // Camera
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
-  void ResetCamera();
   std::shared_ptr<const Camera> GetCamera() const;
   std::shared_ptr<Camera> GetCamera();
 
@@ -71,12 +113,10 @@ public:
   void Rotate(const Quatf& inRotation);
   void Scale(const Vec3f& inScale);
   void Scale(const float inScale);
-  void ResetModelMatrix();
 
   // Materials
   void SetMaterial(const Material& inMaterial);
   const Material& GetMaterial() const;
-  void ResetMaterial();
   Material& GetMaterial();
 
   // Lighting
@@ -121,37 +161,96 @@ private:
   static std::unique_ptr<DrawableMesh> sCone;
   static std::shared_ptr<Texture2D> sWhiteTexture;
 
-  struct State
+  // State ===================
+
+  template <ERendererStateId TStateId>
+  std::stack<RendererStateStackValueType_t<TStateId>>& GetStateStack()
   {
-    std::shared_ptr<Camera> mCamera = std::make_shared<Camera>();
-    Mat4f mModelMatrix = Identity<Mat4f>();
+    auto& state_stack = std::get<static_cast<int>(TStateId)>(mStateStacks);
+    return state_stack;
+  }
 
-    Material mMaterial;
-    std::shared_ptr<ShaderProgram> mOverrideShaderProgram;
-    std::shared_ptr<Texture2D> mRenderTexture;
+  template <ERendererStateId TStateId>
+  const std::stack<RendererStateStackValueType_t<TStateId>>& GetStateStack() const
+  {
+    return const_cast<Renderer&>(*this).GetStateStack<TStateId>();
+  }
 
-    bool mDepthEnabled = true;
-    bool mCullFaceEnabled = true;
+  template <ERendererStateId TStateId>
+  auto& GetCurrentState()
+  {
+    auto& state_stack = GetStateStack<TStateId>();
+    EXPECTS(state_stack.size() >= 1);
+    return state_stack.top();
+  }
 
-    bool mBlendEnabled = true;
-    GL::EBlendFactor mBlendSourceFactor = GL::EBlendFactor::SRC_ALPHA;
-    GL::EBlendFactor mBlendDestFactor = GL::EBlendFactor::ONE_MINUS_SRC_ALPHA;
+  template <ERendererStateId TStateId>
+  const auto& GetCurrentState() const
+  {
+    return const_cast<Renderer&>(*this).GetCurrentState<TStateId>();
+  }
 
-    float mPointSize = 5.0f;
-    float mLineWidth = 1.0f;
+  template <ERendererStateId TStateId>
+  void ApplyState(const RendererStateStackValueType_t<TStateId>& inValue);
 
-    Color3f mSceneAmbientColor = WithValue(White<Color3f>(), 0.1f);
+  // State stack values
+  template <ERendererStateId TStateId>
+  static RendererStateStackValueType_t<TStateId> GetDefaultStateValue();
 
-    std::vector<GLSLDirectionalLight> mDirectionalLights;
-    std::vector<GLSLPointLight> mPointLights;
-  };
-  std::stack<State> mStateStack;
+  using StateStacksTupleType = std::tuple<std::stack<RendererStateStackValueType_t<ERendererStateId::CAMERA>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::MODEL_MATRIX>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::MATERIAL>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::OVERRIDE_SHADER_PROGRAM>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::RENDER_TEXTURE>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::DEPTH_ENABLED>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::CULL_FACE_ENABLED>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_ENABLED>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_SOURCE_FACTOR>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::BLEND_DEST_FACTOR>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::POINT_SIZE>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::LINE_WIDTH>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::SCENE_AMBIENT_COLOR>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::DIRECTIONAL_LIGHTS>>,
+      std::stack<RendererStateStackValueType_t<ERendererStateId::POINT_LIGHTS>>>;
+  StateStacksTupleType mStateStacks;
 
+  template <typename TTuple, ERendererStateId TStateId>
+  void PushDefaultValueToAllStateStacks(TTuple& inTuple)
+  {
+    if constexpr (static_cast<int>(TStateId) < std::tuple_size<TTuple>())
+    {
+      auto& state_stack = std::get<static_cast<int>(TStateId)>(inTuple);
+      state_stack.push(GetDefaultStateValue<TStateId>());
+      PushDefaultValueToAllStateStacks<TTuple, static_cast<ERendererStateId>(static_cast<int>(TStateId) + 1)>(inTuple);
+    }
+  }
+
+  template <typename TTuple, ERendererStateId TStateId>
+  void ApplyAllStateStacks(const TTuple& inTuple)
+  {
+    if constexpr (static_cast<int>(TStateId) < std::tuple_size<TTuple>())
+    {
+      const auto& state_stack_current_top_element = GetCurrentState<TStateId>();
+      ApplyState<TStateId>(state_stack_current_top_element);
+      ApplyAllStateStacks<TTuple, static_cast<ERendererStateId>(static_cast<int>(TStateId) + 1)>(inTuple);
+    }
+  }
+
+  template <ERendererStateId TStateId>
+  void ResetCurrentState()
+  {
+    GetCurrentState<TStateId>() = GetDefaultStateValue<TStateId>();
+  }
+
+  // ==========================
+
+  // Lights
   static constexpr auto MaxNumberOfDirectionalLights = 100;
   static constexpr auto MaxNumberOfPointLights = 100;
   UBO mDirectionalLightsUBO;
   UBO mPointLightsUBO;
 
+  // Render texture framebuffer
   std::unique_ptr<Framebuffer> mRenderTextureFramebuffer;
 
   // Draw helpers
@@ -160,12 +259,6 @@ private:
       const GL::EPrimitivesType inPrimitivesType,
       const bool inDrawArrays,
       const GL::Size inBeginArraysPrimitiveIndex);
-
-  // State
-  static const State DefaultState;
-  State& GetCurrentState();
-  const State& GetCurrentState() const;
-  void ApplyState(const State& inStateToApply);
 
   // Draw - Generic (3D and 2D)
   template <typename T, std::size_t N>

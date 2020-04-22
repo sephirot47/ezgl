@@ -81,6 +81,8 @@ int main()
     ioRenderer.SetLineWidth(3.0f);
     ioRenderer.DrawAxes();
 
+    ioRenderer.SetCullFaceEnabled(false);
+
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
     ioRenderer.Translate(obj_pos);
     UNUSED(q);
@@ -106,6 +108,8 @@ int main()
       ioRenderer.ResetState();
       ioRenderer.SetRenderTexture(nullptr);
 
+      ioRenderer.SetCullFaceEnabled(true);
+
       const auto new_camera = std::make_shared<Camera>();
       new_camera->SetPosition(Back<Vec3f>() * 8.0f);
       new_camera->LookAtPoint(Zero<Vec3f>());
@@ -114,7 +118,7 @@ int main()
       ioRenderer.ClearDepth();
       ioRenderer.ClearBackground(Black());
 
-      ioRenderer.ResetMaterial();
+      // ioRenderer.ResetMaterial();
       ioRenderer.Rotate(AngleAxis(0.5f, Forward()));
       ioRenderer.Scale(All<Vec3f>(14.0f));
       ioRenderer.GetMaterial().SetLightingEnabled(false);

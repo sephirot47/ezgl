@@ -16,8 +16,6 @@
 
 namespace egl
 {
-
-const Renderer::State Renderer::DefaultState;
 bool Renderer::sStaticResourcesInited = false;
 std::unique_ptr<ShaderProgram> Renderer::sOnlyColorShaderProgram;
 std::unique_ptr<ShaderProgram> Renderer::sMeshShaderProgram;
@@ -35,7 +33,6 @@ Renderer::Renderer()
 
     sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
         FragmentShader { std::filesystem::path("../res/Mesh.frag") });
-
     sCone = std::make_unique<DrawableMesh>(DrawableMeshFactory::GetCone(32));
     sWhiteTexture = TextureFactory::GetWhiteTexture();
 
@@ -52,8 +49,7 @@ Renderer::Renderer()
       GL::ETextureInternalFormat::DEPTH24_STENCIL8);
 
   // Init state
-  mStateStack.push(DefaultState);
-  ApplyState(GetCurrentState());
+  PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mStateStacks);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -66,50 +62,50 @@ void Renderer::ClearDepth() { GL::ClearBuffer(GL::EBufferBitFlags::DEPTH); }
 
 void Renderer::SetDepthTestEnabled(const bool inDepthTestEnabled)
 {
-  GetCurrentState().mDepthEnabled = inDepthTestEnabled;
+  GetCurrentState<ERendererStateId::DEPTH_ENABLED>() = inDepthTestEnabled;
   GL::SetEnabled(GL::Enablable::DEPTH_TEST, inDepthTestEnabled);
 }
 
 void Renderer::SetCullFaceEnabled(const bool inCullFaceEnabled)
 {
-  GetCurrentState().mCullFaceEnabled = inCullFaceEnabled;
+  GetCurrentState<ERendererStateId::CULL_FACE_ENABLED>() = inCullFaceEnabled;
   GL::SetEnabled(GL::Enablable::CULL_FACE, inCullFaceEnabled);
 }
 
 void Renderer::SetBlendEnabled(const bool inBlendEnabled)
 {
-  GetCurrentState().mBlendEnabled = inBlendEnabled;
+  GetCurrentState<ERendererStateId::BLEND_ENABLED>() = inBlendEnabled;
   GL::SetEnabled(GL::Enablable::BLEND, inBlendEnabled);
 }
 
 void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
 {
-  GetCurrentState().mBlendSourceFactor = inBlendSourceFactor;
-  GetCurrentState().mBlendDestFactor = inBlendDestFactor;
+  GetCurrentState<ERendererStateId::BLEND_SOURCE_FACTOR>() = inBlendSourceFactor;
+  GetCurrentState<ERendererStateId::BLEND_DEST_FACTOR>() = inBlendDestFactor;
   GL::BlendFunc(inBlendSourceFactor, inBlendDestFactor);
 }
 
 void Renderer::SetPointSize(const float inPointSize)
 {
-  GetCurrentState().mPointSize = inPointSize;
+  GetCurrentState<ERendererStateId::POINT_SIZE>() = inPointSize;
   GL::PointSize(inPointSize);
 }
 
 void Renderer::SetLineWidth(const float inLineWidth)
 {
-  GetCurrentState().mLineWidth = inLineWidth;
+  GetCurrentState<ERendererStateId::LINE_WIDTH>() = inLineWidth;
   GL::LineWidth(inLineWidth);
 }
 
 void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
 {
-  GetCurrentState().mOverrideShaderProgram = inShaderProgram;
+  GetCurrentState<ERendererStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
 void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
 {
   mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
-  GetCurrentState().mRenderTexture = inRenderTexture;
+  GetCurrentState<ERendererStateId::RENDER_TEXTURE>() = inRenderTexture;
 
   if (inRenderTexture)
   {
@@ -124,35 +120,41 @@ void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTextur
   }
 }
 
-void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera) { GetCurrentState().mCamera = inCamera; }
-std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState().mCamera; }
-std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState().mCamera; }
-void Renderer::ResetCamera() { GetCurrentState().mCamera = DefaultState.mCamera; }
+void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera)
+{
+  GetCurrentState<ERendererStateId::CAMERA>() = inCamera;
+}
+std::shared_ptr<const Camera> Renderer::GetCamera() const { return GetCurrentState<ERendererStateId::CAMERA>(); }
+std::shared_ptr<Camera> Renderer::GetCamera() { return GetCurrentState<ERendererStateId::CAMERA>(); }
 
-void Renderer::SetModelMatrix(const Mat4f& inModelMatrix) { GetCurrentState().mModelMatrix = inModelMatrix; }
+void Renderer::SetModelMatrix(const Mat4f& inModelMatrix)
+{
+  GetCurrentState<ERendererStateId::MODEL_MATRIX>() = inModelMatrix;
+}
 void Renderer::Translate(const Vec3f& inTranslation)
 {
-  GetCurrentState().mModelMatrix = GetCurrentState().mModelMatrix * TranslationMat4(inTranslation);
+  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
+      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * TranslationMat4(inTranslation);
 }
 void Renderer::Rotate(const Quatf& inRotation)
 {
-  GetCurrentState().mModelMatrix = GetCurrentState().mModelMatrix * RotationMat4(inRotation);
+  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
+      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * RotationMat4(inRotation);
 }
 void Renderer::Scale(const Vec3f& inScale)
 {
-  GetCurrentState().mModelMatrix = GetCurrentState().mModelMatrix * ScaleMat4(inScale);
+  GetCurrentState<ERendererStateId::MODEL_MATRIX>()
+      = GetCurrentState<ERendererStateId::MODEL_MATRIX>() * ScaleMat4(inScale);
 }
 void Renderer::Scale(const float inScale) { Scale(Vec3f { inScale }); }
-void Renderer::ResetModelMatrix() { GetCurrentState().mModelMatrix = DefaultState.mModelMatrix; }
 
-void Renderer::SetMaterial(const Material& inMaterial) { GetCurrentState().mMaterial = inMaterial; }
-const Material& Renderer::GetMaterial() const { return GetCurrentState().mMaterial; }
-Material& Renderer::GetMaterial() { return GetCurrentState().mMaterial; }
-void Renderer::ResetMaterial() { GetCurrentState().mMaterial = Material(); }
+void Renderer::SetMaterial(const Material& inMaterial) { GetCurrentState<ERendererStateId::MATERIAL>() = inMaterial; }
+const Material& Renderer::GetMaterial() const { return GetCurrentState<ERendererStateId::MATERIAL>(); }
+Material& Renderer::GetMaterial() { return GetCurrentState<ERendererStateId::MATERIAL>(); }
 
 void Renderer::SetSceneAmbientColor(const Color3f& inSceneAmbientColor)
 {
-  GetCurrentState().mSceneAmbientColor = inSceneAmbientColor;
+  GetCurrentState<ERendererStateId::SCENE_AMBIENT_COLOR>() = inSceneAmbientColor;
 }
 
 void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor)
@@ -160,65 +162,55 @@ void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inCo
   EXPECTS(IsNormalized(inDirection));
 
   GLSLDirectionalLight directional_light;
-  directional_light.mDirection = NormalizedSafe(XYZ(GetCurrentState().mModelMatrix * XYZ0(inDirection)));
+  directional_light.mDirection
+      = NormalizedSafe(XYZ(GetCurrentState<ERendererStateId::MODEL_MATRIX>() * XYZ0(inDirection)));
   directional_light.mColor = inColor;
 
-  GetCurrentState().mDirectionalLights.push_back(directional_light);
+  GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>().push_back(directional_light);
 }
 
-void Renderer::ClearDirectionalLights() { GetCurrentState().mDirectionalLights.clear(); }
+void Renderer::ClearDirectionalLights() { GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>().clear(); }
 
 void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor)
 {
   EXPECTS(inRange > 0.0f);
 
   GLSLPointLight point_light;
-  point_light.mPosition = XYZ(GetCurrentState().mModelMatrix * XYZ1(inPosition));
+  point_light.mPosition = XYZ(GetCurrentState<ERendererStateId::MODEL_MATRIX>() * XYZ1(inPosition));
   point_light.mRange = inRange;
   point_light.mColor = inColor;
 
-  GetCurrentState().mPointLights.push_back(point_light);
+  GetCurrentState<ERendererStateId::POINT_LIGHTS>().push_back(point_light);
 }
 
-void Renderer::ClearPointLights() { GetCurrentState().mPointLights.clear(); }
+void Renderer::ClearPointLights() { GetCurrentState<ERendererStateId::POINT_LIGHTS>().clear(); }
 
-void Renderer::PushState() { mStateStack.push(GetCurrentState()); }
+void Renderer::PushState()
+{
+  std::apply([](auto&... state_stack) { (..., [&]() { state_stack.push(state_stack.top()); }()); }, mStateStacks);
+}
 
 void Renderer::PopState()
 {
-  EXPECTS(mStateStack.size() >= 2);
-  mStateStack.pop();
+  // Pop all
+  std::apply([](auto&... state_stack) { (..., state_stack.pop()); }, mStateStacks);
+  /*
+  std::apply(
+      [](auto& state_stack) {
+        EXPECTS(state_stack.size() >= 2);
+        state_stack.pop();
+      },
+      mStateStacks);
+      */
 
-  ApplyState(GetCurrentState());
+  // Apply new current state after pop, by applying the current state of each stack
+  ApplyAllStateStacks<decltype(mStateStacks), static_cast<ERendererStateId>(0)>(mStateStacks);
 }
 
 void Renderer::ResetState()
 {
-  EXPECTS(mStateStack.size() >= 2);
-  mStateStack.top() = DefaultState;
-}
-
-Renderer::State& Renderer::GetCurrentState()
-{
-  EXPECTS(!mStateStack.empty());
-  return mStateStack.top();
-}
-
-const Renderer::State& Renderer::GetCurrentState() const
-{
-  EXPECTS(!mStateStack.empty());
-  return mStateStack.top();
-}
-
-void Renderer::ApplyState(const State& inStateToApply)
-{
-  GL::SetEnabled(GL::Enablable::DEPTH_TEST, inStateToApply.mDepthEnabled);
-  GL::SetEnabled(GL::Enablable::CULL_FACE, inStateToApply.mCullFaceEnabled);
-  GL::SetEnabled(GL::Enablable::BLEND, inStateToApply.mBlendEnabled);
-  GL::BlendFunc(inStateToApply.mBlendSourceFactor, inStateToApply.mBlendDestFactor);
-  GL::PointSize(inStateToApply.mPointSize);
-  GL::LineWidth(inStateToApply.mLineWidth);
-  SetRenderTexture(inStateToApply.mRenderTexture);
+  PopState();
+  PushState();
 }
 
 // Draw - 3D ========================================================================================
@@ -291,7 +283,7 @@ void Renderer::DrawArrow(const Segment3f& inArrowSegment)
 void Renderer::DrawAxes()
 {
   PushState();
-  ResetMaterial();
+  ResetCurrentState<ERendererStateId::MATERIAL>();
 
   GetMaterial().SetDiffuseColor(Red());
   DrawArrow(Segment3f { Zero<Vec3f>(), Right<Vec3f>() });
@@ -323,17 +315,17 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
 {
   Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
 
-  auto& current_state = GetCurrentState();
-  auto& shader_program
-      = (current_state.mOverrideShaderProgram ? *current_state.mOverrideShaderProgram : ioShaderProgram);
+  auto& current_override_shader_program = GetCurrentState<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
+  auto& shader_program = (current_override_shader_program ? *current_override_shader_program : ioShaderProgram);
 
-  const auto& model_matrix = current_state.mModelMatrix;
-  const auto view_matrix = current_state.mCamera->GetViewMatrix();
+  const auto& model_matrix = GetCurrentState<ERendererStateId::MODEL_MATRIX>();
+  const auto& current_camera = GetCurrentState<ERendererStateId::CAMERA>();
+  const auto view_matrix = current_camera->GetViewMatrix();
   const auto normal_matrix = NormalMat4(model_matrix);
-  const auto projection_matrix = current_state.mCamera->GetProjectionMatrix();
+  const auto projection_matrix = current_camera->GetProjectionMatrix();
   const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
-  const auto camera_world_position = current_state.mCamera->GetPosition();
-  const auto camera_world_direction = Direction(current_state.mCamera->GetRotation());
+  const auto camera_world_position = current_camera->GetPosition();
+  const auto camera_world_direction = Direction(current_camera->GetRotation());
 
   shader_program.Bind();
 
@@ -343,7 +335,7 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
   shader_program.SetUniformSafe("UView", view_matrix);
   shader_program.SetUniformSafe("UCameraWorldPosition", camera_world_position);
   shader_program.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
-  shader_program.SetUniformSafe("USceneAmbientColor", current_state.mSceneAmbientColor);
+  shader_program.SetUniformSafe("USceneAmbientColor", GetCurrentState<ERendererStateId::SCENE_AMBIENT_COLOR>());
   shader_program.SetUniformSafe("UProjection", projection_view_model_matrix);
   shader_program.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
 
@@ -352,14 +344,14 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
   {
     // Directional lights
     shader_program.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
-    const auto& directional_lights = current_state.mDirectionalLights;
+    const auto& directional_lights = GetCurrentState<ERendererStateId::DIRECTIONAL_LIGHTS>();
     mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
     mDirectionalLightsUBO.BindToBindingPoint(0);
     shader_program.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
 
     // Point lights
     shader_program.SetUniformBlockBindingSafe("UBlockPointLights", 1);
-    const auto& point_lights = current_state.mPointLights;
+    const auto& point_lights = GetCurrentState<ERendererStateId::POINT_LIGHTS>();
     mPointLightsUBO.BufferSubData(MakeSpan(point_lights));
     mPointLightsUBO.BindToBindingPoint(1);
     shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));

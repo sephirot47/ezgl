@@ -1,5 +1,6 @@
 ﻿---
 BasedOnStyle: WebKit
+AlignTrailingComments: 'true'
 AccessModifierOffset: '-2'
 AllowAllArgumentsOnNextLine: 'false'
 AllowAllConstructorInitializersOnNextLine: 'false'
