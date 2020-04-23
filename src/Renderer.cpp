@@ -9,10 +9,10 @@
 #include "Math.h"
 #include "MeshFactory.h"
 #include "PointLight.h"
-#include "ProjectionParametersVariant.h"
 #include "ShaderProgram.h"
 #include "TextureFactory.h"
 #include "UBO.h"
+#include "Window.h"
 
 namespace egl
 {
@@ -50,7 +50,6 @@ Renderer::Renderer()
 
   // Init state
   mState.PushAllDefaultValues();
-  // PushDefaultValueToAllStateStacks<StateStacksTupleType, static_cast<ERendererStateId>(0)>(mState);
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -125,8 +124,41 @@ void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera)
 {
   mState.GetCurrent<ERendererStateId::CAMERA>() = inCamera;
 }
-std::shared_ptr<const Camera> Renderer::GetCamera() const { return mState.GetCurrent<ERendererStateId::CAMERA>(); }
+
+void Renderer::Set2DCamera(const Window& inWindow)
+{
+  OrthographicParameters orthographic_params;
+  orthographic_params.mMin = Vec3f { 0.0f, 0.0f, -1.0f };
+  orthographic_params.mMax
+      = Vec3f(static_cast<float>(inWindow.GetSize()[0]), static_cast<float>(inWindow.GetSize()[1]), 1.0f);
+
+  const auto orthographic_camera = std::make_shared<OrthographicCamera>();
+  orthographic_camera->SetOrthographicParameters(orthographic_params);
+  SetCamera(orthographic_camera);
+}
+
 std::shared_ptr<Camera> Renderer::GetCamera() { return mState.GetCurrent<ERendererStateId::CAMERA>(); }
+std::shared_ptr<const Camera> Renderer::GetCamera() const { return const_cast<Renderer&>(*this).GetCamera(); }
+
+std::shared_ptr<PerspectiveCamera> Renderer::GetPerspectiveCamera()
+{
+  return std::dynamic_pointer_cast<PerspectiveCamera>(mState.GetCurrent<ERendererStateId::CAMERA>());
+}
+
+std::shared_ptr<const PerspectiveCamera> Renderer::GetPerspectiveCamera() const
+{
+  return const_cast<Renderer&>(*this).GetPerspectiveCamera();
+}
+
+std::shared_ptr<OrthographicCamera> Renderer::GetOrthographicCamera()
+{
+  return std::dynamic_pointer_cast<OrthographicCamera>(mState.GetCurrent<ERendererStateId::CAMERA>());
+}
+
+std::shared_ptr<const OrthographicCamera> Renderer::GetOrthographicCamera() const
+{
+  return const_cast<Renderer&>(*this).GetOrthographicCamera();
+}
 
 void Renderer::SetModelMatrix(const Mat4f& inModelMatrix)
 {
@@ -150,8 +182,6 @@ void Renderer::Scale(const Vec3f& inScale)
 void Renderer::Scale(const float inScale) { Scale(Vec3f { inScale }); }
 
 void Renderer::SetMaterial(const Material& inMaterial) { mState.GetCurrent<ERendererStateId::MATERIAL>() = inMaterial; }
-const Material& Renderer::GetMaterial() const { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
-Material& Renderer::GetMaterial() { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
 
 void Renderer::SetSceneAmbientColor(const Color3f& inSceneAmbientColor)
 {
@@ -170,8 +200,6 @@ void Renderer::AddDirectionalLight(const Vec3f& inDirection, const Color3f& inCo
   mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>().push_back(directional_light);
 }
 
-void Renderer::ClearDirectionalLights() { mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>().clear(); }
-
 void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor)
 {
   EXPECTS(inRange > 0.0f);
@@ -183,8 +211,6 @@ void Renderer::AddPointLight(const Vec3f& inPosition, const float inRange, const
 
   mState.GetCurrent<ERendererStateId::POINT_LIGHTS>().push_back(point_light);
 }
-
-void Renderer::ClearPointLights() { mState.GetCurrent<ERendererStateId::POINT_LIGHTS>().clear(); }
 
 void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState()
@@ -255,21 +281,19 @@ void Renderer::DrawVAOArrays(const VAO& inVAO,
 
 void Renderer::DrawArrow(const Segment3f& inArrowSegment)
 {
-  PushState();
+  RENDERER_STATE_GUARD(*this, ERendererStateId::MODEL_MATRIX);
 
   DrawSegment(inArrowSegment);
   Translate(inArrowSegment.GetToPoint());
   Rotate(LookInDirection(Direction(inArrowSegment)));
   Scale(Vec3f { 0.05f, 0.05f, 0.08f });
   DrawMesh(*sCone);
-
-  PopState();
 }
 
 void Renderer::DrawAxes()
 {
-  PushState();
-  mState.Reset<ERendererStateId::MATERIAL>();
+  RENDERER_STATE_GUARD(*this, ERendererStateId::MATERIAL);
+  ResetMaterial();
 
   GetMaterial().SetDiffuseColor(Red());
   DrawArrow(Segment3f { Zero<Vec3f>(), Right<Vec3f>() });
@@ -279,8 +303,6 @@ void Renderer::DrawAxes()
 
   GetMaterial().SetDiffuseColor(Blue());
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
-
-  PopState();
 }
 
 void Renderer::DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint); }
@@ -301,8 +323,8 @@ Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& io
 {
   Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
 
-  auto& current_override_shader_program = mState.GetCurrent<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
-  auto& shader_program = (current_override_shader_program ? *current_override_shader_program : ioShaderProgram);
+  const auto override_shader_program = GetOverrideShaderProgram();
+  auto& shader_program = (override_shader_program ? *override_shader_program : ioShaderProgram);
 
   const auto& model_matrix = mState.GetCurrent<ERendererStateId::MODEL_MATRIX>();
   const auto& current_camera = mState.GetCurrent<ERendererStateId::CAMERA>();

@@ -141,9 +141,9 @@ void Window::EasyRenderLoop(const Window::EasyRenderLoopCallback& inEasyRenderLo
 
     inEasyRenderLoopCallback(inDeltaTime, renderer);
 
-    if (const auto camera = renderer.GetCamera())
+    if (const auto perspective_camera = renderer.GetPerspectiveCamera())
     {
-      camera->GetPerspectiveParameters().mAspectRatio = GetFramebufferAspectRatio();
+      perspective_camera->SetAspectRatio(GetFramebufferAspectRatio());
     }
 
     renderer.PopState();
@@ -179,8 +179,7 @@ void CallInputEventCallback(GLFWwindow* inGLFWWindow, const TInputEvent& inInput
   if (const auto& input_event_callback = window.GetInputEventCallback())
     input_event_callback({ inInputEvent });
 
-  for (auto& input_listener : window.GetInputListeners())
-    input_listener->OnInput({ inInputEvent });
+  for (auto& input_listener : window.GetInputListeners()) input_listener->OnInput({ inInputEvent });
 }
 
 void Window::AddInputListener(InputListener* inInputListener) { mInputListeners.push_back(inInputListener); }

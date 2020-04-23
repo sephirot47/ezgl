@@ -56,7 +56,6 @@ class RendererStateStacks : public RenderStateTupleOfStacks
 public:
   template <ERendererStateId TStateId>
   using StackType = typename RenderStateTupleOfStacks::StackType<TStateId>;
-
   template <ERendererStateId TStateId>
   using ValueType = typename RenderStateTupleOfStacks::StackValueType<TStateId>;
 
@@ -70,11 +69,16 @@ public:
   {
     return Top<TStateId>();
   }
-
   template <ERendererStateId TStateId>
   const auto& GetCurrent() const
   {
     return Top<TStateId>();
+  }
+  template <ERendererStateId TStateId>
+  void PushTop()
+  {
+    PushTopStateFunctor<TStateId> push_top_functor;
+    push_top_functor(GetStack<TStateId>());
   }
 
   void PushAllTops() { ApplyToAll<PushTopStateFunctor>(); }
@@ -95,17 +99,13 @@ private:
   template <ERendererStateId TStateId>
   struct PushTopStateFunctor
   {
-    void operator()(StackType<TStateId>& ioStack) const { ioStack.push(ioStack.top()); }
+    void operator()(StackType<TStateId>& ioStack) const { return ioStack.push(ioStack.top()); }
   };
 
   template <ERendererStateId TStateId>
   struct PushDefaultValueToAllStacksFunctor
   {
-    void operator()(StackType<TStateId>& ioStack) const
-    {
-      static const auto default_stack_value = GetDefaultValue<TStateId>();
-      ioStack.push(default_stack_value);
-    }
+    void operator()(StackType<TStateId>& ioStack) const { ioStack.push(GetDefaultValue<TStateId>()); }
   };
 
   template <ERendererStateId TStateId>
@@ -123,6 +123,9 @@ private:
       ApplyState<TStateId>(inStack.top(), ioStateStacks);
     }
   };
+
+  template <ERendererStateId TStateId>
+  static void Copy(const ValueType<TStateId>& inValue, ValueType<TStateId>& outCopiedValue);
 
   template <ERendererStateId TStateId>
   static void ApplyState(const ValueType<TStateId>& inValue, RendererStateStacks<TRenderer>& ioStateStacks);

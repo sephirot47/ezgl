@@ -1,3 +1,4 @@
+#include "PerspectiveCamera.h"
 #include "RendererStateStacks.h"
 
 namespace egl
@@ -70,7 +71,8 @@ typename RendererStateStacks<TRenderer>::template ValueType<TStateId> RendererSt
 {
   if constexpr (TStateId == ERendererStateId::CAMERA)
   {
-    return std::make_shared<Camera>();
+    std::unique_ptr<Camera> default_camera = std::make_unique<PerspectiveCamera>();
+    return default_camera;
   }
   else if constexpr (TStateId == ERendererStateId::MODEL_MATRIX)
   {

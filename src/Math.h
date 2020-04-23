@@ -12,6 +12,8 @@
 
 namespace egl
 {
+using AngleRads = float;
+
 template <typename TVecOrMat>
 constexpr TVecOrMat All(const typename TVecOrMat::ValueType& inAllValue)
 {
@@ -153,8 +155,7 @@ template <typename TColor>
 constexpr TColor WithValue(const TColor& inColor, const typename TColor::ValueType inValue)
 {
   TColor new_color = inColor;
-  for (std::size_t i = 0; i < 3; ++i)
-    new_color[i] *= inValue;
+  for (std::size_t i = 0; i < 3; ++i) new_color[i] *= inValue;
   return new_color;
 }
 
@@ -265,10 +266,7 @@ constexpr auto Abs(const T& inValue)
   else
   {
     auto result = inValue;
-    for (auto& v : result)
-    {
-      v = Abs(v);
-    }
+    for (auto& v : result) { v = Abs(v); }
     return result;
   }
 }
@@ -294,10 +292,7 @@ constexpr auto Dot(const T& inLHS, const T& inRHS)
   using ValueType = typename T::ValueType;
 
   auto dot = static_cast<ValueType>(0);
-  for (std::size_t i = 0; i < T::NumComponents; ++i)
-  {
-    dot += inLHS[i] * inRHS[i];
-  }
+  for (std::size_t i = 0; i < T::NumComponents; ++i) { dot += inLHS[i] * inRHS[i]; }
   return dot;
 }
 
@@ -457,14 +452,14 @@ constexpr T Roll(const Quat<T>& inQuat)
 template <typename T>
 constexpr T DegreeToRad(const T& inV)
 {
-  constexpr T Factor = (Pi<T>() / 180.0f);
+  constexpr T Factor = (Pi<T>() / 180.0);
   return inV * Factor;
 }
 
 template <typename T>
 constexpr T RadToDegree(const T& inV)
 {
-  constexpr T Factor = (180.0f / Pi<T>());
+  constexpr T Factor = (180.0 / Pi<T>());
   return inV * Factor;
 }
 
@@ -548,10 +543,7 @@ constexpr SquareMat<T, N> Transposed(const SquareMat<T, N>& inMat)
   SquareMat<T, N> transposed;
   for (std::size_t row = 0; row < N; ++row)
   {
-    for (std::size_t col = 0; col < N; ++col)
-    {
-      transposed[row][col] = inMat[col][row];
-    }
+    for (std::size_t col = 0; col < N; ++col) { transposed[row][col] = inMat[col][row]; }
   }
   return transposed;
 }
@@ -681,10 +673,7 @@ constexpr auto RandomUnit()
     using ValueType = typename T::ValueType;
 
     T result;
-    for (auto& value : result)
-    {
-      value = RandomUnit<ValueType>();
-    }
+    for (auto& value : result) { value = RandomUnit<ValueType>(); }
     result = Normalized(result);
     return result;
   }
@@ -728,14 +717,14 @@ constexpr auto RandomSign()
   {
     using ValueType = typename T::ValueType;
     T result;
-    for (auto& value : result)
-      value = RandomSign<ValueType>();
+    for (auto& value : result) value = RandomSign<ValueType>();
     return result;
   }
 }
 
 template <typename T>
-constexpr T Map(const T& inValue, const T& inSourceBegin, const T& inSourceEnd, const T& inTargetBegin, const T& inTargetEnd)
+constexpr T
+Map(const T& inValue, const T& inSourceBegin, const T& inSourceEnd, const T& inTargetBegin, const T& inTargetEnd)
 {
   const auto source_range = (inSourceEnd - inSourceBegin);
   const auto target_range = (inTargetEnd - inTargetBegin);
@@ -747,10 +736,7 @@ template <typename T, std::size_t N>
 constexpr SquareMat<T, N> Diagonal(const T& inDiagonalValue)
 {
   SquareMat<T, N> diagonal_matrix(static_cast<T>(0));
-  for (std::size_t i = 0; i < N; ++i)
-  {
-    diagonal_matrix[i][i] = inDiagonalValue;
-  }
+  for (std::size_t i = 0; i < N; ++i) { diagonal_matrix[i][i] = inDiagonalValue; }
   return diagonal_matrix;
 }
 
@@ -821,7 +807,7 @@ constexpr bool VeryPerpendicular(const Vec3<T>& inDirection0, const Vec3<T>& inD
 }
 
 template <typename T>
-constexpr bool Between(const T&inValue, const T&inMin, const T&inMax)
+constexpr bool Between(const T& inValue, const T& inMin, const T& inMax)
 {
   return (inValue >= inMin) && (inValue <= inMax);
 }

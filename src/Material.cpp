@@ -26,6 +26,7 @@ void Material::Bind(ShaderProgram& ioShaderProgram)
     mTexture->BindToTextureUnit(0);
   else
     TextureFactory::GetWhiteTexture()->BindToTextureUnit(0);
+
   ioShaderProgram.SetUniformSafe("UMaterialTexture", 0);
 
   ioShaderProgram.SetUniformSafe("UMaterialLightingEnabled", mLightingEnabled);

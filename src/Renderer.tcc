@@ -4,6 +4,30 @@
 
 namespace egl
 {
+template <ERendererStateId TStateId>
+auto& Renderer::GetCurrent()
+{
+  return mState.GetCurrent<TStateId>();
+}
+
+template <ERendererStateId TStateId>
+const auto& Renderer::GetCurrent() const
+{
+  return const_cast<Renderer&>(*this).GetCurrent<TStateId>();
+}
+
+template <ERendererStateId TStateId>
+void Renderer::Push()
+{
+  mState.PushTop<TStateId>();
+}
+
+template <ERendererStateId TStateId>
+void Renderer::Pop()
+{
+  mState.Pop<TStateId>();
+}
+
 template <typename T, std::size_t N>
 void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint)
 {

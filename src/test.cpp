@@ -42,7 +42,7 @@ int main()
   const auto test_mesh = DrawableMeshFactory::GetTorus(25, 25, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
-  const auto camera = std::make_shared<Camera>();
+  const auto camera = std::make_shared<PerspectiveCamera>();
   camera->SetPosition(Back<Vec3f>() * 8.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
   camera->LookAtPoint(Zero<Vec3f>());
 
@@ -62,10 +62,6 @@ int main()
     if (window->IsKeyPressed(Key::X))
       ioRenderer.SetRenderTexture(render_texture);
 
-    Framebuffer framebuffer(1, 1);
-    framebuffer.CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
-        GL::ETextureInternalFormat::DEPTH24_STENCIL8);
-
     if (window->IsKeyPressed(Key::X))
       ioRenderer.SetRenderTexture(render_texture);
 
@@ -81,27 +77,29 @@ int main()
     ioRenderer.SetLineWidth(3.0f);
     ioRenderer.DrawAxes();
 
+    ioRenderer.GetPerspectiveCamera()->SetAngleOfView(DegreeToRad(60.0f));
+
     ioRenderer.SetCullFaceEnabled(false);
 
     const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
     ioRenderer.Translate(obj_pos);
     UNUSED(q);
-    // ioRenderer.Rotate(q);
+    ioRenderer.Rotate(q);
     ioRenderer.GetMaterial().SetTexture(nullptr);
     ioRenderer.Scale(All<Vec3f>(5.0f));
     ioRenderer.GetMaterial().SetDiffuseColor(White());
     ioRenderer.GetMaterial().SetLightingEnabled(true);
     ioRenderer.GetMaterial().SetSpecularExponent(120.0f);
-    // ioRenderer.DrawMesh(test_mesh);
-    ioRenderer.DrawMesh(circle);
+    ioRenderer.DrawMesh(test_mesh);
+    // ioRenderer.DrawMesh(circle);
     ioRenderer.DrawAxes();
 
     ioRenderer.GetMaterial().SetDiffuseColor(Blue());
-    // ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
+    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
     ioRenderer.SetPointSize(1.0f);
     ioRenderer.GetMaterial().SetDiffuseColor(Red());
-    // ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+    ioRenderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
     if (window->IsKeyPressed(Key::X))
     {
@@ -110,15 +108,14 @@ int main()
 
       ioRenderer.SetCullFaceEnabled(true);
 
-      const auto new_camera = std::make_shared<Camera>();
-      new_camera->SetPosition(Back<Vec3f>() * 8.0f);
-      new_camera->LookAtPoint(Zero<Vec3f>());
+      RENDERER_STATE_GUARD(ioRenderer, ERendererStateId::CAMERA);
+      ioRenderer.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
+      ioRenderer.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
-      ioRenderer.SetCamera(new_camera);
       ioRenderer.ClearDepth();
       ioRenderer.ClearBackground(Black());
 
-      // ioRenderer.ResetMaterial();
+      ioRenderer.ResetMaterial();
       ioRenderer.Rotate(AngleAxis(0.5f, Forward()));
       ioRenderer.Scale(All<Vec3f>(14.0f));
       ioRenderer.GetMaterial().SetLightingEnabled(false);
