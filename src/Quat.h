@@ -9,7 +9,7 @@ namespace egl
 {
 
 template <typename T>
-class Quat
+class Quat final
 {
 public:
   using ValueType = T;

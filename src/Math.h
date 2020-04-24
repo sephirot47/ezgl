@@ -4,6 +4,7 @@
 #include "Mat.h"
 #include "Quat.h"
 #include "Segment.h"
+#include "Transformation.h"
 #include "TypeTraits.h"
 #include "Vec.h"
 #include <cmath>
@@ -885,6 +886,12 @@ constexpr Mat4<T> ScaleMat4(const Vec3<T>& inScale)
 }
 
 template <typename T>
+constexpr Mat4<T> ScaleMat4(const T inScale)
+{
+  return ScaleMat4(All<Vec3<T>>(inScale));
+}
+
+template <typename T>
 constexpr Mat4<T> PerspectiveMat4(const T inAngleOfViewRads, const T inAspectRatio, const T inZNear, const T inZFar)
 {
   const T tanHalfFovy = std::tan(inAngleOfViewRads / static_cast<T>(2));
@@ -901,10 +908,11 @@ constexpr Mat4<T> PerspectiveMat4(const T inAngleOfViewRads, const T inAspectRat
 template <typename T>
 constexpr Mat4<T> OrthographicMat4(const Vec3<T>& inMin, const Vec3<T>& inMax)
 {
-  Mat4<T> orthographic_matrix(1);
+  Mat4<T> orthographic_matrix;
   orthographic_matrix[0][0] = static_cast<T>(2) / (inMax[0] - inMin[0]);
   orthographic_matrix[1][1] = static_cast<T>(2) / (inMax[1] - inMin[1]);
-  orthographic_matrix[2][2] = -static_cast<T>(2) / (inMax[2] - inMin[2]);
+  orthographic_matrix[2][2] = -static_cast<T>(-2) / (inMax[2] - inMin[2]);
+  orthographic_matrix[3][3] = static_cast<T>(1);
   orthographic_matrix[0][3] = -static_cast<T>(inMax[0] + inMin[0]) / static_cast<T>(inMax[0] - inMin[0]);
   orthographic_matrix[1][3] = -static_cast<T>(inMax[1] + inMin[1]) / static_cast<T>(inMax[1] - inMin[1]);
   orthographic_matrix[2][3] = -static_cast<T>(inMax[2] + inMin[2]) / static_cast<T>(inMax[2] - inMin[2]);
@@ -943,6 +951,63 @@ constexpr TQuat SLerp(const TQuat& inFrom, const TQuat& inTo, const T& inT)
     const auto angle = std::acos(cosTheta);
     return (std::sin((static_cast<T>(1) - inT) * angle) * inFrom + std::sin(inT * angle) * to) / std::sin(angle);
   }
+}
+
+template <typename T>
+void Transform(Vec4<T>& ioPoint, const Mat4<T>& inTransformMatrix)
+{
+  ioPoint = (inTransformMatrix * ioPoint);
+}
+
+template <typename T>
+[[nodiscard]] T Transformed(const Vec4<T>& inPoint, const Mat4<T>& inTransformMatrix)
+{
+  auto transformed_point = inPoint;
+  Transform(transformed_point, inTransformMatrix);
+  return transformed_point;
+}
+
+template <typename T>
+void Transform(Vec3<T>& ioPoint, const Mat4<T>& inTransformMatrix)
+{
+  ioPoint = XYZ(inTransformMatrix * XYZ1(ioPoint));
+}
+
+template <typename T>
+[[nodiscard]] T Transformed(const Vec3<T>& inPoint, const Mat4<T>& inTransformMatrix)
+{
+  auto transformed_point = inPoint;
+  Transform(transformed_point, inTransformMatrix);
+  return transformed_point;
+}
+
+template <typename T, typename TM>
+void Transform(T& ioObjectToTransform, const Mat4<TM>& inTransformMatrix)
+{
+  for (auto& value : ioObjectToTransform) { Transform(value, inTransformMatrix); }
+}
+
+template <typename T, typename TM>
+[[nodiscard]] T Transformed(const T& inObjectToTransform, const Mat4<TM>& inTransformMatrix)
+{
+  auto transformed_object = inObjectToTransform;
+  Transform(transformed_object, inTransformMatrix);
+  return transformed_object;
+}
+
+template <typename T>
+void Transform(T& ioObjectToTransform, const Transformation& inTransformation)
+{
+  const auto transform_matrix = inTransformation.GetMatrix();
+  for (auto& value : ioObjectToTransform) { Transform(value, transform_matrix); }
+}
+
+template <typename T>
+[[nodiscard]] T Transformed(const T& inObjectToTransform, const Transformation& inTransformation)
+{
+  auto transformed_object = inObjectToTransform;
+  Transform(transformed_object, inTransformation);
+  return transformed_object;
 }
 
 // Swizzling

@@ -13,7 +13,7 @@ template <typename, std::size_t>
 class Vec;
 
 template <typename T, std::size_t NRows, std::size_t NCols>
-class Mat
+class Mat final
 {
 public:
   using ValueType = T;

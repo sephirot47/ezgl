@@ -10,11 +10,13 @@
 #include "Math.h"
 #include "OrthographicCamera.h"
 #include "PerspectiveCamera.h"
+#include "Plane.h"
 #include "PointLight.h"
 #include "RendererStateStacks.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "Triangle.h"
 #include "UBO.h"
 #include "Window.h"
 #include <any>
@@ -123,13 +125,12 @@ public:
 
   // Camera
   void SetCamera(const std::shared_ptr<Camera>& inCamera);
-  void Set2DCamera(const Window& inWindow);
   std::shared_ptr<Camera> GetCamera();
   std::shared_ptr<const Camera> GetCamera() const;
-  std::shared_ptr<PerspectiveCamera> GetPerspectiveCamera();               // Null if the camera is not a PerspectiveCamera
-  std::shared_ptr<const PerspectiveCamera> GetPerspectiveCamera() const;   // Null if the camera is not a PerspectiveCamera
-  std::shared_ptr<OrthographicCamera> GetOrthographicCamera();             // Null if the camera is not an OrthographicCamera
-  std::shared_ptr<const OrthographicCamera> GetOrthographicCamera() const; // Null if the camera is not an OrthographicCamera
+  std::shared_ptr<PerspectiveCamera> GetPerspectiveCamera();               // Null if it is not a PerspectiveCamera
+  std::shared_ptr<const PerspectiveCamera> GetPerspectiveCamera() const;   // Null if it is not a PerspectiveCamera
+  std::shared_ptr<OrthographicCamera> GetOrthographicCamera();             // Null if it is not an OrthographicCamera
+  std::shared_ptr<const OrthographicCamera> GetOrthographicCamera() const; // Null if it is not an OrthographicCamera
   void PushCamera() { mState.PushTop<ERendererStateId::CAMERA>(); }
   void PopCamera() { mState.Pop<ERendererStateId::CAMERA>(); }
   void ResetCamera() { mState.Reset<ERendererStateId::CAMERA>(); }
@@ -173,6 +174,10 @@ public:
   void PopPointLights() { mState.Pop<ERendererStateId::POINT_LIGHTS>(); }
   void ResetPointLights() { mState.Reset<ERendererStateId::POINT_LIGHTS>(); }
 
+  // Helpers
+  void PrepareFor3D(const Window& inWindow);
+  void PrepareFor2D(const Window& inWindow);
+
   // All state
   void PushState();
   void PopState();
@@ -199,16 +204,19 @@ public:
       const GL::Size inBeginPrimitiveIndex = 0);
   void DrawArrow(const Segment3f& inArrowSegment);
   void DrawAxes();
-  void DrawPoint(const Vec3f& inPoint);
-  void DrawPoints(const Span<Vec3f>& inPoints);
-  void DrawSegment(const Segment3f& inSegment);
-  void DrawSegments(const Span<Segment3f>& inSegments);
+  void DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint); }
+  void DrawPoints(const Span<Vec3f>& inPoints) { DrawPointsGeneric(inPoints); }
+  void DrawSegment(const Segment3f& inSegment) { DrawSegmentGeneric(inSegment); }
+  void DrawSegments(const Span<Segment3f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+  void DrawTriangle(const Triangle3f& inTriangle);
 
   // Draw - 2D (z = 0.0)
-  void DrawPoint(const Vec2f& inPoint);
-  void DrawPoints(const Span<Vec2f>& inPoints);
-  void DrawSegment(const Segment2f& inSegment);
-  void DrawSegments(const Span<Segment2f>& inSegments);
+  void DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint); }
+  void DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints); }
+  void DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment); }
+  void DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+  void DrawTriangle(const Triangle2f& inTriangle);
+  void DrawTriangleBoundary(const Triangle2f& inTriangle);
 
 private:
   // Static resources
@@ -247,7 +255,8 @@ private:
   template <typename T, std::size_t N>
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
 
-  // Helpers
+  // Helpers or common functionality
+  void PrepareFor3DOr2DCommon(const Window& inWindow);
   using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material>;
   [[nodiscard]] UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
 };
@@ -264,6 +273,17 @@ private:
   Renderer& mRenderer;
 };
 
+class RendererStateGuardAll
+{
+public:
+  RendererStateGuardAll(Renderer& ioRenderer) : mRenderer(ioRenderer) { mRenderer.PushState(); }
+  ~RendererStateGuardAll() { mRenderer.PopState(); }
+
+private:
+  Renderer& mRenderer;
+};
+
+#define RENDERER_STATE_GUARD_ALL(RENDERER) RendererStateGuardAll ANONYMOUS_VARIABLE_NAME { RENDERER };
 #define RENDERER_STATE_GUARD(RENDERER, STATE_ID) RendererStateGuard<STATE_ID> ANONYMOUS_VARIABLE_NAME { RENDERER };
 }
 

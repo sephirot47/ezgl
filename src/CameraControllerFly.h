@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Math.h"
-#include "Renderer.h"
 #include "Time.h"
 #include "Window.h"
 #include <chrono>

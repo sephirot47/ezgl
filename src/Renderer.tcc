@@ -31,7 +31,7 @@ void Renderer::Pop()
 template <typename T, std::size_t N>
 void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint)
 {
-  DrawPointsGeneric(MakeSpan(std::array { inPoint }));
+  DrawPointsGeneric(MakeSpan({ inPoint }));
 }
 
 template <typename T, std::size_t N>
@@ -48,13 +48,13 @@ void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints)
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec<T, N>>());
   vao.Bind();
 
-  GL::DrawArrays(GL::EPrimitivesType::POINTS, 1);
+  GL::DrawArrays(GL::EPrimitivesType::POINTS, inPoints.GetNumberOfElements());
 }
 
 template <typename T, std::size_t N>
 void Renderer::DrawSegmentGeneric(const Segment<T, N>& inSegment)
 {
-  DrawSegmentsGeneric(MakeSpan(std::array { inSegment }));
+  DrawSegmentsGeneric(MakeSpan({ inSegment }));
 }
 
 template <typename T, std::size_t N>
@@ -78,6 +78,6 @@ void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
   vao.AddVBO(vbo, PositionAttribLocation, VAOVertexAttribT<Vec<T, N>>());
   vao.Bind();
 
-  GL::DrawArrays(GL::EPrimitivesType::LINES, 2);
+  GL::DrawArrays(GL::EPrimitivesType::LINES, inSegments.GetNumberOfElements() * 2);
 }
 }

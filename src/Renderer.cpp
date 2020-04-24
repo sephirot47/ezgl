@@ -6,6 +6,7 @@
 #include "GL.h"
 #include "GLGuard.h"
 #include "GLTypeTraits.h"
+#include "Geometry.h"
 #include "Math.h"
 #include "MeshFactory.h"
 #include "PointLight.h"
@@ -125,16 +126,53 @@ void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera)
   mState.GetCurrent<ERendererStateId::CAMERA>() = inCamera;
 }
 
-void Renderer::Set2DCamera(const Window& inWindow)
+void Renderer::PrepareFor3DOr2DCommon(const Window& inWindow)
 {
-  OrthographicParameters orthographic_params;
-  orthographic_params.mMin = Vec3f { 0.0f, 0.0f, -1.0f };
-  orthographic_params.mMax
-      = Vec3f(static_cast<float>(inWindow.GetSize()[0]), static_cast<float>(inWindow.GetSize()[1]), 1.0f);
+  ResetState();
+  GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
+}
 
-  const auto orthographic_camera = std::make_shared<OrthographicCamera>();
-  orthographic_camera->SetOrthographicParameters(orthographic_params);
-  SetCamera(orthographic_camera);
+void Renderer::PrepareFor3D(const Window& inWindow)
+{
+  PrepareFor3DOr2DCommon(inWindow);
+
+  SetDepthTestEnabled(true);
+  SetCullFaceEnabled(true);
+
+  ClearBackground(Black());
+  ClearDepth();
+
+  // 3D Perspective Camera
+  {
+    const auto perspective_camera = GetPerspectiveCamera();
+    assert(perspective_camera != nullptr);
+    perspective_camera->SetAspectRatio(inWindow.GetFramebufferAspectRatio());
+  }
+}
+
+void Renderer::PrepareFor2D(const Window& inWindow)
+{
+  PrepareFor3DOr2DCommon(inWindow);
+
+  SetDepthTestEnabled(false);
+  SetCullFaceEnabled(false);
+
+  GetMaterial().SetLightingEnabled(false);
+
+  // 2D Orthographic Camera
+  {
+    const auto window_size = inWindow.GetSize();
+    const float window_width = window_size[0];
+    const float window_height = window_size[1];
+
+    OrthographicParameters orthographic_params;
+    orthographic_params.mMin = Vec3f { 0.0f, 0.0f, -1.0f };
+    orthographic_params.mMax = Vec3f(window_width, window_height, 1.0f);
+
+    const auto orthographic_camera = std::make_shared<OrthographicCamera>();
+    orthographic_camera->SetOrthographicParameters(orthographic_params);
+    SetCamera(orthographic_camera);
+  }
 }
 
 std::shared_ptr<Camera> Renderer::GetCamera() { return mState.GetCurrent<ERendererStateId::CAMERA>(); }
@@ -216,13 +254,14 @@ void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState()
 {
   mState.PopAll();
-  mState.ApplyCurrentState();
+  mState.PushAllDefaultValues();
 }
 
 void Renderer::ResetState()
 {
   PopState();
-  PushState();
+  mState.PushAllDefaultValues();
+  mState.ApplyCurrentState();
 }
 
 // Draw - 3D ========================================================================================
@@ -305,17 +344,43 @@ void Renderer::DrawAxes()
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 }
 
-void Renderer::DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint); }
-void Renderer::DrawPoints(const Span<Vec3f>& inPoints) { DrawPointsGeneric(inPoints); }
-void Renderer::DrawSegment(const Segment3f& inSegment) { DrawSegmentGeneric(inSegment); }
-void Renderer::DrawSegments(const Span<Segment3f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+void Renderer::DrawTriangle(const Triangle3f& inTriangle)
+{
+  DrawableMesh triangle_mesh;
+  triangle_mesh.AddVertex(inTriangle[0]);
+  triangle_mesh.AddVertex(inTriangle[1]);
+  triangle_mesh.AddVertex(inTriangle[2]);
+  triangle_mesh.AddFace(0, 1, 2);
 
-// Draw - 2D ========================================================================================
+  const auto triangle_normal = Normal(inTriangle);
+  triangle_mesh.SetCornerNormal(0, triangle_normal);
+  triangle_mesh.SetCornerNormal(1, triangle_normal);
+  triangle_mesh.SetCornerNormal(2, triangle_normal);
 
-void Renderer::DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint); }
-void Renderer::DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints); }
-void Renderer::DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment); }
-void Renderer::DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+  triangle_mesh.UpdateVAOs();
+
+  DrawMesh(triangle_mesh);
+}
+
+void Renderer::DrawTriangle(const Triangle2f& inTriangle)
+{
+  DrawableMesh triangle_mesh;
+  triangle_mesh.AddVertex(XY0(inTriangle[0]));
+  triangle_mesh.AddVertex(XY0(inTriangle[1]));
+  triangle_mesh.AddVertex(XY0(inTriangle[2]));
+  triangle_mesh.AddFace(0, 1, 2);
+
+  triangle_mesh.UpdateVAOs();
+
+  DrawMesh(triangle_mesh);
+}
+
+void Renderer::DrawTriangleBoundary(const Triangle2f& inTriangle)
+{
+  DrawSegments(MakeSpan({ Segment2f { inTriangle[0], inTriangle[1] },
+      Segment2f { inTriangle[1], inTriangle[2] },
+      Segment2f { inTriangle[2], inTriangle[0] } }));
+}
 
 // Helpers ========================================================================================
 

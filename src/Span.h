@@ -30,10 +30,15 @@ private:
   const std::size_t mNumberOfElements = 0;
 };
 
+template <typename T>
+inline Span<T> MakeSpan(const std::initializer_list<T>& inList)
+{
+  return Span<T>(&(*inList.begin()), std::distance(inList.begin(), inList.end()));
+}
 template <typename TArray>
 inline Span<typename TArray::value_type> MakeSpan(const TArray& inArray)
 {
-  return Span<typename TArray::value_type> { inArray.data(), inArray.size() };
+  return Span<typename TArray::value_type>(&(*inArray.begin()), std::distance(inArray.begin(), inArray.end()));
 }
 template <typename TArray>
 inline Span<typename TArray::value_type> MakeSpan(const TArray& inArray, const std::size_t inNumberOfElements)

@@ -11,7 +11,7 @@
 namespace egl
 {
 template <typename T, std::size_t N>
-class Vec
+class Vec final
 {
 public:
   static_assert(N >= 1);

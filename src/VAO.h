@@ -20,8 +20,8 @@ public:
   using GLBindGuardType = GLBindGuard<GL::EBindingType::VAO>;
 
   VAO() = default;
-  VAO(VAO&& ioRHS) noexcept = default;
   ~VAO() override = default;
+  VAO(VAO&& ioRHS) noexcept = default;
 
   void AddVBO(const std::shared_ptr<VBO>& inVBO, const GL::Id inAttribLocation, const VAOVertexAttrib& inVertexAttrib);
   void SetEBO(const std::shared_ptr<EBO>& inEBO);

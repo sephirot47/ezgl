@@ -33,7 +33,7 @@ class Camera;
 class ShaderProgram;
 class Texture2D;
 
-using RenderStateTupleOfStacks = TupleOfStacks<ERendererStateId,
+using RendererStateTupleOfStacks = TupleOfStacks<ERendererStateId,
     std::shared_ptr<Camera>,           // ERendererStateId::CAMERA
     Mat4f,                             // ERendererStateId::MODEL_MATRIX
     Material,                          // ERendererStateId::MATERIAL
@@ -51,16 +51,16 @@ using RenderStateTupleOfStacks = TupleOfStacks<ERendererStateId,
     std::vector<GLSLPointLight>>;      // ERendererStateId::POINT_LIGHTS
 
 template <typename TRenderer>
-class RendererStateStacks : public RenderStateTupleOfStacks
+class RendererStateStacks : public RendererStateTupleOfStacks
 {
 public:
   template <ERendererStateId TStateId>
-  using StackType = typename RenderStateTupleOfStacks::StackType<TStateId>;
+  using StackType = typename RendererStateTupleOfStacks::StackType<TStateId>;
   template <ERendererStateId TStateId>
-  using ValueType = typename RenderStateTupleOfStacks::StackValueType<TStateId>;
+  using ValueType = typename RendererStateTupleOfStacks::StackValueType<TStateId>;
 
-  using RenderStateTupleOfStacks::Pop;
-  using RenderStateTupleOfStacks::Push;
+  using RendererStateTupleOfStacks::Pop;
+  using RendererStateTupleOfStacks::Push;
 
   RendererStateStacks(TRenderer& ioRenderer) : mRenderer(ioRenderer) {}
 
