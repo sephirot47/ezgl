@@ -167,7 +167,6 @@ void Renderer::Begin(const Window& inWindow)
 {
   ResetState();
   GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
-  Clear(Black(), 1.0f);
 }
 
 void Renderer::DrawVAOArraysOrElements(ShaderProgram& ioShaderProgram,
@@ -217,24 +216,19 @@ void Renderer::DrawVAOArrays(ShaderProgram& ioShaderProgram,
       inBeginPrimitiveIndex);
 }
 
+ShaderProgram& Renderer::GetOverrideShaderProgramOr(ShaderProgram& ioAlternativeShaderProgram)
+{
+  const auto override_shader_program = GetOverrideShaderProgram();
+  auto& shader_program = (override_shader_program ? *override_shader_program : ioAlternativeShaderProgram);
+  return shader_program;
+}
+
 Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
 {
   Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
 
-  const auto override_shader_program = GetOverrideShaderProgram();
-  auto& shader_program = (override_shader_program ? *override_shader_program : ioShaderProgram);
-
-  const auto& current_camera = mState.GetCurrent<Renderer::EStateId::CAMERA>();
-  const auto view_matrix = current_camera->GetViewMatrix();
-  const auto projection_matrix = current_camera->GetProjectionMatrix();
-  const auto camera_world_position = current_camera->GetPosition();
-  const auto camera_world_direction = Direction(current_camera->GetRotation());
-
+  auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
   shader_program.Bind();
-  shader_program.SetUniformSafe("UView", view_matrix);
-  shader_program.SetUniformSafe("UProjection", projection_matrix);
-  shader_program.SetUniformSafe("UCameraWorldPosition", camera_world_position);
-  shader_program.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
 
   return use_shader_program_bind_guard;
 }

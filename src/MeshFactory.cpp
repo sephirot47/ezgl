@@ -1,5 +1,4 @@
 #include "MeshFactory.h"
-
 #include "Mesh.h"
 
 namespace egl
@@ -48,7 +47,7 @@ Mesh MeshFactory::GetHemisphere(const std::size_t inNumLatitudes, const std::siz
 Mesh MeshFactory::GetCone(const std::size_t inNumLongitudes)
 {
   auto cone = GetHemisphere(2, inNumLongitudes);
-  cone.Transform(ScaleMat4(Vec3f { 1.0f, 1.0f, 2.0f }));
+  cone.Transform(ScaleMat(Vec3f { 1.0f, 1.0f, 2.0f }));
   ConsolidateMesh(cone);
   return cone;
 }
@@ -192,9 +191,7 @@ Mesh MeshFactory::GetCylinder(const std::size_t inNumVerticesX)
   return cylinder;
 }
 
-Mesh MeshFactory::GetTorus(const std::size_t inNumLatitudes,
-    const std::size_t inNumLongitudes,
-    const float inHoleSize)
+Mesh MeshFactory::GetTorus(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const float inHoleSize)
 {
   EXPECTS(inNumLatitudes >= 3);
   EXPECTS(inNumLongitudes >= 3);

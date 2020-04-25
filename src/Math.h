@@ -832,23 +832,30 @@ constexpr Quat<T> LookInDirection(const Vec3<T>& inForwardNormalized, const Vec3
   return quat_result;
 }
 
-template <typename T>
-constexpr Mat4<T> NormalMat4(const Mat4<T>& inModelViewMatrix)
+template <std::size_t N, typename T>
+constexpr SquareMat<T, N> NormalMat(const SquareMat<T, N>& inModelViewMatrix)
 {
   return Transposed(Inverted(inModelViewMatrix));
 }
 
-template <typename T>
-constexpr Mat4<T> TranslationMat4(const Vec3<T>& inTranslation)
+template <typename T, std::size_t N>
+constexpr SquareMat<T, N + 1> TranslationMat(const Vec<T, N>& inTranslation)
 {
-  return Mat4<T> { Vec4<T> { static_cast<T>(1), static_cast<T>(0), static_cast<T>(0), inTranslation[0] },
-    Vec4<T> { static_cast<T>(0), static_cast<T>(1), static_cast<T>(0), inTranslation[1] },
-    Vec4<T> { static_cast<T>(0), static_cast<T>(0), static_cast<T>(1), inTranslation[2] },
-    Vec4<T> { static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1) } };
+  auto translation_matrix = Identity<SquareMat<T, N + 1>>();
+  for (std::size_t i = 0; i < N; ++i) { translation_matrix[i][N] = inTranslation[i]; }
+  return translation_matrix;
 }
 
 template <typename T>
-constexpr Mat4<T> RotationMat4(const Quat<T>& inRotation)
+constexpr SquareMat<T, 3> RotationMat(const T inAngle)
+{
+  return SquareMat<T, 3> { Vec3<T> { std::cos(inAngle), -std::sin(inAngle), static_cast<T>(0) },
+    Vec3<T> { std::sin(inAngle), std::cos(inAngle), static_cast<T>(0) },
+    Vec3<T> { static_cast<T>(0), static_cast<T>(0), static_cast<T>(1) } };
+}
+
+template <typename T>
+constexpr SquareMat<T, 4> RotationMat(const Quat<T>& inRotation)
 {
   const auto& q = inRotation;
   const auto qxx { q[0] * q[0] };
@@ -876,19 +883,26 @@ constexpr Mat4<T> RotationMat4(const Quat<T>& inRotation)
     Vec4<T> { static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1) } };
 }
 
-template <typename T>
-constexpr Mat4<T> ScaleMat4(const Vec3<T>& inScale)
+template <typename T, std::size_t N>
+constexpr SquareMat<T, N + 1> ScaleMat(const Vec<T, N>& inScale)
 {
-  return Mat4<T> { Vec4<T> { inScale[0], static_cast<T>(0), static_cast<T>(0), static_cast<T>(0) },
-    Vec4<T> { static_cast<T>(0), inScale[1], static_cast<T>(0), static_cast<T>(0) },
-    Vec4<T> { static_cast<T>(0), static_cast<T>(0), inScale[2], static_cast<T>(0) },
-    Vec4<T> { static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1) } };
+  auto scale_matrix = Identity<SquareMat<T, N + 1>>();
+  for (std::size_t i = 0; i < N; ++i) { scale_matrix[i][i] = inScale[i]; }
+  scale_matrix[N][N] = static_cast<T>(1);
+  return scale_matrix;
 }
 
 template <typename T>
-constexpr Mat4<T> ScaleMat4(const T inScale)
+constexpr Vec2<T> Rotated(const Vec2<T>& inVec, const AngleRads inAngle)
 {
-  return ScaleMat4(All<Vec3<T>>(inScale));
+  return Vec2<T> { inVec[0] * std::cos(inAngle) - inVec[1] * std::sin(inAngle),
+    inVec[0] * std::sin(inAngle) + inVec[1] * std::cos(inAngle) };
+}
+
+template <typename T>
+constexpr Vec3<T> Rotated(const Vec3<T>& inVec, const Quat<T>& inRotation)
+{
+  return inRotation * inVec;
 }
 
 template <typename T>
@@ -953,57 +967,65 @@ constexpr TQuat SLerp(const TQuat& inFrom, const TQuat& inTo, const T& inT)
   }
 }
 
-template <typename T>
-void Transform(Vec4<T>& ioPoint, const Mat4<T>& inTransformMatrix)
+template <typename T, std::size_t N>
+void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N>& inTransformMatrix)
 {
   ioPoint = (inTransformMatrix * ioPoint);
 }
 
-template <typename T>
-[[nodiscard]] T Transformed(const Vec4<T>& inPoint, const Mat4<T>& inTransformMatrix)
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N>& inTransformMatrix)
 {
   auto transformed_point = inPoint;
   Transform(transformed_point, inTransformMatrix);
   return transformed_point;
 }
 
-template <typename T>
-void Transform(Vec3<T>& ioPoint, const Mat4<T>& inTransformMatrix)
+template <typename T, std::size_t N>
+void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N + 1>& inTransformMatrix)
 {
-  ioPoint = XYZ(inTransformMatrix * XYZ1(ioPoint));
+  // If the point has one less dimension than the transform matrix, convert the point to one
+  // more dimension by adding a 1 at the end, and then retrieve it from the result
+
+  Vec<T, N + 1> point_and_1;
+  for (std::size_t i = 0; i < N; ++i) { point_and_1[i] = ioPoint[i]; }
+  point_and_1[N] = static_cast<T>(1);
+
+  const auto transformed_point_and_1 = Transformed(point_and_1, inTransformMatrix);
+  for (std::size_t i = 0; i < N; ++i) { ioPoint[i] = transformed_point_and_1[i]; }
 }
 
-template <typename T>
-[[nodiscard]] T Transformed(const Vec3<T>& inPoint, const Mat4<T>& inTransformMatrix)
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N + 1>& inTransformMatrix)
 {
   auto transformed_point = inPoint;
   Transform(transformed_point, inTransformMatrix);
   return transformed_point;
 }
 
-template <typename T, typename TM>
-void Transform(T& ioObjectToTransform, const Mat4<TM>& inTransformMatrix)
+template <typename T, std::size_t N>
+void Transform(T& ioObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix)
 {
   for (auto& value : ioObjectToTransform) { Transform(value, inTransformMatrix); }
 }
 
-template <typename T, typename TM>
-[[nodiscard]] T Transformed(const T& inObjectToTransform, const Mat4<TM>& inTransformMatrix)
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix)
 {
   auto transformed_object = inObjectToTransform;
   Transform(transformed_object, inTransformMatrix);
   return transformed_object;
 }
 
-template <typename T>
-void Transform(T& ioObjectToTransform, const Transformation& inTransformation)
+template <typename T, std::size_t N>
+void Transform(T& ioObjectToTransform, const Transformation<T, N>& inTransformation)
 {
   const auto transform_matrix = inTransformation.GetMatrix();
   for (auto& value : ioObjectToTransform) { Transform(value, transform_matrix); }
 }
 
-template <typename T>
-[[nodiscard]] T Transformed(const T& inObjectToTransform, const Transformation& inTransformation)
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const Transformation<T, N>& inTransformation)
 {
   auto transformed_object = inObjectToTransform;
   Transform(transformed_object, inTransformation);

@@ -202,6 +202,7 @@ protected:
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram& ioShaderProgram);
 
   // Helpers or common functionality
+  ShaderProgram& GetOverrideShaderProgramOr(ShaderProgram &ioAlternativeShaderProgram);
   using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material3D>;
   [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
 

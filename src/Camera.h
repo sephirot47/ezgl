@@ -32,6 +32,6 @@ public:
   virtual Mat4f GetProjectionMatrix() const = 0;
 
 private:
-  Transformation mTransformation;
+  Transformation3f mTransformation;
 };
 }

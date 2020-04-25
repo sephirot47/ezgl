@@ -2,9 +2,9 @@
 
 uniform vec4 UMaterialDiffuseColor;
 
-layout(location = 0) out vec4 of_color;
+layout(location = 0) out vec4 out_color;
 
 void main()
 {
-    of_color = UMaterialDiffuseColor;
+    out_color = UMaterialDiffuseColor;
 }

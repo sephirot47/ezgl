@@ -284,7 +284,7 @@ void Mesh::SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPos
 
 void Mesh::Transform(const Mat4f& inTransform)
 {
-  for (auto& vertex_data : mVerticesData) { vertex_data.mPosition = XYZ(inTransform * XYZ1(vertex_data.mPosition)); }
+  for (auto& vertex_data : mVerticesData) { vertex_data.mPosition = Transformed(vertex_data.mPosition, inTransform); }
 }
 
 /*

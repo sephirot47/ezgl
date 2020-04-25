@@ -57,17 +57,17 @@ void Renderer3D::SetModelMatrix(const Mat4f& inModelMatrix)
 void Renderer3D::Translate(const Vec3f& inTranslation)
 {
   auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
-  model_matrix = model_matrix * TranslationMat4(inTranslation);
+  model_matrix = model_matrix * TranslationMat(inTranslation);
 }
 void Renderer3D::Rotate(const Quatf& inRotation)
 {
   auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
-  model_matrix = model_matrix * RotationMat4(inRotation);
+  model_matrix = model_matrix * RotationMat(inRotation);
 }
 void Renderer3D::Scale(const Vec3f& inScale)
 {
   auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
-  model_matrix = model_matrix * ScaleMat4(inScale);
+  model_matrix = model_matrix * ScaleMat(inScale);
 }
 void Renderer3D::Scale(const float inScale) { Scale(Vec3f { inScale }); }
 
@@ -199,37 +199,45 @@ Renderer3D::UseShaderProgramBindGuard Renderer3D::UseShaderProgram(ShaderProgram
   auto use_shader_program_bind_guard = Renderer::UseShaderProgram(ioShaderProgram);
   assert(ioShaderProgram.IsBound());
 
+  auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
+  GetMaterial().Bind(shader_program);
+
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();
   const auto view_matrix = current_camera->GetViewMatrix();
-  const auto normal_matrix = NormalMat4(model_matrix);
+  const auto normal_matrix = NormalMat(model_matrix);
   const auto projection_matrix = current_camera->GetProjectionMatrix();
   const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
+
+  shader_program.SetUniformSafe("UModel", model_matrix);
+  shader_program.SetUniformSafe("UNormal", normal_matrix);
+  shader_program.SetUniformSafe("UView", view_matrix);
+  shader_program.SetUniformSafe("UProjection", projection_matrix);
+  shader_program.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
+
   const auto camera_world_position = current_camera->GetPosition();
   const auto camera_world_direction = Direction(current_camera->GetRotation());
+  shader_program.SetUniformSafe("UCameraWorldPosition", camera_world_position);
+  shader_program.SetUniformSafe("UCameraWorldDirection", camera_world_direction);
 
-  GetMaterial().Bind(ioShaderProgram);
-  ioShaderProgram.SetUniformSafe("UModel", model_matrix);
-  ioShaderProgram.SetUniformSafe("UNormal", normal_matrix);
-  ioShaderProgram.SetUniformSafe("USceneAmbientColor", mState.GetCurrent<Renderer3D::EStateId::SCENE_AMBIENT_COLOR>());
-  ioShaderProgram.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
+  shader_program.SetUniformSafe("USceneAmbientColor", GetSceneAmbientColor());
 
   // Lights
   if (GetMaterial().IsLightingEnabled())
   {
     // Directional lights
-    ioShaderProgram.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
+    shader_program.SetUniformBlockBindingSafe("UBlockDirectionalLights", 0);
     const auto& directional_lights = mState.GetCurrent<Renderer3D::EStateId::DIRECTIONAL_LIGHTS>();
     mDirectionalLightsUBO.BufferSubData(MakeSpan(directional_lights));
     mDirectionalLightsUBO.BindToBindingPoint(0);
-    ioShaderProgram.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
+    shader_program.SetUniformSafe("UNumberOfDirectionalLights", static_cast<int>(directional_lights.size()));
 
     // Point lights
-    ioShaderProgram.SetUniformBlockBindingSafe("UBlockPointLights", 1);
+    shader_program.SetUniformBlockBindingSafe("UBlockPointLights", 1);
     const auto& point_lights = mState.GetCurrent<Renderer3D::EStateId::POINT_LIGHTS>();
     mPointLightsUBO.BufferSubData(MakeSpan(point_lights));
     mPointLightsUBO.BindToBindingPoint(1);
-    ioShaderProgram.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
+    shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
   }
 
   return use_shader_program_bind_guard;

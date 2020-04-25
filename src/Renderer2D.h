@@ -1,18 +1,18 @@
 #pragma once
-/*
 
 #include "Camera.h"
 #include "Color.h"
 #include "DirectionalLight.h"
 #include "Framebuffer.h"
 #include "Macros.h"
-#include "Material.h"
+#include "Material2D.h"
 #include "Math.h"
 #include "MeshDrawData.h"
 #include "OrthographicCamera.h"
 #include "PerspectiveCamera.h"
 #include "Plane.h"
 #include "PointLight.h"
+#include "Renderer.h"
 #include "RendererStateStacks.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
@@ -33,233 +33,86 @@ namespace egl
 class MeshDrawData;
 class ShaderProgram;
 
-class Renderer
+class Renderer2D final : public Renderer
 {
 public:
-  enum class EDrawType
+  enum class EStateId
   {
-    SOLID,
-    WIREFRAME,
-    POINTS
+    MODEL_MATRIX,
+    MATERIAL,
   };
 
-  Renderer();
-  Renderer(const Renderer& inRHS) = default;
-  Renderer& operator=(const Renderer& inRHS) = default;
-  Renderer(Renderer&&) = default;
-  Renderer& operator=(Renderer&& inRHS) = default;
-  ~Renderer() = default;
-
-  // Clears
-  void ClearBackground(const Color4f& inClearColor);
-  void ClearDepth();
-
-  // Depth enabled
-  void SetDepthTestEnabled(const bool inDepthTestEnabled);
-  bool GetDepthTestEnabled() const { return mState.GetCurrent<ERendererStateId::DEPTH_ENABLED>(); }
-  void PushDepthTestEnabled() { mState.PushTop<ERendererStateId::DEPTH_ENABLED>(); }
-  void PopDepthTestEnabled() { mState.Pop<ERendererStateId::DEPTH_ENABLED>(); }
-  void ResetDepthEnabled() { mState.Reset<ERendererStateId::DEPTH_ENABLED>(); }
-
-  // Cull face enabled
-  void SetCullFaceEnabled(const bool inCullFaceEnabled);
-  bool GetCullFaceEnabled() const { return mState.GetCurrent<ERendererStateId::CULL_FACE_ENABLED>(); }
-  void PushCullFaceEnabled() { mState.PushTop<ERendererStateId::CULL_FACE_ENABLED>(); }
-  void PopCullFaceEnabled() { mState.Pop<ERendererStateId::CULL_FACE_ENABLED>(); }
-  void ResetCullFaceEnabled() { mState.Reset<ERendererStateId::CULL_FACE_ENABLED>(); }
-
-  // Blend enabled
-  void SetBlendEnabled(const bool inBlendEnabled);
-  bool GetBlendEnabled() const { return mState.GetCurrent<ERendererStateId::BLEND_ENABLED>(); }
-  void PushBlendEnabled() { mState.PushTop<ERendererStateId::BLEND_ENABLED>(); }
-  void PopBlendEnabled() { mState.Pop<ERendererStateId::BLEND_ENABLED>(); }
-  void ResetBlendEnabled() { mState.Reset<ERendererStateId::BLEND_ENABLED>(); }
-
-  // Blend func/factors
-  void SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor);
-  GL::EBlendFactor GetBlendSourceFactor() const { return mState.GetCurrent<ERendererStateId::BLEND_SOURCE_FACTOR>(); }
-  void PushBlendSourceFactor() { mState.PushTop<ERendererStateId::BLEND_SOURCE_FACTOR>(); }
-  void PopBlendSourceFactor() { mState.Pop<ERendererStateId::BLEND_SOURCE_FACTOR>(); }
-  void ResetBlendSourceactor() { mState.Reset<ERendererStateId::BLEND_SOURCE_FACTOR>(); }
-  GL::EBlendFactor GetBlendDestFactor() const { return mState.GetCurrent<ERendererStateId::BLEND_DEST_FACTOR>(); }
-  void PushBlendDestFactor() { mState.PushTop<ERendererStateId::BLEND_DEST_FACTOR>(); }
-  void PopBlendDestFactor() { mState.Pop<ERendererStateId::BLEND_DEST_FACTOR>(); }
-  void ResetBlendDestFactor() { mState.Reset<ERendererStateId::BLEND_DEST_FACTOR>(); }
-
-  // Point and Line properties
-  void SetPointSize(const float inPointSize);
-  float GetPointSize() const { return mState.GetCurrent<ERendererStateId::POINT_SIZE>(); }
-  void PushPointSize() { mState.PushTop<ERendererStateId::POINT_SIZE>(); }
-  void PopPointSize() { mState.Pop<ERendererStateId::POINT_SIZE>(); }
-  void ResetPointSize() { mState.Reset<ERendererStateId::POINT_SIZE>(); }
-
-  void SetLineWidth(const float inLineWidth);
-  float GetLineWidth() const { return mState.GetCurrent<ERendererStateId::LINE_WIDTH>(); }
-  void PushLineWidth() { mState.PushTop<ERendererStateId::LINE_WIDTH>(); }
-  void PopLineWidth() { mState.Pop<ERendererStateId::LINE_WIDTH>(); }
-  void ResetLineWidth() { mState.Reset<ERendererStateId::LINE_WIDTH>(); }
-
-  // Override ShaderProgram
-  void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram);
-  std::shared_ptr<const ShaderProgram> GetOverrideShaderProgram() const
-  {
-    return mState.GetCurrent<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
-  }
-  std::shared_ptr<ShaderProgram> GetOverrideShaderProgram()
-  {
-    return mState.GetCurrent<ERendererStateId::OVERRIDE_SHADER_PROGRAM>();
-  }
-  void PushOverrideShaderProgram() { mState.PushTop<ERendererStateId::OVERRIDE_SHADER_PROGRAM>(); }
-  void PopOverrideShaderProgram() { mState.Pop<ERendererStateId::OVERRIDE_SHADER_PROGRAM>(); }
-  void ResetOverrideShaderProgram() { mState.Reset<ERendererStateId::OVERRIDE_SHADER_PROGRAM>(); }
-
-  // RenderTexture
-  void SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture);
-  std::shared_ptr<const Texture2D> GetRenderTexture() const
-  {
-    return mState.GetCurrent<ERendererStateId::RENDER_TEXTURE>();
-  }
-  std::shared_ptr<Texture2D> GetRenderTexture() { return mState.GetCurrent<ERendererStateId::RENDER_TEXTURE>(); }
-  void PushRenderTexture() { mState.PushTop<ERendererStateId::RENDER_TEXTURE>(); }
-  void PopRenderTexture() { mState.Pop<ERendererStateId::RENDER_TEXTURE>(); }
-  void ResetRenderTexture() { mState.Reset<ERendererStateId::RENDER_TEXTURE>(); }
-
-  // Camera
-  void SetCamera(const std::shared_ptr<Camera>& inCamera);
-  std::shared_ptr<Camera> GetCamera();
-  std::shared_ptr<const Camera> GetCamera() const;
-  std::shared_ptr<PerspectiveCamera> GetPerspectiveCamera();               // Null if it is not a PerspectiveCamera
-  std::shared_ptr<const PerspectiveCamera> GetPerspectiveCamera() const;   // Null if it is not a PerspectiveCamera
-  std::shared_ptr<OrthographicCamera> GetOrthographicCamera();             // Null if it is not an OrthographicCamera
-  std::shared_ptr<const OrthographicCamera> GetOrthographicCamera() const; // Null if it is not an OrthographicCamera
-  void PushCamera() { mState.PushTop<ERendererStateId::CAMERA>(); }
-  void PopCamera() { mState.Pop<ERendererStateId::CAMERA>(); }
-  void ResetCamera() { mState.Reset<ERendererStateId::CAMERA>(); }
+  Renderer2D();
+  Renderer2D(const Renderer2D& inRHS) = default;
+  Renderer2D& operator=(const Renderer2D& inRHS) = default;
+  Renderer2D(Renderer2D&&) = default;
+  Renderer2D& operator=(Renderer2D&& inRHS) = default;
+  ~Renderer2D() override = default;
 
   // Transformation
-  void SetModelMatrix(const Mat4f& inModelMatrix);
-  const Mat4f& GetModelMatrix() const { return mState.GetCurrent<ERendererStateId::MODEL_MATRIX>(); }
-  Mat4f& GetModelMatrix() { return mState.GetCurrent<ERendererStateId::MODEL_MATRIX>(); }
-  void Translate(const Vec3f& inTranslation);
-  void Rotate(const Quatf& inRotation);
-  void Scale(const Vec3f& inScale);
+  void SetModelMatrix(const Mat3f& inModelMatrix);
+  const Mat3f& GetModelMatrix() const { return mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  Mat3f& GetModelMatrix() { return mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  void Translate(const Vec2f& inTranslation);
+  void Rotate(const AngleRads inRotationAngle);
+  void Scale(const Vec2f& inScale);
   void Scale(const float inScale);
-  void PushModelMatrix() { mState.PushTop<ERendererStateId::MODEL_MATRIX>(); }
-  void PopModelMatrix() { mState.Pop<ERendererStateId::MODEL_MATRIX>(); }
-  void ResetModelMatrix() { mState.Reset<ERendererStateId::MODEL_MATRIX>(); }
+  void PushModelMatrix() { mState.PushTop<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  void PopModelMatrix() { mState.Pop<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  void ResetModelMatrix() { mState.Reset<Renderer2D::EStateId::MODEL_MATRIX>(); }
 
   // Materials
-  void SetMaterial(const Material& inMaterial);
-  const Material& GetMaterial() const { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
-  Material& GetMaterial() { return mState.GetCurrent<ERendererStateId::MATERIAL>(); }
-  void PushMaterial() { mState.PushTop<ERendererStateId::MATERIAL>(); }
-  void PopMaterial() { mState.Pop<ERendererStateId::MATERIAL>(); }
-  void ResetMaterial() { mState.Reset<ERendererStateId::MATERIAL>(); }
+  void SetMaterial(const Material2D& inMaterial);
+  const Material2D& GetMaterial() const { return mState.GetCurrent<Renderer2D::EStateId::MATERIAL>(); }
+  Material2D& GetMaterial() { return mState.GetCurrent<Renderer2D::EStateId::MATERIAL>(); }
+  void PushMaterial() { mState.PushTop<Renderer2D::EStateId::MATERIAL>(); }
+  void PopMaterial() { mState.Pop<Renderer2D::EStateId::MATERIAL>(); }
+  void ResetMaterial() { mState.Reset<Renderer2D::EStateId::MATERIAL>(); }
 
-  // Lighting
-  void SetSceneAmbientColor(const Color3f& inSceneAmbientColor);
-  const Color3f& GetSceneAmbientColor() const { return mState.GetCurrent<ERendererStateId::SCENE_AMBIENT_COLOR>(); }
-  void PushSceneAmbientColor() { mState.PushTop<ERendererStateId::SCENE_AMBIENT_COLOR>(); }
-  void PopSceneAmbientColor() { mState.Pop<ERendererStateId::SCENE_AMBIENT_COLOR>(); }
-  void ResetSceneAmbientColor() { mState.Reset<ERendererStateId::SCENE_AMBIENT_COLOR>(); }
-
-  void AddDirectionalLight(const Vec3f& inDirection, const Color3f& inColor);
-  const auto& GetDirectionalLights() { return mState.GetCurrent<ERendererStateId::DIRECTIONAL_LIGHTS>(); }
-  void PushDirectionalLights() { mState.PushTop<ERendererStateId::DIRECTIONAL_LIGHTS>(); }
-  void PopDirectionalLights() { mState.Pop<ERendererStateId::DIRECTIONAL_LIGHTS>(); }
-  void ResetDirectionalLights() { mState.Reset<ERendererStateId::DIRECTIONAL_LIGHTS>(); }
-
-  void AddPointLight(const Vec3f& inPosition, const float inRange, const Color3f& inColor);
-  const auto& GetPointLights() { return mState.GetCurrent<ERendererStateId::POINT_LIGHTS>(); }
-  void PushPointLights() { mState.PushTop<ERendererStateId::POINT_LIGHTS>(); }
-  void PopPointLights() { mState.Pop<ERendererStateId::POINT_LIGHTS>(); }
-  void ResetPointLights() { mState.Reset<ERendererStateId::POINT_LIGHTS>(); }
-
-  // All state
-  void PushState();
-  void PopState();
-  void ResetState();
-
-  // State generics
-  template <ERendererStateId TStateId>
-  auto& GetCurrent();
-  template <ERendererStateId TStateId>
-  const auto& GetCurrent() const;
-  template <ERendererStateId TStateId>
-  void Push();
-  template <ERendererStateId TStateId>
-  void Pop();
-
-  // Draw - 3D
-  void PrepareFor3D(const Window& inWindow);
+  // Draw
+  void Begin(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
-  void DrawVAOElements(const VAO& inVAO,
-      const GL::Size inNumberOfElementsToDraw,
-      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
-  void DrawVAOArrays(const VAO& inVAO,
-      const GL::Size inNumberOfPrimitivesToDraw,
-      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES,
-      const GL::Size inBeginPrimitiveIndex = 0);
-  void DrawArrow(const Segment3f& inArrowSegment);
-  void DrawAxes();
-  void DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint); }
-  void DrawPoints(const Span<Vec3f>& inPoints) { DrawPointsGeneric(inPoints); }
-  void DrawSegment(const Segment3f& inSegment) { DrawSegmentGeneric(inSegment); }
-  void DrawSegments(const Span<Segment3f>& inSegments) { DrawSegmentsGeneric(inSegments); }
-  void DrawTriangle(const Triangle3f& inTriangle);
-
-  // Draw - 2D (z = 0.0)
-  void PrepareFor2D(const Window& inWindow);
-  void DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint); }
-  void DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints); }
-  void DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment); }
-  void DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments); }
+  void DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint, *sShaderProgram); }
+  void DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints, *sShaderProgram); }
+  void DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment, *sShaderProgram); }
+  void DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments, *sShaderProgram); }
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
+
+  // State
+  using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,
+      Mat3f,       // ERendererStateId::MODEL_MATRIX
+      Material2D>; // ERendererStateId::MATERIAL
+  using State = RendererStateStacks<Renderer2D, StateTupleOfStacks>;
+  friend class RendererStateStacks<Renderer2D, StateTupleOfStacks>;
+
+  void PushState() override;
+  void PopState() override;
+  void ResetState() override;
+  State& GetState() { return mState; }
+  const State& GetState() const { return mState; }
 
 private:
   // Static resources
   static bool sStaticResourcesInited;
-  static std::unique_ptr<ShaderProgram> sOnlyColorShaderProgram;
-  static std::unique_ptr<ShaderProgram> sMeshShaderProgram;
-  static std::unique_ptr<MeshDrawData> sCone;
+  static std::unique_ptr<ShaderProgram> sShaderProgram;
 
-  // State
-  RendererStateStacks<Renderer> mState { *this };
+  State mState { *this };
 
-  // Lights
-  static constexpr auto MaxNumberOfDirectionalLights = 100;
-  static constexpr auto MaxNumberOfPointLights = 100;
-  UBO mDirectionalLightsUBO;
-  UBO mPointLightsUBO;
+  template <Renderer2D::EStateId StateId>
+  static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
 
-  // Draw helpers
-  void DrawVAOArraysOrElements(const VAO& inVAO,
-      const GL::Size inNumberOfElementsToDraw,
-      const GL::EPrimitivesType inPrimitivesType,
-      const bool inDrawArrays,
-      const GL::Size inBeginArraysPrimitiveIndex);
+  template <Renderer2D::EStateId StateId>
+  static State::ValueType<StateId> GetDefaultValue();
 
   // Helpers or common functionality
-  void PrepareFor3DOr2DCommon(const Window& inWindow);
-  using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material>;
-  [[nodiscard]] UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
+  [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram) override;
 };
 
-// Renderer state guards
-template <ERendererStateId TStateId>
-class RendererStateGuard final
-{
-public:
-  RendererStateGuard(Renderer& ioRenderer) : mRenderer(ioRenderer) { mRenderer.Push<TStateId>(); }
-  ~RendererStateGuard() { mRenderer.Pop<TStateId>(); }
-
-private:
-  Renderer& mRenderer;
-};
+// clang-format off
+template <> struct StateIdRenderer<Renderer2D::EStateId> { using Type = Renderer2D; };
+// clang-format on
 }
 
-#include "Renderer.tcc"
-};
-}*/
+#include "Renderer2D.tcc"
