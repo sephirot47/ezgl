@@ -6,12 +6,13 @@
 #include "Geometry.h"
 #include "Image2D.h"
 #include "Macros.h"
-#include "Material.h"
+#include "Material3D.h"
 #include "Math.h"
 #include "Mesh.h"
 #include "MeshDrawData.h"
 #include "MeshFactory.h"
 #include "Renderer.h"
+#include "Renderer3D.h"
 #include "Segment.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -53,106 +54,92 @@ int main()
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
-  const auto circle = MeshFactory::GetCircleSection(40, FullCircleRads());
-
   auto time = TimeDuration { 0 };
   window->Loop([&](const DeltaTime& inDeltaTime) {
     time += inDeltaTime;
 
-    Renderer renderer;
-    renderer.PrepareFor3D(*window);
+    Renderer3D renderer3D;
+    renderer3D.Begin(*window);
     {
+      if (window->IsKeyPressed(Key::X))
+        renderer3D.SetRenderTexture(render_texture);
+
+      renderer3D.SetLineWidth(5.0f);
+      renderer3D.Clear(Pink());
       render_texture->Resize(window->GetSize());
 
-      if (window->IsKeyPressed(Key::X))
-        renderer.SetRenderTexture(render_texture);
-
-      renderer.ClearDepth();
-      renderer.ClearBackground(Pink());
-      renderer.SetCamera(camera);
-
-      renderer.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
+      renderer3D.SetCamera(camera);
+      renderer3D.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
 
       const auto q = AngleAxis(time.count() * (0.5f * time.count()), Normalized(Vec3f { 0.0f, 0.0f, 1.0f }));
-      // renderer.Rotate(q);
-      // renderer.Scale(All<Vec3f>(10.0f));
-      renderer.SetLineWidth(3.0f);
-      renderer.DrawAxes();
-
-      renderer.GetPerspectiveCamera()->SetAngleOfView(DegreeToRad(60.0f));
-
-      renderer.SetCullFaceEnabled(false);
+      UNUSED(q);
 
       const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
-      renderer.Translate(obj_pos);
-      UNUSED(q);
-      renderer.Rotate(q);
-      renderer.GetMaterial().SetTexture(nullptr);
-      renderer.Scale(All<Vec3f>(5.0f));
-      renderer.GetMaterial().SetDiffuseColor(White());
-      renderer.GetMaterial().SetLightingEnabled(true);
-      renderer.GetMaterial().SetSpecularExponent(120.0f);
-      renderer.DrawMesh(test_mesh);
-      // renderer.DrawMesh(circle);
-      renderer.DrawAxes();
+      renderer3D.Translate(obj_pos);
+      renderer3D.Rotate(q);
+      renderer3D.GetMaterial().SetTexture(nullptr);
+      renderer3D.Scale(All<Vec3f>(5.0f));
+      renderer3D.GetMaterial().SetDiffuseColor(White());
+      renderer3D.GetMaterial().SetLightingEnabled(true);
+      renderer3D.GetMaterial().SetSpecularExponent(120.0f);
+      renderer3D.DrawMesh(test_mesh);
+      // renderer3D.DrawMesh(circle);
+      renderer3D.DrawAxes();
+      renderer3D.GetMaterial().SetDiffuseColor(Blue());
+      renderer3D.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
-      renderer.GetMaterial().SetDiffuseColor(Blue());
-      renderer.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
-
-      renderer.SetPointSize(1.0f);
-      renderer.GetMaterial().SetDiffuseColor(Red());
-      renderer.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
+      renderer3D.SetPointSize(1.0f);
+      renderer3D.GetMaterial().SetDiffuseColor(Red());
+      renderer3D.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
 
       if (window->IsKeyPressed(Key::X))
       {
-        renderer.ResetState();
-        renderer.SetRenderTexture(nullptr);
+        renderer3D.ResetState();
+        renderer3D.SetRenderTexture(nullptr);
 
-        renderer.SetCullFaceEnabled(true);
+        RENDERER_STATE_GUARD(renderer3D, Renderer::EStateId::CAMERA);
+        renderer3D.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
+        renderer3D.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
-        RENDERER_STATE_GUARD(renderer, ERendererStateId::CAMERA);
-        renderer.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
-        renderer.GetCamera()->LookAtPoint(Zero<Vec3f>());
-
-        renderer.ClearDepth();
-        renderer.ClearBackground(Black());
-
-        renderer.ResetMaterial();
-        renderer.Rotate(AngleAxis(0.5f, Forward()));
-        renderer.Scale(All<Vec3f>(14.0f));
-        renderer.GetMaterial().SetLightingEnabled(false);
-        renderer.GetMaterial().SetTexture(render_texture);
-        renderer.DrawMesh(MeshFactory::GetPlane());
+        renderer3D.ResetMaterial();
+        renderer3D.Rotate(AngleAxis(0.5f, Forward()));
+        renderer3D.Scale(All<Vec3f>(14.0f));
+        renderer3D.GetMaterial().SetLightingEnabled(false);
+        renderer3D.GetMaterial().SetTexture(render_texture);
+        renderer3D.DrawMesh(MeshFactory::GetPlane());
 
         const auto triangle = Triangle3f(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1.0f, 5.0f, -3.0f), Vec3f(-5.0f, 1.0f, 3.0f));
-        renderer.Scale(0.4f);
-        renderer.GetMaterial().SetDiffuseColor(Red());
-        renderer.DrawTriangle(triangle);
-        renderer.GetMaterial().SetDiffuseColor(Blue());
-        renderer.SetLineWidth(10.0f);
-        renderer.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
+        renderer3D.Scale(0.4f);
+        renderer3D.GetMaterial().SetDiffuseColor(Red());
+        renderer3D.DrawTriangle(triangle);
+        renderer3D.GetMaterial().SetDiffuseColor(Blue());
+        renderer3D.SetLineWidth(10.0f);
+        renderer3D.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
             Segment3f { triangle[1], triangle[2] },
             Segment3f { triangle[2], triangle[0] } }));
       }
     }
 
-    renderer.PrepareFor2D(*window);
+    /*
+    Renderer2D renderer2D;
+    renderer2D.PrepareFor2D(*window);
     {
-      RENDERER_STATE_GUARD_ALL(renderer);
-      renderer.SetPointSize(15.0f);
-      renderer.GetMaterial().SetDiffuseColor(Red());
+      RENDERER_STATE_GUARD_ALL(renderer2D);
+      renderer2D.SetPointSize(15.0f);
+      renderer2D.GetMaterial().SetDiffuseColor(Red());
 
-      // renderer.DrawTriangle();
-      renderer.SetDepthTestEnabled(false);
-      renderer.DrawPoint(Vec2f(400.0f, 400.0f));
-      renderer.DrawSegment(Segment2f { Vec2f { 0.0f, 0.0f }, Vec2f { 500.0f, 800.0f } });
+      // renderer2D.DrawTriangle();
+      renderer2D.SetDepthTestEnabled(false);
+      renderer2D.DrawPoint(Vec2f(400.0f, 400.0f));
+      renderer2D.DrawSegment(Segment2f { Vec2f { 0.0f, 0.0f }, Vec2f { 500.0f, 800.0f } });
 
       const auto triangle = Triangle2f(Vec2f(10.0f, 50.0f), Vec2f(50.0f, 100.0f), Vec2f(20.0f, 5.0f));
-      renderer.DrawTriangle(triangle);
+      renderer2D.DrawTriangle(triangle);
 
-      renderer.GetMaterial().SetDiffuseColor(Blue());
-      renderer.DrawTriangleBoundary(triangle);
+      renderer2D.GetMaterial().SetDiffuseColor(Blue());
+      renderer2D.DrawTriangleBoundary(triangle);
     }
+    */
 
     camera_controller_fly.Update(inDeltaTime);
   });

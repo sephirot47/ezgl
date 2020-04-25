@@ -11,6 +11,8 @@ template <typename TIndexType = std::size_t, typename... TArgs>
 class TupleOfStacks
 {
 public:
+  using IndexType = TIndexType;
+
   using TupleType = std::tuple<std::stack<TArgs>...>;
 
   template <TIndexType Index>

@@ -9,7 +9,7 @@ namespace egl
 class Texture2D;
 class ShaderProgram;
 
-class Material
+class Material3D
 {
 public:
   using GLBindGuardType = GLNoOpGuard;

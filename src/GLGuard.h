@@ -40,10 +40,18 @@ template <typename T> decltype(auto) GetGLBindGuard() { return typename T::GLBin
 
 #define GL_BIND_GUARD(TYPE) const auto ANONYMOUS_VARIABLE_NAME() = GetGLBindGuard<TYPE>();
 #define GL_BIND_GUARD_VAR(VARIABLE) GL_BIND_GUARD(std::remove_reference_t<std::remove_const_t<decltype(VARIABLE)>>)
+// clang-format on
 
 template <typename... TGuards>
-using GLCompositeGuard = std::tuple<decltype(GetGLBindGuard<TGuards>())...>;
+class GLCompositeGuard : public std::tuple<decltype(GetGLBindGuard<TGuards>())...>
+{
+public:
+  GLCompositeGuard() = default;
+  GLCompositeGuard(const GLCompositeGuard& inRHS) = delete;
+  GLCompositeGuard& operator=(const GLCompositeGuard& inRHS) = delete;
+  GLCompositeGuard(GLCompositeGuard&& ioRHS) = default;
+  GLCompositeGuard& operator=(GLCompositeGuard&& ioRHS) = delete;
+};
 // GLCompositeGuard use example: GLCompositeGuard<VAO, ShaderProgram, VBO>
 
-// clang-format on
 }
