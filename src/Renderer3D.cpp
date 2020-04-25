@@ -105,6 +105,34 @@ void Renderer3D::AddPointLight(const Vec3f& inPosition, const float inRange, con
   mState.GetCurrent<Renderer3D::EStateId::POINT_LIGHTS>().push_back(point_light);
 }
 
+void Renderer3D::SetCamera(const std::shared_ptr<Camera3f>& inCamera)
+{
+  mState.GetCurrent<Renderer3D::EStateId::CAMERA>() = inCamera;
+}
+
+std::shared_ptr<Camera3f> Renderer3D::GetCamera() { return mState.GetCurrent<Renderer3D::EStateId::CAMERA>(); }
+std::shared_ptr<const Camera3f> Renderer3D::GetCamera() const { return const_cast<Renderer3D&>(*this).GetCamera(); }
+
+std::shared_ptr<PerspectiveCameraf> Renderer3D::GetPerspectiveCamera()
+{
+  return std::dynamic_pointer_cast<PerspectiveCameraf>(mState.GetCurrent<Renderer3D::EStateId::CAMERA>());
+}
+
+std::shared_ptr<const PerspectiveCameraf> Renderer3D::GetPerspectiveCamera() const
+{
+  return const_cast<Renderer3D&>(*this).GetPerspectiveCamera();
+}
+
+std::shared_ptr<OrthographicCamera3f> Renderer3D::GetOrthographicCamera()
+{
+  return std::dynamic_pointer_cast<OrthographicCamera3f>(mState.GetCurrent<Renderer3D::EStateId::CAMERA>());
+}
+
+std::shared_ptr<const OrthographicCamera3f> Renderer3D::GetOrthographicCamera() const
+{
+  return const_cast<Renderer3D&>(*this).GetOrthographicCamera();
+}
+
 void Renderer3D::PushState()
 {
   Renderer::PushState();

@@ -8,7 +8,10 @@ void Renderer2D::ApplyState(const State::ValueType<StateId>& inValue, State& ioS
   UNUSED(inValue);
   UNUSED(ioState);
 
-  if constexpr (StateId == Renderer2D::EStateId::MODEL_MATRIX) {}
+  if constexpr (StateId == Renderer2D::EStateId::CAMERA) {}
+  else if constexpr (StateId == Renderer2D::EStateId::MODEL_MATRIX)
+  {
+  }
   else if constexpr (StateId == Renderer2D::EStateId::MATERIAL)
   {
   }
@@ -21,7 +24,12 @@ void Renderer2D::ApplyState(const State::ValueType<StateId>& inValue, State& ioS
 template <Renderer2D::EStateId StateId>
 typename Renderer2D::State::template ValueType<StateId> Renderer2D::GetDefaultValue()
 {
-  if constexpr (StateId == Renderer2D::EStateId::MODEL_MATRIX)
+  if constexpr (StateId == Renderer2D::EStateId::CAMERA)
+  {
+    std::unique_ptr<OrthographicCamera2f> default_camera = std::make_unique<OrthographicCamera2f>();
+    return default_camera;
+  }
+  else if constexpr (StateId == Renderer2D::EStateId::MODEL_MATRIX)
   {
     return Identity<Mat3f>();
   }

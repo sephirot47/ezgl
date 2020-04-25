@@ -34,8 +34,8 @@ public:
 
   Vec<T, N> Transformed(const Vec<T, N>& inPoint);
   Vec<T, N> InverseTransformed(const Vec<T, N>& inPoint);
-  Mat4f GetMatrix() const;
-  Mat4f GetInverseMatrix() const;
+  SquareMat<T, N + 1> GetMatrix() const;
+  SquareMat<T, N + 1> GetInverseMatrix() const;
 
 private:
   Vec<T, N> mPosition = Vec<T, N>(static_cast<T>(0.0f));
@@ -55,6 +55,32 @@ using Transformation3f = Transformation3<float>;
 template <typename T> struct TransformationRotationType<Transformation2<T>> { using Type = T; };
 template <typename T> struct TransformationRotationType<Transformation3<T>> { using Type = Quat<T>; };
 // clang-format on
+
+// Helper functions
+template <typename T, std::size_t N>
+void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N + 1>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N + 1>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+void Transform(T& ioObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix);
+
+template <typename T, std::size_t N>
+void Transform(T& ioObjectToTransform, const Transformation<T, N>& inTransformation);
+
+template <typename T, std::size_t N>
+[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const Transformation<T, N>& inTransformation);
+
 }
 
 #include "Transformation.tcc"

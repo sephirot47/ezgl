@@ -4,6 +4,7 @@
 #include "MeshIO.h"
 #include "MeshIterators.h"
 #include "StreamOperators.h"
+#include "Transformation.h"
 #include <algorithm>
 #include <cassert>
 #include <unordered_map>

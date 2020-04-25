@@ -32,7 +32,6 @@ namespace egl
 {
 class MeshDrawData;
 class ShaderProgram;
-class Camera;
 class ShaderProgram;
 class Texture2D;
 
@@ -41,7 +40,6 @@ class Renderer
 public:
   enum class EStateId
   {
-    CAMERA,
     OVERRIDE_SHADER_PROGRAM,
     RENDER_TEXTURE,
     DEPTH_ENABLED,
@@ -136,21 +134,8 @@ public:
   void PopRenderTexture() { mState.Pop<Renderer::EStateId::RENDER_TEXTURE>(); }
   void ResetRenderTexture() { mState.Reset<Renderer::EStateId::RENDER_TEXTURE>(); }
 
-  // Camera
-  void SetCamera(const std::shared_ptr<Camera>& inCamera);
-  std::shared_ptr<Camera> GetCamera();
-  std::shared_ptr<const Camera> GetCamera() const;
-  std::shared_ptr<PerspectiveCamera> GetPerspectiveCamera();               // Null if it is not a PerspectiveCamera
-  std::shared_ptr<const PerspectiveCamera> GetPerspectiveCamera() const;   // Null if it is not a PerspectiveCamera
-  std::shared_ptr<OrthographicCamera> GetOrthographicCamera();             // Null if it is not an OrthographicCamera
-  std::shared_ptr<const OrthographicCamera> GetOrthographicCamera() const; // Null if it is not an OrthographicCamera
-  void PushCamera() { mState.PushTop<Renderer::EStateId::CAMERA>(); }
-  void PopCamera() { mState.Pop<Renderer::EStateId::CAMERA>(); }
-  void ResetCamera() { mState.Reset<Renderer::EStateId::CAMERA>(); }
-
   // State
   using StateTupleOfStacks = TupleOfStacks<EStateId,
-      std::shared_ptr<Camera>,        // EStateId::CAMERA
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
       std::shared_ptr<Texture2D>,     // EStateId::RENDER_TEXTURE
       bool,                           // EStateId::DEPTH_ENABLED
@@ -202,7 +187,7 @@ protected:
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram& ioShaderProgram);
 
   // Helpers or common functionality
-  ShaderProgram& GetOverrideShaderProgramOr(ShaderProgram &ioAlternativeShaderProgram);
+  ShaderProgram& GetOverrideShaderProgramOr(ShaderProgram& ioAlternativeShaderProgram);
   using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material3D>;
   [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
 

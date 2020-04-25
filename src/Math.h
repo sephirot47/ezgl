@@ -4,7 +4,6 @@
 #include "Mat.h"
 #include "Quat.h"
 #include "Segment.h"
-#include "Transformation.h"
 #include "TypeTraits.h"
 #include "Vec.h"
 #include <cmath>
@@ -847,7 +846,7 @@ constexpr SquareMat<T, N + 1> TranslationMat(const Vec<T, N>& inTranslation)
 }
 
 template <typename T>
-constexpr SquareMat<T, 3> RotationMat(const T inAngle)
+constexpr std::enable_if_t<IsNumber_v<T>, SquareMat<T, 3>> RotationMat(const T inAngle)
 {
   return SquareMat<T, 3> { Vec3<T> { std::cos(inAngle), -std::sin(inAngle), static_cast<T>(0) },
     Vec3<T> { std::sin(inAngle), std::cos(inAngle), static_cast<T>(0) },
@@ -906,7 +905,7 @@ constexpr Vec3<T> Rotated(const Vec3<T>& inVec, const Quat<T>& inRotation)
 }
 
 template <typename T>
-constexpr Mat4<T> PerspectiveMat4(const T inAngleOfViewRads, const T inAspectRatio, const T inZNear, const T inZFar)
+constexpr Mat4<T> PerspectiveMat(const T inAngleOfViewRads, const T inAspectRatio, const T inZNear, const T inZFar)
 {
   const T tanHalfFovy = std::tan(inAngleOfViewRads / static_cast<T>(2));
 
@@ -919,17 +918,16 @@ constexpr Mat4<T> PerspectiveMat4(const T inAngleOfViewRads, const T inAspectRat
   return perspective_matrix;
 }
 
-template <typename T>
-constexpr Mat4<T> OrthographicMat4(const Vec3<T>& inMin, const Vec3<T>& inMax)
+template <typename T, std::size_t N>
+constexpr SquareMat<T, N + 1> OrthographicMat(const Vec<T, N>& inMin, const Vec<T, N>& inMax)
 {
-  Mat4<T> orthographic_matrix;
-  orthographic_matrix[0][0] = static_cast<T>(2) / (inMax[0] - inMin[0]);
-  orthographic_matrix[1][1] = static_cast<T>(2) / (inMax[1] - inMin[1]);
-  orthographic_matrix[2][2] = -static_cast<T>(-2) / (inMax[2] - inMin[2]);
-  orthographic_matrix[3][3] = static_cast<T>(1);
-  orthographic_matrix[0][3] = -static_cast<T>(inMax[0] + inMin[0]) / static_cast<T>(inMax[0] - inMin[0]);
-  orthographic_matrix[1][3] = -static_cast<T>(inMax[1] + inMin[1]) / static_cast<T>(inMax[1] - inMin[1]);
-  orthographic_matrix[2][3] = -static_cast<T>(inMax[2] + inMin[2]) / static_cast<T>(inMax[2] - inMin[2]);
+  SquareMat<T, N + 1> orthographic_matrix;
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    orthographic_matrix[i][i] = static_cast<T>(2) / (inMax[i] - inMin[i]);
+    orthographic_matrix[i][N] = -static_cast<T>(inMax[i] + inMin[i]) / static_cast<T>(inMax[i] - inMin[i]);
+  }
+  orthographic_matrix[N][N] = static_cast<T>(1);
   return orthographic_matrix;
 }
 
@@ -965,71 +963,6 @@ constexpr TQuat SLerp(const TQuat& inFrom, const TQuat& inTo, const T& inT)
     const auto angle = std::acos(cosTheta);
     return (std::sin((static_cast<T>(1) - inT) * angle) * inFrom + std::sin(inT * angle) * to) / std::sin(angle);
   }
-}
-
-template <typename T, std::size_t N>
-void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N>& inTransformMatrix)
-{
-  ioPoint = (inTransformMatrix * ioPoint);
-}
-
-template <typename T, std::size_t N>
-[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N>& inTransformMatrix)
-{
-  auto transformed_point = inPoint;
-  Transform(transformed_point, inTransformMatrix);
-  return transformed_point;
-}
-
-template <typename T, std::size_t N>
-void Transform(Vec<T, N>& ioPoint, const SquareMat<T, N + 1>& inTransformMatrix)
-{
-  // If the point has one less dimension than the transform matrix, convert the point to one
-  // more dimension by adding a 1 at the end, and then retrieve it from the result
-
-  Vec<T, N + 1> point_and_1;
-  for (std::size_t i = 0; i < N; ++i) { point_and_1[i] = ioPoint[i]; }
-  point_and_1[N] = static_cast<T>(1);
-
-  const auto transformed_point_and_1 = Transformed(point_and_1, inTransformMatrix);
-  for (std::size_t i = 0; i < N; ++i) { ioPoint[i] = transformed_point_and_1[i]; }
-}
-
-template <typename T, std::size_t N>
-[[nodiscard]] Vec<T, N> Transformed(const Vec<T, N>& inPoint, const SquareMat<T, N + 1>& inTransformMatrix)
-{
-  auto transformed_point = inPoint;
-  Transform(transformed_point, inTransformMatrix);
-  return transformed_point;
-}
-
-template <typename T, std::size_t N>
-void Transform(T& ioObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix)
-{
-  for (auto& value : ioObjectToTransform) { Transform(value, inTransformMatrix); }
-}
-
-template <typename T, std::size_t N>
-[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const SquareMat<T, N + 1>& inTransformMatrix)
-{
-  auto transformed_object = inObjectToTransform;
-  Transform(transformed_object, inTransformMatrix);
-  return transformed_object;
-}
-
-template <typename T, std::size_t N>
-void Transform(T& ioObjectToTransform, const Transformation<T, N>& inTransformation)
-{
-  const auto transform_matrix = inTransformation.GetMatrix();
-  for (auto& value : ioObjectToTransform) { Transform(value, transform_matrix); }
-}
-
-template <typename T, std::size_t N>
-[[nodiscard]] Vec<T, N> Transformed(const T& inObjectToTransform, const Transformation<T, N>& inTransformation)
-{
-  auto transformed_object = inObjectToTransform;
-  Transform(transformed_object, inTransformation);
-  return transformed_object;
 }
 
 // Swizzling

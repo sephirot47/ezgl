@@ -92,14 +92,29 @@ void Renderer2D::Begin(const Window& inWindow)
     const float window_width = window_size[0];
     const float window_height = window_size[1];
 
-    OrthographicParameters orthographic_params;
-    orthographic_params.mMin = Vec3f { 0.0f, 0.0f, -1.0f };
-    orthographic_params.mMax = Vec3f(window_width, window_height, 1.0f);
+    OrthographicParameters2f orthographic_params;
+    orthographic_params.mMin = Vec2f { 0.0f, 0.0f };
+    orthographic_params.mMax = Vec2f { window_width, window_height };
 
-    const auto orthographic_camera = std::make_shared<OrthographicCamera>();
+    const auto orthographic_camera = std::make_shared<OrthographicCamera2f>();
     orthographic_camera->SetOrthographicParameters(orthographic_params);
     SetCamera(orthographic_camera);
   }
+}
+
+void Renderer2D::SetCamera(const std::shared_ptr<OrthographicCamera2f>& inCamera)
+{
+  mState.GetCurrent<Renderer2D::EStateId::CAMERA>() = inCamera;
+}
+
+std::shared_ptr<OrthographicCamera2f> Renderer2D::GetCamera()
+{
+  return mState.GetCurrent<Renderer2D::EStateId::CAMERA>();
+}
+
+std::shared_ptr<const OrthographicCamera2f> Renderer2D::GetCamera() const
+{
+  return const_cast<Renderer2D&>(*this).GetCamera();
 }
 
 void Renderer2D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
@@ -142,14 +157,13 @@ Renderer2D::UseShaderProgramBindGuard Renderer2D::UseShaderProgram(ShaderProgram
   assert(ioShaderProgram.IsBound());
 
   auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
-  /*
+
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();
   const auto view_matrix = current_camera->GetViewMatrix();
   const auto normal_matrix = NormalMat(model_matrix);
   const auto projection_matrix = current_camera->GetProjectionMatrix();
   const auto projection_view_model_matrix = projection_matrix * view_matrix * model_matrix;
-  */
 
   GetMaterial().Bind(shader_program);
 

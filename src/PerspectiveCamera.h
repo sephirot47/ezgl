@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Camera.h"
+#include "Math.h"
 #include "PerspectiveParameters.h"
 
 namespace egl
 {
-class PerspectiveCamera final : public Camera
+template <typename T>
+class PerspectiveCamera final : public Camera<T, 3>
 {
 public:
   void SetAngleOfView(const AngleRads inAngleOfView) { mPerspectiveParameters.mAngleOfView = inAngleOfView; }
@@ -20,16 +22,25 @@ public:
   void SetZFar(const float inZFar) { mPerspectiveParameters.mZFar = inZFar; }
   float GetZFar() const { return mPerspectiveParameters.mZFar; }
 
-  void SetPerspectiveParameters(const PerspectiveParameters& inPerspectiveParameters)
+  void SetPerspectiveParameters(const PerspectiveParameters<T>& inPerspectiveParameters)
   {
     mPerspectiveParameters = inPerspectiveParameters;
   }
-  PerspectiveParameters& GetPerspectiveParameters() { return mPerspectiveParameters; }
-  const PerspectiveParameters& GetPerspectiveParameters() const { return mPerspectiveParameters; }
+  PerspectiveParameters<T>& GetPerspectiveParameters() { return mPerspectiveParameters; }
+  const PerspectiveParameters<T>& GetPerspectiveParameters() const { return mPerspectiveParameters; }
 
-  virtual Mat4f GetProjectionMatrix() const final override;
+  virtual Mat4<T> GetProjectionMatrix() const final override
+  {
+    const auto perspective_projection_matrix = PerspectiveMat(mPerspectiveParameters.mAngleOfView,
+        mPerspectiveParameters.mAspectRatio,
+        mPerspectiveParameters.mZNear,
+        mPerspectiveParameters.mZFar);
+    return perspective_projection_matrix;
+  }
 
 private:
-  PerspectiveParameters mPerspectiveParameters;
+  PerspectiveParameters<T> mPerspectiveParameters;
 };
+
+using PerspectiveCameraf = PerspectiveCamera<float>;
 }

@@ -7,7 +7,10 @@ void Renderer3D::ApplyState(const State::ValueType<StateId>& inValue, State& ioS
 {
   UNUSED(ioState);
 
-  if constexpr (StateId == Renderer3D::EStateId::MODEL_MATRIX) {}
+  if constexpr (StateId == Renderer3D::EStateId::CAMERA) {}
+  else if constexpr (StateId == Renderer3D::EStateId::MODEL_MATRIX)
+  {
+  }
   else if constexpr (StateId == Renderer3D::EStateId::MATERIAL)
   {
   }
@@ -33,7 +36,12 @@ void Renderer3D::ApplyState(const State::ValueType<StateId>& inValue, State& ioS
 template <Renderer3D::EStateId StateId>
 typename Renderer3D::State::template ValueType<StateId> Renderer3D::GetDefaultValue()
 {
-  if constexpr (StateId == Renderer3D::EStateId::MODEL_MATRIX)
+  if constexpr (StateId == Renderer3D::EStateId::CAMERA)
+  {
+    std::unique_ptr<Camera3f> default_camera = std::make_unique<PerspectiveCameraf>();
+    return default_camera;
+  }
+  else if constexpr (StateId == Renderer3D::EStateId::MODEL_MATRIX)
   {
     return Identity<Mat4f>();
   }

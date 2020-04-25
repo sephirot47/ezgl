@@ -45,12 +45,14 @@ int main()
   const auto test_mesh = MeshFactory::GetTorus(25, 25, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
-  const auto camera = std::make_shared<PerspectiveCamera>();
-  camera->SetPosition(Back<Vec3f>() * 12.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
-  camera->LookAtPoint(Zero<Vec3f>());
+  const auto camera3d = std::make_shared<PerspectiveCameraf>();
+  camera3d->SetPosition(Back<Vec3f>() * 12.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
+  camera3d->LookAtPoint(Zero<Vec3f>());
 
-  CameraControllerFly camera_controller_fly;
-  camera_controller_fly.SetCamera(camera);
+  const auto camera2d = std::make_shared<OrthographicCamera2f>();
+
+  CameraControllerFly2f camera_controller_fly;
+  camera_controller_fly.SetCamera(camera2d);
   camera_controller_fly.SetWindow(window);
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
@@ -69,7 +71,7 @@ int main()
       renderer3D.Clear(Pink());
       render_texture->Resize(window->GetSize());
 
-      renderer3D.SetCamera(camera);
+      renderer3D.SetCamera(camera3d);
       renderer3D.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
 
       const auto q = AngleAxis(time.count() * (0.5f * time.count()), Normalized(Vec3f { 0.0f, 0.0f, 1.0f }));
@@ -98,7 +100,7 @@ int main()
         renderer3D.ResetState();
         renderer3D.SetRenderTexture(nullptr);
 
-        RENDERER_STATE_GUARD(renderer3D, Renderer::EStateId::CAMERA);
+        RENDERER_STATE_GUARD(renderer3D, Renderer3D::EStateId::CAMERA);
         renderer3D.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
         renderer3D.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
@@ -137,8 +139,6 @@ int main()
 
       renderer2D.GetMaterial().SetColor(Blue());
       renderer2D.DrawTriangleBoundary(triangle);
-      /*
-       */
     }
 
     camera_controller_fly.Update(inDeltaTime);

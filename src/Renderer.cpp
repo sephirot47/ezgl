@@ -105,34 +105,6 @@ void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTextur
   }
 }
 
-void Renderer::SetCamera(const std::shared_ptr<Camera>& inCamera)
-{
-  mState.GetCurrent<Renderer::EStateId::CAMERA>() = inCamera;
-}
-
-std::shared_ptr<Camera> Renderer::GetCamera() { return mState.GetCurrent<Renderer::EStateId::CAMERA>(); }
-std::shared_ptr<const Camera> Renderer::GetCamera() const { return const_cast<Renderer&>(*this).GetCamera(); }
-
-std::shared_ptr<PerspectiveCamera> Renderer::GetPerspectiveCamera()
-{
-  return std::dynamic_pointer_cast<PerspectiveCamera>(mState.GetCurrent<Renderer::EStateId::CAMERA>());
-}
-
-std::shared_ptr<const PerspectiveCamera> Renderer::GetPerspectiveCamera() const
-{
-  return const_cast<Renderer&>(*this).GetPerspectiveCamera();
-}
-
-std::shared_ptr<OrthographicCamera> Renderer::GetOrthographicCamera()
-{
-  return std::dynamic_pointer_cast<OrthographicCamera>(mState.GetCurrent<Renderer::EStateId::CAMERA>());
-}
-
-std::shared_ptr<const OrthographicCamera> Renderer::GetOrthographicCamera() const
-{
-  return const_cast<Renderer&>(*this).GetOrthographicCamera();
-}
-
 void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState() { mState.PopAll(); }
 

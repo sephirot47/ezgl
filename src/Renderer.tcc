@@ -56,8 +56,7 @@ void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram&
 template <Renderer::EStateId StateId>
 void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioState)
 {
-  if constexpr (StateId == Renderer::EStateId::CAMERA) {}
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
+  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
   {
   }
   else if constexpr (StateId == Renderer::EStateId::RENDER_TEXTURE)
@@ -97,12 +96,7 @@ void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioSta
 template <Renderer::EStateId StateId>
 typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue()
 {
-  if constexpr (StateId == Renderer::EStateId::CAMERA)
-  {
-    std::unique_ptr<Camera> default_camera = std::make_unique<PerspectiveCamera>();
-    return default_camera;
-  }
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
+  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
   {
     return nullptr;
   }

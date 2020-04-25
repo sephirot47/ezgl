@@ -38,9 +38,10 @@ class Renderer3D final : public Renderer
 public:
   enum class EStateId
   {
+    CULL_FACE_ENABLED,
+    CAMERA,
     MODEL_MATRIX,
     MATERIAL,
-    CULL_FACE_ENABLED,
     SCENE_AMBIENT_COLOR,
     DIRECTIONAL_LIGHTS,
     POINT_LIGHTS
@@ -59,6 +60,18 @@ public:
   void PushCullFaceEnabled() { mState.PushTop<Renderer3D::EStateId::CULL_FACE_ENABLED>(); }
   void PopCullFaceEnabled() { mState.Pop<Renderer3D::EStateId::CULL_FACE_ENABLED>(); }
   void ResetCullFaceEnabled() { mState.Reset<Renderer3D::EStateId::CULL_FACE_ENABLED>(); }
+
+  // Camera
+  void SetCamera(const std::shared_ptr<Camera3f>& inCamera);
+  std::shared_ptr<Camera3f> GetCamera();
+  std::shared_ptr<const Camera3f> GetCamera() const;
+  std::shared_ptr<PerspectiveCameraf> GetPerspectiveCamera();               // Null if it is not a PerspectiveCamera
+  std::shared_ptr<const PerspectiveCameraf> GetPerspectiveCamera() const;   // Null if it is not a PerspectiveCamera
+  std::shared_ptr<OrthographicCamera3f> GetOrthographicCamera();             // Null if it is not an OrthographicCamera
+  std::shared_ptr<const OrthographicCamera3f> GetOrthographicCamera() const; // Null if it is not an OrthographicCamera
+  void PushCamera() { mState.PushTop<Renderer3D::EStateId::CAMERA>(); }
+  void PopCamera() { mState.Pop<Renderer3D::EStateId::CAMERA>(); }
+  void ResetCamera() { mState.Reset<Renderer3D::EStateId::CAMERA>(); }
 
   // Transformation
   void SetModelMatrix(const Mat4f& inModelMatrix);
@@ -113,12 +126,13 @@ public:
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer3D::EStateId,
-      Mat4f,                             // ERendererStateId::MODEL_MATRIX
-      Material3D,                        // ERendererStateId::MATERIAL
-      bool,                              // ERendererStateId::CULL_FACE_ENABLED
-      Color3f,                           // ERendererStateId::SCENE_AMBIENT_COLOR
-      std::vector<GLSLDirectionalLight>, // ERendererStateId::DIRECTIONAL_LIGHTS
-      std::vector<GLSLPointLight>>;      // ERendererStateId::POINT_LIGHTS
+      bool,                              // EStateId::CULL_FACE_ENABLED
+      std::shared_ptr<Camera3f>,         // EStateId::CAMERA
+      Mat4f,                             // EStateId::MODEL_MATRIX
+      Material3D,                        // EStateId::MATERIAL
+      Color3f,                           // EStateId::SCENE_AMBIENT_COLOR
+      std::vector<GLSLDirectionalLight>, // EStateId::DIRECTIONAL_LIGHTS
+      std::vector<GLSLPointLight>>;      // EStateId::POINT_LIGHTS
   using State = RendererStateStacks<Renderer3D, StateTupleOfStacks>;
   friend class RendererStateStacks<Renderer3D, StateTupleOfStacks>;
 

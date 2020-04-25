@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Camera.h"
 #include "Math.h"
 #include "Time.h"
 #include "Window.h"
@@ -8,9 +9,9 @@
 
 namespace egl
 {
-class Camera;
 struct InputEvent;
 
+template <typename T, std::size_t N>
 class CameraControllerFly : public InputListener
 {
 public:
@@ -19,10 +20,10 @@ public:
   CameraControllerFly& operator=(const CameraControllerFly& inRHS) = default;
   CameraControllerFly(CameraControllerFly&& inRHS) = default;
   CameraControllerFly& operator=(CameraControllerFly&& inRHS) = default;
-  virtual ~CameraControllerFly();
+  virtual ~CameraControllerFly() = default;
 
   void SetWindow(const std::shared_ptr<Window>& inWindow);
-  void SetCamera(const std::shared_ptr<Camera>& inCamera);
+  void SetCamera(const std::shared_ptr<Camera<T, N>>& inCamera);
 
   void Update(const DeltaTime& inDeltaTime);
 
@@ -43,7 +44,7 @@ private:
 
   static constexpr float PanSpeed = 3.0f;
 
-  std::weak_ptr<Camera> mCamera;
+  std::weak_ptr<Camera<T, N>> mCamera;
   float mCurrentFlySpeed = InitFlySpeed;
 
   bool mWantsToMoveForward = false;
@@ -60,4 +61,15 @@ private:
   Vec2f mPreviousMousePosition = Zero<Vec2f>();
   Vec2f mCurrentRotationAngle = Zero<Vec2f>();
 };
+
+template <typename T>
+using CameraControllerFly2 = CameraControllerFly<T, 2>;
+using CameraControllerFly2f = CameraControllerFly2<float>;
+
+template <typename T>
+using CameraControllerFly3 = CameraControllerFly<T, 3>;
+using CameraControllerFly3f = CameraControllerFly3<float>;
+
 }
+
+#include "CameraControllerFly.tcc"

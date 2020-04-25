@@ -2,12 +2,16 @@
 
 #include "Math.h"
 #include "Transformation.h"
+#include <cstdint>
 
 namespace egl
 {
+template <typename T, std::size_t N>
 class Camera
 {
 public:
+  using RotationType = typename Transformation<T, N>::RotationType;
+
   Camera() = default;
   Camera(const Camera& inRHS) = default;
   Camera& operator=(const Camera& inRHS) = default;
@@ -15,23 +19,33 @@ public:
   Camera& operator=(Camera&& ioRHS) = default;
   virtual ~Camera() = default;
 
-  void SetPosition(const Vec3f& inPosition);
-  const Vec3f& GetPosition() const { return mTransformation.GetPosition(); }
+  void SetPosition(const Vec<T, N>& inPosition) { mTransformation.SetPosition(inPosition); }
+  const Vec<T, N>& GetPosition() const { return mTransformation.GetPosition(); }
 
-  void SetRotation(const Quatf& inRotation);
-  const Quatf& GetRotation() const { return mTransformation.GetRotation(); }
+  void SetRotation(const Camera::RotationType& inRotation);
+  const Camera::RotationType& GetRotation() const { return mTransformation.GetRotation(); }
 
-  void LookAtPoint(const Vec3f& inPointToLookAt, const Vec3f& inUpNormalized = Up<Vec3f>());
+  void LookAtPoint(const Vec<T, N>& inPointToLookAt, const Vec<T, N>& inUpNormalized = Up<Vec<T, N>>());
 
-  Vec3f GetForward() const;
-  Vec3f GetRight() const;
-  Vec3f GetUp() const;
+  Vec<T, N> GetForward() const { return GetRotation() * Forward<Vec<T, N>>(); }
+  Vec<T, N> GetRight() const { return GetRotation() * Right<Vec<T, N>>(); }
+  Vec<T, N> GetUp() const { return GetRotation() * Up<Vec<T, N>>(); }
 
-  Mat4f GetModelMatrix() const;
-  Mat4f GetViewMatrix() const;
-  virtual Mat4f GetProjectionMatrix() const = 0;
+  SquareMat<T, N + 1> GetModelMatrix() const { return mTransformation.GetMatrix(); }
+  SquareMat<T, N + 1> GetViewMatrix() const { return mTransformation.GetInverseMatrix(); }
+  virtual SquareMat<T, N + 1> GetProjectionMatrix() const = 0;
 
 private:
-  Transformation3f mTransformation;
+  Transformation<T, N> mTransformation;
 };
+
+template <typename T>
+using Camera2 = Camera<T, 2>;
+using Camera2f = Camera2<float>;
+
+template <typename T>
+using Camera3 = Camera<T, 3>;
+using Camera3f = Camera3<float>;
 }
+
+#include "Camera.tcc"

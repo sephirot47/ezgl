@@ -38,6 +38,7 @@ class Renderer2D final : public Renderer
 public:
   enum class EStateId
   {
+    CAMERA,
     MODEL_MATRIX,
     MATERIAL,
   };
@@ -48,6 +49,14 @@ public:
   Renderer2D(Renderer2D&&) = default;
   Renderer2D& operator=(Renderer2D&& inRHS) = default;
   ~Renderer2D() override = default;
+
+  // Camera
+  void SetCamera(const std::shared_ptr<OrthographicCamera2f>& inCamera);
+  std::shared_ptr<OrthographicCamera2f> GetCamera();
+  std::shared_ptr<const OrthographicCamera2f> GetCamera() const;
+  void PushCamera() { mState.PushTop<Renderer2D::EStateId::CAMERA>(); }
+  void PopCamera() { mState.Pop<Renderer2D::EStateId::CAMERA>(); }
+  void ResetCamera() { mState.Reset<Renderer2D::EStateId::CAMERA>(); }
 
   // Transformation
   void SetModelMatrix(const Mat3f& inModelMatrix);
@@ -82,8 +91,9 @@ public:
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,
-      Mat3f,       // ERendererStateId::MODEL_MATRIX
-      Material2D>; // ERendererStateId::MATERIAL
+      std::shared_ptr<OrthographicCamera2f>, // EStateId::CAMERA
+      Mat3f,                                 // EStateId::MODEL_MATRIX
+      Material2D>;                           // EStateId::MATERIAL
   using State = RendererStateStacks<Renderer2D, StateTupleOfStacks>;
   friend class RendererStateStacks<Renderer2D, StateTupleOfStacks>;
 
