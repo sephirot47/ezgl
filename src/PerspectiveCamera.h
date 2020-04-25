@@ -29,8 +29,6 @@ public:
 
   virtual Mat4f GetProjectionMatrix() const final override;
 
-  virtual PerspectiveCamera* Clone() const { return new PerspectiveCamera(*this); }
-
 private:
   PerspectiveParameters mPerspectiveParameters;
 };

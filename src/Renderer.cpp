@@ -1,13 +1,13 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "DirectionalLight.h"
-#include "DrawableMesh.h"
 #include "FileUtils.h"
 #include "GL.h"
 #include "GLGuard.h"
 #include "GLTypeTraits.h"
 #include "Geometry.h"
 #include "Math.h"
+#include "MeshDrawData.h"
 #include "MeshFactory.h"
 #include "PointLight.h"
 #include "ShaderProgram.h"
@@ -20,7 +20,7 @@ namespace egl
 bool Renderer::sStaticResourcesInited = false;
 std::unique_ptr<ShaderProgram> Renderer::sOnlyColorShaderProgram;
 std::unique_ptr<ShaderProgram> Renderer::sMeshShaderProgram;
-std::unique_ptr<DrawableMesh> Renderer::sCone;
+std::unique_ptr<MeshDrawData> Renderer::sCone;
 std::shared_ptr<Texture2D> Renderer::sWhiteTexture;
 
 Renderer::Renderer()
@@ -34,7 +34,7 @@ Renderer::Renderer()
 
     sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
         FragmentShader { std::filesystem::path("../res/Mesh.frag") });
-    sCone = std::make_unique<DrawableMesh>(DrawableMeshFactory::GetCone(32));
+    sCone = std::make_unique<MeshDrawData>(MeshFactory::GetCone(32));
     sWhiteTexture = TextureFactory::GetWhiteTexture();
 
     sStaticResourcesInited = true;
@@ -266,7 +266,12 @@ void Renderer::ResetState()
 
 // Draw - 3D ========================================================================================
 
-void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType)
+void Renderer::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
+{
+  const auto mesh_draw_data = MeshDrawData { inMesh };
+  DrawMesh(mesh_draw_data, inDrawType);
+}
+void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
 {
   if (inDrawType == EDrawType::WIREFRAME)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -274,7 +279,7 @@ void Renderer::DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDra
   const auto primitives_type
       = (inDrawType == EDrawType::POINTS) ? GL::EPrimitivesType::POINTS : GL::EPrimitivesType::TRIANGLES;
 
-  DrawVAOElements(inDrawableMesh.GetVAO(), inDrawableMesh.GetNumberOfCorners(), primitives_type);
+  DrawVAOElements(inMeshDrawData.GetVAO(), inMeshDrawData.GetNumberOfElements(), primitives_type);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // TODO: Restore this properly
 }
@@ -346,7 +351,7 @@ void Renderer::DrawAxes()
 
 void Renderer::DrawTriangle(const Triangle3f& inTriangle)
 {
-  DrawableMesh triangle_mesh;
+  Mesh triangle_mesh;
   triangle_mesh.AddVertex(inTriangle[0]);
   triangle_mesh.AddVertex(inTriangle[1]);
   triangle_mesh.AddVertex(inTriangle[2]);
@@ -357,20 +362,16 @@ void Renderer::DrawTriangle(const Triangle3f& inTriangle)
   triangle_mesh.SetCornerNormal(1, triangle_normal);
   triangle_mesh.SetCornerNormal(2, triangle_normal);
 
-  triangle_mesh.UpdateVAOs();
-
   DrawMesh(triangle_mesh);
 }
 
 void Renderer::DrawTriangle(const Triangle2f& inTriangle)
 {
-  DrawableMesh triangle_mesh;
+  Mesh triangle_mesh;
   triangle_mesh.AddVertex(XY0(inTriangle[0]));
   triangle_mesh.AddVertex(XY0(inTriangle[1]));
   triangle_mesh.AddVertex(XY0(inTriangle[2]));
   triangle_mesh.AddFace(0, 1, 2);
-
-  triangle_mesh.UpdateVAOs();
 
   DrawMesh(triangle_mesh);
 }

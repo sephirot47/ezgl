@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "Color.h"
 #include "DirectionalLight.h"
-#include "DrawableMesh.h"
+#include "MeshDrawData.h"
 #include "Framebuffer.h"
 #include "Macros.h"
 #include "Material.h"
@@ -29,7 +29,7 @@
 
 namespace egl
 {
-class DrawableMesh;
+class MeshDrawData;
 class ShaderProgram;
 
 class Renderer
@@ -174,10 +174,6 @@ public:
   void PopPointLights() { mState.Pop<ERendererStateId::POINT_LIGHTS>(); }
   void ResetPointLights() { mState.Reset<ERendererStateId::POINT_LIGHTS>(); }
 
-  // Helpers
-  void PrepareFor3D(const Window& inWindow);
-  void PrepareFor2D(const Window& inWindow);
-
   // All state
   void PushState();
   void PopState();
@@ -194,7 +190,9 @@ public:
   void Pop();
 
   // Draw - 3D
-  void DrawMesh(const DrawableMesh& inDrawableMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void PrepareFor3D(const Window& inWindow);
+  void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawVAOElements(const VAO& inVAO,
       const GL::Size inNumberOfElementsToDraw,
       const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
@@ -211,6 +209,7 @@ public:
   void DrawTriangle(const Triangle3f& inTriangle);
 
   // Draw - 2D (z = 0.0)
+  void PrepareFor2D(const Window& inWindow);
   void DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint); }
   void DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints); }
   void DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment); }
@@ -223,7 +222,7 @@ private:
   static bool sStaticResourcesInited;
   static std::unique_ptr<ShaderProgram> sOnlyColorShaderProgram;
   static std::unique_ptr<ShaderProgram> sMeshShaderProgram;
-  static std::unique_ptr<DrawableMesh> sCone;
+  static std::unique_ptr<MeshDrawData> sCone;
   static std::shared_ptr<Texture2D> sWhiteTexture;
 
   // State
@@ -273,7 +272,7 @@ private:
   Renderer& mRenderer;
 };
 
-class RendererStateGuardAll
+class RendererStateGuardAll final
 {
 public:
   RendererStateGuardAll(Renderer& ioRenderer) : mRenderer(ioRenderer) { mRenderer.PushState(); }

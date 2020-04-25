@@ -96,10 +96,10 @@ public:
   void SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f& inFaceNormal);
   void SetCornerNormal(const Mesh::CornerId inCornerId, const Vec3f& inCornerNormal);
   void SetCornerTextureCoordinates(const Mesh::CornerId& inCornerId, const Vec2f& inTextureCoordinates);
-  const Vec3f& GetVertexPosition(const Mesh::VertexId& inVertexId);
-  const Vec3f& GetFaceNormal(const Mesh::CornerId& inCornerId);
-  const Vec3f& GetCornerNormal(const Mesh::FaceId& inFaceId);
-  const Vec2f& GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId);
+  const Vec3f& GetVertexPosition(const Mesh::VertexId& inVertexId) const;
+  const Vec3f& GetFaceNormal(const Mesh::CornerId& inCornerId) const;
+  const Vec3f& GetCornerNormal(const Mesh::FaceId& inFaceId) const;
+  const Vec2f& GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId) const;
   Mesh::VertexId GetVertexIdFromCornerId(const Mesh::CornerId inCornerId) const;
   Mesh::VertexId GetVertexIdFromFaceIdAndInternalCornerId(const Mesh::FaceId inFaceId,
       const Mesh::InternalCornerId inInternalCornerId) const;

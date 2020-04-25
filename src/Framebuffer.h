@@ -19,7 +19,7 @@ public:
   explicit Framebuffer(const Vec2i& inSize);
   Framebuffer(const int inWidth, const int inHeight);
   Framebuffer(Framebuffer&& ioRHS);
-  ~Framebuffer() override = default;
+  ~Framebuffer() override;
 
   using GLBindableObject<GL::EBindingType::FRAMEBUFFER>::GetGLId;
 

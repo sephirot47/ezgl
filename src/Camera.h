@@ -31,8 +31,6 @@ public:
   Mat4f GetViewMatrix() const;
   virtual Mat4f GetProjectionMatrix() const = 0;
 
-  virtual Camera* Clone() const = 0;
-
 private:
   Transformation mTransformation;
 };

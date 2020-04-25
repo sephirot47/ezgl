@@ -1,6 +1,5 @@
 #include "Camera.h"
 #include "CameraControllerFly.h"
-#include "DrawableMesh.h"
 #include "EBO.h"
 #include "FileUtils.h"
 #include "Framebuffer.h"
@@ -10,6 +9,7 @@
 #include "Material.h"
 #include "Math.h"
 #include "Mesh.h"
+#include "MeshDrawData.h"
 #include "MeshFactory.h"
 #include "Renderer.h"
 #include "Segment.h"
@@ -40,7 +40,7 @@ int main()
 
   const auto window = std::make_shared<Window>();
 
-  const auto test_mesh = DrawableMeshFactory::GetTorus(25, 25, 0.5f);
+  const auto test_mesh = MeshFactory::GetTorus(25, 25, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
 
   const auto camera = std::make_shared<PerspectiveCamera>();
@@ -53,7 +53,7 @@ int main()
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
-  const auto circle = DrawableMeshFactory::GetCircleSection(40, FullCircleRads());
+  const auto circle = MeshFactory::GetCircleSection(40, FullCircleRads());
 
   auto time = TimeDuration { 0 };
   window->Loop([&](const DeltaTime& inDeltaTime) {
@@ -62,12 +62,6 @@ int main()
     Renderer renderer;
     renderer.PrepareFor3D(*window);
     {
-      GL::Viewport(Zero<Vec2i>(), window->GetFramebufferSize());
-      if (const auto perspective_camera = renderer.GetPerspectiveCamera())
-      {
-        perspective_camera->SetAspectRatio(window->GetFramebufferAspectRatio());
-      }
-
       render_texture->Resize(window->GetSize());
 
       if (window->IsKeyPressed(Key::X))
@@ -92,7 +86,7 @@ int main()
       const auto obj_pos = Vec3f { 1.0f, 1.0f, 1.0f } * 0.0f;
       renderer.Translate(obj_pos);
       UNUSED(q);
-      // renderer.Rotate(q);
+      renderer.Rotate(q);
       renderer.GetMaterial().SetTexture(nullptr);
       renderer.Scale(All<Vec3f>(5.0f));
       renderer.GetMaterial().SetDiffuseColor(White());
@@ -128,18 +122,18 @@ int main()
         renderer.Scale(All<Vec3f>(14.0f));
         renderer.GetMaterial().SetLightingEnabled(false);
         renderer.GetMaterial().SetTexture(render_texture);
-        renderer.DrawMesh(DrawableMeshFactory::GetPlane());
-      }
+        renderer.DrawMesh(MeshFactory::GetPlane());
 
-      const auto triangle = Triangle3f(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1.0f, 5.0f, -3.0f), Vec3f(-5.0f, 1.0f, 3.0f));
-      renderer.Scale(0.4f);
-      renderer.GetMaterial().SetDiffuseColor(Red());
-      renderer.DrawTriangle(triangle);
-      renderer.GetMaterial().SetDiffuseColor(Blue());
-      renderer.SetLineWidth(10.0f);
-      renderer.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
-          Segment3f { triangle[1], triangle[2] },
-          Segment3f { triangle[2], triangle[0] } }));
+        const auto triangle = Triangle3f(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1.0f, 5.0f, -3.0f), Vec3f(-5.0f, 1.0f, 3.0f));
+        renderer.Scale(0.4f);
+        renderer.GetMaterial().SetDiffuseColor(Red());
+        renderer.DrawTriangle(triangle);
+        renderer.GetMaterial().SetDiffuseColor(Blue());
+        renderer.SetLineWidth(10.0f);
+        renderer.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
+            Segment3f { triangle[1], triangle[2] },
+            Segment3f { triangle[2], triangle[0] } }));
+      }
     }
 
     renderer.PrepareFor2D(*window);

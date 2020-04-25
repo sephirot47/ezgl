@@ -23,8 +23,6 @@ public:
 
   virtual Mat4f GetProjectionMatrix() const final override;
 
-  virtual OrthographicCamera* Clone() const { return new OrthographicCamera(*this); }
-
 private:
   OrthographicParameters mOrthographicParameters;
 };

@@ -26,11 +26,9 @@ Window::Window(const Window::CreateOptions& inCreateOptions)
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, false);
 
-  if (inCreateOptions.mResizable)
-    glfwWindowHint(GLFW_RESIZABLE, true);
-
-  if (inCreateOptions.mUseAntialiasing)
-    glfwWindowHint(GLFW_SAMPLES, 4);
+  glfwWindowHint(GLFW_RESIZABLE, inCreateOptions.mResizable);
+  glfwWindowHint(GLFW_SAMPLES, (inCreateOptions.mUseAntialiasing ? 4 : 1));
+  glfwWindowHint(GLFW_DOUBLEBUFFER, inCreateOptions.mDoubleBuffer);
 
   mHandle = glfwCreateWindow(inCreateOptions.mWidth,
       inCreateOptions.mHeight,

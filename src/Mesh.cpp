@@ -39,9 +39,7 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
 
   // For each vertex of the new face, create corners
   for (Mesh::InternalCornerId internal_corner_id = 0; internal_corner_id < 3; ++internal_corner_id)
-  {
-    mCornersData.emplace_back();
-  }
+  { mCornersData.emplace_back(); }
   mOppositeCornerIdsComputed = false;
 }
 
@@ -63,25 +61,25 @@ void Mesh::SetCornerTextureCoordinates(const Mesh::CornerId& inCornerId, const V
   mCornersData.at(inCornerId).mTextureCoordinates = inTextureCoordinates;
 }
 
-const Vec3f& Mesh::GetVertexPosition(const Mesh::VertexId& inVertexId)
+const Vec3f& Mesh::GetVertexPosition(const Mesh::VertexId& inVertexId) const
 {
   EXPECTS(inVertexId < mVerticesData.size());
   return mVerticesData.at(inVertexId).mPosition;
 }
 
-const Vec3f& Mesh::GetFaceNormal(const Mesh::FaceId& inFaceId)
+const Vec3f& Mesh::GetFaceNormal(const Mesh::FaceId& inFaceId) const
 {
   EXPECTS(inFaceId < mFacesData.size());
   return mFacesData.at(inFaceId).mNormal;
 }
 
-const Vec3f& Mesh::GetCornerNormal(const Mesh::CornerId& inCornerId)
+const Vec3f& Mesh::GetCornerNormal(const Mesh::CornerId& inCornerId) const
 {
   EXPECTS(inCornerId < mCornersData.size());
   return mCornersData.at(inCornerId).mNormal;
 }
 
-const Vec2f& Mesh::GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId)
+const Vec2f& Mesh::GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId) const
 {
   EXPECTS(inCornerId < mCornersData.size());
   return mCornersData.at(inCornerId).mTextureCoordinates;
@@ -286,10 +284,7 @@ void Mesh::SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPos
 
 void Mesh::Transform(const Mat4f& inTransform)
 {
-  for (auto& vertex_data : mVerticesData)
-  {
-    vertex_data.mPosition = XYZ(inTransform * XYZ1(vertex_data.mPosition));
-  }
+  for (auto& vertex_data : mVerticesData) { vertex_data.mPosition = XYZ(inTransform * XYZ1(vertex_data.mPosition)); }
 }
 
 /*

@@ -32,6 +32,7 @@ public:
 
     bool mResizable = true;
     bool mUseAntialiasing = true;
+    bool mDoubleBuffer = true;
   };
 
   Window(const Window::CreateOptions& inCreateOptions = Window::CreateOptions());

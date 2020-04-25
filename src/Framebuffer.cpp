@@ -6,6 +6,11 @@ namespace egl
 Framebuffer::Framebuffer() : Framebuffer(1, 1) {}
 Framebuffer::Framebuffer(const Vec2i& inSize) : Framebuffer(inSize[0], inSize[1]) {}
 Framebuffer::Framebuffer(const int inWidth, const int inHeight) { Resize(inWidth, inHeight); }
+Framebuffer::~Framebuffer()
+{
+  if (mCreatedRenderbufferId != 0)
+    GL::DeleteRenderbuffer(mCreatedRenderbufferId);
+}
 
 void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
     const std::shared_ptr<Texture2D>& inTexture)

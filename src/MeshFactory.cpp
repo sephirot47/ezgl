@@ -1,21 +1,22 @@
 #include "MeshFactory.h"
 
+#include "Mesh.h"
+
 namespace egl
 {
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetCube()
+Mesh MeshFactory::GetCube()
 {
-  TMesh cube;
+  Mesh cube;
 
   cube.AddVertex(Vec3f { -1.0f, -1.0f, -1.0f }); // 0
-  cube.AddVertex(Vec3f { -1.0f, -1.0f, 1.0f }); // 1
-  cube.AddVertex(Vec3f { -1.0f, 1.0f, -1.0f }); // 2
-  cube.AddVertex(Vec3f { -1.0f, 1.0f, 1.0f }); // 3
-  cube.AddVertex(Vec3f { 1.0f, -1.0f, -1.0f }); // 4
-  cube.AddVertex(Vec3f { 1.0f, -1.0f, 1.0f }); // 5
-  cube.AddVertex(Vec3f { 1.0f, 1.0f, -1.0f }); // 6
-  cube.AddVertex(Vec3f { 1.0f, 1.0f, 1.0f }); // 7
+  cube.AddVertex(Vec3f { -1.0f, -1.0f, 1.0f });  // 1
+  cube.AddVertex(Vec3f { -1.0f, 1.0f, -1.0f });  // 2
+  cube.AddVertex(Vec3f { -1.0f, 1.0f, 1.0f });   // 3
+  cube.AddVertex(Vec3f { 1.0f, -1.0f, -1.0f });  // 4
+  cube.AddVertex(Vec3f { 1.0f, -1.0f, 1.0f });   // 5
+  cube.AddVertex(Vec3f { 1.0f, 1.0f, -1.0f });   // 6
+  cube.AddVertex(Vec3f { 1.0f, 1.0f, 1.0f });    // 7
 
   cube.AddFace(0, 4, 1); // Y-
   cube.AddFace(1, 4, 5); // Y-
@@ -34,20 +35,17 @@ TMesh GMeshFactory<TMesh>::GetCube()
   return cube;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)
+Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)
 {
   return GetSphere(inNumLatitudes, inNumLongitudes, false);
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)
+Mesh MeshFactory::GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)
 {
   return GetSphere(inNumLatitudes + 1, inNumLongitudes, true);
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetCone(const std::size_t inNumLongitudes)
+Mesh MeshFactory::GetCone(const std::size_t inNumLongitudes)
 {
   auto cone = GetHemisphere(2, inNumLongitudes);
   cone.Transform(ScaleMat4(Vec3f { 1.0f, 1.0f, 2.0f }));
@@ -55,15 +53,14 @@ TMesh GMeshFactory<TMesh>::GetCone(const std::size_t inNumLongitudes)
   return cone;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumLatitudes,
+Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes,
     const std::size_t inNumLongitudes,
     const bool inIsHemisphere)
 {
   EXPECTS(inNumLatitudes >= 3);
   EXPECTS(inNumLongitudes >= 3);
 
-  TMesh sphere;
+  Mesh sphere;
 
   // Add vertices
   const auto angle_z_increment
@@ -141,12 +138,11 @@ TMesh GMeshFactory<TMesh>::GetSphere(const std::size_t inNumLatitudes,
   return sphere;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
+Mesh MeshFactory::GetCylinder(const std::size_t inNumVerticesX)
 {
   EXPECTS(inNumVerticesX >= 3);
 
-  TMesh cylinder;
+  Mesh cylinder;
 
   // Forward and back circle vertices
   for (const auto forward : { true, false })
@@ -196,8 +192,7 @@ TMesh GMeshFactory<TMesh>::GetCylinder(const std::size_t inNumVerticesX)
   return cylinder;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
+Mesh MeshFactory::GetTorus(const std::size_t inNumLatitudes,
     const std::size_t inNumLongitudes,
     const float inHoleSize)
 {
@@ -210,7 +205,7 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
   const auto angle_longitude_increment = (FullCircleRads() / inNumLongitudes);
   const auto angle_latitude_increment = (FullCircleRads() / inNumLatitudes);
 
-  TMesh torus;
+  Mesh torus;
 
   auto angle_longitude = 0.0f;
   for (Mesh::VertexId longitude = 0; longitude < inNumLongitudes; ++longitude)
@@ -254,13 +249,12 @@ TMesh GMeshFactory<TMesh>::GetTorus(const std::size_t inNumLatitudes,
   return torus;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY)
+Mesh MeshFactory::GetPlane(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY)
 {
   EXPECTS(inNumVerticesX >= 2);
   EXPECTS(inNumVerticesY >= 2);
 
-  TMesh plane;
+  Mesh plane;
 
   const auto stride_x = (inNumVerticesX - 1);
   const auto stride_y = (inNumVerticesY - 1);
@@ -304,15 +298,14 @@ TMesh GMeshFactory<TMesh>::GetPlane(const std::size_t inNumVerticesX, const std:
   return plane;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetCircleSection(const std::size_t inNumVertices, const float inSectionAngleRads)
+Mesh MeshFactory::GetCircleSection(const std::size_t inNumVertices, const float inSectionAngleRads)
 {
   EXPECTS(inNumVertices >= 3);
   EXPECTS(Between(inSectionAngleRads, 0.0f, FullCircleRads()));
 
   bool isFullCircle = (inSectionAngleRads == FullCircleRads());
 
-  TMesh circle_section;
+  Mesh circle_section;
   {
     const auto center_vertex = Zero<Vec3f>();
     circle_section.AddVertex(center_vertex);
@@ -337,14 +330,12 @@ TMesh GMeshFactory<TMesh>::GetCircleSection(const std::size_t inNumVertices, con
   return circle_section;
 }
 
-template <typename TMesh>
-TMesh GMeshFactory<TMesh>::GetCircle(const std::size_t inNumVertices)
+Mesh MeshFactory::GetCircle(const std::size_t inNumVertices)
 {
   return GetCircleSection(inNumVertices, FullCircleRads());
 }
 
-template <typename TMesh>
-void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh, const bool inUpdateNormals)
+void MeshFactory::ConsolidateMesh(Mesh& ioMesh, const bool inUpdateNormals)
 {
   constexpr auto max_smooth_angle = DegreeToRad(45.0f);
   ioMesh.ComputeOppositeCornerIds();
@@ -352,11 +343,6 @@ void GMeshFactory<TMesh>::ConsolidateMesh(TMesh& ioMesh, const bool inUpdateNorm
   if (inUpdateNormals)
   {
     ioMesh.ComputeNormals(max_smooth_angle);
-  }
-
-  if constexpr (std::is_same_v<TMesh, DrawableMesh>)
-  {
-    ioMesh.UpdateVAOs();
   }
 }
 }
