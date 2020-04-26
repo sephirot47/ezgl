@@ -112,6 +112,13 @@ void Renderer3D::SetCamera(const std::shared_ptr<Camera3f>& inCamera)
 std::shared_ptr<Camera3f> Renderer3D::GetCamera() { return mState.GetCurrent<Renderer3D::EStateId::CAMERA>(); }
 std::shared_ptr<const Camera3f> Renderer3D::GetCamera() const { return const_cast<Renderer3D&>(*this).GetCamera(); }
 
+void Renderer3D::AdaptCameraToWindow(const Window& inWindow)
+{
+  const auto perspective_camera = GetPerspectiveCamera();
+  assert(perspective_camera != nullptr);
+  perspective_camera->SetAspectRatio(inWindow.GetFramebufferAspectRatio());
+}
+
 std::shared_ptr<PerspectiveCameraf> Renderer3D::GetPerspectiveCamera()
 {
   return std::dynamic_pointer_cast<PerspectiveCameraf>(mState.GetCurrent<Renderer3D::EStateId::CAMERA>());
@@ -159,12 +166,7 @@ void Renderer3D::Begin(const Window& inWindow)
   SetDepthTestEnabled(true);
   SetCullFaceEnabled(true);
 
-  // 3D Perspective Camera
-  {
-    const auto perspective_camera = GetPerspectiveCamera();
-    assert(perspective_camera != nullptr);
-    perspective_camera->SetAspectRatio(inWindow.GetFramebufferAspectRatio());
-  }
+  AdaptCameraToWindow(inWindow);
 }
 
 void Renderer3D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)

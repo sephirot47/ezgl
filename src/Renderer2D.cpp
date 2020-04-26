@@ -84,20 +84,7 @@ void Renderer2D::Begin(const Window& inWindow)
   Renderer::Begin(inWindow);
 
   SetDepthTestEnabled(false);
-  GL::Disable(GL::EEnablable::CULL_FACE);
-
-  // 2D Orthographic Camera
-  {
-    const auto window_size = inWindow.GetSize();
-    const float window_width = window_size[0];
-    const float window_height = window_size[1];
-
-    OrthographicParameters2f orthographic_params;
-    orthographic_params.mMin = Vec2f { 0.0f, 0.0f };
-    orthographic_params.mMax = Vec2f { window_width, window_height };
-
-    GetCamera()->SetOrthographicParameters(orthographic_params);
-  }
+  AdaptCameraToWindow(inWindow);
 }
 
 void Renderer2D::SetCamera(const std::shared_ptr<OrthographicCamera2f>& inCamera)
@@ -113,6 +100,20 @@ std::shared_ptr<OrthographicCamera2f> Renderer2D::GetCamera()
 std::shared_ptr<const OrthographicCamera2f> Renderer2D::GetCamera() const
 {
   return const_cast<Renderer2D&>(*this).GetCamera();
+}
+
+void Renderer2D::AdaptCameraToWindow(const Window& inWindow)
+{
+  // 2D Orthographic Camera
+  const auto window_size = inWindow.GetSize();
+  const float window_width = window_size[0];
+  const float window_height = window_size[1];
+
+  OrthographicParameters2f orthographic_params;
+  orthographic_params.mMin = Vec2f { 0.0f, 0.0f };
+  orthographic_params.mMax = Vec2f { window_width, window_height };
+
+  GetCamera()->SetOrthographicParameters(orthographic_params);
 }
 
 void Renderer2D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
@@ -185,6 +186,7 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
   assert(shader_program.IsBound());
 
   mState.ApplyCurrentState();
+  GL::Disable(GL::EEnablable::CULL_FACE);
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();

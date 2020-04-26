@@ -13,7 +13,7 @@ public:
   const Vec<T, N>& GetOrthoMin() const { return GetOrthographicParameters().mMin; }
 
   void SetOrthoMax(const Vec<T, N>& inOrthoMax) { GetOrthographicParameters().mMax = inOrthoMax; }
-  const Vec<T, N>& GetOrthoMax() const { return GetOrthographicParameters().mMin; }
+  const Vec<T, N>& GetOrthoMax() const { return GetOrthographicParameters().mMax; }
 
   void SetOrthographicParameters(const OrthographicParameters<T, N>& inOrthographicParameters)
   {

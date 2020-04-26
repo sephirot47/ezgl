@@ -17,6 +17,16 @@ class CameraControllerFly : public InputListener
 public:
   struct Parameters
   {
+    Parameters()
+    {
+      if constexpr (N == 2) // Adjust default parameters better for 2D
+      {
+        mInitFlySpeed *= 30.0f;
+        mMaxFlySpeed *= 30.0f;
+        mPanSpeed = 1.0f;
+      }
+    }
+
     float mInitFlySpeed = 10.0f;
     float mMinFlySpeed = 0.05f;
     float mMaxFlySpeed = 100.0f;

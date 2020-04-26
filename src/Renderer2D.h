@@ -57,6 +57,7 @@ public:
   void PushCamera() { mState.PushTop<Renderer2D::EStateId::CAMERA>(); }
   void PopCamera() { mState.Pop<Renderer2D::EStateId::CAMERA>(); }
   void ResetCamera() { mState.Reset<Renderer2D::EStateId::CAMERA>(); }
+  void AdaptCameraToWindow(const Window &inWindow);
 
   // Transformation
   void SetModelMatrix(const Mat3f& inModelMatrix);

@@ -9,9 +9,9 @@ template <typename T, std::size_t N>
 void CameraControllerFly<T, N>::SetCamera(const std::shared_ptr<Camera<T, N>>& inCamera)
 {
   mCamera = inCamera;
-  if (inCamera)
+  if constexpr (N == 3)
   {
-    if constexpr (N == 3)
+    if (inCamera)
     {
       mCurrentRotationAngle = YX(AngleAxis(inCamera->GetRotation()));
     }
@@ -90,8 +90,7 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
   auto current_mouse_speed = Zero<Vec2f>();
   {
     const auto mouse_position_delta = (current_mouse_position - mPreviousMousePosition);
-    const auto mouse_delta_direction = NormalizedSafe(mouse_position_delta);
-    current_mouse_speed = mParameters.mRotationSpeedFactor * mouse_position_delta;
+    current_mouse_speed = mouse_position_delta;
   }
 
   // Rotation
@@ -101,6 +100,8 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
     {
       auto new_rotation = Identity<Quatf>();
       {
+        auto current_mouse_rotation_speed = mParameters.mRotationSpeedFactor * NormalizedSafe(current_mouse_speed);
+
         mCurrentRotationAngle -= current_mouse_speed;
         mCurrentRotationAngle[1]
             = Clamp(mCurrentRotationAngle[1], mParameters.mRotationAngleYLimit[0], mParameters.mRotationAngleYLimit[1]);
@@ -121,10 +122,12 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
   {
     const auto pan_speed = mParameters.mPanSpeed;
     const auto camera_old_position = camera->GetPosition();
-    auto pan_displacement_local = All<Vec<T, N>>(1.0f);
-    pan_displacement_local[0] *= static_cast<T>(-1.0f);
-    const auto pan_displacement_local_with_speed = (current_mouse_speed * pan_speed) * pan_displacement_local;
-    const auto pan_displacement_world = Rotated(pan_displacement_local, camera->GetRotation());
+
+    const auto pan_displacement_local = (current_mouse_speed * pan_speed) * Vec2f(-1.0f, 1.0f);
+    auto pan_displacement_local_n = Zero<Vec<T, N>>();
+    pan_displacement_local_n[0] = pan_displacement_local[0];
+    pan_displacement_local_n[1] = pan_displacement_local[1];
+    const auto pan_displacement_world = Rotated(pan_displacement_local_n, camera->GetRotation());
     const auto camera_new_position = camera_old_position + pan_displacement_world;
     camera->SetPosition(camera_new_position);
   }

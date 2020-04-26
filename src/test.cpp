@@ -54,7 +54,6 @@ int main()
   CameraControllerFly2f camera_controller_fly;
   camera_controller_fly.SetCamera(camera2d);
   camera_controller_fly.SetWindow(window);
-  camera_controller_fly.GetParameters().mInitFlySpeed = 1.0f;
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
@@ -129,6 +128,7 @@ int main()
     {
       RENDERER_STATE_GUARD_ALL(renderer2D);
       renderer2D.SetCamera(camera2d);
+      renderer2D.AdaptCameraToWindow(*window);
       renderer2D.SetPointSize(15.0f);
       renderer2D.GetMaterial().SetColor(Red());
 
