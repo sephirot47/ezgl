@@ -66,8 +66,6 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
 
         if (mWantsToMoveForward)
           fly_direction_local += Up<Vec<T, N>>();
-
-        fly_direction_local *= -1.0f;
       }
 
       fly_direction_local = NormalizedSafe(fly_direction_local);
@@ -95,16 +93,16 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
     current_mouse_speed = mouse_position_delta;
   }
 
-  // Rotation
+  // Rotation, only for 3D
   if constexpr (N == 3)
   {
     if (mWantsToRotate)
     {
       auto new_rotation = Identity<Quatf>();
       {
-        auto current_mouse_rotation_speed = mParameters.mRotationSpeedFactor * NormalizedSafe(current_mouse_speed);
+        auto current_mouse_rotation_speed = mParameters.mRotationSpeedFactor * current_mouse_speed;
 
-        mCurrentRotationAngle -= current_mouse_speed;
+        mCurrentRotationAngle -= current_mouse_rotation_speed;
         mCurrentRotationAngle[1]
             = Clamp(mCurrentRotationAngle[1], mParameters.mRotationAngleYLimit[0], mParameters.mRotationAngleYLimit[1]);
 
@@ -119,19 +117,17 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
     }
   }
 
-  // Panning
-  if (mWantsToPan)
+  // Panning, only for 2D
+  if constexpr (N == 2)
   {
-    const auto pan_speed = mParameters.mPanSpeed;
-    const auto camera_old_position = camera->GetPosition();
+    if (mWantsToPan)
+    {
+      const auto pan_displacement_world = current_mouse_speed * Vec2f(-1.0f, 1.0f);
+      const auto camera_old_position = camera->GetPosition();
+      const auto camera_new_position = camera_old_position + pan_displacement_world;
 
-    const auto pan_displacement_local = (current_mouse_speed * pan_speed) * Vec2f(-1.0f, 1.0f);
-    auto pan_displacement_local_n = Zero<Vec<T, N>>();
-    pan_displacement_local_n[0] = pan_displacement_local[0];
-    pan_displacement_local_n[1] = pan_displacement_local[1];
-    const auto pan_displacement_world = Rotated(pan_displacement_local_n, camera->GetRotation());
-    const auto camera_new_position = camera_old_position + pan_displacement_world;
-    camera->SetPosition(camera_new_position);
+      camera->SetPosition(camera_new_position);
+    }
   }
 
   mPreviousMousePosition = current_mouse_position;

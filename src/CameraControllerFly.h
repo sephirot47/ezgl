@@ -23,7 +23,6 @@ public:
       {
         mInitFlySpeed *= 30.0f;
         mMaxFlySpeed *= 30.0f;
-        mPanSpeed = 1.0f;
       }
     }
 
@@ -34,8 +33,6 @@ public:
     float mAltSpeedFactor = 0.3f;
     float mShiftSpeedFactor = 3.0f;
     float mScrollAccelerationFactor = 0.1f;
-
-    float mPanSpeed = 3.0f;
 
     // Only for 3D
     float mRotationSpeedFactor = 0.005f;

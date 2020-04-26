@@ -51,8 +51,8 @@ int main()
 
   const auto camera2d = std::make_shared<OrthographicCamera2f>();
 
-  CameraControllerFly2f camera_controller_fly;
-  camera_controller_fly.SetCamera(camera2d);
+  CameraControllerFly3f camera_controller_fly;
+  camera_controller_fly.SetCamera(camera3d);
   camera_controller_fly.SetWindow(window);
 
   const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
@@ -126,6 +126,8 @@ int main()
     Renderer2D renderer2D;
     renderer2D.Begin(*window);
     {
+      renderer2D.SetLineWidth(3.0f);
+
       RENDERER_STATE_GUARD_ALL(renderer2D);
       renderer2D.SetCamera(camera2d);
       renderer2D.AdaptCameraToWindow(*window);
