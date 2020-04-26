@@ -19,14 +19,14 @@
 namespace egl
 {
 bool Renderer2D::sStaticResourcesInited = false;
-std::unique_ptr<ShaderProgram> Renderer2D::sShaderProgram;
+std::shared_ptr<ShaderProgram> Renderer2D::sShaderProgram;
 
 Renderer2D::Renderer2D()
 {
   // Init static resources
   if (!sStaticResourcesInited)
   {
-    sShaderProgram = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/2D.vert") },
+    sShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/2D.vert") },
         FragmentShader { std::filesystem::path("../res/2D.frag") });
 
     sStaticResourcesInited = true;
@@ -84,7 +84,7 @@ void Renderer2D::Begin(const Window& inWindow)
   Renderer::Begin(inWindow);
 
   SetDepthTestEnabled(false);
-  GL::Disable(GL::Enablable::CULL_FACE);
+  GL::Disable(GL::EEnablable::CULL_FACE);
 
   // 2D Orthographic Camera
   {
@@ -96,9 +96,7 @@ void Renderer2D::Begin(const Window& inWindow)
     orthographic_params.mMin = Vec2f { 0.0f, 0.0f };
     orthographic_params.mMax = Vec2f { window_width, window_height };
 
-    const auto orthographic_camera = std::make_shared<OrthographicCamera2f>();
-    orthographic_camera->SetOrthographicParameters(orthographic_params);
-    SetCamera(orthographic_camera);
+    GetCamera()->SetOrthographicParameters(orthographic_params);
   }
 }
 
@@ -119,12 +117,38 @@ std::shared_ptr<const OrthographicCamera2f> Renderer2D::GetCamera() const
 
 void Renderer2D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
 {
-  Renderer::DrawMesh(*sShaderProgram, inMesh, inDrawType);
+  SetShaderProgram(sShaderProgram);
+  Renderer::DrawMesh(inMesh, inDrawType);
 }
 
 void Renderer2D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
 {
-  Renderer::DrawMesh(*sShaderProgram, inMeshDrawData, inDrawType);
+  SetShaderProgram(sShaderProgram);
+  Renderer::DrawMesh(inMeshDrawData, inDrawType);
+}
+
+void Renderer2D::DrawPoint(const Vec2f& inPoint)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawPointGeneric(inPoint);
+}
+
+void Renderer2D::DrawPoints(const Span<Vec2f>& inPoints)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawPointsGeneric(inPoints);
+}
+
+void Renderer2D::DrawSegment(const Segment2f& inSegment)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawSegmentGeneric(inSegment);
+}
+
+void Renderer2D::DrawSegments(const Span<Segment2f>& inSegments)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawSegmentsGeneric(inSegments);
 }
 
 void Renderer2D::DrawTriangle(const Triangle2f& inTriangle)
@@ -151,12 +175,16 @@ void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
 
 // Helpers ========================================================================================
 
-Renderer2D::UseShaderProgramBindGuard Renderer2D::UseShaderProgram(ShaderProgram& ioShaderProgram)
+void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
-  auto use_shader_program_bind_guard = Renderer::UseShaderProgram(ioShaderProgram);
-  assert(ioShaderProgram.IsBound());
+  Renderer::PrepareForDraw(ioDrawSetup);
 
-  auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
+  const auto& draw_setup_2d = static_cast<DrawSetup2D&>(ioDrawSetup);
+  assert(draw_setup_2d.mShaderProgram);
+  auto& shader_program = *draw_setup_2d.mShaderProgram;
+  assert(shader_program.IsBound());
+
+  mState.ApplyCurrentState();
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();
@@ -172,6 +200,5 @@ Renderer2D::UseShaderProgramBindGuard Renderer2D::UseShaderProgram(ShaderProgram
   shader_program.SetUniformSafe("UView", view_matrix);
   shader_program.SetUniformSafe("UProjection", projection_matrix);
   shader_program.SetUniformSafe("UProjectionViewModel", projection_view_model_matrix);
-  return use_shader_program_bind_guard;
 }
 }

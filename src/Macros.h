@@ -19,8 +19,8 @@
 
 #define THROW_EXCEPTION(STREAM) THROW_EXCEPTION_PARAMS(STREAM, __DATE__, __TIME__, __FILENAME__, __FUNCTION__, __LINE__)
 
-#define PRINT(EXPR) std::cout << EXPR << std::endl;
-#define PEEK(EXPR) std::cout << #EXPR << ": " << EXPR << std::endl;
+#define PRINT(EXPR) std::cout << std::boolalpha << EXPR << std::endl;
+#define PEEK(EXPR) std::cout << std::boolalpha << #EXPR << ": " << EXPR << std::endl;
 
 #define _CONCAT_(x,y) x ## y
 #define CONCAT(x,y) _CONCAT_(x,y)

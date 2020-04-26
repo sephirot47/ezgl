@@ -15,7 +15,7 @@ namespace egl
 class ShaderProgram : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
 {
 public:
-  using GLBindGuardType = GLBindGuard<GL::EBindingType::SHADER_PROGRAM>;
+  using GLGuardType = GLBindGuard<GL::EBindingType::SHADER_PROGRAM>;
   using GLBindableObject<GL::EBindingType::SHADER_PROGRAM>::GetGLId;
 
   ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);

@@ -15,6 +15,23 @@ template <typename T, std::size_t N>
 class CameraControllerFly : public InputListener
 {
 public:
+  struct Parameters
+  {
+    float mInitFlySpeed = 10.0f;
+    float mMinFlySpeed = 0.05f;
+    float mMaxFlySpeed = 100.0f;
+
+    float mAltSpeedFactor = 0.3f;
+    float mShiftSpeedFactor = 3.0f;
+    float mScrollAccelerationFactor = 0.1f;
+
+    float mPanSpeed = 3.0f;
+
+    // Only for 3D
+    float mRotationSpeedFactor = 0.005f;
+    Vec2f mRotationAngleYLimit = Vec2f(-QuarterCircleRads<float>(), QuarterCircleRads<float>()) * 0.99f;
+  };
+
   CameraControllerFly() = default;
   CameraControllerFly(const CameraControllerFly& inRHS) = default;
   CameraControllerFly& operator=(const CameraControllerFly& inRHS) = default;
@@ -26,26 +43,15 @@ public:
   void SetCamera(const std::shared_ptr<Camera<T, N>>& inCamera);
 
   void Update(const DeltaTime& inDeltaTime);
+  CameraControllerFly::Parameters& GetParameters() { return mParameters; }
+  const CameraControllerFly::Parameters& GetParameters() const { return mParameters; }
 
   virtual void OnInput(const InputEvent& inInputEvent) override;
 
 private:
-  static constexpr float InitFlySpeed = 10.0f;
-  static constexpr float MinFlySpeed = 0.05f;
-  static constexpr float MaxFlySpeed = 100.0f;
-  static_assert(InitFlySpeed >= MinFlySpeed && InitFlySpeed <= MaxFlySpeed);
-
-  static constexpr float AltSpeedFactor = 0.3f;
-  static constexpr float ShiftSpeedFactor = 3.0f;
-  static constexpr float ScrollAccelerationFactor = 0.1f;
-
-  static constexpr float RotationSpeedFactor = 0.005f;
-  static constexpr Vec2f RotationAngleYLimit = Vec2f(-QuarterCircleRads<float>(), QuarterCircleRads<float>()) * 0.99f;
-
-  static constexpr float PanSpeed = 3.0f;
-
+  Parameters mParameters;
   std::weak_ptr<Camera<T, N>> mCamera;
-  float mCurrentFlySpeed = InitFlySpeed;
+  float mCurrentFlySpeed = mParameters.mInitFlySpeed;
 
   bool mWantsToMoveForward = false;
   bool mWantsToMoveBack = false;
@@ -57,8 +63,10 @@ private:
   bool mWantsToSpeedUp = false;
   bool mWantsToRotate = false;
   bool mWantsToPan = false;
-  Vec2f mCurrentRotationSpeed = Zero<Vec2f>();
   Vec2f mPreviousMousePosition = Zero<Vec2f>();
+
+  // Only for 3D
+  Vec2f mCurrentRotationSpeed = Zero<Vec2f>();
   Vec2f mCurrentRotationAngle = Zero<Vec2f>();
 };
 

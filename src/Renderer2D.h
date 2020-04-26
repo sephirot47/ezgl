@@ -82,10 +82,10 @@ public:
   void Begin(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
-  void DrawPoint(const Vec2f& inPoint) { DrawPointGeneric(inPoint, *sShaderProgram); }
-  void DrawPoints(const Span<Vec2f>& inPoints) { DrawPointsGeneric(inPoints, *sShaderProgram); }
-  void DrawSegment(const Segment2f& inSegment) { DrawSegmentGeneric(inSegment, *sShaderProgram); }
-  void DrawSegments(const Span<Segment2f>& inSegments) { DrawSegmentsGeneric(inSegments, *sShaderProgram); }
+  void DrawPoint(const Vec2f& inPoint);
+  void DrawPoints(const Span<Vec2f>& inPoints);
+  void DrawSegment(const Segment2f& inSegment);
+  void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
 
@@ -106,7 +106,7 @@ public:
 private:
   // Static resources
   static bool sStaticResourcesInited;
-  static std::unique_ptr<ShaderProgram> sShaderProgram;
+  static std::shared_ptr<ShaderProgram> sShaderProgram;
 
   State mState { *this };
 
@@ -116,8 +116,13 @@ private:
   template <Renderer2D::EStateId StateId>
   static State::ValueType<StateId> GetDefaultValue();
 
-  // Helpers or common functionality
-  [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram) override;
+  class DrawSetup2D : public DrawSetup
+  {
+  private:
+    GLMultiGuard<Material2D> mGuard;
+  };
+  virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup2D>(); }
+  virtual void PrepareForDraw(DrawSetup& ioDrawSetupPointer) override;
 };
 
 // clang-format off

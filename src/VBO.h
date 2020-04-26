@@ -8,7 +8,7 @@ namespace egl
 class VBO : public Buffer<GL::EBufferType::VBO>
 {
 public:
-  using GLBindGuardType = GLBindGuard<GL::EBindingType::VBO>;
+  using GLGuardType = GLBindGuard<GL::EBindingType::VBO>;
 
   VBO();
   template <typename T>

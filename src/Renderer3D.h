@@ -65,8 +65,8 @@ public:
   void SetCamera(const std::shared_ptr<Camera3f>& inCamera);
   std::shared_ptr<Camera3f> GetCamera();
   std::shared_ptr<const Camera3f> GetCamera() const;
-  std::shared_ptr<PerspectiveCameraf> GetPerspectiveCamera();               // Null if it is not a PerspectiveCamera
-  std::shared_ptr<const PerspectiveCameraf> GetPerspectiveCamera() const;   // Null if it is not a PerspectiveCamera
+  std::shared_ptr<PerspectiveCameraf> GetPerspectiveCamera();                // Null if it is not a PerspectiveCamera
+  std::shared_ptr<const PerspectiveCameraf> GetPerspectiveCamera() const;    // Null if it is not a PerspectiveCamera
   std::shared_ptr<OrthographicCamera3f> GetOrthographicCamera();             // Null if it is not an OrthographicCamera
   std::shared_ptr<const OrthographicCamera3f> GetOrthographicCamera() const; // Null if it is not an OrthographicCamera
   void PushCamera() { mState.PushTop<Renderer3D::EStateId::CAMERA>(); }
@@ -118,10 +118,10 @@ public:
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawArrow(const Segment3f& inArrowSegment);
   void DrawAxes();
-  void DrawPoint(const Vec3f& inPoint) { DrawPointGeneric(inPoint, *sOnlyColorShaderProgram); }
-  void DrawPoints(const Span<Vec3f>& inPoints) { DrawPointsGeneric(inPoints, *sOnlyColorShaderProgram); }
-  void DrawSegment(const Segment3f& inSegment) { DrawSegmentGeneric(inSegment, *sOnlyColorShaderProgram); }
-  void DrawSegments(const Span<Segment3f>& inSegments) { DrawSegmentsGeneric(inSegments, *sOnlyColorShaderProgram); }
+  void DrawPoint(const Vec3f& inPoint);
+  void DrawPoints(const Span<Vec3f>& inPoints);
+  void DrawSegment(const Segment3f& inSegment);
+  void DrawSegments(const Span<Segment3f>& inSegments);
   void DrawTriangle(const Triangle3f& inTriangle);
 
   // State
@@ -145,9 +145,9 @@ public:
 private:
   // Static resources
   static bool sStaticResourcesInited;
-  static std::unique_ptr<ShaderProgram> sOnlyColorShaderProgram;
-  static std::unique_ptr<ShaderProgram> sMeshShaderProgram;
-  static std::unique_ptr<MeshDrawData> sCone;
+  static std::shared_ptr<ShaderProgram> sOnlyColorShaderProgram;
+  static std::shared_ptr<ShaderProgram> sMeshShaderProgram;
+  static std::shared_ptr<MeshDrawData> sCone;
 
   State mState { *this };
 
@@ -163,8 +163,13 @@ private:
   UBO mDirectionalLightsUBO;
   UBO mPointLightsUBO;
 
-  // Helpers or common functionality
-  [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram) override;
+  struct DrawSetup3D : public DrawSetup
+  {
+  private:
+    GLMultiGuard<Material3D> mGuard;
+  };
+  virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup3D>(); }
+  virtual void PrepareForDraw(DrawSetup& ioDrawSetup) override;
 };
 
 // clang-format off

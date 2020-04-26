@@ -47,7 +47,7 @@ Window::Window(const Window::CreateOptions& inCreateOptions)
 
   if (inCreateOptions.mUseAntialiasing)
   {
-    GL::Enable(GL::Enablable::LINE_SMOOTH);
+    GL::Enable(GL::EEnablable::LINE_SMOOTH);
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);

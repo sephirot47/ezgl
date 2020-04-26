@@ -5,15 +5,15 @@
 namespace egl
 {
 template <typename T, std::size_t N>
-void Renderer::DrawSegmentGeneric(const Segment<T, N>& inSegment, ShaderProgram& ioShaderProgram)
+void Renderer::DrawSegmentGeneric(const Segment<T, N>& inSegment)
 {
-  DrawSegmentsGeneric(MakeSpan({ inSegment }), ioShaderProgram);
+  DrawSegmentsGeneric(MakeSpan({ inSegment }));
 }
 
 template <typename T, std::size_t N>
-void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments, ShaderProgram& ioShaderProgram)
+void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
 {
-  const auto use_shader_program_bind_guard = UseShaderProgram(ioShaderProgram);
+  const auto base_draw_setup = PrepareForDraw();
 
   std::vector<Vec<T, N>> segment_points;
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);
@@ -24,31 +24,29 @@ void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments, Shader
   }
   const auto vbo = std::make_shared<VBO>(MakeSpan(segment_points));
 
-  GL_BIND_GUARD(VAO);
   VAO vao;
   vao.AddVBO(vbo, MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
-  vao.Bind();
+  const auto vao_bind_guard = vao.BindGuarded();
 
   GL::DrawArrays(GL::EPrimitivesType::LINES, inSegments.GetNumberOfElements() * 2);
 }
 
 template <typename T, std::size_t N>
-void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint, ShaderProgram& ioShaderProgram)
+void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint)
 {
-  DrawPointsGeneric(MakeSpan({ inPoint }), ioShaderProgram);
+  DrawPointsGeneric(MakeSpan({ inPoint }));
 }
 
 template <typename T, std::size_t N>
-void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram& ioShaderProgram)
+void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints)
 {
-  const auto use_shader_program_guard = UseShaderProgram(ioShaderProgram);
+  const auto base_draw_setup = PrepareForDraw();
 
   const auto vbo = std::make_shared<VBO>(inPoints);
 
-  GL_BIND_GUARD(VAO);
   VAO vao;
   vao.AddVBO(vbo, MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
-  vao.Bind();
+  const auto vao_bind_guard = vao.BindGuarded();
 
   GL::DrawArrays(GL::EPrimitivesType::POINTS, inPoints.GetNumberOfElements());
 }
@@ -56,20 +54,18 @@ void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram&
 template <Renderer::EStateId StateId>
 void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioState)
 {
-  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
-  {
-  }
+  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM) {}
   else if constexpr (StateId == Renderer::EStateId::RENDER_TEXTURE)
   {
     ioState.GetRenderer().SetRenderTexture(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::DEPTH_ENABLED)
   {
-    GL::SetEnabled(GL::Enablable::DEPTH_TEST, inValue);
+    GL::SetEnabled(GL::EEnablable::DEPTH_TEST, inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::BLEND_ENABLED)
   {
-    GL::SetEnabled(GL::Enablable::BLEND, inValue);
+    GL::SetEnabled(GL::EEnablable::BLEND, inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::BLEND_SOURCE_FACTOR)
   {

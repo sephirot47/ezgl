@@ -170,7 +170,7 @@ public:
     INFO_LOG_LENGTH = GL_INFO_LOG_LENGTH
   };
 
-  enum class Enablable
+  enum class EEnablable
   {
     DEPTH_TEST = GL_DEPTH_TEST,
     CULL_FACE = GL_CULL_FACE,
@@ -397,9 +397,10 @@ public:
     TEXTURE_WRAP_R = GL_TEXTURE_WRAP_R,
   };
 
-  static void Enable(const GL::Enablable inEnablable);
-  static void Disable(const GL::Enablable inEnablable);
-  static void SetEnabled(const GL::Enablable inEnablable, const bool inEnabled);
+  static void Enable(const GL::EEnablable inEnablable);
+  static void Disable(const GL::EEnablable inEnablable);
+  static void SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled);
+  static bool IsEnabled(const GL::EEnablable inEnablable);
 
   static void BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor);
 

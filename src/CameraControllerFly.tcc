@@ -11,7 +11,7 @@ void CameraControllerFly<T, N>::SetCamera(const std::shared_ptr<Camera<T, N>>& i
   mCamera = inCamera;
   if (inCamera)
   {
-    if constexpr (N == 3) // TODO: Do base class and specialization for 2D and 3D
+    if constexpr (N == 3)
     {
       mCurrentRotationAngle = YX(AngleAxis(inCamera->GetRotation()));
     }
@@ -39,6 +39,12 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
   {
     auto fly_direction_local = Zero<Vec<T, N>>();
     {
+      if (mWantsToMoveRight)
+        fly_direction_local += Right<Vec<T, N>>();
+
+      if (mWantsToMoveLeft)
+        fly_direction_local += Left<Vec<T, N>>();
+
       if constexpr (N == 3)
       {
         if (mWantsToMoveForward)
@@ -46,12 +52,6 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
 
         if (mWantsToMoveBack)
           fly_direction_local += Back<Vec<T, N>>();
-
-        if (mWantsToMoveRight)
-          fly_direction_local += Right<Vec<T, N>>();
-
-        if (mWantsToMoveLeft)
-          fly_direction_local += Left<Vec<T, N>>();
 
         if (mWantsToMoveDown)
           fly_direction_local += Down<Vec<T, N>>();
@@ -61,12 +61,6 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
       }
       else if constexpr (N == 2)
       {
-        if (mWantsToMoveRight)
-          fly_direction_local += Right<Vec<T, N>>();
-
-        if (mWantsToMoveLeft)
-          fly_direction_local += Left<Vec<T, N>>();
-
         if (mWantsToMoveBack)
           fly_direction_local += Down<Vec<T, N>>();
 
@@ -79,7 +73,8 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
 
     auto fly_speed = 0.0f;
     {
-      const auto fly_speed_factor = (mWantsToSlowDown ? AltSpeedFactor : (mWantsToSpeedUp ? ShiftSpeedFactor : 1.0f));
+      const auto fly_speed_factor
+          = (mWantsToSlowDown ? mParameters.mAltSpeedFactor : (mWantsToSpeedUp ? mParameters.mShiftSpeedFactor : 1.0f));
       fly_speed = mCurrentFlySpeed * fly_speed_factor;
     }
 
@@ -96,7 +91,7 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
   {
     const auto mouse_position_delta = (current_mouse_position - mPreviousMousePosition);
     const auto mouse_delta_direction = NormalizedSafe(mouse_position_delta);
-    current_mouse_speed = RotationSpeedFactor * mouse_position_delta;
+    current_mouse_speed = mParameters.mRotationSpeedFactor * mouse_position_delta;
   }
 
   // Rotation
@@ -107,7 +102,8 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
       auto new_rotation = Identity<Quatf>();
       {
         mCurrentRotationAngle -= current_mouse_speed;
-        mCurrentRotationAngle[1] = Clamp(mCurrentRotationAngle[1], RotationAngleYLimit[0], RotationAngleYLimit[1]);
+        mCurrentRotationAngle[1]
+            = Clamp(mCurrentRotationAngle[1], mParameters.mRotationAngleYLimit[0], mParameters.mRotationAngleYLimit[1]);
 
         const auto current_rotation_angle_x = mCurrentRotationAngle[0];
         const auto current_rotation_angle_y = mCurrentRotationAngle[1];
@@ -123,21 +119,14 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
   // Panning
   if (mWantsToPan)
   {
-    const auto pan_speed = PanSpeed;
+    const auto pan_speed = mParameters.mPanSpeed;
     const auto camera_old_position = camera->GetPosition();
-    const auto pan_displacement_local = (current_mouse_speed * pan_speed) * Vec2<T>(-1.0f, 1.0f);
-    if constexpr (N == 2)
-    {
-      const auto pan_displacement_world = Rotated(pan_displacement_local, camera->GetRotation());
-      const auto camera_new_position = camera_old_position + pan_displacement_world;
-      camera->SetPosition(camera_new_position);
-    }
-    else
-    {
-      const auto pan_displacement_world = Rotated(XY0(pan_displacement_local), camera->GetRotation());
-      const auto camera_new_position = camera_old_position + pan_displacement_world;
-      camera->SetPosition(camera_new_position);
-    }
+    auto pan_displacement_local = All<Vec<T, N>>(1.0f);
+    pan_displacement_local[0] *= static_cast<T>(-1.0f);
+    const auto pan_displacement_local_with_speed = (current_mouse_speed * pan_speed) * pan_displacement_local;
+    const auto pan_displacement_world = Rotated(pan_displacement_local, camera->GetRotation());
+    const auto camera_new_position = camera_old_position + pan_displacement_world;
+    camera->SetPosition(camera_new_position);
   }
 
   mPreviousMousePosition = current_mouse_position;
@@ -155,8 +144,8 @@ void CameraControllerFly<T, N>::OnInput(const InputEvent& inInputEvent)
   case InputEvent::Type::MouseScroll:
   {
     const auto& scroll_event = inInputEvent.As<InputEvent::Type::MouseScroll>();
-    mCurrentFlySpeed += ScrollAccelerationFactor * mCurrentFlySpeed * -scroll_event.mDeltaScroll[1];
-    mCurrentFlySpeed = Clamp(mCurrentFlySpeed, MinFlySpeed, MaxFlySpeed);
+    mCurrentFlySpeed += mParameters.mScrollAccelerationFactor * mCurrentFlySpeed * -scroll_event.mDeltaScroll[1];
+    mCurrentFlySpeed = Clamp(mCurrentFlySpeed, mParameters.mMinFlySpeed, mParameters.mMaxFlySpeed);
   }
   break;
 

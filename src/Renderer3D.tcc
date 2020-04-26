@@ -16,7 +16,7 @@ void Renderer3D::ApplyState(const State::ValueType<StateId>& inValue, State& ioS
   }
   else if constexpr (StateId == Renderer3D::EStateId::CULL_FACE_ENABLED)
   {
-    GL::SetEnabled(GL::Enablable::CULL_FACE, inValue);
+    GL::SetEnabled(GL::EEnablable::CULL_FACE, inValue);
   }
   else if constexpr (StateId == Renderer3D::EStateId::SCENE_AMBIENT_COLOR)
   {

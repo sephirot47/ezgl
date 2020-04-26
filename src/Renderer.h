@@ -154,42 +154,51 @@ public:
   const State& GetState() const { return mState; }
 
 protected:
+  // Shader
+  void SetShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram) { mShaderProgram = inShaderProgram; }
+  std::shared_ptr<ShaderProgram>& GetShaderProgram() { return mShaderProgram; }
+  const std::shared_ptr<ShaderProgram>& GetShaderProgram() const { return mShaderProgram; }
+
   // Draw helpers
   virtual void Begin(const Window& inWindow);
-  void DrawMesh(ShaderProgram& ioShaderProgram,
-      const Mesh& inMesh,
-      const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
-  void DrawMesh(ShaderProgram& ioShaderProgram,
-      const MeshDrawData& inMeshDrawData,
-      const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
-  void DrawVAOElements(ShaderProgram& ioShaderProgram,
-      const VAO& inVAO,
+  void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawVAOElements(const VAO& inVAO,
       const GL::Size inNumberOfElementsToDraw,
       const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
-  void DrawVAOArrays(ShaderProgram& ioShaderProgram,
-      const VAO& inVAO,
+  void DrawVAOArrays(const VAO& inVAO,
       const GL::Size inNumberOfPrimitivesToDraw,
       const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES,
       const GL::Size inBeginPrimitiveIndex = 0);
-  void DrawVAOArraysOrElements(ShaderProgram& ioShaderProgram,
-      const VAO& inVAO,
+  void DrawVAOArraysOrElements(const VAO& inVAO,
       const GL::Size inNumberOfElementsToDraw,
       const GL::EPrimitivesType inPrimitivesType,
       const bool inDrawArrays,
       const GL::Size inBeginArraysPrimitiveIndex);
   template <typename T, std::size_t N>
-  void DrawSegmentGeneric(const Segment<T, N>& inSegment, ShaderProgram& ioShaderProgram);
+  void DrawSegmentGeneric(const Segment<T, N>& inSegment);
   template <typename T, std::size_t N>
-  void DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments, ShaderProgram& ioShaderProgram);
+  void DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments);
   template <typename T, std::size_t N>
-  void DrawPointGeneric(const Vec<T, N>& inPoint, ShaderProgram& ioShaderProgram);
+  void DrawPointGeneric(const Vec<T, N>& inPoint);
   template <typename T, std::size_t N>
-  void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints, ShaderProgram& ioShaderProgram);
+  void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
 
   // Helpers or common functionality
-  ShaderProgram& GetOverrideShaderProgramOr(ShaderProgram& ioAlternativeShaderProgram);
-  using UseShaderProgramBindGuard = GLCompositeGuard<ShaderProgram, Material3D>;
-  [[nodiscard]] virtual UseShaderProgramBindGuard UseShaderProgram(ShaderProgram& ioShaderProgram);
+  class DrawSetup
+  {
+  public:
+    std::shared_ptr<ShaderProgram> mShaderProgram;
+
+  private:
+    GLMultiGuard<ShaderProgram::GLGuardType,
+        GLGuardWrap_t<GL::EEnablable::DEPTH_TEST>,
+        GLGuardWrap_t<GL::EEnablable::BLEND>>
+        mGuard;
+  };
+  virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const { return std::make_unique<DrawSetup>(); }
+  [[nodiscard]] std::unique_ptr<DrawSetup> PrepareForDraw();
+  virtual void PrepareForDraw(DrawSetup& ioDrawSetup);
 
 private:
   // Static resources
@@ -203,6 +212,9 @@ private:
 
   template <Renderer::EStateId StateId>
   static State::ValueType<StateId> GetDefaultValue();
+
+  // Normal shader (non-override)
+  std::shared_ptr<ShaderProgram> mShaderProgram;
 
   // Render texture framebuffer
   std::unique_ptr<Framebuffer> mRenderTextureFramebuffer;

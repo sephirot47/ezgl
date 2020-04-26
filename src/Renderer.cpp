@@ -54,32 +54,27 @@ void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
 void Renderer::SetDepthTestEnabled(const bool inDepthTestEnabled)
 {
   mState.GetCurrent<Renderer::EStateId::DEPTH_ENABLED>() = inDepthTestEnabled;
-  GL::SetEnabled(GL::Enablable::DEPTH_TEST, inDepthTestEnabled);
 }
 
 void Renderer::SetBlendEnabled(const bool inBlendEnabled)
 {
   mState.GetCurrent<Renderer::EStateId::BLEND_ENABLED>() = inBlendEnabled;
-  GL::SetEnabled(GL::Enablable::BLEND, inBlendEnabled);
 }
 
 void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
 {
   mState.GetCurrent<Renderer::EStateId::BLEND_SOURCE_FACTOR>() = inBlendSourceFactor;
   mState.GetCurrent<Renderer::EStateId::BLEND_DEST_FACTOR>() = inBlendDestFactor;
-  GL::BlendFunc(inBlendSourceFactor, inBlendDestFactor);
 }
 
 void Renderer::SetPointSize(const float inPointSize)
 {
   mState.GetCurrent<Renderer::EStateId::POINT_SIZE>() = inPointSize;
-  GL::PointSize(inPointSize);
 }
 
 void Renderer::SetLineWidth(const float inLineWidth)
 {
   mState.GetCurrent<Renderer::EStateId::LINE_WIDTH>() = inLineWidth;
-  GL::LineWidth(inLineWidth);
 }
 
 void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
@@ -115,14 +110,12 @@ void Renderer::ResetState()
   mState.ApplyCurrentState();
 }
 
-void Renderer::DrawMesh(ShaderProgram& ioShaderProgram, const Mesh& inMesh, const Renderer::EDrawType inDrawType)
+void Renderer::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
 {
   const auto mesh_draw_data = MeshDrawData { inMesh };
-  DrawMesh(ioShaderProgram, mesh_draw_data, inDrawType);
+  DrawMesh(mesh_draw_data, inDrawType);
 }
-void Renderer::DrawMesh(ShaderProgram& ioShaderProgram,
-    const MeshDrawData& inMeshDrawData,
-    const Renderer::EDrawType inDrawType)
+void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
 {
   if (inDrawType == EDrawType::WIREFRAME)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -130,7 +123,7 @@ void Renderer::DrawMesh(ShaderProgram& ioShaderProgram,
   const auto primitives_type
       = (inDrawType == EDrawType::POINTS) ? GL::EPrimitivesType::POINTS : GL::EPrimitivesType::TRIANGLES;
 
-  DrawVAOElements(ioShaderProgram, inMeshDrawData.GetVAO(), inMeshDrawData.GetNumberOfElements(), primitives_type);
+  DrawVAOElements(inMeshDrawData.GetVAO(), inMeshDrawData.GetNumberOfElements(), primitives_type);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // TODO: Restore this properly
 }
@@ -141,17 +134,15 @@ void Renderer::Begin(const Window& inWindow)
   GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
 }
 
-void Renderer::DrawVAOArraysOrElements(ShaderProgram& ioShaderProgram,
-    const VAO& inVAO,
+void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
     const GL::Size inNumberOfElementsToDraw,
     const GL::EPrimitivesType inPrimitivesType,
     const bool inDrawArrays,
     const GL::Size inBeginArraysPrimitiveIndex)
 {
-  const auto use_shader_program_bind_guard = UseShaderProgram(ioShaderProgram);
+  const auto draw_setup = PrepareForDraw();
 
-  GL_BIND_GUARD_VAR(inVAO);
-  inVAO.Bind();
+  const auto vao_bind_guard = inVAO.BindGuarded();
 
   if (inDrawArrays)
   {
@@ -164,44 +155,41 @@ void Renderer::DrawVAOArraysOrElements(ShaderProgram& ioShaderProgram,
   }
 }
 
-void Renderer::DrawVAOElements(ShaderProgram& ioShaderProgram,
-    const VAO& inVAO,
+void Renderer::DrawVAOElements(const VAO& inVAO,
     const GL::Size inNumberOfElementsToDraw,
     const GL::EPrimitivesType inPrimitivesType)
 {
   constexpr auto draw_arrays = false;
-  DrawVAOArraysOrElements(ioShaderProgram, inVAO, inNumberOfElementsToDraw, inPrimitivesType, draw_arrays, 0);
+  DrawVAOArraysOrElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType, draw_arrays, 0);
 }
 
-void Renderer::DrawVAOArrays(ShaderProgram& ioShaderProgram,
-    const VAO& inVAO,
+void Renderer::DrawVAOArrays(const VAO& inVAO,
     const GL::Size inNumberOfPrimitivesToDraw,
     const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inBeginPrimitiveIndex)
 {
   constexpr auto draw_arrays = false;
-  DrawVAOArraysOrElements(ioShaderProgram,
-      inVAO,
-      inNumberOfPrimitivesToDraw,
-      inPrimitivesType,
-      draw_arrays,
-      inBeginPrimitiveIndex);
+  DrawVAOArraysOrElements(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, draw_arrays, inBeginPrimitiveIndex);
 }
 
-ShaderProgram& Renderer::GetOverrideShaderProgramOr(ShaderProgram& ioAlternativeShaderProgram)
+std::unique_ptr<Renderer::DrawSetup> Renderer::PrepareForDraw()
 {
+  std::unique_ptr<Renderer::DrawSetup> draw_setup_ptr = CreateDrawSetup();
+  PrepareForDraw(*draw_setup_ptr);
+  return draw_setup_ptr;
+}
+
+void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
+{
+  EXPECTS(GetShaderProgram());
+
   const auto override_shader_program = GetOverrideShaderProgram();
-  auto& shader_program = (override_shader_program ? *override_shader_program : ioAlternativeShaderProgram);
-  return shader_program;
-}
+  ioDrawSetup.mShaderProgram = (override_shader_program ? override_shader_program : GetShaderProgram());
+  assert(ioDrawSetup.mShaderProgram);
+  ioDrawSetup.mShaderProgram->Bind();
 
-Renderer::UseShaderProgramBindGuard Renderer::UseShaderProgram(ShaderProgram& ioShaderProgram)
-{
-  Renderer::UseShaderProgramBindGuard use_shader_program_bind_guard;
+  mState.ApplyCurrentState();
 
-  auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
-  shader_program.Bind();
-
-  return use_shader_program_bind_guard;
+  ENSURES(ioDrawSetup.mShaderProgram->IsBound());
 }
 }

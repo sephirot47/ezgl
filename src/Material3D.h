@@ -12,7 +12,7 @@ class ShaderProgram;
 class Material3D
 {
 public:
-  using GLBindGuardType = GLNoOpGuard;
+  using GLGuardType = GLNoOpGuard;
 
   void SetDiffuseIntensity(const float inDiffuseIntensity);
   float GetDiffuseIntensity() const;

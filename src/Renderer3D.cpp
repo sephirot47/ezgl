@@ -18,9 +18,9 @@
 namespace egl
 {
 bool Renderer3D::sStaticResourcesInited = false;
-std::unique_ptr<ShaderProgram> Renderer3D::sOnlyColorShaderProgram;
-std::unique_ptr<ShaderProgram> Renderer3D::sMeshShaderProgram;
-std::unique_ptr<MeshDrawData> Renderer3D::sCone;
+std::shared_ptr<ShaderProgram> Renderer3D::sOnlyColorShaderProgram;
+std::shared_ptr<ShaderProgram> Renderer3D::sMeshShaderProgram;
+std::shared_ptr<MeshDrawData> Renderer3D::sCone;
 
 Renderer3D::Renderer3D()
 {
@@ -28,13 +28,13 @@ Renderer3D::Renderer3D()
   if (!sStaticResourcesInited)
   {
     sOnlyColorShaderProgram
-        = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/OnlyColor.vert") },
+        = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/OnlyColor.vert") },
             FragmentShader { std::filesystem::path("../res/OnlyColor.frag") });
 
-    sMeshShaderProgram = std::make_unique<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
+    sMeshShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
         FragmentShader { std::filesystem::path("../res/Mesh.frag") });
 
-    sCone = std::make_unique<MeshDrawData>(MeshFactory::GetCone(32));
+    sCone = std::make_shared<MeshDrawData>(MeshFactory::GetCone(32));
 
     sStaticResourcesInited = true;
   }
@@ -47,7 +47,6 @@ Renderer3D::Renderer3D()
 void Renderer3D::SetCullFaceEnabled(const bool inCullFaceEnabled)
 {
   mState.GetCurrent<Renderer3D::EStateId::CULL_FACE_ENABLED>() = inCullFaceEnabled;
-  GL::SetEnabled(GL::Enablable::CULL_FACE, inCullFaceEnabled);
 }
 
 void Renderer3D::SetModelMatrix(const Mat4f& inModelMatrix)
@@ -170,12 +169,14 @@ void Renderer3D::Begin(const Window& inWindow)
 
 void Renderer3D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
 {
-  Renderer::DrawMesh(*sMeshShaderProgram, inMesh, inDrawType);
+  SetShaderProgram(sMeshShaderProgram);
+  Renderer::DrawMesh(inMesh, inDrawType);
 }
 
 void Renderer3D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
 {
-  Renderer::DrawMesh(*sMeshShaderProgram, inMeshDrawData, inDrawType);
+  SetShaderProgram(sMeshShaderProgram);
+  Renderer::DrawMesh(inMeshDrawData, inDrawType);
 }
 
 void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
@@ -204,6 +205,30 @@ void Renderer3D::DrawAxes()
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 }
 
+void Renderer3D::DrawPoint(const Vec3f& inPoint)
+{
+  SetShaderProgram(sOnlyColorShaderProgram);
+  DrawPointGeneric(inPoint);
+}
+
+void Renderer3D::DrawPoints(const Span<Vec3f>& inPoints)
+{
+  SetShaderProgram(sOnlyColorShaderProgram);
+  DrawPointsGeneric(inPoints);
+}
+
+void Renderer3D::DrawSegment(const Segment3f& inSegment)
+{
+  SetShaderProgram(sOnlyColorShaderProgram);
+  DrawSegmentGeneric(inSegment);
+}
+
+void Renderer3D::DrawSegments(const Span<Segment3f>& inSegments)
+{
+  SetShaderProgram(sOnlyColorShaderProgram);
+  DrawSegmentsGeneric(inSegments);
+}
+
 void Renderer3D::DrawTriangle(const Triangle3f& inTriangle)
 {
   Mesh triangle_mesh;
@@ -222,12 +247,18 @@ void Renderer3D::DrawTriangle(const Triangle3f& inTriangle)
 
 // Helpers ========================================================================================
 
-Renderer3D::UseShaderProgramBindGuard Renderer3D::UseShaderProgram(ShaderProgram& ioShaderProgram)
+void Renderer3D::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
-  auto use_shader_program_bind_guard = Renderer::UseShaderProgram(ioShaderProgram);
-  assert(ioShaderProgram.IsBound());
+  Renderer::PrepareForDraw(ioDrawSetup);
 
-  auto& shader_program = GetOverrideShaderProgramOr(ioShaderProgram);
+  const auto& draw_setup_3d = static_cast<DrawSetup3D&>(ioDrawSetup);
+  assert(draw_setup_3d.mShaderProgram);
+
+  auto& shader_program = *draw_setup_3d.mShaderProgram;
+  assert(shader_program.IsBound());
+
+  mState.ApplyCurrentState();
+
   GetMaterial().Bind(shader_program);
 
   const auto& model_matrix = GetModelMatrix();
@@ -267,7 +298,5 @@ Renderer3D::UseShaderProgramBindGuard Renderer3D::UseShaderProgram(ShaderProgram
     mPointLightsUBO.BindToBindingPoint(1);
     shader_program.SetUniformSafe("UNumberOfPointLights", static_cast<int>(point_lights.size()));
   }
-
-  return use_shader_program_bind_guard;
 }
 }

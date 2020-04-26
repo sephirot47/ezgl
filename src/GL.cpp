@@ -3,9 +3,19 @@
 namespace egl
 {
 
-void GL::Enable(const GL::Enablable inEnablable) { glEnable(GL::EnumCast(inEnablable)); }
+void GL::Enable(const GL::EEnablable inEnablable) { glEnable(GL::EnumCast(inEnablable)); }
 
-void GL::Disable(const GL::Enablable inEnablable) { glDisable(GL::EnumCast(inEnablable)); }
+void GL::Disable(const GL::EEnablable inEnablable) { glDisable(GL::EnumCast(inEnablable)); }
+
+void GL::SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled)
+{
+  if (inEnabled)
+    GL::Enable(inEnablable);
+  else
+    GL::Disable(inEnablable);
+}
+
+bool GL::IsEnabled(const GL::EEnablable inEnablable) { return glIsEnabled(GL::EnumCast(inEnablable)); }
 
 void GL::PointSize(const float inPointSize) { glPointSize(inPointSize); }
 
@@ -19,14 +29,6 @@ void GL::Viewport(const int inX, const int inY, const int inWidth, const int inH
 }
 
 void GL::Viewport(const Vec2i& inXY, const Vec2i& inSize) { GL::Viewport(inXY[0], inXY[1], inSize[0], inSize[1]); }
-
-void GL::SetEnabled(const GL::Enablable inEnablable, const bool inEnabled)
-{
-  if (inEnabled)
-    GL::Enable(inEnablable);
-  else
-    GL::Disable(inEnablable);
-}
 
 void GL::BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor)
 {
@@ -61,9 +63,12 @@ GL::EBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
 {
   switch (inBufferType)
   {
-  case GL::EBufferType::ARRAY_BUFFER: return GL::EBindingType::ARRAY_BUFFER;
-  case GL::EBufferType::ELEMENT_ARRAY: return GL::EBindingType::ELEMENT_ARRAY;
-  case GL::EBufferType::UNIFORM_BUFFER: return GL::EBindingType::UNIFORM_BUFFER;
+  case GL::EBufferType::ARRAY_BUFFER:
+    return GL::EBindingType::ARRAY_BUFFER;
+  case GL::EBufferType::ELEMENT_ARRAY:
+    return GL::EBindingType::ELEMENT_ARRAY;
+  case GL::EBufferType::UNIFORM_BUFFER:
+    return GL::EBindingType::UNIFORM_BUFFER;
   }
   assert(false);
   return static_cast<GL::EBindingType>(-1);
@@ -429,14 +434,22 @@ std::string GL::ErrorToString(const GL::EError inGLError)
 {
   switch (inGLError)
   {
-  case GL::EError::NO_ERROR: return "NO_ERROR";
-  case GL::EError::INVALID_ENUM: return "INVALID_ENUM";
-  case GL::EError::INVALID_VALUE: return "INVALID_VALUE";
-  case GL::EError::INVALID_OPERATION: return "INVALID_OPERATION";
-  case GL::EError::INVALID_FRAMEBUFFER_OPERATION: return "INVALID_FRAMEBUFFER_OPERATION";
-  case GL::EError::OUT_OF_MEMORY: return "OUT_OF_MEMORY";
-  case GL::EError::STACK_UNDERFLOW: return "STACK_UNDERFLOW";
-  case GL::EError::STACK_OVERFLOW: return "STACK_OVERFLOW";
+  case GL::EError::NO_ERROR:
+    return "NO_ERROR";
+  case GL::EError::INVALID_ENUM:
+    return "INVALID_ENUM";
+  case GL::EError::INVALID_VALUE:
+    return "INVALID_VALUE";
+  case GL::EError::INVALID_OPERATION:
+    return "INVALID_OPERATION";
+  case GL::EError::INVALID_FRAMEBUFFER_OPERATION:
+    return "INVALID_FRAMEBUFFER_OPERATION";
+  case GL::EError::OUT_OF_MEMORY:
+    return "OUT_OF_MEMORY";
+  case GL::EError::STACK_UNDERFLOW:
+    return "STACK_UNDERFLOW";
+  case GL::EError::STACK_OVERFLOW:
+    return "STACK_OVERFLOW";
   }
   return "UNKNOWN_ERROR";
 }

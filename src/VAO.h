@@ -17,7 +17,7 @@ class VBO;
 class VAO : public GLBindableObject<GL::EBindingType::VAO>
 {
 public:
-  using GLBindGuardType = GLBindGuard<GL::EBindingType::VAO>;
+  using GLGuardType = GLBindGuard<GL::EBindingType::VAO>;
 
   VAO() = default;
   ~VAO() override = default;

@@ -12,7 +12,7 @@ namespace egl
 class MeshDrawData
 {
 public:
-  using GLBindGuardType = GLCompositeGuard<VAO>;
+  using GLGuardType = GLMultiGuard<VAO>;
 
   static constexpr GL::Id PositionAttribLocation() { return 0; }
   static constexpr GL::Id NormalAttribLocation() { return 1; }

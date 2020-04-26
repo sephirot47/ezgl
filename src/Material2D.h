@@ -12,7 +12,7 @@ class ShaderProgram;
 class Material2D
 {
 public:
-  using GLBindGuardType = GLNoOpGuard;
+  using GLGuardType = GLNoOpGuard;
 
   void SetColor(const Color4f& inColor) { mColor = inColor; }
   Color4f GetColor() const { return mColor; }
