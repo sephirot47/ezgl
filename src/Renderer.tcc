@@ -55,9 +55,11 @@ template <Renderer::EStateId StateId>
 void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioState)
 {
   if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM) {}
-  else if constexpr (StateId == Renderer::EStateId::RENDER_TEXTURE)
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TEXTURE)
   {
-    ioState.GetRenderer().SetRenderTexture(inValue);
+  }
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
+  {
   }
   else if constexpr (StateId == Renderer::EStateId::DEPTH_ENABLED)
   {
@@ -96,7 +98,11 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   {
     return nullptr;
   }
-  else if constexpr (StateId == Renderer::EStateId::RENDER_TEXTURE)
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TEXTURE)
+  {
+    return nullptr;
+  }
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
   {
     return nullptr;
   }

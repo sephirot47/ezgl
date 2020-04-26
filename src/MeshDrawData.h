@@ -2,6 +2,7 @@
 
 #include "EBO.h"
 #include "GLGuard.h"
+#include "GLTypeTraits.h"
 #include "Mesh.h"
 #include "VAO.h"
 #include "VBO.h"
@@ -13,6 +14,8 @@ class MeshDrawData
 {
 public:
   using GLGuardType = GLMultiGuard<VAO>;
+  using EBOIndexType = Mesh::VertexId;
+  static constexpr auto EBOGLIndexType = GLTypeTraits<Mesh::VertexId>::GLType;
 
   static constexpr GL::Id PositionAttribLocation() { return 0; }
   static constexpr GL::Id NormalAttribLocation() { return 1; }
@@ -27,6 +30,7 @@ public:
   virtual ~MeshDrawData() = default;
 
   void Bind() const;
+  [[nodiscard]] GLGuardType BindGuarded() const;
   void ComputeFromMesh(const Mesh& inMesh);
   std::size_t GetNumberOfElements() const { return mNumberOfElements; }
 

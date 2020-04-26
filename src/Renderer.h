@@ -41,7 +41,8 @@ public:
   enum class EStateId
   {
     OVERRIDE_SHADER_PROGRAM,
-    RENDER_TEXTURE,
+    OVERRIDE_RENDER_TEXTURE,
+    OVERRIDE_FRAMEBUFFER,
     DEPTH_ENABLED,
     BLEND_ENABLED,
     BLEND_SOURCE_FACTOR,
@@ -73,71 +74,108 @@ public:
 
   // Depth enabled
   void SetDepthTestEnabled(const bool inDepthTestEnabled);
-  bool GetDepthTestEnabled() const { return mState.GetCurrent<Renderer::EStateId::DEPTH_ENABLED>(); }
-  void PushDepthTestEnabled() { mState.PushTop<Renderer::EStateId::DEPTH_ENABLED>(); }
-  void PopDepthTestEnabled() { mState.Pop<Renderer::EStateId::DEPTH_ENABLED>(); }
-  void ResetDepthEnabled() { mState.Reset<Renderer::EStateId::DEPTH_ENABLED>(); }
+  bool GetDepthTestEnabled() const { return mState.GetCurrent<EStateId::DEPTH_ENABLED>(); }
+  void PushDepthTestEnabled() { mState.PushTop<EStateId::DEPTH_ENABLED>(); }
+  void PopDepthTestEnabled() { mState.Pop<EStateId::DEPTH_ENABLED>(); }
+  void ResetDepthEnabled() { mState.Reset<EStateId::DEPTH_ENABLED>(); }
 
   // Blend enabled
   void SetBlendEnabled(const bool inBlendEnabled);
-  bool GetBlendEnabled() const { return mState.GetCurrent<Renderer::EStateId::BLEND_ENABLED>(); }
-  void PushBlendEnabled() { mState.PushTop<Renderer::EStateId::BLEND_ENABLED>(); }
-  void PopBlendEnabled() { mState.Pop<Renderer::EStateId::BLEND_ENABLED>(); }
-  void ResetBlendEnabled() { mState.Reset<Renderer::EStateId::BLEND_ENABLED>(); }
+  bool GetBlendEnabled() const { return mState.GetCurrent<EStateId::BLEND_ENABLED>(); }
+  void PushBlendEnabled() { mState.PushTop<EStateId::BLEND_ENABLED>(); }
+  void PopBlendEnabled() { mState.Pop<EStateId::BLEND_ENABLED>(); }
+  void ResetBlendEnabled() { mState.Reset<EStateId::BLEND_ENABLED>(); }
 
   // Blend func/factors
   void SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor);
-  GL::EBlendFactor GetBlendSourceFactor() const { return mState.GetCurrent<Renderer::EStateId::BLEND_SOURCE_FACTOR>(); }
-  void PushBlendSourceFactor() { mState.PushTop<Renderer::EStateId::BLEND_SOURCE_FACTOR>(); }
-  void PopBlendSourceFactor() { mState.Pop<Renderer::EStateId::BLEND_SOURCE_FACTOR>(); }
-  void ResetBlendSourceactor() { mState.Reset<Renderer::EStateId::BLEND_SOURCE_FACTOR>(); }
-  GL::EBlendFactor GetBlendDestFactor() const { return mState.GetCurrent<Renderer::EStateId::BLEND_DEST_FACTOR>(); }
-  void PushBlendDestFactor() { mState.PushTop<Renderer::EStateId::BLEND_DEST_FACTOR>(); }
-  void PopBlendDestFactor() { mState.Pop<Renderer::EStateId::BLEND_DEST_FACTOR>(); }
-  void ResetBlendDestFactor() { mState.Reset<Renderer::EStateId::BLEND_DEST_FACTOR>(); }
+  GL::EBlendFactor GetBlendSourceFactor() const { return mState.GetCurrent<EStateId::BLEND_SOURCE_FACTOR>(); }
+  void PushBlendSourceFactor() { mState.PushTop<EStateId::BLEND_SOURCE_FACTOR>(); }
+  void PopBlendSourceFactor() { mState.Pop<EStateId::BLEND_SOURCE_FACTOR>(); }
+  void ResetBlendSourceactor() { mState.Reset<EStateId::BLEND_SOURCE_FACTOR>(); }
+  GL::EBlendFactor GetBlendDestFactor() const { return mState.GetCurrent<EStateId::BLEND_DEST_FACTOR>(); }
+  void PushBlendDestFactor() { mState.PushTop<EStateId::BLEND_DEST_FACTOR>(); }
+  void PopBlendDestFactor() { mState.Pop<EStateId::BLEND_DEST_FACTOR>(); }
+  void ResetBlendDestFactor() { mState.Reset<EStateId::BLEND_DEST_FACTOR>(); }
 
-  // Point and Line properties
+  // Point size
   void SetPointSize(const float inPointSize);
-  float GetPointSize() const { return mState.GetCurrent<Renderer::EStateId::POINT_SIZE>(); }
-  void PushPointSize() { mState.PushTop<Renderer::EStateId::POINT_SIZE>(); }
-  void PopPointSize() { mState.Pop<Renderer::EStateId::POINT_SIZE>(); }
-  void ResetPointSize() { mState.Reset<Renderer::EStateId::POINT_SIZE>(); }
+  float GetPointSize() const { return mState.GetCurrent<EStateId::POINT_SIZE>(); }
+  void PushPointSize() { mState.PushTop<EStateId::POINT_SIZE>(); }
+  void PopPointSize() { mState.Pop<EStateId::POINT_SIZE>(); }
+  void ResetPointSize() { mState.Reset<EStateId::POINT_SIZE>(); }
 
+  // Line width
   void SetLineWidth(const float inLineWidth);
-  float GetLineWidth() const { return mState.GetCurrent<Renderer::EStateId::LINE_WIDTH>(); }
-  void PushLineWidth() { mState.PushTop<Renderer::EStateId::LINE_WIDTH>(); }
-  void PopLineWidth() { mState.Pop<Renderer::EStateId::LINE_WIDTH>(); }
-  void ResetLineWidth() { mState.Reset<Renderer::EStateId::LINE_WIDTH>(); }
+  float GetLineWidth() const { return mState.GetCurrent<EStateId::LINE_WIDTH>(); }
+  void PushLineWidth() { mState.PushTop<EStateId::LINE_WIDTH>(); }
+  void PopLineWidth() { mState.Pop<EStateId::LINE_WIDTH>(); }
+  void ResetLineWidth() { mState.Reset<EStateId::LINE_WIDTH>(); }
 
   // Override ShaderProgram
   void SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram);
-  std::shared_ptr<const ShaderProgram> GetOverrideShaderProgram() const
-  {
-    return mState.GetCurrent<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>();
-  }
   std::shared_ptr<ShaderProgram> GetOverrideShaderProgram()
   {
-    return mState.GetCurrent<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>();
+    return mState.GetCurrent<EStateId::OVERRIDE_SHADER_PROGRAM>();
   }
-  void PushOverrideShaderProgram() { mState.PushTop<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>(); }
-  void PopOverrideShaderProgram() { mState.Pop<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>(); }
-  void ResetOverrideShaderProgram() { mState.Reset<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>(); }
+  std::shared_ptr<const ShaderProgram> GetOverrideShaderProgram() const
+  {
+    return mState.GetCurrent<EStateId::OVERRIDE_SHADER_PROGRAM>();
+  }
+  void PushOverrideShaderProgram() { mState.PushTop<EStateId::OVERRIDE_SHADER_PROGRAM>(); }
+  void PopOverrideShaderProgram() { mState.Pop<EStateId::OVERRIDE_SHADER_PROGRAM>(); }
+  void ResetOverrideShaderProgram() { mState.Reset<EStateId::OVERRIDE_SHADER_PROGRAM>(); }
 
-  // RenderTexture
-  void SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture);
+  // Render Texture
+  std::shared_ptr<Texture2D> GetDefaultRenderTexture() { return mDefaultRenderTexture; }
+  std::shared_ptr<const Texture2D> GetDefaultRenderTexture() const { return mDefaultRenderTexture; }
+  std::shared_ptr<Texture2D> GetRenderTexture()
+  {
+    return GetOverrideRenderTexture() ? GetOverrideRenderTexture() : GetDefaultRenderTexture();
+  }
   std::shared_ptr<const Texture2D> GetRenderTexture() const
   {
-    return mState.GetCurrent<Renderer::EStateId::RENDER_TEXTURE>();
+    return GetOverrideRenderTexture() ? GetOverrideRenderTexture() : GetDefaultRenderTexture();
   }
-  std::shared_ptr<Texture2D> GetRenderTexture() { return mState.GetCurrent<Renderer::EStateId::RENDER_TEXTURE>(); }
-  void PushRenderTexture() { mState.PushTop<Renderer::EStateId::RENDER_TEXTURE>(); }
-  void PopRenderTexture() { mState.Pop<Renderer::EStateId::RENDER_TEXTURE>(); }
-  void ResetRenderTexture() { mState.Reset<Renderer::EStateId::RENDER_TEXTURE>(); }
+  void SetOverrideRenderTexture(const std::shared_ptr<Texture2D>& inOverrideRenderTexture);
+  std::shared_ptr<Texture2D> GetOverrideRenderTexture()
+  {
+    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TEXTURE>();
+  }
+  std::shared_ptr<const Texture2D> GetOverrideRenderTexture() const
+  {
+    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TEXTURE>();
+  }
+  void PushOverrideRenderTexture() { mState.PushTop<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
+  void PopOverrideRenderTexture() { mState.Pop<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
+  void ResetOverrideRenderTexture() { mState.Reset<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
+
+  // Framebuffer
+  std::shared_ptr<Framebuffer> GetDefaultFramebuffer() { return mDefaultFramebuffer; }
+  std::shared_ptr<const Framebuffer> GetDefaultFramebuffer() const { return mDefaultFramebuffer; }
+  std::shared_ptr<Framebuffer> GetFramebuffer()
+  {
+    return GetOverrideFramebuffer() ? GetOverrideFramebuffer() : GetDefaultFramebuffer();
+  }
+  std::shared_ptr<const Framebuffer> GetFramebuffer() const
+  {
+    return GetOverrideFramebuffer() ? GetOverrideFramebuffer() : GetDefaultFramebuffer();
+  }
+  void SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOverrideFramebuffer);
+  std::shared_ptr<Framebuffer> GetOverrideFramebuffer() { return mState.GetCurrent<EStateId::OVERRIDE_FRAMEBUFFER>(); }
+  std::shared_ptr<const Framebuffer> GetOverrideFramebuffer() const
+  {
+    return mState.GetCurrent<EStateId::OVERRIDE_FRAMEBUFFER>();
+  }
+  void PushOverrideFramebuffer() { mState.PushTop<EStateId::OVERRIDE_FRAMEBUFFER>(); }
+  void PopOverrideFramebuffer() { mState.Pop<EStateId::OVERRIDE_FRAMEBUFFER>(); }
+  void ResetOverrideFramebuffer() { mState.Reset<EStateId::OVERRIDE_FRAMEBUFFER>(); }
+  void Blit();
 
   // State
   using StateTupleOfStacks = TupleOfStacks<EStateId,
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
-      std::shared_ptr<Texture2D>,     // EStateId::RENDER_TEXTURE
+      std::shared_ptr<Texture2D>,     // EStateId::OVERRIDE_RENDER_TEXTURE
+      std::shared_ptr<Framebuffer>,   // EStateId::OVERRIDE_FRAMEBUFFER
       bool,                           // EStateId::DEPTH_ENABLED
       bool,                           // EStateId::BLEND_ENABLED
       GL::EBlendFactor,               // EStateId::BLEND_SOURCE_FACTOR
@@ -192,6 +230,7 @@ protected:
 
   private:
     GLMultiGuard<ShaderProgram::GLGuardType,
+        Framebuffer::GLGuardType,
         GLGuardWrap_t<GL::EEnablable::DEPTH_TEST>,
         GLGuardWrap_t<GL::EEnablable::BLEND>>
         mGuard;
@@ -216,8 +255,10 @@ private:
   // Normal shader (non-override)
   std::shared_ptr<ShaderProgram> mShaderProgram;
 
-  // Render texture framebuffer
-  std::unique_ptr<Framebuffer> mRenderTextureFramebuffer;
+  // Render texture
+  std::shared_ptr<Framebuffer> mDefaultFramebuffer;
+  std::shared_ptr<Texture2D> mDefaultRenderTexture;
+  std::shared_ptr<Texture2D> mDefaultDepthStencilTexture;
 };
 
 // Renderer state guards

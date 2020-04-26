@@ -16,6 +16,13 @@ void MeshDrawData::Bind() const
   mVAO->Bind();
 }
 
+[[nodiscard]] MeshDrawData::GLGuardType MeshDrawData::BindGuarded() const
+{
+  MeshDrawData::GLGuardType guard;
+  Bind();
+  return guard;
+}
+
 void MeshDrawData::ComputeFromMesh(const Mesh& inMesh)
 {
   // Create vertices ids EBO

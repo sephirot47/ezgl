@@ -6,5 +6,6 @@ layout(location = 0) out vec4 of_color;
 
 void main()
 {
-    of_color = UMaterialColor;
+  gl_FragDepth = 0.0f;
+  of_color = UMaterialColor;
 }

@@ -288,6 +288,9 @@ public:
     COMPRESSED_RGB_BPTC_SIGNED_FLOAT = GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT,
     COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT = GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT,
     DEPTH_COMPONENT = GL_DEPTH_COMPONENT,
+    DEPTH_COMPONENT16 = GL_DEPTH_COMPONENT16,
+    DEPTH_COMPONENT24 = GL_DEPTH_COMPONENT24,
+    DEPTH_COMPONENT32F = GL_DEPTH_COMPONENT32F,
     DEPTH_STENCIL = GL_DEPTH_STENCIL,
     DEPTH24_STENCIL8 = GL_DEPTH24_STENCIL8,
     DEPTH32F_STENCIL8 = GL_DEPTH32F_STENCIL8,
@@ -397,6 +400,16 @@ public:
     TEXTURE_WRAP_R = GL_TEXTURE_WRAP_R,
   };
 
+  enum class EFilterType
+  {
+    NEAREST = GL_NEAREST,
+    LINEAR = GL_LINEAR,
+    NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
+    NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
+    LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
+    LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
+  };
+
   static void Enable(const GL::EEnablable inEnablable);
   static void Disable(const GL::EEnablable inEnablable);
   static void SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled);
@@ -468,6 +481,14 @@ public:
       const GL::ETextureTarget inTextureTarget,
       const GL::Id inTextureId,
       const GL::Size inMipmapLevel = 0);
+  static void BlitFramebuffer(const GL::Id inReadFramebufferId,
+      const Vec2i& inReadMin,
+      const Vec2i& inReadMax,
+      const GL::Id inDrawFramebufferId,
+      const Vec2i& inDrawMin,
+      const Vec2i& inDrawMax,
+      const GL::EBufferBitFlags inBufferMask,
+      const GL::EFilterType inFilterType);
   static void DeleteFramebuffer(const GL::Id inFramebufferId);
 
   static GL::Id GenRenderbuffer();
@@ -478,8 +499,9 @@ public:
   static void BindRenderbuffer(const GL::Id inRenderbufferId);
   static void DeleteRenderbuffer(const GL::Id inRenderbufferId);
 
-  static void ClearColor(const Color4f& inColor);
-  static void ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags);
+  static void ClearColor(const Color4f& inClearColor);
+  static void ClearDepth(const float inClearDepth);
+  static void Clear(const GL::EBufferBitFlags& inBufferBitFlags);
   static void DrawElements(const GL::EPrimitivesType inPrimitivesType,
       const GL::Size inNumberOfPrimitives,
       const GL::EDataType inIndicesDataType,

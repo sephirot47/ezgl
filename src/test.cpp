@@ -21,6 +21,8 @@
 #include "StreamOperators.h"
 #include "Texture.h"
 #include "Texture2D.h"
+#include "TextureFactory.h"
+#include "TextureOperations.h"
 #include "VAO.h"
 #include "VAOVertexAttrib.h"
 #include "VBO.h"
@@ -65,7 +67,7 @@ int main()
     renderer3D.Begin(*window);
     {
       if (window->IsKeyPressed(Key::X))
-        renderer3D.SetRenderTexture(render_texture);
+        renderer3D.SetOverrideRenderTexture(render_texture);
 
       renderer3D.SetLineWidth(5.0f);
       renderer3D.Clear(Pink());
@@ -98,9 +100,10 @@ int main()
       if (window->IsKeyPressed(Key::X))
       {
         renderer3D.ResetState();
-        renderer3D.SetRenderTexture(nullptr);
+        renderer3D.SetOverrideRenderTexture(nullptr);
 
         RENDERER_STATE_GUARD(renderer3D, Renderer3D::EStateId::CAMERA);
+        renderer3D.Clear();
         renderer3D.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
         renderer3D.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
@@ -121,6 +124,7 @@ int main()
             Segment3f { triangle[1], triangle[2] },
             Segment3f { triangle[2], triangle[0] } }));
       }
+      renderer3D.Blit();
     }
 
     Renderer2D renderer2D;
@@ -133,8 +137,6 @@ int main()
       renderer2D.AdaptCameraToWindow(*window);
       renderer2D.SetPointSize(15.0f);
       renderer2D.GetMaterial().SetColor(Red());
-
-      // renderer2D.DrawTriangle();
       renderer2D.DrawPoint(Vec2f(400.0f, 400.0f));
       renderer2D.DrawSegment(Segment2f { Vec2f { 0.0f, 0.0f }, Vec2f { 500.0f, 800.0f } });
 
@@ -143,10 +145,9 @@ int main()
 
       renderer2D.GetMaterial().SetColor(Blue());
       renderer2D.DrawTriangleBoundary(triangle);
-    }
-    /*
-     */
 
+      renderer2D.Blit();
+    }
     camera_controller_fly.Update(inDeltaTime);
   });
   return EXIT_SUCCESS;

@@ -175,6 +175,29 @@ void GL::FramebufferTexture2D(const GL::EFramebufferAttachment inAttachment,
       inMipmapLevel);
 }
 
+void GL::BlitFramebuffer(const GL::Id inReadFramebufferId,
+    const Vec2i& inReadMin,
+    const Vec2i& inReadMax,
+    const GL::Id inDrawFramebufferId,
+    const Vec2i& inDrawMin,
+    const Vec2i& inDrawMax,
+    const GL::EBufferBitFlags inBufferMask,
+    const GL::EFilterType inFilterType)
+{
+  glBlitNamedFramebuffer(inReadFramebufferId,
+      inDrawFramebufferId,
+      inReadMin[0],
+      inReadMin[1],
+      inReadMax[0],
+      inReadMax[1],
+      inDrawMin[0],
+      inDrawMin[1],
+      inDrawMax[0],
+      inDrawMax[1],
+      GL::EnumCast(inBufferMask),
+      GL::EnumCast(inFilterType));
+}
+
 void GL::DeleteFramebuffer(const GL::Id inFramebufferId) { glDeleteFramebuffers(1, &inFramebufferId); }
 
 GL::Id GL::GenRenderbuffer()
@@ -202,8 +225,19 @@ void GL::BindRenderbuffer(const GL::Id inRenderbufferId) { glBindRenderbuffer(GL
 
 void GL::DeleteRenderbuffer(const GL::Id inRenderbufferId) { glDeleteRenderbuffers(1, &inRenderbufferId); }
 
-void GL::ClearColor(const Color4f& inColor) { glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]); }
-void GL::ClearBuffer(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }
+void GL::ClearColor(const Color4f& inColor)
+{
+  glClearColor(inColor[0], inColor[1], inColor[2], inColor[3]);
+  GL::Clear(GL::EBufferBitFlags::COLOR);
+}
+
+void GL::ClearDepth(const float inClearDepth)
+{
+  glClearDepth(inClearDepth);
+  GL::Clear(GL::EBufferBitFlags::DEPTH);
+}
+
+void GL::Clear(const GL::EBufferBitFlags& inBufferBitFlags) { glClear(GL::EnumCast(inBufferBitFlags)); }
 
 void GL::DrawElements(const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inNumberOfPrimitives,

@@ -30,7 +30,7 @@ void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
 
     mRenderbufferTexture = inTexture;
     mRenderbufferAttachment = inAttachment;
-    GL::FramebufferRenderbuffer(inAttachment, inTexture ? inTexture->GetGLId() : 0);
+    GL::FramebufferTexture2D(inAttachment, GL::ETextureTarget::TEXTURE_2D, inTexture ? inTexture->GetGLId() : 0);
   }
 }
 

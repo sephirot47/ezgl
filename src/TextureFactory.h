@@ -9,6 +9,7 @@ class Texture2D;
 class TextureFactory
 {
 public:
-  static std::shared_ptr<Texture2D> GetWhiteTexture();
+  static std::shared_ptr<Texture2D> GetOneTexture();
+  static std::shared_ptr<Texture2D> GetZeroTexture();
 };
 }

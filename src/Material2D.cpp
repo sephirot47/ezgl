@@ -13,7 +13,7 @@ void Material2D::Bind(ShaderProgram& ioShaderProgram)
   if (mTexture)
     mTexture->BindToTextureUnit(0);
   else
-    TextureFactory::GetWhiteTexture()->BindToTextureUnit(0);
+    TextureFactory::GetOneTexture()->BindToTextureUnit(0);
 
   ioShaderProgram.SetUniformSafe("UMaterialTexture", 0);
   ioShaderProgram.SetUniformSafe("UMaterialColor", mColor);

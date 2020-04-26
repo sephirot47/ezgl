@@ -12,6 +12,7 @@
 #include "PointLight.h"
 #include "ShaderProgram.h"
 #include "TextureFactory.h"
+#include "TextureOperations.h"
 #include "UBO.h"
 #include "Window.h"
 
@@ -27,22 +28,24 @@ Renderer::Renderer()
     sStaticResourcesInited = true;
   }
 
-  // Init render texture
-  mRenderTextureFramebuffer = std::make_unique<Framebuffer>();
-  mRenderTextureFramebuffer->CreateRenderbuffer(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
-      GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+  // Init render/depth_stencil textures and framebuffer
+  mDefaultRenderTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::RGBA8);
+  mDefaultDepthStencilTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+  mDefaultFramebuffer = std::make_shared<Framebuffer>();
+  mDefaultFramebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT, mDefaultDepthStencilTexture);
+  mDefaultFramebuffer->CheckFramebufferIsComplete();
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
 {
   GL::ClearColor(inClearColor);
-  GL::ClearBuffer(GL::EBufferBitFlags::COLOR);
+  GL::Clear(GL::EBufferBitFlags::COLOR);
 }
 
 void Renderer::ClearDepth(const float inClearDepth)
 {
   glClearDepth(inClearDepth);
-  GL::ClearBuffer(GL::EBufferBitFlags::DEPTH);
+  GL::Clear(GL::EBufferBitFlags::DEPTH);
 }
 
 void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
@@ -82,22 +85,19 @@ void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& in
   mState.GetCurrent<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
-void Renderer::SetRenderTexture(const std::shared_ptr<Texture2D>& inRenderTexture)
+void Renderer::SetOverrideRenderTexture(const std::shared_ptr<Texture2D>& inOverrideRenderTexture)
 {
-  mRenderTextureFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, inRenderTexture);
-  mState.GetCurrent<Renderer::EStateId::RENDER_TEXTURE>() = inRenderTexture;
+  mState.GetCurrent<Renderer::EStateId::OVERRIDE_RENDER_TEXTURE>() = inOverrideRenderTexture;
+}
 
-  if (inRenderTexture)
-  {
-    mRenderTextureFramebuffer->Bind(); // Leave it bound so that next draw calls are to this framebuffer
-    mRenderTextureFramebuffer->Resize(inRenderTexture->GetSize());
-  }
-  else
-  {
-    // If we want no render texture, then unbind framebuffer so that we do not draw into this framebuffer anymore
-    if (mRenderTextureFramebuffer->IsBound())
-      mRenderTextureFramebuffer->UnBind();
-  }
+void Renderer::SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOverrideFramebuffer)
+{
+  mState.GetCurrent<Renderer::EStateId::OVERRIDE_FRAMEBUFFER>() = inOverrideFramebuffer;
+}
+
+void Renderer::Blit()
+{
+  TextureOperations::DrawFullScreenTexture(*GetRenderTexture(), *mDefaultDepthStencilTexture, 0.0f);
 }
 
 void Renderer::PushState() { mState.PushAllTops(); }
@@ -132,6 +132,7 @@ void Renderer::Begin(const Window& inWindow)
 {
   ResetState();
   GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
+  mDefaultRenderTexture->Resize(inWindow.GetSize());
 }
 
 void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
@@ -183,13 +184,21 @@ void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
   EXPECTS(GetShaderProgram());
 
+  // Prepare shader program
   const auto override_shader_program = GetOverrideShaderProgram();
   ioDrawSetup.mShaderProgram = (override_shader_program ? override_shader_program : GetShaderProgram());
   assert(ioDrawSetup.mShaderProgram);
   ioDrawSetup.mShaderProgram->Bind();
 
-  mState.ApplyCurrentState();
+  // Prepare framebuffer
+  const auto framebuffer = GetFramebuffer();
+  assert(framebuffer);
+  framebuffer->Bind();
 
-  ENSURES(ioDrawSetup.mShaderProgram->IsBound());
+  const auto render_texture_to_use = GetRenderTexture();
+  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture_to_use);
+  framebuffer->Resize(render_texture_to_use->GetSize());
+
+  mState.ApplyCurrentState();
 }
 }

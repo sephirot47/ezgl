@@ -83,7 +83,7 @@ void Renderer2D::Begin(const Window& inWindow)
 {
   Renderer::Begin(inWindow);
 
-  SetDepthTestEnabled(false);
+  SetDepthTestEnabled(true);
   AdaptCameraToWindow(inWindow);
 }
 
@@ -187,6 +187,8 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
 
   mState.ApplyCurrentState();
   GL::Disable(GL::EEnablable::CULL_FACE);
+
+  glDepthFunc(GL_ALWAYS); // TODO add to guards
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();
