@@ -66,6 +66,8 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
 
         if (mWantsToMoveForward)
           fly_direction_local += Up<Vec<T, N>>();
+
+        fly_direction_local *= -1.0f;
       }
 
       fly_direction_local = NormalizedSafe(fly_direction_local);
