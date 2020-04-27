@@ -19,29 +19,38 @@ void TextureOperations::DrawFullScreenQuad()
   GL::DrawElements(GL::EPrimitivesType::TRIANGLES, sPlaneDrawData->GetNumberOfElements(), MeshDrawData::EBOGLIndexType);
 }
 
-void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const float inAlphaCutoff)
+void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture)
 {
-  DrawFullScreenTexture(inTexture, *TextureFactory::GetZeroTexture(), inAlphaCutoff);
+  DrawFullScreenTexture(inTexture, *TextureFactory::GetZeroTexture());
 }
 
-void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture,
-    const Texture2D& inDepthTexture,
-    const float inAlphaCutoff)
+void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const Texture2D& inDepthTexture)
 {
   TextureOperations::Init();
   sDrawFullScreenTextureShaderProgram->Bind();
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  const GLEnableGuard<GL::EEnablable::BLEND> blend_enable_guard;
+  GL::Enable(GL::EEnablable::BLEND);
+
+  const GLBlendFuncGuard blend_func_guard;
+  GL::BlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
 
   inTexture.BindToTextureUnit(0);
   sDrawFullScreenTextureShaderProgram->SetUniformSafe("UTexture", 0);
 
-  glTextureParameteri(inDepthTexture.GetGLId(), GL_TEXTURE_COMPARE_MODE, GL_NONE);
+  const GLDepthMaskGuard depth_mask_guard;
+  GL::DepthMask(true);
+
+  const GLDepthFuncGuard depth_func_guard;
+  GL::DepthFunc(GL::EDepthFunc::LEQUAL);
+
+  const GLTextureParameteriGuard<GL::ETextureParameter::TEXTURE_COMPARE_MODE> texture_compare_mode_guard(
+      inDepthTexture.GetGLId());
+  GL::SetTextureCompareMode(inDepthTexture.GetGLId(), GL::ETextureCompareMode::NONE);
+
   inDepthTexture.BindToTextureUnit(1);
   sDrawFullScreenTextureShaderProgram->SetUniformSafe("UDepthTexture", 1);
 
-  sDrawFullScreenTextureShaderProgram->SetUniformSafe("UAlphaCutoff", inAlphaCutoff);
   DrawFullScreenQuad();
 }
 

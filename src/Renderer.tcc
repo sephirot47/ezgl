@@ -54,12 +54,17 @@ void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints)
 template <Renderer::EStateId StateId>
 void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioState)
 {
-  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM) {}
+  if constexpr (StateId == Renderer::EStateId::OVERRIDE_SHADER_PROGRAM)
+  {
+    ioState.GetRenderer().SetOverrideShaderProgram(inValue);
+  }
   else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TEXTURE)
   {
+    ioState.GetRenderer().SetOverrideRenderTexture(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
   {
+    ioState.GetRenderer().SetOverrideFramebuffer(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::DEPTH_ENABLED)
   {

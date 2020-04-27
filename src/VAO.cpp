@@ -12,7 +12,7 @@ void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
     const GL::Id inAttribLocation,
     const VAOVertexAttrib& inVertexAttrib)
 {
-  GL_GUARD(VBO); // First VBO so that the guard is released the latest
+  const GLBindGuard<GL::EBindingType::VBO> vbo_bind_guard; // First VBO so that the guard is released the latest
   const auto vao_bind_guard = BindGuarded();
 
   mVBOs.push_back(inVBO);
@@ -22,7 +22,7 @@ void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
 
 void VAO::SetEBO(const std::shared_ptr<EBO>& inEBO)
 {
-  GL_GUARD(EBO); // First EBO so that the guard is released the latest
+  const GLBindGuard<GL::EBindingType::EBO> ebo_bind_guard; // First EBO so that the guard is released the latest
   const auto vao_bind_guard = BindGuarded();
 
   mEBO = inEBO;

@@ -31,6 +31,7 @@ Renderer::Renderer()
   // Init render/depth_stencil textures and framebuffer
   mDefaultRenderTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::RGBA8);
   mDefaultDepthStencilTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+
   mDefaultFramebuffer = std::make_shared<Framebuffer>();
   mDefaultFramebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT, mDefaultDepthStencilTexture);
   mDefaultFramebuffer->CheckFramebufferIsComplete();
@@ -38,14 +39,18 @@ Renderer::Renderer()
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
 {
+  const GLBindGuard<GL::EBindingType::FRAMEBUFFER> framebuffer_bind_guard;
+  BindFramebuffer();
+
   GL::ClearColor(inClearColor);
-  GL::Clear(GL::EBufferBitFlags::COLOR);
 }
 
 void Renderer::ClearDepth(const float inClearDepth)
 {
-  glClearDepth(inClearDepth);
-  GL::Clear(GL::EBufferBitFlags::DEPTH);
+  const GLBindGuard<GL::EBindingType::FRAMEBUFFER> framebuffer_bind_guard;
+  BindFramebuffer();
+
+  GL::ClearDepth(inClearDepth);
 }
 
 void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
@@ -95,10 +100,17 @@ void Renderer::SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOver
   mState.GetCurrent<Renderer::EStateId::OVERRIDE_FRAMEBUFFER>() = inOverrideFramebuffer;
 }
 
-void Renderer::Blit()
+void Renderer::BindFramebuffer()
 {
-  TextureOperations::DrawFullScreenTexture(*GetRenderTexture(), *mDefaultDepthStencilTexture, 0.0f);
+  auto framebuffer = GetFramebuffer();
+  framebuffer->Bind();
+
+  const auto render_texture_to_use = GetRenderTexture();
+  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture_to_use);
+  framebuffer->Resize(render_texture_to_use->GetSize());
 }
+
+void Renderer::Blit() { TextureOperations::DrawFullScreenTexture(*GetRenderTexture(), *mDefaultDepthStencilTexture); }
 
 void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState() { mState.PopAll(); }
@@ -191,13 +203,7 @@ void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
   ioDrawSetup.mShaderProgram->Bind();
 
   // Prepare framebuffer
-  const auto framebuffer = GetFramebuffer();
-  assert(framebuffer);
-  framebuffer->Bind();
-
-  const auto render_texture_to_use = GetRenderTexture();
-  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture_to_use);
-  framebuffer->Resize(render_texture_to_use->GetSize());
+  BindFramebuffer();
 
   mState.ApplyCurrentState();
 }

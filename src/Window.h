@@ -31,7 +31,7 @@ public:
     uint32_t mGLVersionMinor = 0;
 
     bool mResizable = true;
-    bool mUseAntialiasing = true;
+    bool mUseAntialiasing = false;
     bool mDoubleBuffer = true;
   };
 

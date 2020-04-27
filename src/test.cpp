@@ -42,10 +42,13 @@ int main()
 {
   srand(time(0));
 
-  const auto window = std::make_shared<Window>();
+  Window::CreateOptions create_options;
+  create_options.mUseAntialiasing = false;
+  const auto window = std::make_shared<Window>(create_options);
 
   const auto test_mesh = MeshFactory::GetTorus(25, 25, 0.5f);
   const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
+  const auto sphere = MeshFactory::GetSphere(50, 50);
 
   const auto camera3d = std::make_shared<PerspectiveCameraf>();
   camera3d->SetPosition(Back<Vec3f>() * 12.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
@@ -63,9 +66,13 @@ int main()
   window->Loop([&](const DeltaTime& inDeltaTime) {
     time += inDeltaTime;
 
-    Renderer3D renderer3D;
-    renderer3D.Begin(*window);
+    GL::ClearColor(Gray());
+    GL::ClearDepth();
+
     {
+      Renderer3D renderer3D;
+      renderer3D.Begin(*window);
+
       if (window->IsKeyPressed(Key::X))
         renderer3D.SetOverrideRenderTexture(render_texture);
 
@@ -100,10 +107,9 @@ int main()
       if (window->IsKeyPressed(Key::X))
       {
         renderer3D.ResetState();
-        renderer3D.SetOverrideRenderTexture(nullptr);
+        renderer3D.Clear(Blue());
 
         RENDERER_STATE_GUARD(renderer3D, Renderer3D::EStateId::CAMERA);
-        renderer3D.Clear();
         renderer3D.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
         renderer3D.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
@@ -124,12 +130,23 @@ int main()
             Segment3f { triangle[1], triangle[2] },
             Segment3f { triangle[2], triangle[0] } }));
       }
+
       renderer3D.Blit();
     }
 
-    Renderer2D renderer2D;
-    renderer2D.Begin(*window);
     {
+      Renderer3D renderer3D;
+      renderer3D.Begin(*window);
+      renderer3D.SetCamera(camera3d);
+      renderer3D.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
+      renderer3D.DrawMesh(sphere);
+      renderer3D.Blit();
+    }
+
+    {
+      Renderer2D renderer2D;
+      renderer2D.Begin(*window);
+
       renderer2D.SetLineWidth(3.0f);
 
       RENDERER_STATE_GUARD_ALL(renderer2D);
@@ -148,7 +165,9 @@ int main()
 
       renderer2D.Blit();
     }
+
     camera_controller_fly.Update(inDeltaTime);
   });
+
   return EXIT_SUCCESS;
 }

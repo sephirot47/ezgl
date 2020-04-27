@@ -17,6 +17,12 @@ void GL::SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled)
 
 bool GL::IsEnabled(const GL::EEnablable inEnablable) { return glIsEnabled(GL::EnumCast(inEnablable)); }
 
+void GL::DepthMask(const bool inDepthMask) { glDepthMask(inDepthMask); }
+bool GL::GetDepthMask() { return GL::GetInteger(GL::EGetInteger::DEPTH_WRITEMASK); }
+
+void GL::DepthFunc(const GL::EDepthFunc inDepthFunc) { glDepthFunc(GL::EnumCast(inDepthFunc)); }
+GL::EDepthFunc GL::GetDepthFunc() { return static_cast<GL::EDepthFunc>(GL::GetInteger(GL::EGetInteger::DEPTH_FUNC)); }
+
 void GL::PointSize(const float inPointSize) { glPointSize(inPointSize); }
 
 void GL::LineWidth(const float inLineWidth) { glLineWidth(inLineWidth); }
@@ -33,6 +39,34 @@ void GL::Viewport(const Vec2i& inXY, const Vec2i& inSize) { GL::Viewport(inXY[0]
 void GL::BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor)
 {
   glBlendFunc(GL::EnumCast(inSourceBlendFactor), GL::EnumCast(inDestBlendFactor));
+}
+
+void GL::BlendFuncSeparate(const GL::EBlendFactor inSourceBlendFactorRGB,
+    const GL::EBlendFactor inDestBlendFactorRGB,
+    const GL::EBlendFactor inSourceBlendFactorAlpha,
+    const GL::EBlendFactor inDestBlendFactorAlpha)
+
+{
+  glBlendFuncSeparate(GL::EnumCast(inSourceBlendFactorRGB),
+      GL::EnumCast(inSourceBlendFactorAlpha),
+      GL::EnumCast(inDestBlendFactorRGB),
+      GL::EnumCast(inDestBlendFactorAlpha));
+}
+GL::EBlendFactor GL::GetSourceBlendFactorRGB()
+{
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_SRC_RGB));
+}
+GL::EBlendFactor GL::GetDestBlendFactorRGB()
+{
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_DST_RGB));
+}
+GL::EBlendFactor GL::GetSourceBlendFactorAlpha()
+{
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_SRC_ALPHA));
+}
+GL::EBlendFactor GL::GetDestBlendFactorAlpha()
+{
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_DST_ALPHA));
 }
 
 GL::Id GL::GenBuffer()
@@ -431,6 +465,25 @@ void GL::TextureParameteri(const GL::Id inTextureId,
     const GL::Int inParameter)
 {
   glTextureParameteri(inTextureId, GL::EnumCast(inTextureParameter), inParameter);
+}
+
+void GL::SetTextureCompareMode(const GL::Id inTextureId, const GL::ETextureCompareMode inTextureCompareMode)
+{
+  GL::TextureParameteri(inTextureId, GL::ETextureParameter::TEXTURE_COMPARE_MODE, GL::EnumCast(inTextureCompareMode));
+}
+
+GL::Int GL::GetTextureParameteri(const GL::Id inTextureId, const GL::ETextureParameter inTextureParameter)
+{
+  GL::Int value;
+  glGetTextureParameteriv(inTextureId, GL::EnumCast(inTextureParameter), &value);
+  return value;
+}
+
+GL::Int GL::GetInteger(const GL::EGetInteger inGetIntegerId)
+{
+  GL::Int result = 0;
+  glGetIntegerv(GL::EnumCast(inGetIntegerId), &result);
+  return result;
 }
 
 void GLAPIENTRY GL::ErrorCallback(GL::Enum inSource,

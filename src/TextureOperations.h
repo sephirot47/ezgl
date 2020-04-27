@@ -14,11 +14,8 @@ class TextureOperations
 {
 public:
   static void DrawFullScreenQuad();
-  static void DrawFullScreenTexture(const Texture2D& inTexture,
-      const float inAlphaCutoff = 0.0f);
-  static void DrawFullScreenTexture(const Texture2D& inTexture,
-      const Texture2D& inDepthTexture,
-      const float inAlphaCutoff = 0.0f);
+  static void DrawFullScreenTexture(const Texture2D& inTexture);
+  static void DrawFullScreenTexture(const Texture2D& inTexture, const Texture2D& inDepthTexture);
 
 private:
   static void Init();

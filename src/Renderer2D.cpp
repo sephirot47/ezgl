@@ -186,9 +186,15 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
   assert(shader_program.IsBound());
 
   mState.ApplyCurrentState();
+
+  const GLEnableGuard<GL::EEnablable::CULL_FACE> cull_face_enabled_guard;
   GL::Disable(GL::EEnablable::CULL_FACE);
 
-  glDepthFunc(GL_ALWAYS); // TODO add to guards
+  const GLDepthMaskGuard depth_mask_guard;
+  GL::DepthMask(true); // We want to draw depth for blitting purposes
+
+  const GLDepthFuncGuard depth_func_guard;
+  GL::DepthFunc(GL::EDepthFunc::ALWAYS);
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();

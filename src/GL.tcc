@@ -17,14 +17,6 @@ void GL::BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL:
 }
 
 template <typename T>
-GL::Int GL::GetInteger(const T& inGLEnum)
-{
-  GL::Int result = 0;
-  glGetIntegerv(GL::EnumCast(inGLEnum), &result);
-  return result;
-}
-
-template <typename T>
 GL::Enum GL::EnumCast(const T& inGLEnum)
 {
   return static_cast<GL::Enum>(inGLEnum);

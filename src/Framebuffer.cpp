@@ -52,7 +52,7 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
   mCreatedRenderbufferId = GL::CreateRenderbuffer();
   mCreatedRenderbufferInternalFormat = inInternalFormat;
 
-  GL_GUARD(GL::EBindingType::RENDERBUFFER);
+  const GLBindGuard<GL::EBindingType::RENDERBUFFER> renderbuffer_bind_guard;
   GL::BindRenderbuffer(mCreatedRenderbufferId);
 
   GL::RenderbufferStorage(inInternalFormat, mSize[0], mSize[1]);
@@ -77,7 +77,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
 
   if (mCreatedRenderbufferId != GL::InvalidId)
   {
-    GL_GUARD(GL::EBindingType::RENDERBUFFER);
+    const GLBindGuard<GL::EBindingType::RENDERBUFFER> renderbuffer_bind_guard;
     GL::BindRenderbuffer(mCreatedRenderbufferId);
 
     GL::RenderbufferStorage(mCreatedRenderbufferInternalFormat, mSize[0], mSize[1]);

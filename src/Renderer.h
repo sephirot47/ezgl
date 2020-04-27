@@ -197,6 +197,8 @@ protected:
   std::shared_ptr<ShaderProgram>& GetShaderProgram() { return mShaderProgram; }
   const std::shared_ptr<ShaderProgram>& GetShaderProgram() const { return mShaderProgram; }
 
+  void BindFramebuffer();
+
   // Draw helpers
   virtual void Begin(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
