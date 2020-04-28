@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Macros.h"
-#include "Math.h"
+#include "Vec.h"
+#include "MathInitializers.h"
 
 namespace egl
 {

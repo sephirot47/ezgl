@@ -54,7 +54,7 @@ void Renderer2D::Scale(const Vec2f& inScale)
   auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>();
   model_matrix = model_matrix * ScaleMat(inScale);
 }
-void Renderer2D::Scale(const float inScale) { Scale(Vec2f { inScale }); }
+void Renderer2D::Scale(const float inScale) { Scale(All<Vec2f>( inScale )); }
 
 void Renderer2D::SetMaterial(const Material2D& inMaterial)
 {

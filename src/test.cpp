@@ -144,9 +144,13 @@ int main()
       renderer3D.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
           Segment3f { triangle[1], triangle[2] },
           Segment3f { triangle[2], triangle[0] } }));
-    }
 
-    renderer3D.Blit();
+      renderer3D.Blit();
+    }
+    else
+    {
+      renderer3D.Blit();
+    }
 
     renderer2D.ResetState();
     renderer2D.AdaptToWindow(*window);

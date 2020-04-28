@@ -1,18 +1,25 @@
 #include "Mat.h"
 #include "StreamOperators.h"
+#include "VariadicRepeat.h"
 #include <cmath>
 
 namespace egl
 {
+
 template <typename T, std::size_t NRows, std::size_t NCols>
-constexpr Mat<T, NRows, NCols>::Mat() noexcept : Mat<T, NRows, NCols>(T())
+constexpr Mat<T, NRows, NCols>::Mat(const MITAll<T>& inMITAll) noexcept
+    : mRows { GetArrayWithRepeatedValue<Vec<T, NCols>, NRows>(Vec<T, NCols> { inMITAll }) }
 {
 }
 
 template <typename T, std::size_t NRows, std::size_t NCols>
-constexpr Mat<T, NRows, NCols>::Mat(const T& inAllValue) noexcept
-    : mRows { GetArrayWithRepeatedValue<Vec<T, NCols>, NRows>(Vec<T, NCols>(inAllValue)) }
+constexpr Mat<T, NRows, NCols>::Mat(const MITMultiplicativeIdentity&) noexcept
 {
+  static_assert(NRows == NCols, "Multiplicate Identity only supported for square matrices.");
+  for (std::size_t r = 0; r < NRows; ++r)
+  {
+    for (std::size_t c = 0; c < NCols; ++c) { (*this)[r][c] = static_cast<T>(((r == c) ? 1 : 0)); }
+  }
 }
 
 template <typename T, std::size_t NRows, std::size_t NCols>
@@ -99,10 +106,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator+(const Mat<T, NRow
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] + inRHS[r][c];
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] + inRHS[r][c]; }
   }
   return result;
 }
@@ -125,10 +129,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-(const Mat<T, NRow
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] - inRHS[r][c];
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] - inRHS[r][c]; }
   }
   return result;
 }
@@ -138,10 +139,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator+(const T& inRHS) c
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] + inRHS;
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] + inRHS; }
   }
   return result;
 }
@@ -152,10 +150,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-(const T& inRHS) c
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] - inRHS;
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] - inRHS; }
   }
   return result;
 }
@@ -166,10 +161,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator*(const T& inRHS) c
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] * inRHS;
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] * inRHS; }
   }
   return result;
 }
@@ -180,10 +172,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator/(const T& inRHS) c
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = (*this)[r][c] / inRHS;
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = (*this)[r][c] / inRHS; }
   }
   return result;
 }
@@ -196,10 +185,7 @@ constexpr Vec<T, NCols> Mat<T, NRows, NCols>::operator*(const Vec<T, NCols>& inR
   {
     const auto& row_vector = (*this)[r];
     result[r] = 0;
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r] += (row_vector[c] * inRHS[c]);
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r] += (row_vector[c] * inRHS[c]); }
   }
   return result;
 }
@@ -234,10 +220,7 @@ constexpr Mat<T, NRows, NCols> Mat<T, NRows, NCols>::operator-() const
   Mat<T, NRows, NCols> result;
   for (std::size_t r = 0; r < NRows; ++r)
   {
-    for (std::size_t c = 0; c < NCols; ++c)
-    {
-      result[r][c] = -((*this)[r][c]);
-    }
+    for (std::size_t c = 0; c < NCols; ++c) { result[r][c] = -((*this)[r][c]); }
   }
   return result;
 }
@@ -246,15 +229,12 @@ template <typename T, std::size_t NRows, std::size_t NCols>
 template <std::size_t TRHSCols>
 constexpr Mat<T, NRows, TRHSCols> Mat<T, NRows, NCols>::operator*(const Mat<T, NCols, TRHSCols>& inRHS) const
 {
-  Mat<T, NRows, TRHSCols> result { T() };
+  auto result = All<Mat<T, NRows, TRHSCols>>(static_cast<T>(0));
   for (std::size_t r = 0; r < NRows; ++r)
   {
     for (std::size_t c = 0; c < TRHSCols; ++c)
     {
-      for (std::size_t k = 0; k < NCols; ++k)
-      {
-        result[r][c] += ((*this)[r][k] * inRHS[k][c]);
-      }
+      for (std::size_t k = 0; k < NCols; ++k) { result[r][c] += ((*this)[r][k] * inRHS[k][c]); }
     }
   }
   return result;

@@ -5,12 +5,8 @@ namespace egl
 {
 
 template <typename T, std::size_t N>
-constexpr Vec<T, N>::Vec() noexcept : Vec(0)
-{
-}
-
-template <typename T, std::size_t N>
-constexpr Vec<T, N>::Vec(const T& inAllValue) noexcept : mComponents { GetArrayWithRepeatedValue<T, N>(inAllValue) }
+constexpr Vec<T, N>::Vec(const MITAll<T>& inMITAll) noexcept
+    : mComponents { GetArrayWithRepeatedValue<ValueType, N>(static_cast<ValueType>(inMITAll.mAllValue)) }
 {
 }
 
@@ -248,28 +244,28 @@ constexpr void Vec<T, N>::operator/=(const T& inRHS)
 template <typename T, std::size_t N>
 inline constexpr Vec<T, N> operator+(const T& inLHS, const Vec<T, N>& inRHS)
 {
-  Vec<T, N> lhs_vec(inLHS);
+  Vec<T, N> lhs_vec { MITAll<T> { inLHS } };
   return lhs_vec + inRHS;
 }
 
 template <typename T, std::size_t N>
 inline constexpr Vec<T, N> operator-(const T& inLHS, const Vec<T, N>& inRHS)
 {
-  Vec<T, N> lhs_vec(inLHS);
+  Vec<T, N> lhs_vec { MITAll<T> { inLHS } };
   return lhs_vec - inRHS;
 }
 
 template <typename T, std::size_t N>
 inline constexpr Vec<T, N> operator*(const T& inLHS, const Vec<T, N>& inRHS)
 {
-  Vec<T, N> lhs_vec(inLHS);
+  Vec<T, N> lhs_vec { MITAll<T> { inLHS } };
   return lhs_vec * inRHS;
 }
 
 template <typename T, std::size_t N>
 inline constexpr Vec<T, N> operator/(const T& inLHS, const Vec<T, N>& inRHS)
 {
-  Vec<T, N> lhs_vec(inLHS);
+  Vec<T, N> lhs_vec { MITAll<T> { inLHS } };
   return lhs_vec / inRHS;
 }
 

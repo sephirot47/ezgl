@@ -1,8 +1,9 @@
 #pragma once
 
 #include "GLBindableObject.h"
-#include "Math.h"
+#include "MathInitializers.h"
 #include "Texture2D.h"
+#include "Vec.h"
 #include <array>
 #include <memory>
 #include <variant>
@@ -24,8 +25,7 @@ public:
   using GLBindableObject<GL::EBindingType::FRAMEBUFFER>::GetGLId;
 
   void SetAttachment(const GL::EFramebufferAttachment inAttachment, const std::shared_ptr<Texture2D>& inTexture);
-  void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
-      const GL::ETextureFormat inFormat);
+  void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment, const GL::ETextureFormat inFormat);
   void SetRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
       const std::shared_ptr<Texture2D>& inTexture);
   void Resize(const Vec2i& inSize);

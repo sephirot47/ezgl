@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MathInitializerTokens.h"
+#include "MathTypeTraits.h"
 #include "VariadicRepeat.h"
 #include <array>
 #include <cstdint>
@@ -20,8 +22,10 @@ public:
   static constexpr auto NumRows = NRows;
   static constexpr auto NumCols = NCols;
 
-  constexpr Mat() noexcept;
-  constexpr explicit Mat(const T& inAllValue) noexcept;
+  constexpr explicit Mat(const MITAll<ValueType>& inMITAll) noexcept;
+  constexpr explicit Mat(const MITMultiplicativeIdentity&) noexcept;
+  constexpr explicit Mat(const MITAdditiveIdentity&) noexcept : Mat(MITAll<ValueType>(0)) {}
+  constexpr Mat() noexcept : Mat(MITAll<ValueType> { static_cast<ValueType>(0) }) {}
 
   template <typename... TArgs, typename = std::enable_if_t<(sizeof...(TArgs) > 1)>>
   constexpr explicit Mat(TArgs&&... inArgs) noexcept;
@@ -87,20 +91,11 @@ using Mat4f = Mat4<float>;
 using Mat4d = Mat4<double>;
 using Mat4i = Mat4<int32_t>;
 
-template <typename T>
-struct IsMat final
-{
-  static constexpr bool value = false;
-};
-
 template <typename T, std::size_t N>
 struct IsMat<Mat<T, N, N>> final
 {
   static constexpr bool value = true;
 };
-
-template <typename T>
-inline constexpr bool IsMat_v = IsMat<T>::value;
 
 }
 

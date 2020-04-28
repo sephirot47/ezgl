@@ -70,7 +70,7 @@ void Renderer3D::Scale(const Vec3f& inScale)
   auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
   model_matrix = model_matrix * ScaleMat(inScale);
 }
-void Renderer3D::Scale(const float inScale) { Scale(Vec3f { inScale }); }
+void Renderer3D::Scale(const float inScale) { Scale(All<Vec3f>(inScale)); }
 
 void Renderer3D::SetMaterial(const Material3D& inMaterial)
 {

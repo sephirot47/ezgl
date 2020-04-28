@@ -1,7 +1,8 @@
 #pragma once
 
 #include "GLGuard.h"
-#include "Math.h"
+#include "Color.h"
+#include "MathInitializers.h"
 #include <memory>
 
 namespace egl

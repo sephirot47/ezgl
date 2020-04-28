@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mat.h"
+#include "MathInitializers.h"
 #include "Quat.h"
 #include "Vec.h"
 
@@ -38,9 +39,9 @@ public:
   SquareMat<T, N + 1> GetInverseMatrix() const;
 
 private:
-  Vec<T, N> mPosition = Vec<T, N>(static_cast<T>(0.0f));
-  RotationType mRotation = {}; // Identity
-  Vec<T, N> mScale = Vec<T, N>(static_cast<T>(1.0f));
+  Vec<T, N> mPosition = Zero<Vec<T, N>>();
+  RotationType mRotation = Identity<RotationType>();
+  Vec<T, N> mScale = One<Vec<T, N>>();
 };
 
 template <typename T>

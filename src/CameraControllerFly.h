@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Camera.h"
-#include "Math.h"
+#include "Vec.h"
+#include "MathInitializers.h"
 #include "Time.h"
 #include "Window.h"
 #include <chrono>

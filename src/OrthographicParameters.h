@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Math.h"
+#include "Vec.h"
+#include "MathInitializers.h"
 
 namespace egl
 {

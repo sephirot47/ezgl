@@ -5,17 +5,6 @@
 namespace egl
 {
 template <typename T>
-constexpr Quat<T>::Quat() noexcept : mComponents { 0, 0, 0, 1 }
-{
-}
-
-template <typename T>
-constexpr Quat<T>::Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept
-    : mComponents { inX, inY, inZ, inW }
-{
-}
-
-template <typename T>
 constexpr typename std::array<T, 4>::iterator Quat<T>::begin()
 {
   return std::begin(mComponents);

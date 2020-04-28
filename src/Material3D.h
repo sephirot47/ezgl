@@ -2,6 +2,7 @@
 
 #include "Color.h"
 #include "GLGuard.h"
+#include "Color.h"
 #include "MathInitializers.h"
 #include <memory>
 

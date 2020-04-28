@@ -2,7 +2,8 @@
 
 #include "Macros.h"
 #include "Mat.h"
-#include "Math.h"
+#include "Vec.h"
+#include "MathInitializers.h"
 #include "MeshIterators.h"
 #include "Range.h"
 #include "Vec.h"

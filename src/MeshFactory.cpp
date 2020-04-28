@@ -1,4 +1,5 @@
 #include "MeshFactory.h"
+#include "Math.h"
 #include "Mesh.h"
 
 namespace egl
@@ -287,7 +288,7 @@ Mesh MeshFactory::GetPlane(const std::size_t inNumVerticesX, const std::size_t i
     const auto vertex_id = plane.GetVertexIdFromCornerId(corner_id);
     const auto vertex_position = plane.GetVertexPosition(vertex_id);
     const auto corner_texture_coordinates
-        = Map(XY(vertex_position), Vec2f { -0.5f }, Vec2f { 0.5f }, Vec2f { 0.0f }, Vec2f { 1.0f });
+        = Map(XY(vertex_position), All<Vec2f>(-0.5f), All<Vec2f>(0.5f), All<Vec2f>(0.0f), All<Vec2f>(1.0f));
     plane.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
   }
 

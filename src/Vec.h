@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MathInitializerTokens.h"
+#include "MathTypeTraits.h"
 #include "VariadicRepeat.h"
 #include <array>
 #include <cstdint>
@@ -19,8 +21,16 @@ public:
   using ValueType = T;
   static constexpr auto NumComponents = N;
 
-  constexpr Vec() noexcept;
-  constexpr explicit Vec(const T& inAllValue) noexcept;
+  constexpr explicit Vec(const MITAll<ValueType>& inMITAll) noexcept;
+  constexpr explicit Vec(const MITAdditiveIdentity&) noexcept
+      : Vec(MITAll<ValueType>(static_cast<ValueType>(0)))
+  {
+  }
+  constexpr explicit Vec(const MITMultiplicativeIdentity&) noexcept
+      : Vec(MITAll<ValueType>(static_cast<ValueType>(1)))
+  {
+  }
+  constexpr Vec() noexcept : Vec(MITAll<ValueType> { static_cast<ValueType>(0) }) {}
 
   template <typename... TArgs, typename = std::enable_if_t<sizeof...(TArgs) == N>>
   constexpr explicit Vec(TArgs&&... inArgs) noexcept;
@@ -110,21 +120,11 @@ using Vec4u = Vec4<uint32_t>;
 using Vec4f = Vec4<float>;
 using Vec4d = Vec4<double>;
 
-template <typename T>
-struct IsVec
-{
-  static constexpr bool value = false;
-};
-
 template <typename T, std::size_t N>
 struct IsVec<Vec<T, N>>
 {
   static constexpr bool value = true;
 };
-
-template <typename T>
-constexpr bool IsVec_v = IsVec<T>::value;
-
 }
 
 #include "Vec.tcc"

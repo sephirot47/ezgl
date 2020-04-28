@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Mat.h"
+#include "MathInitializerTokens.h"
+#include "MathTypeTraits.h"
 #include "Vec.h"
 #include <array>
 #include <ostream>
@@ -15,8 +17,11 @@ public:
   using ValueType = T;
   static constexpr std::size_t NumComponents = 4;
 
-  constexpr Quat() noexcept;
-  constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept;
+  constexpr Quat(const MITMultiplicativeIdentity&) noexcept : mComponents { 0, 0, 0, 1 } {}
+  constexpr Quat(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept : mComponents { inX, inY, inZ, inW }
+  {
+  }
+  constexpr Quat() noexcept : Quat(MITMultiplicativeIdentity()) {}
 
   // Iterators
   constexpr typename std::array<T, 4>::iterator begin();
@@ -63,19 +68,10 @@ using Quatf = Quat<float>;
 using Quatd = Quat<double>;
 
 template <typename T>
-struct IsQuat
-{
-  static constexpr bool value = false;
-};
-
-template <typename T>
 struct IsQuat<Quat<T>>
 {
   static constexpr bool value = true;
 };
-
-template <typename T>
-inline constexpr bool IsQuat_v = IsQuat<T>::value;
 }
 
 #include "Quat.tcc"
