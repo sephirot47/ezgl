@@ -4,12 +4,12 @@
 namespace egl
 {
 RenderTarget::RenderTarget()
-    : RenderTarget(GL::ETextureInternalFormat::RGBA8, GL::ETextureInternalFormat::DEPTH24_STENCIL8)
+    : RenderTarget(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8)
 {
 }
 
-RenderTarget::RenderTarget(const GL::ETextureInternalFormat inColorFormat,
-    const GL::ETextureInternalFormat inDepthFormat)
+RenderTarget::RenderTarget(const GL::ETextureFormat inColorFormat,
+    const GL::ETextureFormat inDepthFormat)
 {
   EXPECTS(GL::IsColorFormat(inColorFormat));
   EXPECTS(GL::IsDepthOnlyFormat(inDepthFormat) || GL::IsDepthStencilFormat(inDepthFormat));

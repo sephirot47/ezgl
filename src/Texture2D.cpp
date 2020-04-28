@@ -14,10 +14,10 @@ Texture2D::Texture2D() : Texture()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-Texture2D::Texture2D(const int inWidth, const int inHeight, const GL::ETextureInternalFormat inInternalFormat)
+Texture2D::Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat)
     : Texture2D()
 {
-  SetEmptyData(inWidth, inHeight, inInternalFormat);
+  SetEmptyData(inWidth, inHeight, inFormat);
 }
 
 Texture2D::Texture2D(const Image2D<Color4f>& inImage2D) : Texture2D() { SetData(inImage2D); }
@@ -31,11 +31,11 @@ void Texture2D::Resize(const int inWidth, const int inHeight)
   if (Vec2i(inWidth, inHeight) == mSize)
     return;
 
-  SetEmptyData(inWidth, inHeight, GetInternalFormat(), 0);
+  SetEmptyData(inWidth, inHeight, GetFormat(), 0);
 }
 
 void Texture2D::SetData(const Image2D<Color4f>& inImage2D,
-    const GL::ETextureInternalFormat& inInternalFormat,
+    const GL::ETextureFormat& inFormat,
     const GL::Int& inMipMapLevel)
 {
   SetData(inImage2D.GetWidth(),
@@ -43,17 +43,17 @@ void Texture2D::SetData(const Image2D<Color4f>& inImage2D,
       GL::ETextureInputFormat::RGBA,
       GL::ETextureInputComponentFormat::FLOAT,
       inImage2D.GetData(),
-      inInternalFormat,
+      inFormat,
       inMipMapLevel);
 }
 
 void Texture2D::SetEmptyData(const GL::Size inWidth,
     const GL::Size inHeight,
-    const GL::ETextureInternalFormat& inInternalFormat,
+    const GL::ETextureFormat& inFormat,
     const GL::Int& inMipMapLevel)
 {
   auto texture_input_format = GL::ETextureInputFormat::RED;
-  if (GL::IsDepthOnlyFormat(inInternalFormat) || GL::IsDepthStencilFormat(inInternalFormat))
+  if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))
   {
     texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
   }
@@ -63,14 +63,14 @@ void Texture2D::SetEmptyData(const GL::Size inWidth,
       texture_input_format,
       GL::ETextureInputComponentFormat::FLOAT,
       Span<float>(nullptr, 0),
-      inInternalFormat,
+      inFormat,
       inMipMapLevel);
 }
 
 GL::Size Texture2D::GetWidth() const { return mSize[0]; }
 GL::Size Texture2D::GetHeight() const { return mSize[1]; }
 const Vec2i& Texture2D::GetSize() const { return mSize; }
-GL::ETextureInternalFormat Texture2D::GetInternalFormat() const { return mInternalFormat; }
+GL::ETextureFormat Texture2D::GetFormat() const { return mFormat; }
 
 Image2D<Color4f> Texture2D::GetImage(const bool inInvertY, const int inMipmapLevel) const
 {

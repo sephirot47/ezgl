@@ -30,7 +30,7 @@ Renderer::Renderer()
 
   // Init default render target and default framebuffer
   mDefaultRenderTarget
-      = std::make_shared<RenderTarget>(GL::ETextureInternalFormat::RGBA8, GL::ETextureInternalFormat::DEPTH24_STENCIL8);
+      = std::make_shared<RenderTarget>(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8);
   mDefaultFramebuffer = std::make_shared<Framebuffer>();
 }
 
@@ -104,7 +104,7 @@ void Renderer::BindFramebuffer()
 
   const auto render_target_to_use = GetRenderTarget();
   framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_target_to_use->GetColorTexture());
-  if (GL::IsDepthOnlyFormat(render_target_to_use->GetDepthTexture()->GetInternalFormat()))
+  if (GL::IsDepthOnlyFormat(render_target_to_use->GetDepthTexture()->GetFormat()))
   {
     framebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
         render_target_to_use->GetDepthTexture());

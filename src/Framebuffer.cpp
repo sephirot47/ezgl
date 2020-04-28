@@ -35,7 +35,7 @@ void Framebuffer::SetAttachment(const GL::EFramebufferAttachment inAttachment,
 }
 
 void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
-    const GL::ETextureInternalFormat inInternalFormat)
+    const GL::ETextureFormat inFormat)
 {
   if (mRenderbufferTexture != nullptr)
     THROW_EXCEPTION("Can't create a Renderbuffer because a texture has been attached before as Renderbuffer.");
@@ -50,12 +50,12 @@ void Framebuffer::CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbu
   const auto framebuffer_bind_guard = BindGuarded();
 
   mCreatedRenderbufferId = GL::CreateRenderbuffer();
-  mCreatedRenderbufferInternalFormat = inInternalFormat;
+  mCreatedRenderbufferFormat = inFormat;
 
   const GLBindGuard<GL::EBindingType::RENDERBUFFER> renderbuffer_bind_guard;
   GL::BindRenderbuffer(mCreatedRenderbufferId);
 
-  GL::RenderbufferStorage(inInternalFormat, mSize[0], mSize[1]);
+  GL::RenderbufferStorage(inFormat, mSize[0], mSize[1]);
   GL::FramebufferRenderbuffer(inRenderbufferAttachment, mCreatedRenderbufferId);
 }
 
@@ -80,7 +80,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
     const GLBindGuard<GL::EBindingType::RENDERBUFFER> renderbuffer_bind_guard;
     GL::BindRenderbuffer(mCreatedRenderbufferId);
 
-    GL::RenderbufferStorage(mCreatedRenderbufferInternalFormat, mSize[0], mSize[1]);
+    GL::RenderbufferStorage(mCreatedRenderbufferFormat, mSize[0], mSize[1]);
   }
   else if (mRenderbufferTexture)
   {

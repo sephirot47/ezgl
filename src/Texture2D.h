@@ -14,7 +14,7 @@ class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D>
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::TEXTURE_2D>;
 
-  Texture2D(const int inWidth, const int inHeight, const GL::ETextureInternalFormat inInternalFormat);
+  Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat);
   explicit Texture2D(const Image2D<Color4f>& inImage2D);
   Texture2D(Texture2D&& ioRHS) noexcept = default;
   Texture2D& operator=(Texture2D&& ioRHS) = default;
@@ -29,28 +29,28 @@ public:
       const GL::ETextureInputFormat& inInputFormat,
       const GL::ETextureInputComponentFormat& inInputComponentFormat,
       const Span<T>& inData,
-      const GL::ETextureInternalFormat& inInternalFormat = GL::ETextureInternalFormat::RGBA8,
+      const GL::ETextureFormat& inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
   void SetData(const Image2D<Color4f>& inImage2D,
-      const GL::ETextureInternalFormat& inInternalFormat = GL::ETextureInternalFormat::RGBA8,
+      const GL::ETextureFormat& inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
   void SetEmptyData(const GL::Size inWidth,
       const GL::Size inHeight,
-      const GL::ETextureInternalFormat& inInternalFormat = GL::ETextureInternalFormat::RGBA8,
+      const GL::ETextureFormat& inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
   GL::Size GetWidth() const;
   GL::Size GetHeight() const;
   const Vec2i& GetSize() const;
-  GL::ETextureInternalFormat GetInternalFormat() const;
+  GL::ETextureFormat GetFormat() const;
 
   Image2D<Color4f> GetImage(const bool inInvertY = false, const int inMipmapLevel = 0) const;
 
 private:
   Vec2i mSize = Zero<Vec2i>();
-  GL::ETextureInternalFormat mInternalFormat = GL::ETextureInternalFormat::RED;
+  GL::ETextureFormat mFormat = GL::ETextureFormat::RED;
 
   Texture2D();
 };

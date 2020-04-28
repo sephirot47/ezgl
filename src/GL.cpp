@@ -174,24 +174,24 @@ void GL::BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureI
   glBindTextureUnit(inTextureUnit, inTextureId);
 }
 
-bool GL::IsColorFormat(const GL::ETextureInternalFormat inTextureFormat)
+bool GL::IsColorFormat(const GL::ETextureFormat inTextureFormat)
 {
   return !IsDepthOnlyFormat(inTextureFormat) && !IsDepthStencilFormat(inTextureFormat);
 }
 
-bool GL::IsDepthOnlyFormat(const GL::ETextureInternalFormat inTextureFormat)
+bool GL::IsDepthOnlyFormat(const GL::ETextureFormat inTextureFormat)
 {
-  return (inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT
-      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT16
-      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT24
-      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT32F);
+  return (inTextureFormat == GL::ETextureFormat::DEPTH_COMPONENT
+      || inTextureFormat == GL::ETextureFormat::DEPTH_COMPONENT16
+      || inTextureFormat == GL::ETextureFormat::DEPTH_COMPONENT24
+      || inTextureFormat == GL::ETextureFormat::DEPTH_COMPONENT32F);
 }
 
-bool GL::IsDepthStencilFormat(const GL::ETextureInternalFormat inTextureFormat)
+bool GL::IsDepthStencilFormat(const GL::ETextureFormat inTextureFormat)
 {
-  return (inTextureFormat == GL::ETextureInternalFormat::DEPTH_STENCIL
-      || inTextureFormat == GL::ETextureInternalFormat::DEPTH24_STENCIL8
-      || inTextureFormat == GL::ETextureInternalFormat::DEPTH32F_STENCIL8);
+  return (inTextureFormat == GL::ETextureFormat::DEPTH_STENCIL
+      || inTextureFormat == GL::ETextureFormat::DEPTH24_STENCIL8
+      || inTextureFormat == GL::ETextureFormat::DEPTH32F_STENCIL8);
 }
 
 void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }
@@ -268,11 +268,11 @@ GL::Id GL::CreateRenderbuffer()
   return new_renderbuffer_id;
 }
 
-void GL::RenderbufferStorage(const GL::ETextureInternalFormat inInternalFormat,
+void GL::RenderbufferStorage(const GL::ETextureFormat inFormat,
     const GL::Size inWidth,
     const GL::Size inHeight)
 {
-  glRenderbufferStorage(GL_RENDERBUFFER, GL::EnumCast(inInternalFormat), inWidth, inHeight);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL::EnumCast(inFormat), inWidth, inHeight);
 }
 
 void GL::BindRenderbuffer(const GL::Id inRenderbufferId) { glBindRenderbuffer(GL_RENDERBUFFER, inRenderbufferId); }

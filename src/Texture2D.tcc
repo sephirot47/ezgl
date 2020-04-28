@@ -10,13 +10,13 @@ void Texture2D::SetData(const GL::Size& inWidth,
     const GL::ETextureInputFormat& inInputFormat,
     const GL::ETextureInputComponentFormat& inInputComponentFormat,
     const Span<T>& inData,
-    const GL::ETextureInternalFormat& inInternalFormat,
+    const GL::ETextureFormat& inFormat,
     const GL::Int& inMipMapLevel)
 {
   const auto texture_bind_guard = BindGuarded();
 
   mSize = Vec2i(inWidth, inHeight);
-  mInternalFormat = inInternalFormat;
+  mFormat = inFormat;
 
   GL::TexImage2D(GetTextureTarget(),
       inWidth,
@@ -24,7 +24,7 @@ void Texture2D::SetData(const GL::Size& inWidth,
       inInputFormat,
       inInputComponentFormat,
       inData,
-      inInternalFormat,
+      inFormat,
       inMipMapLevel);
 }
 

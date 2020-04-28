@@ -25,7 +25,7 @@ public:
 
   void SetAttachment(const GL::EFramebufferAttachment inAttachment, const std::shared_ptr<Texture2D>& inTexture);
   void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
-      const GL::ETextureInternalFormat inInternalFormat);
+      const GL::ETextureFormat inFormat);
   void SetRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
       const std::shared_ptr<Texture2D>& inTexture);
   void Resize(const Vec2i& inSize);
@@ -45,7 +45,7 @@ private:
 
   // TODO: Use variant for Renderbuffer
   GL::Id mCreatedRenderbufferId = GL::InvalidId;
-  GL::ETextureInternalFormat mCreatedRenderbufferInternalFormat = GL::ETextureInternalFormat::RED;
+  GL::ETextureFormat mCreatedRenderbufferFormat = GL::ETextureFormat::RED;
 
   std::shared_ptr<Texture2D> mRenderbufferTexture;
   GL::EFramebufferAttachment mRenderbufferAttachment = GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT;

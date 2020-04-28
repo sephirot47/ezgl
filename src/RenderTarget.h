@@ -11,7 +11,7 @@ class RenderTarget
 {
 public:
   RenderTarget();
-  RenderTarget(const GL::ETextureInternalFormat inColorFormat, const GL::ETextureInternalFormat inDepthFormat);
+  RenderTarget(const GL::ETextureFormat inColorFormat, const GL::ETextureFormat inDepthFormat);
   RenderTarget(const RenderTarget&) = delete;
   RenderTarget& operator=(const RenderTarget&) = delete;
   RenderTarget(RenderTarget&& ioRHS) = default;

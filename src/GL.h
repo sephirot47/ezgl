@@ -206,7 +206,7 @@ public:
     ONE_MINUS_SRC1_ALPHA = GL_ONE_MINUS_SRC1_ALPHA,
   };
 
-  enum class ETextureInternalFormat
+  enum class ETextureFormat
   {
     RED = GL_RED,
     RG = GL_RG,
@@ -698,7 +698,7 @@ public:
       const GL::ETextureInputFormat& inInputFormat,
       const GL::ETextureInputComponentFormat& inInputComponentFormat,
       const Span<T>& inData,
-      const GL::ETextureInternalFormat& inInternalFormat,
+      const GL::ETextureFormat& inTextureFormat,
       const GL::Int& inMipMapLevel = 0);
   template <typename T>
   static std::vector<T> GetTextureImage(const GL::Id inTextureId,
@@ -714,9 +714,9 @@ public:
   static void GenerateTextureMipMap(const GL::Id& inTextureId);
   static void ActiveTexture(const GL::Id& inTextureUnit);
   static void BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId);
-  static bool IsColorFormat(const GL::ETextureInternalFormat inTextureFormat);
-  static bool IsDepthOnlyFormat(const GL::ETextureInternalFormat inTextureFormat);
-  static bool IsDepthStencilFormat(const GL::ETextureInternalFormat inTextureFormat);
+  static bool IsColorFormat(const GL::ETextureFormat inTextureFormat);
+  static bool IsDepthOnlyFormat(const GL::ETextureFormat inTextureFormat);
+  static bool IsDepthStencilFormat(const GL::ETextureFormat inTextureFormat);
   static void DeleteTexture(const GL::Id& inTextureId);
 
   static GL::Id GenFramebuffer();
@@ -739,7 +739,7 @@ public:
 
   static GL::Id GenRenderbuffer();
   static GL::Id CreateRenderbuffer();
-  static void RenderbufferStorage(const GL::ETextureInternalFormat inInternalFormat,
+  static void RenderbufferStorage(const GL::ETextureFormat inFormat,
       const GL::Size inWidth,
       const GL::Size inHeight);
   static void BindRenderbuffer(const GL::Id inRenderbufferId);
