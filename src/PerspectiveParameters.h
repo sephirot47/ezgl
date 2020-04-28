@@ -5,7 +5,7 @@
 namespace egl
 {
 template <typename T>
-struct PerspectiveParameters
+struct PerspectiveParameters final
 {
   static constexpr auto VariantIndex = 1;
 

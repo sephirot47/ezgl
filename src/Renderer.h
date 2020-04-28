@@ -12,6 +12,7 @@
 #include "PerspectiveCamera.h"
 #include "Plane.h"
 #include "PointLight.h"
+#include "Rect.h"
 #include "RenderTarget.h"
 #include "RendererStateStacks.h"
 #include "Segment.h"
@@ -44,7 +45,9 @@ public:
     OVERRIDE_SHADER_PROGRAM,
     OVERRIDE_RENDER_TARGET,
     OVERRIDE_FRAMEBUFFER,
-    DEPTH_ENABLED,
+    VIEWPORT,
+    DEPTH_FUNC,
+    DEPTH_WRITE_ENABLED,
     BLEND_ENABLED,
     BLEND_SOURCE_FACTOR,
     BLEND_DEST_FACTOR,
@@ -73,12 +76,19 @@ public:
   void ClearDepth(const float inClearDepth = 1.0f);
   void Clear(const Color4f& inClearColor = Black(), const float inClearDepth = 1.0f);
 
-  // Depth enabled
-  void SetDepthTestEnabled(const bool inDepthTestEnabled);
-  bool GetDepthTestEnabled() const { return mState.GetCurrent<EStateId::DEPTH_ENABLED>(); }
-  void PushDepthTestEnabled() { mState.PushTop<EStateId::DEPTH_ENABLED>(); }
-  void PopDepthTestEnabled() { mState.Pop<EStateId::DEPTH_ENABLED>(); }
-  void ResetDepthEnabled() { mState.Reset<EStateId::DEPTH_ENABLED>(); }
+  // Depth func
+  void SetDepthFunc(const GL::EDepthFunc inDepthFunc);
+  GL::EDepthFunc GetDepthFunc() const { return mState.GetCurrent<EStateId::DEPTH_FUNC>(); }
+  void PushDepthFunc() { mState.PushTop<EStateId::DEPTH_FUNC>(); }
+  void PopDepthFunc() { mState.Pop<EStateId::DEPTH_FUNC>(); }
+  void ResetDepthFunc() { mState.Reset<EStateId::DEPTH_FUNC>(); }
+
+  // Depth write
+  void SetDepthWriteEnabled(const bool inDepthWriteEnabled);
+  bool GetDepthWriteEnabled() const { return mState.GetCurrent<EStateId::DEPTH_WRITE_ENABLED>(); }
+  void PushDepthWriteEnabled() { mState.PushTop<EStateId::DEPTH_WRITE_ENABLED>(); }
+  void PopDepthWriteEnabled() { mState.Pop<EStateId::DEPTH_WRITE_ENABLED>(); }
+  void ResetDepthWriteEnabled() { mState.Reset<EStateId::DEPTH_WRITE_ENABLED>(); }
 
   // Blend enabled
   void SetBlendEnabled(const bool inBlendEnabled);
@@ -172,12 +182,21 @@ public:
   void ResetOverrideFramebuffer() { mState.Reset<EStateId::OVERRIDE_FRAMEBUFFER>(); }
   void Blit();
 
+  // Viewport
+  void SetViewport(const Recti& inViewport) { mState.GetCurrent<EStateId::VIEWPORT>() = inViewport; }
+  const Recti& GetViewport() const { return mState.GetCurrent<EStateId::VIEWPORT>(); }
+  void PushViewport() { mState.PushTop<EStateId::VIEWPORT>(); }
+  void PopViewport() { mState.Pop<EStateId::VIEWPORT>(); }
+  void ResetViewport() { mState.Reset<EStateId::VIEWPORT>(); }
+
   // State
   using StateTupleOfStacks = TupleOfStacks<EStateId,
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
       std::shared_ptr<RenderTarget>,  // EStateId::OVERRIDE_RENDER_TARGET
       std::shared_ptr<Framebuffer>,   // EStateId::OVERRIDE_FRAMEBUFFER
-      bool,                           // EStateId::DEPTH_ENABLED
+      Recti,                          // EStateId::VIEWPORT
+      GL::EDepthFunc,                 // EStateId::DEPTH_FUNC
+      bool,                           // EStateId::DEPTH_WRITE_ENABLED
       bool,                           // EStateId::BLEND_ENABLED
       GL::EBlendFactor,               // EStateId::BLEND_SOURCE_FACTOR
       GL::EBlendFactor,               // EStateId::BLEND_DEST_FACTOR
@@ -188,7 +207,7 @@ public:
 
   virtual void PushState();
   virtual void PopState();
-  virtual void ResetState();
+  void ResetState();
   State& GetState() { return mState; }
   const State& GetState() const { return mState; }
 
@@ -198,10 +217,11 @@ protected:
   std::shared_ptr<ShaderProgram>& GetShaderProgram() { return mShaderProgram; }
   const std::shared_ptr<ShaderProgram>& GetShaderProgram() const { return mShaderProgram; }
 
+  // Framebuffer
   void BindFramebuffer();
 
   // Draw helpers
-  virtual void Begin(const Window& inWindow);
+  virtual void AdaptToWindow(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawVAOElements(const VAO& inVAO,
@@ -225,7 +245,7 @@ protected:
   template <typename T, std::size_t N>
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
 
-  // Helpers or common functionality
+  // DrawSetup
   class DrawSetup
   {
   public:
@@ -235,9 +255,19 @@ protected:
   private:
     ShaderProgram::GLGuardType mShaderProgramGuard;
     Framebuffer::GLGuardType mFramebufferGuard;
-    GLEnableGuard<GL::EEnablable::DEPTH_TEST> mDepthTestEnabledGuard;
+    GLViewportGuard mViewportGuard;
+    GLDepthFuncGuard mDepthFuncGuard;
+    GLDepthMaskGuard mDepthMaskGuard;
     GLEnableGuard<GL::EEnablable::BLEND> mBlendEnabledGuard;
+    GLBlendFuncGuard mBlendFuncGuard;
+    GLPointSizeGuard mPointSizeGuard;
+    GLLineWidthGuard mLineWidthGuard;
   };
+
+  // State functions
+  virtual void PushAllDefaultStateValues();
+
+  // DrawSetup functions
   virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const = 0;
   [[nodiscard]] std::unique_ptr<DrawSetup> PrepareForDraw();
   virtual void PrepareForDraw(DrawSetup& ioDrawSetup);
@@ -249,25 +279,34 @@ private:
   // State
   State mState { *this };
 
-  template <Renderer::EStateId StateId>
-  static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
-
-  template <Renderer::EStateId StateId>
-  static State::ValueType<StateId> GetDefaultValue();
-
   // Normal shader (non-override)
   std::shared_ptr<ShaderProgram> mShaderProgram;
 
   // Render texture
   std::shared_ptr<Framebuffer> mDefaultFramebuffer;
   std::shared_ptr<RenderTarget> mDefaultRenderTarget;
+
+  // State functions
+  template <Renderer::EStateId StateId>
+  static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
+
+  template <Renderer::EStateId StateId>
+  static State::ValueType<StateId> GetDefaultValue();
 };
 
+// clang-format off
+template <typename T> struct RendererFromEStateId { static_assert(!std::is_same_v<T, T>); using Type = void; };
+template <> struct RendererFromEStateId<Renderer::EStateId> { using Type = Renderer; };
+template <typename T> using RendererFromEStateId_t = typename RendererFromEStateId<T>::Type;
+// clang-format on
+
 // Renderer state guards
-template <typename TRenderer, typename TEStateId, TEStateId StateId>
+template <auto StateId>
 class RendererStateGuard final
 {
 public:
+  using TRenderer = RendererFromEStateId_t<std::remove_pointer_t<std::decay_t<decltype(StateId)>>>;
+
   RendererStateGuard(TRenderer& ioRenderer) : mRenderer(ioRenderer)
   {
     mRenderer.TRenderer::template GetState().template PushTop<StateId>();
@@ -291,20 +330,11 @@ private:
   TRenderer& mRenderer;
 };
 
-// clang-format off
-template <typename T> struct StateIdRenderer { static_assert(!std::is_same_v<T, T>); using Type = void; };
-template <> struct StateIdRenderer<Renderer::EStateId> { using Type = Renderer; };
-template <typename T> using StateIdRenderer_t = typename StateIdRenderer<T>::Type;
-// clang-format on
-
 #define RENDERER_STATE_GUARD_ALL(RENDERER_OBJECT)                                                                      \
   RendererStateGuardAll ANONYMOUS_VARIABLE_NAME() { RENDERER_OBJECT };                                                 \
   UNUSED(ANONYMOUS_VARIABLE_NAME());
 #define RENDERER_STATE_GUARD(RENDERER_OBJECT, STATE_ID)                                                                \
-  RendererStateGuard<StateIdRenderer_t<std::remove_pointer_t<std::decay_t<decltype(STATE_ID)>>>,                       \
-      std::remove_pointer_t<std::decay_t<decltype(STATE_ID)>>,                                                         \
-      STATE_ID>                                                                                                        \
-  ANONYMOUS_VARIABLE_NAME() { RENDERER_OBJECT };                                                                       \
+  RendererStateGuard<STATE_ID> ANONYMOUS_VARIABLE_NAME() { RENDERER_OBJECT };                                          \
   UNUSED(ANONYMOUS_VARIABLE_NAME());
 }
 

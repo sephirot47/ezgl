@@ -114,7 +114,7 @@ public:
   void ResetPointLights() { mState.Reset<Renderer3D::EStateId::POINT_LIGHTS>(); }
 
   // Draw - 3D
-  void Begin(const Window& inWindow);
+  void AdaptToWindow(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawArrow(const Segment3f& inArrowSegment);
@@ -137,11 +137,14 @@ public:
   using State = RendererStateStacks<Renderer3D, StateTupleOfStacks>;
   friend class RendererStateStacks<Renderer3D, StateTupleOfStacks>;
 
-  void PushState() override;
-  void PopState() override;
-  void ResetState() override;
+  void PushState() final override;
+  void PopState() final override;
   State& GetState() { return mState; }
   const State& GetState() const { return mState; }
+
+protected:
+  // State
+  void PushAllDefaultStateValues() final override;
 
 private:
   // Static resources
@@ -150,13 +153,8 @@ private:
   static std::shared_ptr<ShaderProgram> sMeshShaderProgram;
   static std::shared_ptr<MeshDrawData> sCone;
 
+  // State
   State mState { *this };
-
-  template <Renderer3D::EStateId StateId>
-  static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
-
-  template <Renderer3D::EStateId StateId>
-  static State::ValueType<StateId> GetDefaultValue();
 
   // Lights
   static constexpr auto MaxNumberOfDirectionalLights = 100;
@@ -164,17 +162,28 @@ private:
   UBO mDirectionalLightsUBO;
   UBO mPointLightsUBO;
 
+  // DrawSetup3D
   struct DrawSetup3D : public DrawSetup
   {
   private:
     Material3D::GLGuardType mMaterial3DGuard;
+    GLEnableGuard<GL::EEnablable::CULL_FACE> mCullFaceEnabledGuard;
   };
+
+  // State functions
+  template <Renderer3D::EStateId StateId>
+  static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
+
+  template <Renderer3D::EStateId StateId>
+  static State::ValueType<StateId> GetDefaultValue();
+
+  // DrawSetup3D functions
   virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup3D>(); }
   virtual void PrepareForDraw(DrawSetup& ioDrawSetup) override;
 };
 
 // clang-format off
-template <> struct StateIdRenderer<Renderer3D::EStateId> { using Type = Renderer3D; };
+template <> struct RendererFromEStateId<Renderer3D::EStateId> { using Type = Renderer3D; };
 // clang-format on
 }
 

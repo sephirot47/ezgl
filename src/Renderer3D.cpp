@@ -42,6 +42,8 @@ Renderer3D::Renderer3D()
   // Init lights
   mDirectionalLightsUBO.BufferDataEmpty(MaxNumberOfDirectionalLights * sizeof(GLSLDirectionalLight));
   mPointLightsUBO.BufferDataEmpty(MaxNumberOfPointLights * sizeof(GLSLPointLight));
+
+  PushAllDefaultStateValues();
 }
 
 void Renderer3D::SetCullFaceEnabled(const bool inCullFaceEnabled)
@@ -151,20 +153,15 @@ void Renderer3D::PopState()
   mState.PopAll();
 }
 
-void Renderer3D::ResetState()
+void Renderer3D::PushAllDefaultStateValues()
 {
-  Renderer::ResetState();
-  mState.PopAll();
+  Renderer::PushAllDefaultStateValues();
   mState.PushAllDefaultValues();
-  mState.ApplyCurrentState();
 }
 
-void Renderer3D::Begin(const Window& inWindow)
+void Renderer3D::AdaptToWindow(const Window& inWindow)
 {
-  Renderer::Begin(inWindow);
-
-  SetDepthTestEnabled(true);
-  SetCullFaceEnabled(true);
+  Renderer::AdaptToWindow(inWindow);
 
   AdaptCameraToWindow(inWindow);
 }

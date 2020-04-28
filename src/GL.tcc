@@ -72,6 +72,14 @@ void GL::UnBind()
 
 // clang-format off
 
+template <std::size_t N>
+std::array<GL::Int, N> GL::GetIntegers(const GL::EGetEnum inGetIntegerId)
+{
+  std::array<GL::Int, N> ints;
+  glGetIntegerv(GL::EnumCast(inGetIntegerId), ints.data());
+  return ints;
+}
+
 template <> inline GL::Id GL::Create<GL::EObjectType::EBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAGMENT_SHADER>() { return GL::CreateShader(GL::EShaderType::FRAGMENT); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAMEBUFFER>() { return GL::CreateFramebuffer(); }

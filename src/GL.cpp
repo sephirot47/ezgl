@@ -18,14 +18,16 @@ void GL::SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled)
 bool GL::IsEnabled(const GL::EEnablable inEnablable) { return glIsEnabled(GL::EnumCast(inEnablable)); }
 
 void GL::DepthMask(const bool inDepthMask) { glDepthMask(inDepthMask); }
-bool GL::GetDepthMask() { return (GL::GetInteger(GL::EGetInteger::DEPTH_WRITEMASK) == 1); }
+bool GL::GetDepthMask() { return (GL::GetInteger(GL::EGetEnum::DEPTH_WRITEMASK) == 1); }
 
 void GL::DepthFunc(const GL::EDepthFunc inDepthFunc) { glDepthFunc(GL::EnumCast(inDepthFunc)); }
-GL::EDepthFunc GL::GetDepthFunc() { return static_cast<GL::EDepthFunc>(GL::GetInteger(GL::EGetInteger::DEPTH_FUNC)); }
+GL::EDepthFunc GL::GetDepthFunc() { return static_cast<GL::EDepthFunc>(GL::GetInteger(GL::EGetEnum::DEPTH_FUNC)); }
 
 void GL::PointSize(const float inPointSize) { glPointSize(inPointSize); }
+float GL::GetPointSize() { return GL::GetFloat(GL::EGetEnum::POINT_SIZE); }
 
 void GL::LineWidth(const float inLineWidth) { glLineWidth(inLineWidth); }
+float GL::GetLineWidth() { return GL::GetFloat(GL::EGetEnum::LINE_WIDTH); }
 
 void GL::Viewport(const int inX, const int inY, const int inWidth, const int inHeight)
 {
@@ -35,6 +37,19 @@ void GL::Viewport(const int inX, const int inY, const int inWidth, const int inH
 }
 
 void GL::Viewport(const Vec2i& inXY, const Vec2i& inSize) { GL::Viewport(inXY[0], inXY[1], inSize[0], inSize[1]); }
+
+void GL::Viewport(const Recti& inViewport) { GL::Viewport(inViewport.GetMin(), inViewport.GetMax()); }
+
+Recti GL::GetViewport()
+{
+  const auto x_y_width_height_ints = GL::GetIntegers<4>(GL::EGetEnum::VIEWPORT);
+  const auto x = x_y_width_height_ints[0];
+  const auto y = x_y_width_height_ints[1];
+  const auto width = x_y_width_height_ints[2];
+  const auto height = x_y_width_height_ints[3];
+  const auto viewport = Recti(Vec2i(x, y), Vec2i(width, height));
+  return viewport;
+}
 
 void GL::BlendFunc(const GL::EBlendFactor inSourceBlendFactor, const GL::EBlendFactor inDestBlendFactor)
 {
@@ -54,19 +69,19 @@ void GL::BlendFuncSeparate(const GL::EBlendFactor inSourceBlendFactorRGB,
 }
 GL::EBlendFactor GL::GetSourceBlendFactorRGB()
 {
-  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_SRC_RGB));
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_SRC_RGB));
 }
 GL::EBlendFactor GL::GetDestBlendFactorRGB()
 {
-  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_DST_RGB));
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_DST_RGB));
 }
 GL::EBlendFactor GL::GetSourceBlendFactorAlpha()
 {
-  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_SRC_ALPHA));
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_SRC_ALPHA));
 }
 GL::EBlendFactor GL::GetDestBlendFactorAlpha()
 {
-  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetInteger::BLEND_DST_ALPHA));
+  return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_DST_ALPHA));
 }
 
 GL::Id GL::GenBuffer()
@@ -268,9 +283,7 @@ GL::Id GL::CreateRenderbuffer()
   return new_renderbuffer_id;
 }
 
-void GL::RenderbufferStorage(const GL::ETextureFormat inFormat,
-    const GL::Size inWidth,
-    const GL::Size inHeight)
+void GL::RenderbufferStorage(const GL::ETextureFormat inFormat, const GL::Size inWidth, const GL::Size inHeight)
 {
   glRenderbufferStorage(GL_RENDERBUFFER, GL::EnumCast(inFormat), inWidth, inHeight);
 }
@@ -499,10 +512,31 @@ GL::Int GL::GetTextureParameteri(const GL::Id inTextureId, const GL::ETexturePar
   return value;
 }
 
-GL::Int GL::GetInteger(const GL::EGetInteger inGetIntegerId)
+bool GL::GetBoolean(const GL::EGetEnum inGetBooleanId)
+{
+  GL::Boolean result = 0;
+  glGetBooleanv(GL::EnumCast(inGetBooleanId), &result);
+  return (result != 0);
+}
+
+GL::Int GL::GL::GetInteger(const GL::EGetEnum inGetIntegerId)
 {
   GL::Int result = 0;
   glGetIntegerv(GL::EnumCast(inGetIntegerId), &result);
+  return result;
+}
+
+GL::Float GL::GetFloat(const GL::EGetEnum inGetFloatId)
+{
+  GL::Float result = 0.0f;
+  glGetFloatv(GL::EnumCast(inGetFloatId), &result);
+  return result;
+}
+
+GL::Double GL::GetDouble(const GL::EGetEnum inGetDoubleId)
+{
+  GL::Double result = 0.0f;
+  glGetDoublev(GL::EnumCast(inGetDoubleId), &result);
   return result;
 }
 

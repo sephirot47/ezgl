@@ -8,7 +8,7 @@ namespace egl
 template <typename T>
 class Image2D;
 
-class ImageIO
+class ImageIO final
 {
 public:
   static void Read(const std::filesystem::path& inPath, Image2D<Color4f>& outImage);

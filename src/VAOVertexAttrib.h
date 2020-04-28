@@ -24,7 +24,7 @@ struct VAOVertexAttrib
 };
 
 template <typename T>
-struct VAOVertexAttribT : public VAOVertexAttrib
+struct VAOVertexAttribT final : public VAOVertexAttrib
 {
   explicit VAOVertexAttribT(uint32_t inStride = GLTypeTraits<T>::NumBytes,
       bool inNormalized = false,

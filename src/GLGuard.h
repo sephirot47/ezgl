@@ -96,6 +96,22 @@ template <GL::ETextureParameter TTextureParameter> inline GL::Int GLTextureParam
 template <GL::ETextureParameter TTextureParameter> inline void GLTextureParameteriGuardSet(const GL::Int inValue, const std::tuple<GL::Id>& inTextureId) { GL::TextureParameteri(std::get<0>(inTextureId), TTextureParameter, inValue); }
 template <GL::ETextureParameter TTextureParameter> using GLTextureParameteriGuard = GLGenericGuard<GLTextureParameteriGuardGet<TTextureParameter>, GLTextureParameteriGuardSet<TTextureParameter>, GL::Id>;
 
+// GLViewportGuard
+inline Recti GLViewportGuardGet() { return GL::GetViewport(); }
+inline void GLViewportGuardSet(const Recti &inPreviousViewport) { GL::Viewport(inPreviousViewport); }
+using GLViewportGuard = GLGenericGuard<GLViewportGuardGet, GLViewportGuardSet>;
+
+// GLPointSizeGuard
+inline float GLPointSizeGuardGet() { return GL::GetPointSize(); }
+inline void GLPointSizeGuardSet(const float inPreviousPointSize) { GL::PointSize(inPreviousPointSize); }
+using GLPointSizeGuard = GLGenericGuard<GLPointSizeGuardGet, GLPointSizeGuardSet>;
+
+// GLLineWidthGuard
+inline float GLLineWidthGuardGet() { return GL::GetLineWidth(); }
+inline void GLLineWidthGuardSet(const float inPreviousLineWidth) { GL::LineWidth(inPreviousLineWidth); }
+using GLLineWidthGuard = GLGenericGuard<GLLineWidthGuardGet, GLLineWidthGuardSet>;
+
+
 // GetGLGuard
 template <typename T> decltype(auto) GetGLGuard() { return typename T::GLGuardType{}; };
 template <GL::EBindingType TBindingTypeValue> decltype(auto) GetGLGuard() { return GLBindGuard<TBindingTypeValue>{}; };

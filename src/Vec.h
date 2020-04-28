@@ -47,6 +47,10 @@ public:
   // Operators
   constexpr bool operator==(const Vec& inRHS) const;
   constexpr bool operator!=(const Vec& inRHS) const;
+  constexpr bool operator>(const Vec& inRHS) const;
+  constexpr bool operator>=(const Vec& inRHS) const;
+  constexpr bool operator<(const Vec& inRHS) const;
+  constexpr bool operator<=(const Vec& inRHS) const;
   constexpr T& operator[](std::size_t i);
   constexpr const T& operator[](std::size_t i) const;
   constexpr Vec<T, N> operator+(const Vec& inRHS) const;

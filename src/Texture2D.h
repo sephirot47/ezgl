@@ -9,7 +9,7 @@ namespace egl
 template <typename T>
 class Image2D;
 
-class Texture2D : public Texture<GL::ETextureTarget::TEXTURE_2D>
+class Texture2D final : public Texture<GL::ETextureTarget::TEXTURE_2D>
 {
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::TEXTURE_2D>;

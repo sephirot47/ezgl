@@ -6,7 +6,7 @@ namespace egl
 {
 class Mesh;
 
-class MeshIO
+class MeshIO final
 {
 public:
   static void Read(const std::filesystem::path& inMeshPath, Mesh& ioMesh);

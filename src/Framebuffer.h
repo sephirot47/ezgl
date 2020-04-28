@@ -10,7 +10,7 @@
 
 namespace egl
 {
-class Framebuffer : public GLBindableObject<GL::EBindingType::FRAMEBUFFER>
+class Framebuffer final : public GLBindableObject<GL::EBindingType::FRAMEBUFFER>
 {
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::FRAMEBUFFER>;

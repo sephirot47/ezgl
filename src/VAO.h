@@ -14,7 +14,7 @@ class EBO;
 class VAOVertexAttrib;
 class VBO;
 
-class VAO : public GLBindableObject<GL::EBindingType::VAO>
+class VAO final : public GLBindableObject<GL::EBindingType::VAO>
 {
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::VAO>;

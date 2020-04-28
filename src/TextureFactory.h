@@ -6,7 +6,7 @@ namespace egl
 {
 class Texture2D;
 
-class TextureFactory
+class TextureFactory final
 {
 public:
   static std::shared_ptr<Texture2D> GetOneTexture();

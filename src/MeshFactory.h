@@ -4,7 +4,7 @@
 
 namespace egl
 {
-class MeshFactory
+class MeshFactory final
 {
 public:
   MeshFactory() = delete;

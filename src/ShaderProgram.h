@@ -12,7 +12,7 @@
 
 namespace egl
 {
-class ShaderProgram : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
+class ShaderProgram final : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
 {
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::SHADER_PROGRAM>;

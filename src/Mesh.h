@@ -15,7 +15,7 @@
 
 namespace egl
 {
-class Mesh
+class Mesh final
 {
 public:
   using Id = uint32_t;

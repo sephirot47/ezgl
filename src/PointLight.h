@@ -4,7 +4,7 @@
 
 namespace egl
 {
-class GLSLPointLight
+class GLSLPointLight final
 {
   public:
   Vec3f mPosition = Zero<Vec3f>();

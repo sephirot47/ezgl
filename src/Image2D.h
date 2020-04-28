@@ -8,7 +8,7 @@
 namespace egl
 {
 template <typename T = Color4f>
-class Image2D
+class Image2D final
 {
 public:
   Image2D();

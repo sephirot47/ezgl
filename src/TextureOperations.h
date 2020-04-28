@@ -10,7 +10,7 @@ class ShaderProgram;
 class Texture2D;
 class MeshDrawData;
 
-class TextureOperations
+class TextureOperations final
 {
 public:
   static void DrawFullScreenQuad();

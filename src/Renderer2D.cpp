@@ -31,6 +31,8 @@ Renderer2D::Renderer2D()
 
     sStaticResourcesInited = true;
   }
+
+  PushAllDefaultStateValues();
 }
 
 void Renderer2D::SetModelMatrix(const Mat3f& inModelMatrix)
@@ -71,19 +73,20 @@ void Renderer2D::PopState()
   mState.PopAll();
 }
 
-void Renderer2D::ResetState()
+void Renderer2D::PushAllDefaultStateValues()
 {
-  Renderer::ResetState();
-  mState.PopAll();
+  Renderer::PushAllDefaultStateValues();
   mState.PushAllDefaultValues();
-  mState.ApplyCurrentState();
+
+  // Override default states
+  Renderer::GetState().Top<Renderer::EStateId::DEPTH_FUNC>() = GL::EDepthFunc::ALWAYS;
+  Renderer::GetState().Top<Renderer::EStateId::DEPTH_WRITE_ENABLED>() = true;
 }
 
-void Renderer2D::Begin(const Window& inWindow)
+void Renderer2D::AdaptToWindow(const Window& inWindow)
 {
-  Renderer::Begin(inWindow);
+  Renderer::AdaptToWindow(inWindow);
 
-  SetDepthTestEnabled(true);
   AdaptCameraToWindow(inWindow);
 }
 
@@ -188,8 +191,6 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
   mState.ApplyCurrentState();
 
   GL::Disable(GL::EEnablable::CULL_FACE); // Guarded in DrawSetup2D
-  GL::DepthMask(true);                    // Guarded in DrawSetup2D. We want to draw depth for blitting purposes
-  GL::DepthFunc(GL::EDepthFunc::ALWAYS);  // Guarded in DrawSetup2D
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();

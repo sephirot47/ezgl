@@ -5,7 +5,7 @@
 namespace egl
 {
 template <typename TMesh>
-class MeshCirculatorVertexNeighborFaceIds
+class MeshCirculatorVertexNeighborFaceIds final
 {
 public:
   using MeshId = typename TMesh::Id;

@@ -57,7 +57,7 @@ public:
   void PushCamera() { mState.PushTop<Renderer2D::EStateId::CAMERA>(); }
   void PopCamera() { mState.Pop<Renderer2D::EStateId::CAMERA>(); }
   void ResetCamera() { mState.Reset<Renderer2D::EStateId::CAMERA>(); }
-  void AdaptCameraToWindow(const Window &inWindow);
+  void AdaptCameraToWindow(const Window& inWindow);
 
   // Transformation
   void SetModelMatrix(const Mat3f& inModelMatrix);
@@ -80,7 +80,7 @@ public:
   void ResetMaterial() { mState.Reset<Renderer2D::EStateId::MATERIAL>(); }
 
   // Draw
-  void Begin(const Window& inWindow);
+  void AdaptToWindow(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawPoint(const Vec2f& inPoint);
@@ -98,9 +98,8 @@ public:
   using State = RendererStateStacks<Renderer2D, StateTupleOfStacks>;
   friend class RendererStateStacks<Renderer2D, StateTupleOfStacks>;
 
-  void PushState() override;
-  void PopState() override;
-  void ResetState() override;
+  void PushState() final override;
+  void PopState() final override;
   State& GetState() { return mState; }
   const State& GetState() const { return mState; }
 
@@ -109,28 +108,33 @@ private:
   static bool sStaticResourcesInited;
   static std::shared_ptr<ShaderProgram> sShaderProgram;
 
+  // State
   State mState { *this };
 
+  // DrawSetup2D
+  class DrawSetup2D : public DrawSetup
+  {
+  private:
+    Material2D::GLGuardType mMaterial2DGuard;
+    GLEnableGuard<GL::EEnablable::CULL_FACE> mCullFaceEnableGuard;
+  };
+
+  // State functions
   template <Renderer2D::EStateId StateId>
   static void ApplyState(const State::ValueType<StateId>& inValue, State& ioState);
 
   template <Renderer2D::EStateId StateId>
   static State::ValueType<StateId> GetDefaultValue();
 
-  class DrawSetup2D : public DrawSetup
-  {
-  private:
-    Material2D::GLGuardType mMaterial2DGuard;
-    GLEnableGuard<GL::EEnablable::CULL_FACE> mCullFaceEnableGuard;
-    GLDepthMaskGuard mDepthMaskGuard;
-    GLDepthFuncGuard mDepthFuncGuard;
-  };
+  void PushAllDefaultStateValues() final override;
+
+  // Draw setup functions
   virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup2D>(); }
   virtual void PrepareForDraw(DrawSetup& ioDrawSetupPointer) override;
 };
 
 // clang-format off
-template <> struct StateIdRenderer<Renderer2D::EStateId> { using Type = Renderer2D; };
+template <> struct RendererFromEStateId<Renderer2D::EStateId> { using Type = Renderer2D; };
 // clang-format on
 }
 

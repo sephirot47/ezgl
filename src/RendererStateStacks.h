@@ -7,7 +7,7 @@
 namespace egl
 {
 template <typename TRenderer, typename TTupleOfStacks>
-class RendererStateStacks : public TTupleOfStacks
+class RendererStateStacks final : public TTupleOfStacks
 {
 public:
   using TEStateId = typename TTupleOfStacks::IndexType;
@@ -21,7 +21,7 @@ public:
   using TTupleOfStacks::Pop;
   using TTupleOfStacks::Push;
 
-  RendererStateStacks(TRenderer& ioRenderer) : mRenderer(ioRenderer) { PushAllDefaultValues(); }
+  RendererStateStacks(TRenderer& ioRenderer) : mRenderer(ioRenderer) { }
 
   template <TEStateId StateId>
   auto& GetCurrent()

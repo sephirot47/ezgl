@@ -5,7 +5,7 @@
 namespace egl
 {
 template <typename T, std::size_t N>
-struct OrthographicParameters
+struct OrthographicParameters final
 {
   static constexpr auto VariantIndex = 0;
 

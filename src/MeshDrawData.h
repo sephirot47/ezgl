@@ -10,7 +10,7 @@
 
 namespace egl
 {
-class MeshDrawData
+class MeshDrawData final
 {
 public:
   using GLGuardType = GLMultiGuard<VAO>;

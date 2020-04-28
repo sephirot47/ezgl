@@ -4,7 +4,7 @@ namespace egl
 {
 
 template <typename TIterator>
-class Range
+class Range final
 {
 public:
   Range(TIterator inBegin, TIterator inEnd) : mBegin(inBegin), mEnd(inEnd) {}

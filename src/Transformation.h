@@ -11,7 +11,7 @@ template <typename TTransformation> struct TransformationRotationType { using Ty
 // clang-format on
 
 template <typename T, std::size_t N>
-class Transformation
+class Transformation final
 {
 public:
   using ValueType = T;

@@ -11,7 +11,7 @@
 namespace egl
 {
 template <GL::EShaderType TShaderType>
-class Shader : public GLObject<GL::GetObjectType<TShaderType>()>
+class Shader final : public GLObject<GL::GetObjectType<TShaderType>()>
 {
 public:
   static constexpr auto GLObjectType = GL::GetObjectType<TShaderType>();

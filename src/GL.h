@@ -4,6 +4,7 @@
 #include "Flags.h"
 #include "Macros.h"
 #include "Mat.h"
+#include "Rect.h"
 #include "Span.h"
 #include "Vec.h"
 #include <GL/glew.h>
@@ -14,13 +15,16 @@
 namespace egl
 {
 
-class GL
+class GL final
 {
 public:
   using Char = GLchar;
   using Byte = GLbyte;
   using Uint = GLuint;
+  using Boolean = GLboolean;
   using Int = GLint;
+  using Float = GLfloat;
+  using Double= GLdouble;
   using Id = GLuint;
   using Size = GLsizei;
   using Enum = GLenum;
@@ -422,7 +426,7 @@ public:
     ALWAYS = GL_ALWAYS,
   };
 
-  enum class EGetInteger
+  enum class EGetEnum
   {
     ACTIVE_TEXTURE = GL_ACTIVE_TEXTURE,
     ALIASED_LINE_WIDTH_RANGE = GL_ALIASED_LINE_WIDTH_RANGE,
@@ -629,6 +633,36 @@ public:
     TEXTURE_BINDING_BUFFER = GL_TEXTURE_BINDING_BUFFER,
     TEXTURE_BINDING_CUBE_MAP = GL_TEXTURE_BINDING_CUBE_MAP,
     TEXTURE_BINDING_RECTANGLE = GL_TEXTURE_BINDING_RECTANGLE,
+    TEXTURE_COMPRESSION_HINT = GL_TEXTURE_COMPRESSION_HINT,
+    TEXTURE_BUFFER_OFFSET_ALIGNMENT = GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT,
+    TIMESTAMP = GL_TIMESTAMP,
+    TRANSFORM_FEEDBACK_BUFFER_BINDING = GL_TRANSFORM_FEEDBACK_BUFFER_BINDING,
+    TRANSFORM_FEEDBACK_BUFFER_START = GL_TRANSFORM_FEEDBACK_BUFFER_START,
+    TRANSFORM_FEEDBACK_BUFFER_SIZE = GL_TRANSFORM_FEEDBACK_BUFFER_SIZE,
+    UNIFORM_BUFFER_BINDING = GL_UNIFORM_BUFFER_BINDING,
+    UNIFORM_BUFFER_OFFSET_ALIGNMENT = GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
+    UNIFORM_BUFFER_SIZE = GL_UNIFORM_BUFFER_SIZE,
+    UNIFORM_BUFFER_START = GL_UNIFORM_BUFFER_START,
+    UNPACK_ALIGNMENT = GL_UNPACK_ALIGNMENT,
+    UNPACK_IMAGE_HEIGHT = GL_UNPACK_IMAGE_HEIGHT,
+    UNPACK_LSB_FIRST = GL_UNPACK_LSB_FIRST,
+    UNPACK_ROW_LENGTH = GL_UNPACK_ROW_LENGTH,
+    UNPACK_SKIP_IMAGES = GL_UNPACK_SKIP_IMAGES,
+    UNPACK_SKIP_PIXELS = GL_UNPACK_SKIP_PIXELS,
+    UNPACK_SKIP_ROWS = GL_UNPACK_SKIP_ROWS,
+    UNPACK_SWAP_BYTES = GL_UNPACK_SWAP_BYTES,
+    VERTEX_ARRAY_BINDING = GL_VERTEX_ARRAY_BINDING,
+    VERTEX_BINDING_DIVISOR = GL_VERTEX_BINDING_DIVISOR,
+    VERTEX_BINDING_OFFSET = GL_VERTEX_BINDING_OFFSET,
+    VERTEX_BINDING_STRIDE = GL_VERTEX_BINDING_STRIDE,
+    VERTEX_BINDING_BUFFER = GL_VERTEX_BINDING_BUFFER,
+    MAX_VERTEX_ATTRIB_RELATIVE_OFFSET = GL_MAX_VERTEX_ATTRIB_RELATIVE_OFFSET,
+    MAX_VERTEX_ATTRIB_BINDINGS = GL_MAX_VERTEX_ATTRIB_BINDINGS,
+    VIEWPORT = GL_VIEWPORT,
+    VIEWPORT_BOUNDS_RANGE = GL_VIEWPORT_BOUNDS_RANGE,
+    VIEWPORT_INDEX_PROVOKING_VERTEX = GL_VIEWPORT_INDEX_PROVOKING_VERTEX,
+    VIEWPORT_SUBPIXEL_BITS = GL_VIEWPORT_SUBPIXEL_BITS,
+    MAX_ELEMENT_INDEX = GL_MAX_ELEMENT_INDEX,
   };
 
   enum class ETextureCompareMode
@@ -659,10 +693,15 @@ public:
   static GL::EBlendFactor GetDestBlendFactorAlpha();
 
   static void PointSize(const float inPointSize);
+  static float GetPointSize();
+
   static void LineWidth(const float inLineWidth);
+  static float GetLineWidth();
 
   static void Viewport(const int inX, const int inY, const int inWidth, const int inHeight);
   static void Viewport(const Vec2i& inXY, const Vec2i& inSize);
+  static void Viewport(const Recti& inViewport);
+  static Recti GetViewport();
 
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();
@@ -739,9 +778,7 @@ public:
 
   static GL::Id GenRenderbuffer();
   static GL::Id CreateRenderbuffer();
-  static void RenderbufferStorage(const GL::ETextureFormat inFormat,
-      const GL::Size inWidth,
-      const GL::Size inHeight);
+  static void RenderbufferStorage(const GL::ETextureFormat inFormat, const GL::Size inWidth, const GL::Size inHeight);
   static void BindRenderbuffer(const GL::Id inRenderbufferId);
   static void DeleteRenderbuffer(const GL::Id inRenderbufferId);
 
@@ -795,7 +832,13 @@ public:
   UniformBlockBinding(const GL::Id inShaderProgramId, const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint);
   static void DeleteProgram(const GL::Id inShaderProgramId);
 
-  static GL::Int GetInteger(const GL::EGetInteger inGetIntegerId);
+  static bool GetBoolean(const GL::EGetEnum inGetBooleanId);
+  static GL::Int GetInteger(const GL::EGetEnum inGetIntegerId);
+  static GL::Float GetFloat(const GL::EGetEnum inGetFloatId);
+  static GL::Double GetDouble(const GL::EGetEnum inGetDoubleId);
+
+  template <std::size_t N>
+  static std::array<GL::Int, N> GetIntegers(const GL::EGetEnum inGetIntegerId);
 
   static void GLAPIENTRY ErrorCallback(GL::Enum inSource,
       GL::Enum inType,
@@ -825,7 +868,7 @@ public:
   static void UnBind();
   static GL::Id GetBoundGLId(const GL::EBindingType inBindingType)
   {
-    return GL::GetInteger(static_cast<GL::EGetInteger>(inBindingType));
+    return GL::GetInteger(static_cast<GL::EGetEnum>(inBindingType));
   }
 
   // To ObjectType conversions

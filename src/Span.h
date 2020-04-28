@@ -8,7 +8,7 @@
 namespace egl
 {
 template <typename T>
-struct Span
+struct Span final
 {
 public:
   using ValueType = T;

@@ -66,9 +66,17 @@ void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioSta
   {
     ioState.GetRenderer().SetOverrideFramebuffer(inValue);
   }
-  else if constexpr (StateId == Renderer::EStateId::DEPTH_ENABLED)
+  else if constexpr (StateId == Renderer::EStateId::VIEWPORT)
   {
-    GL::SetEnabled(GL::EEnablable::DEPTH_TEST, inValue);
+    GL::Viewport(inValue.GetMin(), inValue.GetMax());
+  }
+  else if constexpr (StateId == Renderer::EStateId::DEPTH_FUNC)
+  {
+    GL::DepthFunc(inValue);
+  }
+  else if constexpr (StateId == Renderer::EStateId::DEPTH_WRITE_ENABLED)
+  {
+    GL::DepthMask(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::BLEND_ENABLED)
   {
@@ -111,7 +119,15 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   {
     return nullptr;
   }
-  else if constexpr (StateId == Renderer::EStateId::DEPTH_ENABLED)
+  else if constexpr (StateId == Renderer::EStateId::VIEWPORT)
+  {
+    return Recti(Zero<Vec2i>(), Zero<Vec2i>());
+  }
+  else if constexpr (StateId == Renderer::EStateId::DEPTH_FUNC)
+  {
+    return GL::EDepthFunc::LESS;
+  }
+  else if constexpr (StateId == Renderer::EStateId::DEPTH_WRITE_ENABLED)
   {
     return true;
   }

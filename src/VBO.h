@@ -5,7 +5,7 @@
 namespace egl
 {
 
-class VBO : public Buffer<GL::EBufferType::VBO>
+class VBO final : public Buffer<GL::EBufferType::VBO>
 {
 public:
   using GLGuardType = GLBindGuard<GL::EBindingType::VBO>;

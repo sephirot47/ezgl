@@ -6,7 +6,7 @@
 namespace egl
 {
 template <typename T, std::size_t N>
-class Segment
+class Segment final
 {
 public:
   using ValueType = T;

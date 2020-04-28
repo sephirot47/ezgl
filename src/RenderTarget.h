@@ -7,7 +7,7 @@ namespace egl
 {
 class Texture2D;
 
-class RenderTarget
+class RenderTarget final
 {
 public:
   RenderTarget();

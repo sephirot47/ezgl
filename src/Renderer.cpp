@@ -32,6 +32,8 @@ Renderer::Renderer()
   mDefaultRenderTarget
       = std::make_shared<RenderTarget>(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8);
   mDefaultFramebuffer = std::make_shared<Framebuffer>();
+
+  // Renderer subclasses must call PushAllDefaultValues() in their constructor...!
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -54,11 +56,6 @@ void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
 {
   ClearBackground(inClearColor);
   ClearDepth(inClearDepth);
-}
-
-void Renderer::SetDepthTestEnabled(const bool inDepthTestEnabled)
-{
-  mState.GetCurrent<Renderer::EStateId::DEPTH_ENABLED>() = inDepthTestEnabled;
 }
 
 void Renderer::SetBlendEnabled(const bool inBlendEnabled)
@@ -124,14 +121,16 @@ void Renderer::Blit()
 }
 
 void Renderer::PushState() { mState.PushAllTops(); }
+
 void Renderer::PopState() { mState.PopAll(); }
 
 void Renderer::ResetState()
 {
-  mState.PopAll();
-  mState.PushAllDefaultValues();
-  mState.ApplyCurrentState();
+  PopState();
+  PushAllDefaultStateValues();
 }
+
+void Renderer::PushAllDefaultStateValues() { mState.PushAllDefaultValues(); }
 
 void Renderer::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
 {
@@ -151,11 +150,11 @@ void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDra
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // TODO: Restore this properly
 }
 
-void Renderer::Begin(const Window& inWindow)
+void Renderer::AdaptToWindow(const Window& inWindow)
 {
-  ResetState();
-  GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
-  mDefaultRenderTarget->Resize(inWindow.GetSize());
+  SetViewport(Recti(Zero<Vec2i>(), inWindow.GetFramebufferSize()));
+  GetRenderTarget()->Resize(inWindow.GetFramebufferSize());
+  GetFramebuffer()->Resize(inWindow.GetFramebufferSize());
 }
 
 void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
@@ -214,6 +213,8 @@ void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
 
   // Prepare framebuffer
   BindFramebuffer();
+
+  GL::Enable(GL::EEnablable::DEPTH_TEST); // Guarded in DrawSetup
 
   mState.ApplyCurrentState();
 }

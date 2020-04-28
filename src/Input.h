@@ -188,7 +188,7 @@ struct KeyOrButtonEvent
   bool IsSuperModifierPressed() const { return (mModifiers & ModifierKey::SUPER) != ModifierKey::NONE; }
 };
 
-struct KeyEvent : public KeyOrButtonEvent
+struct KeyEvent final : public KeyOrButtonEvent
 {
   KeyAction mAction = KeyAction::UNKNOWN;
   Key mKey = Key::UNKNOWN;
@@ -199,7 +199,7 @@ struct KeyEvent : public KeyOrButtonEvent
   bool IsRelease() const { return mAction == KeyAction::RELEASE; }
 };
 
-struct MouseButtonEvent : public KeyOrButtonEvent
+struct MouseButtonEvent final : public KeyOrButtonEvent
 {
   MouseAction mAction = MouseAction::UNKNOWN;
   MouseButton mButton = MouseButton::UNKNOWN;
@@ -208,24 +208,24 @@ struct MouseButtonEvent : public KeyOrButtonEvent
   bool IsRelease() const { return mAction == MouseAction::RELEASE; }
 };
 
-struct MouseMoveEvent
+struct MouseMoveEvent final
 {
   Vec2f mPosition = Vec2f(0.0f, 0.0f);
 };
 
-struct MouseEnterExitEvent
+struct MouseEnterExitEvent final
 {
   bool mEntered = false; // If true mouse has entered. If false mouse has exited.
 };
 
-struct MouseScrollEvent
+struct MouseScrollEvent final
 {
   Vec2f mDeltaScroll = Vec2f(0.0f, 0.0f);
 };
 
 using VariantInputEvent
     = std::variant<KeyEvent, MouseButtonEvent, MouseMoveEvent, MouseEnterExitEvent, MouseScrollEvent>;
-struct InputEvent : public VariantInputEvent
+struct InputEvent final : public VariantInputEvent
 {
   using VariantInputEvent::operator=;
 

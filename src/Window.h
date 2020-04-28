@@ -15,10 +15,10 @@ namespace egl
 {
 struct InputListener;
 
-class Window
+class Window final
 {
 public:
-  struct CreateOptions
+  struct CreateOptions final
   {
     CreateOptions() {};
 
