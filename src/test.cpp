@@ -69,7 +69,7 @@ int main()
   window->Loop([&](const DeltaTime& inDeltaTime) {
     time += inDeltaTime;
 
-    GL::ClearColor(Gray());
+    GL::ClearColor(Gray<Color4f>());
     GL::ClearDepth();
 
     renderer3D.ResetState();
@@ -83,7 +83,7 @@ int main()
       RendererStateGuardAll<Renderer3D> guard(renderer3D);
 
       renderer3D.SetLineWidth(5.0f);
-      renderer3D.Clear(Pink());
+      renderer3D.Clear(Pink<Color4f>());
 
       renderer3D.SetCamera(camera3d);
       renderer3D.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
@@ -96,17 +96,17 @@ int main()
       renderer3D.Rotate(q);
       renderer3D.GetMaterial().SetTexture(nullptr);
       renderer3D.Scale(All<Vec3f>(5.0f));
-      renderer3D.GetMaterial().SetDiffuseColor(White());
+      renderer3D.GetMaterial().SetDiffuseColor(White<Color4f>());
       renderer3D.GetMaterial().SetLightingEnabled(true);
       renderer3D.GetMaterial().SetSpecularExponent(120.0f);
       renderer3D.DrawMesh(test_mesh);
       // renderer3D.DrawMesh(circle);
       renderer3D.DrawAxes();
-      renderer3D.GetMaterial().SetDiffuseColor(Blue());
+      renderer3D.GetMaterial().SetDiffuseColor(Blue<Color4f>());
       renderer3D.DrawMesh(test_mesh, Renderer::EDrawType::WIREFRAME);
 
       renderer3D.SetPointSize(1.0f);
-      renderer3D.GetMaterial().SetDiffuseColor(Red());
+      renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
       renderer3D.DrawMesh(test_mesh, Renderer::EDrawType::POINTS);
     }
 
@@ -123,13 +123,13 @@ int main()
 
       renderer3D.ResetState();
       renderer3D.AdaptToWindow(*window);
-      renderer3D.Clear(Blue());
+      renderer3D.Clear(Blue<Color4f>());
 
       renderer3D.GetCamera()->SetPosition(Back<Vec3f>() * 8.0f);
       renderer3D.GetCamera()->LookAtPoint(Zero<Vec3f>());
 
       renderer3D.ResetMaterial();
-      renderer3D.Rotate(AngleAxis(0.5f, Forward()));
+      renderer3D.Rotate(AngleAxis(0.5f, Forward<Vec3f>()));
       renderer3D.Scale(All<Vec3f>(14.0f));
       renderer3D.GetMaterial().SetLightingEnabled(false);
       renderer3D.GetMaterial().SetTexture(render_target->GetColorTexture());
@@ -137,9 +137,9 @@ int main()
 
       const auto triangle = Triangle3f(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1.0f, 5.0f, -3.0f), Vec3f(-5.0f, 1.0f, 3.0f));
       renderer3D.Scale(0.4f);
-      renderer3D.GetMaterial().SetDiffuseColor(Red());
+      renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
       renderer3D.DrawTriangle(triangle);
-      renderer3D.GetMaterial().SetDiffuseColor(Blue());
+      renderer3D.GetMaterial().SetDiffuseColor(Blue<Color4f>());
       renderer3D.SetLineWidth(10.0f);
       renderer3D.DrawSegments(MakeSpan({ Segment3f { triangle[0], triangle[1] },
           Segment3f { triangle[1], triangle[2] },
@@ -156,14 +156,14 @@ int main()
     renderer2D.SetCamera(camera2d);
     renderer2D.AdaptCameraToWindow(*window);
     renderer2D.SetPointSize(15.0f);
-    renderer2D.GetMaterial().SetColor(Red());
+    renderer2D.GetMaterial().SetColor(Red<Color4f>());
     renderer2D.DrawPoint(Vec2f(400.0f, 400.0f));
     renderer2D.DrawSegment(Segment2f { Vec2f { 0.0f, 0.0f }, Vec2f { 500.0f, 800.0f } });
 
     const auto triangle = Triangle2f(Vec2f(10.0f, 50.0f), Vec2f(50.0f, 100.0f), Vec2f(20.0f, 5.0f));
     renderer2D.DrawTriangle(triangle);
 
-    renderer2D.GetMaterial().SetColor(Blue());
+    renderer2D.GetMaterial().SetColor(Blue<Color4f>());
     renderer2D.DrawTriangleBoundary(triangle);
 
     renderer2D.Blit();

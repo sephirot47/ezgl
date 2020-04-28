@@ -194,13 +194,13 @@ void Renderer3D::DrawAxes()
   RENDERER_STATE_GUARD(this, Renderer3D::EStateId::MATERIAL);
   ResetMaterial();
 
-  GetMaterial().SetDiffuseColor(Red());
+  GetMaterial().SetDiffuseColor(Red<Color4f>());
   DrawArrow(Segment3f { Zero<Vec3f>(), Right<Vec3f>() });
 
-  GetMaterial().SetDiffuseColor(Green());
+  GetMaterial().SetDiffuseColor(Green<Color4f>());
   DrawArrow(Segment3f { Zero<Vec3f>(), Up<Vec3f>() });
 
-  GetMaterial().SetDiffuseColor(Blue());
+  GetMaterial().SetDiffuseColor(Blue<Color4f>());
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 }
 

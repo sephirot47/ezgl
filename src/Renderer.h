@@ -74,7 +74,7 @@ public:
   // Clears
   void ClearBackground(const Color4f& inClearColor);
   void ClearDepth(const float inClearDepth = 1.0f);
-  void Clear(const Color4f& inClearColor = Black(), const float inClearDepth = 1.0f);
+  void Clear(const Color4f& inClearColor = Black<Color4f>(), const float inClearDepth = 1.0f);
 
   // Depth func
   void SetDepthFunc(const GL::EDepthFunc inDepthFunc);

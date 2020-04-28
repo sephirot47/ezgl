@@ -24,7 +24,7 @@ public:
 
 private:
   std::shared_ptr<Texture2D> mTexture;
-  Color4f mColor = White();
+  Color4f mColor = White<Color4f>();
 };
 
 }

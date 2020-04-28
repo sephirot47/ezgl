@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Color.h"
 #include "GLGuard.h"
-#include "Math.h"
+#include "MathInitializers.h"
 #include <memory>
 
 namespace egl
@@ -38,8 +39,7 @@ private:
   std::shared_ptr<Texture2D> mTexture = nullptr;
 
   bool mLightingEnabled = true;
-  ;
-  Color4f mDiffuseColor = White();
+  Color4f mDiffuseColor = White<Color4f>();
   float mSpecularIntensity = 1.0f;
   float mSpecularExponent = 60.0f;
 };

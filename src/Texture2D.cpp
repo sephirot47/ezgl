@@ -14,8 +14,7 @@ Texture2D::Texture2D() : Texture()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
-Texture2D::Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat)
-    : Texture2D()
+Texture2D::Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat) : Texture2D()
 {
   SetEmptyData(inWidth, inHeight, inFormat);
 }
@@ -76,7 +75,7 @@ Image2D<Color4f> Texture2D::GetImage(const bool inInvertY, const int inMipmapLev
 {
   EXPECTS(inMipmapLevel >= 0);
 
-  Image2D<Color4f> texture_image(GetWidth(), GetHeight(), Black());
+  Image2D<Color4f> texture_image(GetWidth(), GetHeight(), Zero<Color4f>());
   const auto pixels = GL::GetTextureImage<Color4f>(GetGLId(),
       GL::ETextureInputFormat::RGBA,
       GL::EDataType::FLOAT,
