@@ -66,7 +66,7 @@ constexpr auto Distance(const T& inLHS, const T& inRHS)
 }
 
 template <typename T>
-constexpr bool VeryEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
+constexpr bool IsVeryEqual(const T& inLHS, const T& inRHS, const T& inEpsilon = static_cast<T>(1e-6))
 {
   return Distance(inLHS, inRHS) < inEpsilon;
 }
@@ -75,7 +75,7 @@ template <typename T>
 constexpr bool IsNormalized(const T& inV)
 {
   using ValueType = typename T::ValueType;
-  return VeryEqual(SqLength(inV), static_cast<ValueType>(1));
+  return IsVeryEqual(SqLength(inV), static_cast<ValueType>(1));
 }
 
 template <typename T>
@@ -187,7 +187,7 @@ constexpr Vec3<T> AngleAxis(const Quat<T>& inQuat)
   const auto angle = static_cast<T>(2) * std::acos(inQuat[3]);
   const auto wSquared = inQuat[3] * inQuat[3];
   const auto oneMinusWSquared = (static_cast<T>(1) - wSquared);
-  if (VeryEqual(oneMinusWSquared, static_cast<T>(0)))
+  if (IsVeryEqual(oneMinusWSquared, static_cast<T>(0)))
     return Zero<Vec3<T>>();
 
   const auto sqrt = std::sqrt(oneMinusWSquared);
@@ -220,10 +220,10 @@ constexpr std::tuple<Vec3<T>, Vec3<T>, Vec3<T>> Axes(const Vec3<T>& inForwardVec
 
   auto up_vector = inUpVectorNormalized;
   auto right_vector = Zero<Vec3f>();
-  if (VeryParallel(forward_vector, up_vector))
+  if (IsVeryParallel(forward_vector, up_vector))
   {
     right_vector = Right<Vec3f>();
-    if (VeryParallel(right_vector, forward_vector))
+    if (IsVeryParallel(right_vector, forward_vector))
       right_vector = Normalized(Vec3f(0.5f, 0.5f, 0.0f));
 
     up_vector = Normalized(Cross(right_vector, forward_vector));
@@ -239,9 +239,9 @@ constexpr std::tuple<Vec3<T>, Vec3<T>, Vec3<T>> Axes(const Vec3<T>& inForwardVec
   ENSURES(IsNormalized(up_vector));
   ENSURES(IsNormalized(right_vector));
 
-  ENSURES(VeryPerpendicular(forward_vector, up_vector));
-  ENSURES(VeryPerpendicular(forward_vector, right_vector));
-  ENSURES(VeryPerpendicular(up_vector, right_vector));
+  ENSURES(IsVeryPerpendicular(forward_vector, up_vector));
+  ENSURES(IsVeryPerpendicular(forward_vector, right_vector));
+  ENSURES(IsVeryPerpendicular(up_vector, right_vector));
 
   return { right_vector, up_vector, forward_vector };
 }
@@ -423,15 +423,15 @@ constexpr Quat<T> FromTo(const Vec3<T>& inFromNormalized, const Vec3<T>& inToNor
 }
 
 template <typename T>
-constexpr bool VeryParallel(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
+constexpr bool IsVeryParallel(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
 {
-  return VeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(1));
+  return IsVeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(1));
 }
 
 template <typename T>
-constexpr bool VeryPerpendicular(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
+constexpr bool IsVeryPerpendicular(const Vec3<T>& inDirection0, const Vec3<T>& inDirection1)
 {
-  return VeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(0));
+  return IsVeryEqual(Abs(Dot(inDirection0, inDirection1)), static_cast<T>(0));
 }
 
 template <typename T>
