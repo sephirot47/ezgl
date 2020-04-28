@@ -11,6 +11,7 @@
 #include "Mesh.h"
 #include "MeshDrawData.h"
 #include "MeshFactory.h"
+#include "RenderTarget.h"
 #include "Renderer.h"
 #include "Renderer2D.h"
 #include "Renderer3D.h"
@@ -54,13 +55,13 @@ int main()
   camera3d->SetPosition(Back<Vec3f>() * 12.0f); // Random(All<Vec3f>(0.0f), All<Vec3f>(10.0f)));
   camera3d->LookAtPoint(Zero<Vec3f>());
 
+  const auto render_target = std::make_shared<RenderTarget>();
+
   const auto camera2d = std::make_shared<OrthographicCamera2f>();
 
   CameraControllerFly3f camera_controller_fly;
   camera_controller_fly.SetCamera(camera3d);
   camera_controller_fly.SetWindow(window);
-
-  const auto render_texture = std::make_shared<Texture2D>(1024, 1024, GL::ETextureInternalFormat::RGBA8);
 
   auto time = TimeDuration { 0 };
   window->Loop([&](const DeltaTime& inDeltaTime) {
@@ -73,12 +74,12 @@ int main()
       Renderer3D renderer3D;
       renderer3D.Begin(*window);
 
+      render_target->Resize(window->GetSize());
       if (window->IsKeyPressed(Key::X))
-        renderer3D.SetOverrideRenderTexture(render_texture);
+        renderer3D.SetOverrideRenderTarget(render_target);
 
       renderer3D.SetLineWidth(5.0f);
       renderer3D.Clear(Pink());
-      render_texture->Resize(window->GetSize());
 
       renderer3D.SetCamera(camera3d);
       renderer3D.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
@@ -117,7 +118,7 @@ int main()
         renderer3D.Rotate(AngleAxis(0.5f, Forward()));
         renderer3D.Scale(All<Vec3f>(14.0f));
         renderer3D.GetMaterial().SetLightingEnabled(false);
-        renderer3D.GetMaterial().SetTexture(render_texture);
+        renderer3D.GetMaterial().SetTexture(render_target->GetColorTexture());
         renderer3D.DrawMesh(MeshFactory::GetPlane());
 
         const auto triangle = Triangle3f(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1.0f, 5.0f, -3.0f), Vec3f(-5.0f, 1.0f, 3.0f));

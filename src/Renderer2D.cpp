@@ -180,21 +180,16 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
   Renderer::PrepareForDraw(ioDrawSetup);
 
-  const auto& draw_setup_2d = static_cast<DrawSetup2D&>(ioDrawSetup);
+  const auto& draw_setup_2d = static_cast<const DrawSetup2D&>(ioDrawSetup);
   assert(draw_setup_2d.mShaderProgram);
   auto& shader_program = *draw_setup_2d.mShaderProgram;
   assert(shader_program.IsBound());
 
   mState.ApplyCurrentState();
 
-  const GLEnableGuard<GL::EEnablable::CULL_FACE> cull_face_enabled_guard;
-  GL::Disable(GL::EEnablable::CULL_FACE);
-
-  const GLDepthMaskGuard depth_mask_guard;
-  GL::DepthMask(true); // We want to draw depth for blitting purposes
-
-  const GLDepthFuncGuard depth_func_guard;
-  GL::DepthFunc(GL::EDepthFunc::ALWAYS);
+  GL::Disable(GL::EEnablable::CULL_FACE); // Guarded in DrawSetup2D
+  GL::DepthMask(true);                    // Guarded in DrawSetup2D. We want to draw depth for blitting purposes
+  GL::DepthFunc(GL::EDepthFunc::ALWAYS);  // Guarded in DrawSetup2D
 
   const auto& model_matrix = GetModelMatrix();
   const auto& current_camera = GetCamera();

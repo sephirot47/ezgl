@@ -120,7 +120,10 @@ private:
   class DrawSetup2D : public DrawSetup
   {
   private:
-    GLMultiGuard<Material2D> mGuard;
+    Material2D::GLGuardType mMaterial2DGuard;
+    GLEnableGuard<GL::EEnablable::CULL_FACE> mCullFaceEnableGuard;
+    GLDepthMaskGuard mDepthMaskGuard;
+    GLDepthFuncGuard mDepthFuncGuard;
   };
   virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup2D>(); }
   virtual void PrepareForDraw(DrawSetup& ioDrawSetupPointer) override;

@@ -58,9 +58,9 @@ void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioSta
   {
     ioState.GetRenderer().SetOverrideShaderProgram(inValue);
   }
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TEXTURE)
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TARGET)
   {
-    ioState.GetRenderer().SetOverrideRenderTexture(inValue);
+    ioState.GetRenderer().SetOverrideRenderTarget(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
   {
@@ -103,7 +103,7 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   {
     return nullptr;
   }
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TEXTURE)
+  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TARGET)
   {
     return nullptr;
   }

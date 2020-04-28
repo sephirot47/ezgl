@@ -11,28 +11,36 @@ class GLNoOpGuard final
 {
 };
 
-template <typename TValue, auto TGetFunction, auto TSetFunction, typename... TExtraValues>
+template <auto TGetFunction, auto TSetFunction, typename... TExtraValues>
 class GLGenericGuard final
 {
 public:
-  GLGenericGuard(TExtraValues&&... ioExtraValues) : mExtraValues(std::forward<TExtraValues>(ioExtraValues)...)
+  using TValue = std::remove_const_t<std::remove_reference_t<decltype(TGetFunction(std::declval<TExtraValues>()...))>>;
+
+  GLGenericGuard(TExtraValues&&... ioExtraValues)
+      : mExtraValues(std::forward<TExtraValues>(ioExtraValues)...), mValueOpt([&]() {
+          if constexpr (sizeof...(TExtraValues) == 0)
+          {
+            return TGetFunction();
+          }
+          else
+          {
+            return TGetFunction(mExtraValues);
+          }
+        }())
   {
-    if constexpr (sizeof...(TExtraValues) == 0)
-    {
-      mValueOpt = TGetFunction();
-    }
-    else
-    {
-      mValueOpt = TGetFunction(mExtraValues);
-    }
+    ENSURES(mValueOpt.has_value());
   }
+
   GLGenericGuard(const GLGenericGuard& inRHS) = delete;
   GLGenericGuard& operator=(const GLGenericGuard& inRHS) = delete;
+
   GLGenericGuard(GLGenericGuard&& ioRHS)
   {
     EXPECTS(!mValueOpt.has_value());
     mExtraValues = std::move(ioRHS.mExtraValues);
-    std::swap(mValueOpt, ioRHS.mValueOpt);
+    mValueOpt = std::move(ioRHS.mValueOpt);
+    ENSURES(mValueOpt.has_value());
   }
   GLGenericGuard& operator=(GLGenericGuard&& ioRHS) = delete;
 
@@ -60,33 +68,33 @@ public:
 // GLBindGuard
 template <GL::EBindingType TBindingType> GL::Id GLBindGuardGet() { return GL::GetBoundGLId(TBindingType); }
 template <GL::EBindingType TBindingType> void GLBindGuardSet(const GL::Id inId) { GL::Bind<TBindingType>(inId); }
-template <GL::EBindingType TBindingType> using GLBindGuard = GLGenericGuard<GL::Id, GLBindGuardGet<TBindingType>, GLBindGuardSet<TBindingType>>;
+template <GL::EBindingType TBindingType> using GLBindGuard = GLGenericGuard<GLBindGuardGet<TBindingType>, GLBindGuardSet<TBindingType>>;
 
 // GLEnableGuard
 template <GL::EEnablable TEnablable> GL::Id GLEnableGuardGet() { return GL::IsEnabled(TEnablable); }
 template <GL::EEnablable TEnablable> void GLEnableGuardSet(const bool inEnable) { GL::SetEnabled(TEnablable, inEnable); }
-template <GL::EEnablable TEnablable> using GLEnableGuard = GLGenericGuard<bool, GLEnableGuardGet<TEnablable>, GLEnableGuardSet<TEnablable>>;
+template <GL::EEnablable TEnablable> using GLEnableGuard = GLGenericGuard<GLEnableGuardGet<TEnablable>, GLEnableGuardSet<TEnablable>>;
 
 // GLDepthMaskGuard
-inline bool GLDepthMaskGuardGet() { return GL::GL::GetDepthMask(); }
+inline bool GLDepthMaskGuardGet() { return GL::GetDepthMask(); }
 inline void GLDepthMaskGuardSet(const bool inDepthMask) { GL::DepthMask(inDepthMask); }
-using GLDepthMaskGuard = GLGenericGuard<bool, GLDepthMaskGuardGet, GLDepthMaskGuardSet>;
+using GLDepthMaskGuard = GLGenericGuard<GLDepthMaskGuardGet, GLDepthMaskGuardSet>;
 
 // GLDepthFuncGuard
 inline GL::EDepthFunc GLDepthFuncGuardGet() { return GL::GetDepthFunc(); }
 inline void GLDepthFuncGuardSet(const GL::EDepthFunc inDepthFunc) { GL::DepthFunc(inDepthFunc); }
-using GLDepthFuncGuard = GLGenericGuard<GL::EDepthFunc, GLDepthFuncGuardGet, GLDepthFuncGuardSet>;
+using GLDepthFuncGuard = GLGenericGuard<GLDepthFuncGuardGet, GLDepthFuncGuardSet>;
 
 // GLBlendFuncGuard
 inline std::array<GL::EBlendFactor, 4> GLBlendFuncGuardGet()
 { return std::array { GL::GetSourceBlendFactorRGB(), GL::GetDestBlendFactorRGB(), GL::GetSourceBlendFactorAlpha(), GL::GetDestBlendFactorAlpha() }; }
 inline void GLBlendFuncGuardSet(const std::array<GL::EBlendFactor, 4>& inBlendFactors) { GL::BlendFuncSeparate(inBlendFactors[0], inBlendFactors[1], inBlendFactors[2], inBlendFactors[3]); }
-using GLBlendFuncGuard = GLGenericGuard<std::array<GL::EBlendFactor, 4>, GLBlendFuncGuardGet, GLBlendFuncGuardSet>;
+using GLBlendFuncGuard = GLGenericGuard<GLBlendFuncGuardGet, GLBlendFuncGuardSet>;
 
 // GLTextureParameteriGuard
 template <GL::ETextureParameter TTextureParameter> inline GL::Int GLTextureParameteriGuardGet(const std::tuple<GL::Id>& inTextureId) { return GL::GetTextureParameteri(std::get<0>(inTextureId), TTextureParameter); }
 template <GL::ETextureParameter TTextureParameter> inline void GLTextureParameteriGuardSet(const GL::Int inValue, const std::tuple<GL::Id>& inTextureId) { GL::TextureParameteri(std::get<0>(inTextureId), TTextureParameter, inValue); }
-template <GL::ETextureParameter TTextureParameter> using GLTextureParameteriGuard = GLGenericGuard<GL::Int, GLTextureParameteriGuardGet<TTextureParameter>, GLTextureParameteriGuardSet<TTextureParameter>, GL::Id>;
+template <GL::ETextureParameter TTextureParameter> using GLTextureParameteriGuard = GLGenericGuard<GLTextureParameteriGuardGet<TTextureParameter>, GLTextureParameteriGuardSet<TTextureParameter>, GL::Id>;
 
 // GetGLGuard
 template <typename T> decltype(auto) GetGLGuard() { return typename T::GLGuardType{}; };

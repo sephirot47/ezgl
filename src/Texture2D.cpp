@@ -53,16 +53,7 @@ void Texture2D::SetEmptyData(const GL::Size inWidth,
     const GL::Int& inMipMapLevel)
 {
   auto texture_input_format = GL::ETextureInputFormat::RED;
-  if (inInternalFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT
-      || inInternalFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT16
-      || inInternalFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT24
-      || inInternalFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT32F)
-  {
-    texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
-  }
-  else if (inInternalFormat == GL::ETextureInternalFormat::DEPTH_STENCIL
-      || inInternalFormat == GL::ETextureInternalFormat::DEPTH24_STENCIL8
-      || inInternalFormat == GL::ETextureInternalFormat::DEPTH32F_STENCIL8)
+  if (GL::IsDepthOnlyFormat(inInternalFormat) || GL::IsDepthStencilFormat(inInternalFormat))
   {
     texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
   }

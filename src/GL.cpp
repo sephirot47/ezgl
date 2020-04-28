@@ -18,7 +18,7 @@ void GL::SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled)
 bool GL::IsEnabled(const GL::EEnablable inEnablable) { return glIsEnabled(GL::EnumCast(inEnablable)); }
 
 void GL::DepthMask(const bool inDepthMask) { glDepthMask(inDepthMask); }
-bool GL::GetDepthMask() { return GL::GetInteger(GL::EGetInteger::DEPTH_WRITEMASK); }
+bool GL::GetDepthMask() { return (GL::GetInteger(GL::EGetInteger::DEPTH_WRITEMASK) == 1); }
 
 void GL::DepthFunc(const GL::EDepthFunc inDepthFunc) { glDepthFunc(GL::EnumCast(inDepthFunc)); }
 GL::EDepthFunc GL::GetDepthFunc() { return static_cast<GL::EDepthFunc>(GL::GetInteger(GL::EGetInteger::DEPTH_FUNC)); }
@@ -172,6 +172,26 @@ void GL::ActiveTexture(const GL::Id& inTextureUnit) { glActiveTexture(inTextureU
 void GL::BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId)
 {
   glBindTextureUnit(inTextureUnit, inTextureId);
+}
+
+bool GL::IsColorFormat(const GL::ETextureInternalFormat inTextureFormat)
+{
+  return !IsDepthOnlyFormat(inTextureFormat) && !IsDepthStencilFormat(inTextureFormat);
+}
+
+bool GL::IsDepthOnlyFormat(const GL::ETextureInternalFormat inTextureFormat)
+{
+  return (inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT
+      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT16
+      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT24
+      || inTextureFormat == GL::ETextureInternalFormat::DEPTH_COMPONENT32F);
+}
+
+bool GL::IsDepthStencilFormat(const GL::ETextureInternalFormat inTextureFormat)
+{
+  return (inTextureFormat == GL::ETextureInternalFormat::DEPTH_STENCIL
+      || inTextureFormat == GL::ETextureInternalFormat::DEPTH24_STENCIL8
+      || inTextureFormat == GL::ETextureInternalFormat::DEPTH32F_STENCIL8);
 }
 
 void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }

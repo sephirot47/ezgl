@@ -28,13 +28,10 @@ Renderer::Renderer()
     sStaticResourcesInited = true;
   }
 
-  // Init render/depth_stencil textures and framebuffer
-  mDefaultRenderTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::RGBA8);
-  mDefaultDepthStencilTexture = std::make_shared<Texture2D>(1, 1, GL::ETextureInternalFormat::DEPTH24_STENCIL8);
-
+  // Init default render target and default framebuffer
+  mDefaultRenderTarget
+      = std::make_shared<RenderTarget>(GL::ETextureInternalFormat::RGBA8, GL::ETextureInternalFormat::DEPTH24_STENCIL8);
   mDefaultFramebuffer = std::make_shared<Framebuffer>();
-  mDefaultFramebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT, mDefaultDepthStencilTexture);
-  mDefaultFramebuffer->CheckFramebufferIsComplete();
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
@@ -90,9 +87,9 @@ void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& in
   mState.GetCurrent<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
-void Renderer::SetOverrideRenderTexture(const std::shared_ptr<Texture2D>& inOverrideRenderTexture)
+void Renderer::SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOverrideRenderTarget)
 {
-  mState.GetCurrent<Renderer::EStateId::OVERRIDE_RENDER_TEXTURE>() = inOverrideRenderTexture;
+  mState.GetCurrent<Renderer::EStateId::OVERRIDE_RENDER_TARGET>() = inOverrideRenderTarget;
 }
 
 void Renderer::SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOverrideFramebuffer)
@@ -105,12 +102,26 @@ void Renderer::BindFramebuffer()
   auto framebuffer = GetFramebuffer();
   framebuffer->Bind();
 
-  const auto render_texture_to_use = GetRenderTexture();
-  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_texture_to_use);
-  framebuffer->Resize(render_texture_to_use->GetSize());
+  const auto render_target_to_use = GetRenderTarget();
+  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_target_to_use->GetColorTexture());
+  if (GL::IsDepthOnlyFormat(render_target_to_use->GetDepthTexture()->GetInternalFormat()))
+  {
+    framebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
+        render_target_to_use->GetDepthTexture());
+  }
+  else
+  {
+    framebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_ATTACHMENT, render_target_to_use->GetDepthTexture());
+  }
+  framebuffer->Resize(render_target_to_use->GetColorTexture()->GetSize());
+  framebuffer->CheckFramebufferIsComplete();
 }
 
-void Renderer::Blit() { TextureOperations::DrawFullScreenTexture(*GetRenderTexture(), *mDefaultDepthStencilTexture); }
+void Renderer::Blit()
+{
+  TextureOperations::DrawFullScreenTexture(*GetRenderTarget()->GetColorTexture(),
+      *GetRenderTarget()->GetDepthTexture());
+}
 
 void Renderer::PushState() { mState.PushAllTops(); }
 void Renderer::PopState() { mState.PopAll(); }
@@ -144,7 +155,7 @@ void Renderer::Begin(const Window& inWindow)
 {
   ResetState();
   GL::Viewport(Zero<Vec2i>(), inWindow.GetFramebufferSize());
-  mDefaultRenderTexture->Resize(inWindow.GetSize());
+  mDefaultRenderTarget->Resize(inWindow.GetSize());
 }
 
 void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
@@ -154,7 +165,6 @@ void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
     const GL::Size inBeginArraysPrimitiveIndex)
 {
   const auto draw_setup = PrepareForDraw();
-
   const auto vao_bind_guard = inVAO.BindGuarded();
 
   if (inDrawArrays)
@@ -187,7 +197,7 @@ void Renderer::DrawVAOArrays(const VAO& inVAO,
 
 std::unique_ptr<Renderer::DrawSetup> Renderer::PrepareForDraw()
 {
-  std::unique_ptr<Renderer::DrawSetup> draw_setup_ptr = CreateDrawSetup();
+  std::unique_ptr<DrawSetup> draw_setup_ptr = CreateDrawSetup();
   PrepareForDraw(*draw_setup_ptr);
   return draw_setup_ptr;
 }

@@ -72,7 +72,7 @@ public:
   void PushCamera() { mState.PushTop<Renderer3D::EStateId::CAMERA>(); }
   void PopCamera() { mState.Pop<Renderer3D::EStateId::CAMERA>(); }
   void ResetCamera() { mState.Reset<Renderer3D::EStateId::CAMERA>(); }
-  void AdaptCameraToWindow(const Window &inWindow);
+  void AdaptCameraToWindow(const Window& inWindow);
 
   // Transformation
   void SetModelMatrix(const Mat4f& inModelMatrix);
@@ -167,7 +167,7 @@ private:
   struct DrawSetup3D : public DrawSetup
   {
   private:
-    GLMultiGuard<Material3D> mGuard;
+    Material3D::GLGuardType mMaterial3DGuard;
   };
   virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const override { return std::make_unique<DrawSetup3D>(); }
   virtual void PrepareForDraw(DrawSetup& ioDrawSetup) override;

@@ -714,6 +714,9 @@ public:
   static void GenerateTextureMipMap(const GL::Id& inTextureId);
   static void ActiveTexture(const GL::Id& inTextureUnit);
   static void BindTextureUnit(const GL::Size& inTextureUnit, const GL::Id& inTextureId);
+  static bool IsColorFormat(const GL::ETextureInternalFormat inTextureFormat);
+  static bool IsDepthOnlyFormat(const GL::ETextureInternalFormat inTextureFormat);
+  static bool IsDepthStencilFormat(const GL::ETextureInternalFormat inTextureFormat);
   static void DeleteTexture(const GL::Id& inTextureId);
 
   static GL::Id GenFramebuffer();

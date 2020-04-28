@@ -12,6 +12,7 @@
 #include "PerspectiveCamera.h"
 #include "Plane.h"
 #include "PointLight.h"
+#include "RenderTarget.h"
 #include "RendererStateStacks.h"
 #include "Segment.h"
 #include "ShaderProgram.h"
@@ -41,7 +42,7 @@ public:
   enum class EStateId
   {
     OVERRIDE_SHADER_PROGRAM,
-    OVERRIDE_RENDER_TEXTURE,
+    OVERRIDE_RENDER_TARGET,
     OVERRIDE_FRAMEBUFFER,
     DEPTH_ENABLED,
     BLEND_ENABLED,
@@ -126,28 +127,28 @@ public:
   void ResetOverrideShaderProgram() { mState.Reset<EStateId::OVERRIDE_SHADER_PROGRAM>(); }
 
   // Render Texture
-  std::shared_ptr<Texture2D> GetDefaultRenderTexture() { return mDefaultRenderTexture; }
-  std::shared_ptr<const Texture2D> GetDefaultRenderTexture() const { return mDefaultRenderTexture; }
-  std::shared_ptr<Texture2D> GetRenderTexture()
+  std::shared_ptr<RenderTarget> GetDefaultRenderTarget() { return mDefaultRenderTarget; }
+  std::shared_ptr<const RenderTarget> GetDefaultRenderTarget() const { return mDefaultRenderTarget; }
+  std::shared_ptr<RenderTarget> GetRenderTarget()
   {
-    return GetOverrideRenderTexture() ? GetOverrideRenderTexture() : GetDefaultRenderTexture();
+    return GetOverrideRenderTarget() ? GetOverrideRenderTarget() : GetDefaultRenderTarget();
   }
-  std::shared_ptr<const Texture2D> GetRenderTexture() const
+  std::shared_ptr<const RenderTarget> GetRenderTarget() const
   {
-    return GetOverrideRenderTexture() ? GetOverrideRenderTexture() : GetDefaultRenderTexture();
+    return GetOverrideRenderTarget() ? GetOverrideRenderTarget() : GetDefaultRenderTarget();
   }
-  void SetOverrideRenderTexture(const std::shared_ptr<Texture2D>& inOverrideRenderTexture);
-  std::shared_ptr<Texture2D> GetOverrideRenderTexture()
+  void SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOverrideRenderTarget);
+  std::shared_ptr<RenderTarget> GetOverrideRenderTarget()
   {
-    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TEXTURE>();
+    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TARGET>();
   }
-  std::shared_ptr<const Texture2D> GetOverrideRenderTexture() const
+  std::shared_ptr<const RenderTarget> GetOverrideRenderTarget() const
   {
-    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TEXTURE>();
+    return mState.GetCurrent<EStateId::OVERRIDE_RENDER_TARGET>();
   }
-  void PushOverrideRenderTexture() { mState.PushTop<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
-  void PopOverrideRenderTexture() { mState.Pop<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
-  void ResetOverrideRenderTexture() { mState.Reset<EStateId::OVERRIDE_RENDER_TEXTURE>(); }
+  void PushOverrideRenderTarget() { mState.PushTop<EStateId::OVERRIDE_RENDER_TARGET>(); }
+  void PopOverrideRenderTarget() { mState.Pop<EStateId::OVERRIDE_RENDER_TARGET>(); }
+  void ResetOverrideRenderTarget() { mState.Reset<EStateId::OVERRIDE_RENDER_TARGET>(); }
 
   // Framebuffer
   std::shared_ptr<Framebuffer> GetDefaultFramebuffer() { return mDefaultFramebuffer; }
@@ -174,7 +175,7 @@ public:
   // State
   using StateTupleOfStacks = TupleOfStacks<EStateId,
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
-      std::shared_ptr<Texture2D>,     // EStateId::OVERRIDE_RENDER_TEXTURE
+      std::shared_ptr<RenderTarget>,  // EStateId::OVERRIDE_RENDER_TARGET
       std::shared_ptr<Framebuffer>,   // EStateId::OVERRIDE_FRAMEBUFFER
       bool,                           // EStateId::DEPTH_ENABLED
       bool,                           // EStateId::BLEND_ENABLED
@@ -228,16 +229,16 @@ protected:
   class DrawSetup
   {
   public:
+    virtual ~DrawSetup() = default;
     std::shared_ptr<ShaderProgram> mShaderProgram;
 
   private:
-    GLMultiGuard<ShaderProgram::GLGuardType,
-        Framebuffer::GLGuardType,
-        GLGuardWrap_t<GL::EEnablable::DEPTH_TEST>,
-        GLGuardWrap_t<GL::EEnablable::BLEND>>
-        mGuard;
+    ShaderProgram::GLGuardType mShaderProgramGuard;
+    Framebuffer::GLGuardType mFramebufferGuard;
+    GLEnableGuard<GL::EEnablable::DEPTH_TEST> mDepthTestEnabledGuard;
+    GLEnableGuard<GL::EEnablable::BLEND> mBlendEnabledGuard;
   };
-  virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const { return std::make_unique<DrawSetup>(); }
+  virtual std::unique_ptr<DrawSetup> CreateDrawSetup() const = 0;
   [[nodiscard]] std::unique_ptr<DrawSetup> PrepareForDraw();
   virtual void PrepareForDraw(DrawSetup& ioDrawSetup);
 
@@ -259,8 +260,7 @@ private:
 
   // Render texture
   std::shared_ptr<Framebuffer> mDefaultFramebuffer;
-  std::shared_ptr<Texture2D> mDefaultRenderTexture;
-  std::shared_ptr<Texture2D> mDefaultDepthStencilTexture;
+  std::shared_ptr<RenderTarget> mDefaultRenderTarget;
 };
 
 // Renderer state guards
