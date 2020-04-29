@@ -38,4 +38,19 @@ constexpr auto IsNumber_v = std::is_arithmetic_v<T>;
 // IsVecOrMat
 template <typename T>
 constexpr auto IsVecOrMat_v = IsVec_v<T> || IsMat_v<T>;
+
+template <typename T>
+std::enable_if_t<!IsNumber_v<T>, typename T::ValueType> _GetValueType()
+{
+  return typename T::ValueType {};
+};
+
+template <typename T>
+std::enable_if_t<IsNumber_v<T>, T> _GetValueType()
+{
+  return T {};
+};
+
+template <typename T>
+using ValueType_t = decltype(_GetValueType<T>());
 }

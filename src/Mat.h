@@ -21,6 +21,7 @@ public:
   using ValueType = T;
   static constexpr auto NumRows = NRows;
   static constexpr auto NumCols = NCols;
+  static constexpr auto NumComponents = NRows;
 
   constexpr explicit Mat(const MITAll<ValueType>& inMITAll) noexcept;
   constexpr explicit Mat(const MITMultiplicativeIdentity&) noexcept;

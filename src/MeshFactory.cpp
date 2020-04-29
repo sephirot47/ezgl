@@ -299,7 +299,7 @@ Mesh MeshFactory::GetPlane(const std::size_t inNumVerticesX, const std::size_t i
 Mesh MeshFactory::GetCircleSection(const std::size_t inNumVertices, const float inSectionAngleRads)
 {
   EXPECTS(inNumVertices >= 3);
-  EXPECTS(Between(inSectionAngleRads, 0.0f, FullCircleRads()));
+  EXPECTS(IsBetween(inSectionAngleRads, 0.0f, FullCircleRads()));
 
   bool isFullCircle = (inSectionAngleRads == FullCircleRads());
 

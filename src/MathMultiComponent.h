@@ -1,9 +1,69 @@
 #pragma once
 
 #include "MathInitializers.h"
+#include "MathTypeTraits.h"
+#include <cmath>
 
 namespace egl
 {
+template <typename T, auto TGenerateSingleComponentFunction, typename... TExtraArgs>
+constexpr T MathMultiComponentGenerated(TExtraArgs&&... inExtraArgs)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return TGenerateSingleComponentFunction(std::forward<TExtraArgs>(inExtraArgs)...);
+  }
+  else
+  {
+    T result;
+    constexpr auto SplitExtraArgs = (std::is_same_v<std::decay_t<T>, std::decay_t<TExtraArgs>> && ...);
+    for (std::size_t i = 0; i < T::NumComponents; ++i)
+    {
+      auto& v = result[i];
+      if constexpr (SplitExtraArgs)
+      {
+        v = MathMultiComponentGenerated<std::decay_t<decltype(v)>, TGenerateSingleComponentFunction>(
+            std::forward<decltype(inExtraArgs[i])>(inExtraArgs[i])...);
+      }
+      else
+      {
+        v = MathMultiComponentGenerated<std::decay_t<decltype(v)>, TGenerateSingleComponentFunction>(
+            std::forward<TExtraArgs>(inExtraArgs)...);
+      }
+    }
+    return result;
+  }
+}
+
+template <typename T, auto TBaseCaseFunction, typename... TExtraArgs>
+constexpr T MathMultiComponentApplied(const T& inValue, TExtraArgs&&... inExtraArgs)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return TBaseCaseFunction(inValue, std::forward<TExtraArgs>(inExtraArgs)...);
+  }
+  else
+  {
+    auto result = inValue;
+    constexpr auto SplitExtraArgs = (std::is_same_v<std::decay_t<T>, std::decay_t<TExtraArgs>> && ...);
+    for (std::size_t i = 0; i < T::NumComponents; ++i)
+    {
+      auto& v = result[i];
+      if constexpr (SplitExtraArgs)
+      {
+        v = MathMultiComponentApplied<std::decay_t<decltype(v)>, TBaseCaseFunction>(v,
+            std::forward<decltype(inExtraArgs[i])>(inExtraArgs[i])...);
+      }
+      else
+      {
+        v = MathMultiComponentApplied<std::decay_t<decltype(v)>, TBaseCaseFunction>(v,
+            std::forward<TExtraArgs>(inExtraArgs)...);
+      }
+    }
+    return result;
+  }
+}
+
 template <typename T>
 constexpr auto Abs(const T& inValue)
 {
@@ -13,32 +73,141 @@ constexpr auto Abs(const T& inValue)
   }
   else
   {
-    auto result = inValue;
-    for (auto& v : result) { v = Abs(v); }
-    return result;
+    return MathMultiComponentApplied<T, Abs<ValueType_t<T>>>(inValue);
   }
 }
 
 template <typename T>
-constexpr T Clamp(const T& inValue, const T& inMin, const T& inMax)
+constexpr auto Sqrt(const T& inValue)
 {
-  if (inValue < inMin)
-    return inMin;
-  if (inValue > inMax)
-    return inMax;
-  return inValue;
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::sqrt(inValue);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Sqrt<ValueType_t<T>>>(inValue);
+  }
 }
 
 template <typename T>
-constexpr T Sign(const T& inValue)
+constexpr auto Pow(const T& inValue, const T& inPower)
 {
-  return (inValue < 0 ? static_cast<T>(-1) : static_cast<T>(1));
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::pow(inValue, inPower);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Pow<ValueType_t<T>>>(inValue, inPower);
+  }
 }
 
 template <typename T>
-constexpr bool Between(const T& inValue, const T& inMin, const T& inMax)
+constexpr auto Cos(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::cos(inValue);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Cos<ValueType_t<T>>>(inValue);
+  }
+}
+
+template <typename T>
+constexpr auto Sin(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::sin(inValue);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Sin<ValueType_t<T>>>(inValue);
+  }
+}
+
+template <typename T>
+constexpr auto Tan(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::tan(inValue);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Tan<ValueType_t<T>>>(inValue);
+  }
+}
+
+template <typename T>
+constexpr auto Clamp(const T& inValue, const T& inMin, const T& inMax)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return (inValue < inMin ? inMin : (inValue > inMax ? inMax : inValue));
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Clamp<ValueType_t<T>>>(inValue, inMin, inMax);
+  }
+}
+
+template <typename T>
+constexpr auto Min(const T& inLHS, const T& inRHS)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::min(inLHS, inRHS);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Min<ValueType_t<T>>>(inLHS, inRHS);
+  }
+}
+
+template <typename T>
+constexpr auto Max(const T& inLHS, const T& inRHS)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return std::max(inLHS, inRHS);
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Max<ValueType_t<T>>>(inLHS, inRHS);
+  }
+}
+
+template <typename T>
+constexpr auto Sign(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return (inValue < 0 ? static_cast<T>(-1) : static_cast<T>(1));
+  }
+  else
+  {
+    return MathMultiComponentApplied<T, Sign<ValueType_t<T>>>(inValue);
+  }
+}
+
+template <typename T>
+constexpr bool IsBetween(const T& inValue, const T& inMin, const T& inMax)
 {
   return (inValue >= inMin) && (inValue <= inMax);
+}
+
+template <typename T>
+constexpr T
+Map(const T& inValue, const T& inSourceBegin, const T& inSourceEnd, const T& inTargetBegin, const T& inTargetEnd)
+{
+  const auto source_range = (inSourceEnd - inSourceBegin);
+  const auto target_range = (inTargetEnd - inTargetBegin);
+  const auto source_progress = ((inValue - inSourceBegin) / source_range);
+  return (source_progress * target_range) + inTargetBegin;
 }
 
 template <typename T, typename TInterpolationFactor>

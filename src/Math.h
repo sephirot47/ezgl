@@ -373,16 +373,6 @@ constexpr Quat<T> AngleAxis(const T& inAngleRads, const Vec3<T>& inAxisNormalize
 }
 
 template <typename T>
-constexpr T
-Map(const T& inValue, const T& inSourceBegin, const T& inSourceEnd, const T& inTargetBegin, const T& inTargetEnd)
-{
-  const auto source_range = (inSourceEnd - inSourceBegin);
-  const auto target_range = (inTargetEnd - inTargetBegin);
-  const auto source_progress = ((inValue - inSourceBegin) / source_range);
-  return (source_progress * target_range) + inTargetBegin;
-}
-
-template <typename T>
 constexpr Quat<T> FromEulerAngles(const Vec3<T>& inEulerAnglesRads)
 {
   const auto qx = Quat<T>::AngleAxis(inEulerAnglesRads[0], Right<Vec3<T>>());

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Math.h"
 #include "MathInitializers.h"
+#include "MathMultiComponent.h"
 
 namespace egl
 {
@@ -18,12 +20,9 @@ constexpr auto RandomUnit()
   }
   else
   {
-    using ValueType = typename T::ValueType;
-
-    T result;
-    for (auto& value : result) { value = RandomUnit<ValueType>(); }
-    result = Normalized(result);
-    return result;
+    const auto result = MathMultiComponentGenerated<T, RandomUnit<ValueType_t<T>>>();
+    const auto normalized_result = Normalized(result);
+    return normalized_result;
   }
 }
 
@@ -37,20 +36,7 @@ constexpr auto Random(const T& inMin, const T& inMax)
   }
   else
   {
-    using ValueType = typename T::ValueType;
-
-    T result;
-    auto min_it = inMin.begin();
-    auto max_it = inMax.begin();
-    auto result_it = result.begin();
-    while (result_it != result.end())
-    {
-      *result_it = Random<ValueType>(*min_it, *max_it);
-      ++min_it;
-      ++max_it;
-      ++result_it;
-    }
-    return result;
+    return MathMultiComponentGenerated<T, Random<ValueType_t<T>>>(inMin, inMax);
   }
 }
 
@@ -63,10 +49,7 @@ constexpr auto RandomSign()
   }
   else
   {
-    using ValueType = typename T::ValueType;
-    T result;
-    for (auto& value : result) value = RandomSign<ValueType>();
-    return result;
+    return MathMultiComponentGenerated<T, RandomSign<ValueType_t<T>>>();
   }
 }
 }
