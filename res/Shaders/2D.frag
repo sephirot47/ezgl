@@ -1,3 +1,5 @@
+R""(
+
 #version 430 core
 
 uniform vec4 UMaterialColor;
@@ -9,3 +11,5 @@ void main()
   gl_FragDepth = 0.0f;
   of_color = UMaterialColor;
 }
+
+)""

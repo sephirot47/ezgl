@@ -11,6 +11,7 @@
 #include "ezgl/MeshFactory.h"
 #include "ezgl/PointLight.h"
 #include "ezgl/ShaderProgram.h"
+#include "ezgl/ShaderProgramFactory.h"
 #include "ezgl/TextureFactory.h"
 #include "ezgl/UBO.h"
 #include "ezgl/Window.h"
@@ -27,12 +28,8 @@ Renderer3D::Renderer3D()
   // Init static resources
   if (!sStaticResourcesInited)
   {
-    sOnlyColorShaderProgram
-        = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/OnlyColor.vert") },
-            FragmentShader { std::filesystem::path("ezgl/res/OnlyColor.frag") });
-
-    sMeshShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/Mesh.vert") },
-        FragmentShader { std::filesystem::path("ezgl/res/Mesh.frag") });
+    sOnlyColorShaderProgram = ShaderProgramFactory::GetOnlyColorShaderProgram();
+    sMeshShaderProgram = ShaderProgramFactory::GetMeshShaderProgram();
 
     sCone = std::make_shared<MeshDrawData>(MeshFactory::GetCone(32));
 

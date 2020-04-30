@@ -1,3 +1,5 @@
+R""(
+
 #version 430 core
 
 uniform sampler2D UTexture;
@@ -15,3 +17,5 @@ void main()
   vec4 tex_color = texture(UTexture, in_model_tex_coords);
   of_color = tex_color;
 }
+
+)""

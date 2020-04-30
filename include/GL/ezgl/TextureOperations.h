@@ -19,7 +19,6 @@ public:
 
 private:
   static void Init();
-  static std::shared_ptr<ShaderProgram> sDrawFullScreenTextureShaderProgram;
   static std::shared_ptr<MeshDrawData> sPlaneDrawData;
 };
 

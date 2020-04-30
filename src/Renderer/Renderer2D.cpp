@@ -12,6 +12,7 @@
 #include "ezgl/MeshFactory.h"
 #include "ezgl/PointLight.h"
 #include "ezgl/ShaderProgram.h"
+#include "ezgl/ShaderProgramFactory.h"
 #include "ezgl/TextureFactory.h"
 #include "ezgl/UBO.h"
 #include "ezgl/Window.h"
@@ -26,9 +27,7 @@ Renderer2D::Renderer2D()
   // Init static resources
   if (!sStaticResourcesInited)
   {
-    sShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/2D.vert") },
-        FragmentShader { std::filesystem::path("ezgl/res/2D.frag") });
-
+    sShaderProgram = ShaderProgramFactory::Get2DShaderProgram();
     sStaticResourcesInited = true;
   }
 
@@ -54,7 +53,7 @@ void Renderer2D::Scale(const Vec2f& inScale)
   auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>();
   model_matrix = model_matrix * ScaleMat(inScale);
 }
-void Renderer2D::Scale(const float inScale) { Scale(All<Vec2f>( inScale )); }
+void Renderer2D::Scale(const float inScale) { Scale(All<Vec2f>(inScale)); }
 
 void Renderer2D::SetMaterial(const Material2D& inMaterial)
 {

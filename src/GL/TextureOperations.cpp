@@ -2,13 +2,13 @@
 #include "ezgl/MeshDrawData.h"
 #include "ezgl/MeshFactory.h"
 #include "ezgl/ShaderProgram.h"
+#include "ezgl/ShaderProgramFactory.h"
 #include "ezgl/Texture2D.h"
 #include "ezgl/TextureFactory.h"
 
 namespace egl
 {
 
-std::shared_ptr<ShaderProgram> TextureOperations::sDrawFullScreenTextureShaderProgram;
 std::shared_ptr<MeshDrawData> TextureOperations::sPlaneDrawData;
 
 void TextureOperations::DrawFullScreenQuad()
@@ -27,7 +27,9 @@ void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture)
 void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const Texture2D& inDepthTexture)
 {
   TextureOperations::Init();
-  sDrawFullScreenTextureShaderProgram->Bind();
+
+  const auto draw_full_screen_texture_shader_program = ShaderProgramFactory::GetDrawFullScreenTextureShaderProgram();
+  draw_full_screen_texture_shader_program->Bind();
 
   const GLEnableGuard<GL::EEnablable::BLEND> blend_enable_guard;
   GL::Enable(GL::EEnablable::BLEND);
@@ -36,7 +38,7 @@ void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const 
   GL::BlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
 
   inTexture.BindToTextureUnit(0);
-  sDrawFullScreenTextureShaderProgram->SetUniformSafe("UTexture", 0);
+  draw_full_screen_texture_shader_program->SetUniformSafe("UTexture", 0);
 
   const GLDepthMaskGuard depth_mask_guard;
   GL::DepthMask(true);
@@ -49,7 +51,7 @@ void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const 
   GL::SetTextureCompareMode(inDepthTexture.GetGLId(), GL::ETextureCompareMode::NONE);
 
   inDepthTexture.BindToTextureUnit(1);
-  sDrawFullScreenTextureShaderProgram->SetUniformSafe("UDepthTexture", 1);
+  draw_full_screen_texture_shader_program->SetUniformSafe("UDepthTexture", 1);
 
   DrawFullScreenQuad();
 }
@@ -59,10 +61,6 @@ void TextureOperations::Init()
   static bool sInited = false;
   if (!sInited)
   {
-    sDrawFullScreenTextureShaderProgram
-        = std::make_shared<ShaderProgram>(VertexShader(std::filesystem::path("ezgl/res/DrawFullScreenTexture.vert")),
-            FragmentShader(std::filesystem::path("ezgl/res/DrawFullScreenTexture.frag")));
-
     auto plane_mesh = MeshFactory::GetPlane();
     plane_mesh.Transform(ScaleMat(All<Vec3f>(2.0f)));
 

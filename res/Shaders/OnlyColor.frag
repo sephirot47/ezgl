@@ -1,3 +1,5 @@
+R""(
+
 #version 430 core
 
 uniform vec4 UMaterialDiffuseColor;
@@ -8,3 +10,5 @@ void main()
 {
     out_color = UMaterialDiffuseColor;
 }
+
+)""

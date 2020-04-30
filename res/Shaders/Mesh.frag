@@ -1,3 +1,5 @@
+R""(
+
 #version 430 core
 
 struct DirectionalLight
@@ -111,3 +113,5 @@ void main()
     out_color = material_color;
   }
 }
+
+)""

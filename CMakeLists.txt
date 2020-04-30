@@ -38,11 +38,6 @@ target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Rend
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/UI")
 
-add_custom_command(
-	TARGET ezgl POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/res/Shaders" $<TARGET_FILE_DIR:ezgl>/res/Shaders
-        COMMENT "Copying shaders..." VERBATIM)
-
 find_package(assimp REQUIRED)
 target_include_directories(ezgl PUBLIC ${assimp_INCLUDE_DIRS})
 target_link_libraries(ezgl ${assimp_LIBRARIES})

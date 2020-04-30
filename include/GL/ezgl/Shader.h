@@ -4,7 +4,6 @@
 #include "ezgl/GL.h"
 #include "ezgl/GLObject.h"
 #include <cstdint>
-#include <filesystem>
 #include <string>
 #include <string_view>
 
@@ -18,8 +17,7 @@ public:
   using GLObject<GLObjectType>::GetGLId;
 
   Shader() = default;
-  explicit Shader(const std::filesystem::path& inSourceCodePath);
-  explicit Shader(const std::string& inSourceCode);
+  explicit Shader(const std::string_view inSourceCode);
   Shader(Shader&& inRHS) noexcept = default;
   virtual ~Shader() = default;
 

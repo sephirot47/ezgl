@@ -18,6 +18,7 @@
 #include "ezgl/Segment.h"
 #include "ezgl/Shader.h"
 #include "ezgl/ShaderProgram.h"
+#include "ezgl/ShaderProgramFactory.h"
 #include "ezgl/Span.h"
 #include "ezgl/StreamOperators.h"
 #include "ezgl/Texture.h"
@@ -48,7 +49,6 @@ int main()
   const auto window = std::make_shared<Window>(create_options);
 
   const auto test_mesh = MeshFactory::GetTorus(25, 25, 0.5f);
-  const auto texture = std::make_shared<Texture2D>(Image2D { "/home/sephirot47/Downloads/bricks2.jpg" });
   const auto sphere = MeshFactory::GetSphere(50, 50);
 
   const auto camera3d = std::make_shared<PerspectiveCameraf>();

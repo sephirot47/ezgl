@@ -3,12 +3,7 @@
 namespace egl
 {
 template <GL::EShaderType TShaderType>
-Shader<TShaderType>::Shader(const std::filesystem::path& inSourceCodePath) : Shader(GetFileContents(inSourceCodePath))
-{
-}
-
-template <GL::EShaderType TShaderType>
-Shader<TShaderType>::Shader(const std::string& inSourceCode) : Shader()
+Shader<TShaderType>::Shader(const std::string_view inSourceCode) : Shader()
 {
   Compile(inSourceCode);
 }
