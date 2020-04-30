@@ -28,11 +28,11 @@ Renderer3D::Renderer3D()
   if (!sStaticResourcesInited)
   {
     sOnlyColorShaderProgram
-        = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/OnlyColor.vert") },
-            FragmentShader { std::filesystem::path("../res/OnlyColor.frag") });
+        = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/OnlyColor.vert") },
+            FragmentShader { std::filesystem::path("ezgl/res/OnlyColor.frag") });
 
-    sMeshShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/Mesh.vert") },
-        FragmentShader { std::filesystem::path("../res/Mesh.frag") });
+    sMeshShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/Mesh.vert") },
+        FragmentShader { std::filesystem::path("ezgl/res/Mesh.frag") });
 
     sCone = std::make_shared<MeshDrawData>(MeshFactory::GetCone(32));
 

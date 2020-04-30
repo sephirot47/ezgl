@@ -60,8 +60,8 @@ void TextureOperations::Init()
   if (!sInited)
   {
     sDrawFullScreenTextureShaderProgram
-        = std::make_shared<ShaderProgram>(VertexShader(std::filesystem::path("../res/DrawFullScreenTexture.vert")),
-            FragmentShader(std::filesystem::path("../res/DrawFullScreenTexture.frag")));
+        = std::make_shared<ShaderProgram>(VertexShader(std::filesystem::path("ezgl/res/DrawFullScreenTexture.vert")),
+            FragmentShader(std::filesystem::path("ezgl/res/DrawFullScreenTexture.frag")));
 
     auto plane_mesh = MeshFactory::GetPlane();
     plane_mesh.Transform(ScaleMat(All<Vec3f>(2.0f)));

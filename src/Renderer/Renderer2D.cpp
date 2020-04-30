@@ -26,8 +26,8 @@ Renderer2D::Renderer2D()
   // Init static resources
   if (!sStaticResourcesInited)
   {
-    sShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("../res/2D.vert") },
-        FragmentShader { std::filesystem::path("../res/2D.frag") });
+    sShaderProgram = std::make_shared<ShaderProgram>(VertexShader { std::filesystem::path("ezgl/res/2D.vert") },
+        FragmentShader { std::filesystem::path("ezgl/res/2D.frag") });
 
     sStaticResourcesInited = true;
   }
