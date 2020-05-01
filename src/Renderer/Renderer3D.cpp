@@ -48,23 +48,23 @@ void Renderer3D::SetCullFaceEnabled(const bool inCullFaceEnabled)
   mState.GetCurrent<Renderer3D::EStateId::CULL_FACE_ENABLED>() = inCullFaceEnabled;
 }
 
-void Renderer3D::SetModelMatrix(const Mat4f& inModelMatrix)
+void Renderer3D::SetTransformMatrix(const Mat4f& inTransformMatrix)
 {
-  mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>() = inModelMatrix;
+  mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>() = inTransformMatrix;
 }
 void Renderer3D::Translate(const Vec3f& inTranslation)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * TranslationMat(inTranslation);
 }
 void Renderer3D::Rotate(const Quatf& inRotation)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * RotationMat(inRotation);
 }
 void Renderer3D::Scale(const Vec3f& inScale)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * ScaleMat(inScale);
 }
 void Renderer3D::Scale(const float inScale) { Scale(All<Vec3f>(inScale)); }
@@ -85,7 +85,7 @@ void Renderer3D::AddDirectionalLight(const Vec3f& inDirection, const Color3f& in
 
   GLSLDirectionalLight directional_light;
   directional_light.mDirection
-      = NormalizedSafe(XYZ(mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>() * XYZ0(inDirection)));
+      = NormalizedSafe(XYZ(mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>() * XYZ0(inDirection)));
   directional_light.mColor = inColor;
 
   mState.GetCurrent<Renderer3D::EStateId::DIRECTIONAL_LIGHTS>().push_back(directional_light);
@@ -96,7 +96,7 @@ void Renderer3D::AddPointLight(const Vec3f& inPosition, const float inRange, con
   EXPECTS(inRange > 0.0f);
 
   GLSLPointLight point_light;
-  point_light.mPosition = XYZ(mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>() * XYZ1(inPosition));
+  point_light.mPosition = XYZ(mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>() * XYZ1(inPosition));
   point_light.mRange = inRange;
   point_light.mColor = inColor;
 
@@ -177,7 +177,7 @@ void Renderer3D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::ED
 
 void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
 {
-  RENDERER_STATE_GUARD(this, Renderer3D::EStateId::MODEL_MATRIX);
+  RENDERER_STATE_GUARD(this, Renderer3D::EStateId::TRANSFORM_MATRIX);
 
   DrawSegment(inArrowSegment);
   Translate(inArrowSegment.GetToPoint());
@@ -257,7 +257,7 @@ void Renderer3D::PrepareForDraw(DrawSetup& ioDrawSetup)
 
   GetMaterial().Bind(shader_program);
 
-  const auto& model_matrix = GetModelMatrix();
+  const auto& model_matrix = GetTransformMatrix();
   const auto& current_camera = GetCamera();
   const auto view_matrix = current_camera->GetViewMatrix();
   const auto normal_matrix = NormalMat(model_matrix);

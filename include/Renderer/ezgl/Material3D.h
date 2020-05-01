@@ -16,9 +16,6 @@ class Material3D final
 public:
   using GLGuardType = GLNoOpGuard;
 
-  void SetDiffuseIntensity(const float inDiffuseIntensity);
-  float GetDiffuseIntensity() const;
-
   void SetDiffuseColor(const Color4f& inDiffuseColor);
   Color4f GetDiffuseColor() const;
 

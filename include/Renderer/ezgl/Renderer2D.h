@@ -39,7 +39,7 @@ public:
   enum class EStateId
   {
     CAMERA,
-    MODEL_MATRIX,
+    TRANSFORM_MATRIX,
     MATERIAL,
   };
 
@@ -60,16 +60,16 @@ public:
   void AdaptCameraToWindow(const Window& inWindow);
 
   // Transformation
-  void SetModelMatrix(const Mat3f& inModelMatrix);
-  const Mat3f& GetModelMatrix() const { return mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>(); }
-  Mat3f& GetModelMatrix() { return mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  void SetTransformMatrix(const Mat3f& inTransformMatrix);
+  const Mat3f& GetTransformMatrix() const { return mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
+  Mat3f& GetTransformMatrix() { return mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
   void Translate(const Vec2f& inTranslation);
   void Rotate(const AngleRads inRotationAngle);
   void Scale(const Vec2f& inScale);
   void Scale(const float inScale);
-  void PushModelMatrix() { mState.PushTop<Renderer2D::EStateId::MODEL_MATRIX>(); }
-  void PopModelMatrix() { mState.Pop<Renderer2D::EStateId::MODEL_MATRIX>(); }
-  void ResetModelMatrix() { mState.Reset<Renderer2D::EStateId::MODEL_MATRIX>(); }
+  void PushTransformMatrix() { mState.PushTop<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
+  void PopTransformMatrix() { mState.Pop<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
+  void ResetTransformMatrix() { mState.Reset<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
 
   // Materials
   void SetMaterial(const Material2D& inMaterial);
@@ -93,7 +93,7 @@ public:
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,
       std::shared_ptr<OrthographicCamera2f>, // EStateId::CAMERA
-      Mat3f,                                 // EStateId::MODEL_MATRIX
+      Mat3f,                                 // EStateId::TRANSFORM_MATRIX
       Material2D>;                           // EStateId::MATERIAL
   using State = RendererStateStacks<Renderer2D, StateTupleOfStacks>;
   friend class RendererStateStacks<Renderer2D, StateTupleOfStacks>;

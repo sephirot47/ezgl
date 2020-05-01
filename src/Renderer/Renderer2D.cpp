@@ -34,23 +34,23 @@ Renderer2D::Renderer2D()
   PushAllDefaultStateValues();
 }
 
-void Renderer2D::SetModelMatrix(const Mat3f& inModelMatrix)
+void Renderer2D::SetTransformMatrix(const Mat3f& inTransformMatrix)
 {
-  mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>() = inModelMatrix;
+  mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>() = inTransformMatrix;
 }
 void Renderer2D::Translate(const Vec2f& inTranslation)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * TranslationMat(inTranslation);
 }
 void Renderer2D::Rotate(const AngleRads inRotationAngle)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * RotationMat(inRotationAngle);
 }
 void Renderer2D::Scale(const Vec2f& inScale)
 {
-  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::MODEL_MATRIX>();
+  auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * ScaleMat(inScale);
 }
 void Renderer2D::Scale(const float inScale) { Scale(All<Vec2f>(inScale)); }
@@ -191,7 +191,7 @@ void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
 
   GL::Disable(GL::EEnablable::CULL_FACE); // Guarded in DrawSetup2D
 
-  const auto& model_matrix = GetModelMatrix();
+  const auto& model_matrix = GetTransformMatrix();
   const auto& current_camera = GetCamera();
   const auto view_matrix = current_camera->GetViewMatrix();
   const auto normal_matrix = NormalMat(model_matrix);

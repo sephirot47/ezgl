@@ -40,7 +40,7 @@ public:
   {
     CULL_FACE_ENABLED,
     CAMERA,
-    MODEL_MATRIX,
+    TRANSFORM_MATRIX,
     MATERIAL,
     SCENE_AMBIENT_COLOR,
     DIRECTIONAL_LIGHTS,
@@ -75,16 +75,16 @@ public:
   void AdaptCameraToWindow(const Window& inWindow);
 
   // Transformation
-  void SetModelMatrix(const Mat4f& inModelMatrix);
-  const Mat4f& GetModelMatrix() const { return mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>(); }
-  Mat4f& GetModelMatrix() { return mState.GetCurrent<Renderer3D::EStateId::MODEL_MATRIX>(); }
+  void SetTransformMatrix(const Mat4f& inTransformMatrix);
+  const Mat4f& GetTransformMatrix() const { return mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>(); }
+  Mat4f& GetTransformMatrix() { return mState.GetCurrent<Renderer3D::EStateId::TRANSFORM_MATRIX>(); }
   void Translate(const Vec3f& inTranslation);
   void Rotate(const Quatf& inRotation);
   void Scale(const Vec3f& inScale);
   void Scale(const float inScale);
-  void PushModelMatrix() { mState.PushTop<Renderer3D::EStateId::MODEL_MATRIX>(); }
-  void PopModelMatrix() { mState.Pop<Renderer3D::EStateId::MODEL_MATRIX>(); }
-  void ResetModelMatrix() { mState.Reset<Renderer3D::EStateId::MODEL_MATRIX>(); }
+  void PushTransformMatrix() { mState.PushTop<Renderer3D::EStateId::TRANSFORM_MATRIX>(); }
+  void PopTransformMatrix() { mState.Pop<Renderer3D::EStateId::TRANSFORM_MATRIX>(); }
+  void ResetTransformMatrix() { mState.Reset<Renderer3D::EStateId::TRANSFORM_MATRIX>(); }
 
   // Materials
   void SetMaterial(const Material3D& inMaterial);
@@ -129,7 +129,7 @@ public:
   using StateTupleOfStacks = TupleOfStacks<Renderer3D::EStateId,
       bool,                              // EStateId::CULL_FACE_ENABLED
       std::shared_ptr<Camera3f>,         // EStateId::CAMERA
-      Mat4f,                             // EStateId::MODEL_MATRIX
+      Mat4f,                             // EStateId::TRANSFORM_MATRIX
       Material3D,                        // EStateId::MATERIAL
       Color3f,                           // EStateId::SCENE_AMBIENT_COLOR
       std::vector<GLSLDirectionalLight>, // EStateId::DIRECTIONAL_LIGHTS
