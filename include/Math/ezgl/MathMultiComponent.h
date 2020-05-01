@@ -3,6 +3,7 @@
 #include "ezgl/MathInitializers.h"
 #include "ezgl/MathTypeTraits.h"
 #include <cmath>
+#include <limits>
 
 namespace egl
 {
@@ -169,6 +170,21 @@ constexpr auto Min(const T& inLHS, const T& inRHS)
 }
 
 template <typename T>
+constexpr auto Min(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return inValue;
+  }
+  else
+  {
+    auto min = std::numeric_limits<ValueType_t<T>>::max();
+    for (const auto& component : inValue) { min = std::min(min, Min(component)); }
+    return min;
+  }
+}
+
+template <typename T>
 constexpr auto Max(const T& inLHS, const T& inRHS)
 {
   if constexpr (IsNumber_v<T>)
@@ -178,6 +194,21 @@ constexpr auto Max(const T& inLHS, const T& inRHS)
   else
   {
     return MathMultiComponentApplied<T, Max<ValueType_t<T>>>(inLHS, inRHS);
+  }
+}
+
+template <typename T>
+constexpr auto Max(const T& inValue)
+{
+  if constexpr (IsNumber_v<T>)
+  {
+    return inValue;
+  }
+  else
+  {
+    auto max = std::numeric_limits<ValueType_t<T>>::min();
+    for (const auto& component : inValue) { max = std::max(max, Max(component)); }
+    return max;
   }
 }
 
