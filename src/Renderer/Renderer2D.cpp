@@ -148,6 +148,34 @@ void Renderer2D::DrawSegment(const Segment2f& inSegment)
   DrawSegmentGeneric(inSegment);
 }
 
+void Renderer2D::DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices)
+{
+  EXPECTS(inNumVertices >= 3);
+
+  SetShaderProgram(sShaderProgram);
+
+  std::vector<Vec2f> circle_points;
+  circle_points.reserve(inNumVertices + 1);
+  for (std::size_t i = 0; i < inNumVertices; ++i)
+  {
+    const auto progress = (i / static_cast<float>(inNumVertices - 1));
+    const auto angle = inAngle * progress;
+    const auto offset = Vec2f(std::cos(angle), std::sin(angle));
+    const auto circle_point = offset;
+    circle_points.push_back(circle_point);
+  }
+
+  DrawLineStripGeneric(MakeSpan(circle_points));
+}
+
+void Renderer2D::DrawCircle(const Circlef& inCircle, const std::size_t inNumVertices)
+{
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(inCircle.GetCenter());
+  Scale(inCircle.GetRadius());
+  DrawCircleSection(FullCircleRads(), inNumVertices);
+}
+
 void Renderer2D::DrawSegments(const Span<Segment2f>& inSegments)
 {
   SetShaderProgram(sShaderProgram);

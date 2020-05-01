@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ezgl/Camera.h"
+#include "ezgl/Circle.h"
 #include "ezgl/Color.h"
 #include "ezgl/DirectionalLight.h"
 #include "ezgl/Framebuffer.h"
@@ -86,6 +87,8 @@ public:
   void DrawPoint(const Vec2f& inPoint);
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);
+  void DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices = 32);
+  void DrawCircle(const Circlef& inCircle, const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
