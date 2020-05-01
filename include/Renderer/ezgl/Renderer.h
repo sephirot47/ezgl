@@ -244,6 +244,8 @@ protected:
   void DrawPointGeneric(const Vec<T, N>& inPoint);
   template <typename T, std::size_t N>
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
+  template <typename T, std::size_t N>
+  void DrawLineStripGeneric(const Span<Vec<T, N>>& inLinePoints);
 
   // DrawSetup
   class DrawSetup

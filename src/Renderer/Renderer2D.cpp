@@ -154,6 +154,12 @@ void Renderer2D::DrawSegments(const Span<Segment2f>& inSegments)
   DrawSegmentsGeneric(inSegments);
 }
 
+void Renderer2D::DrawLineStrip(const Span<Vec2f>& inLinePoints)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawLineStripGeneric(inLinePoints);
+}
+
 void Renderer2D::DrawTriangle(const Triangle2f& inTriangle)
 {
   Mesh triangle_mesh;

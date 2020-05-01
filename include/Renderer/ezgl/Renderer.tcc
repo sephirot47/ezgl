@@ -13,7 +13,7 @@ void Renderer::DrawSegmentGeneric(const Segment<T, N>& inSegment)
 template <typename T, std::size_t N>
 void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
 {
-  const auto base_draw_setup = PrepareForDraw();
+  const auto draw_setup = PrepareForDraw();
 
   std::vector<Vec<T, N>> segment_points;
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);
@@ -22,10 +22,11 @@ void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
     segment_points.push_back(segment.GetFromPoint());
     segment_points.push_back(segment.GetToPoint());
   }
-  const auto vbo = std::make_shared<VBO>(MakeSpan(segment_points));
 
   VAO vao;
-  vao.AddVBO(vbo, MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
+  vao.AddVBO(std::make_shared<VBO>(MakeSpan(segment_points)),
+      MeshDrawData::PositionAttribLocation(),
+      VAOVertexAttribT<Vec<T, N>>());
   const auto vao_bind_guard = vao.BindGuarded();
 
   GL::DrawArrays(GL::EPrimitivesType::LINES, inSegments.GetNumberOfElements() * 2);
@@ -40,15 +41,25 @@ void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint)
 template <typename T, std::size_t N>
 void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints)
 {
-  const auto base_draw_setup = PrepareForDraw();
-
-  const auto vbo = std::make_shared<VBO>(inPoints);
+  const auto draw_setup = PrepareForDraw();
 
   VAO vao;
-  vao.AddVBO(vbo, MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
+  vao.AddVBO(std::make_shared<VBO>(inPoints), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
   const auto vao_bind_guard = vao.BindGuarded();
 
   GL::DrawArrays(GL::EPrimitivesType::POINTS, inPoints.GetNumberOfElements());
+}
+
+template <typename T, std::size_t N>
+void Renderer::DrawLineStripGeneric(const Span<Vec<T, N>>& inLinePoints)
+{
+  const auto draw_setup = PrepareForDraw();
+
+  VAO vao;
+  vao.AddVBO(std::make_shared<VBO>(inLinePoints), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
+  const auto vao_bind_guard = vao.BindGuarded();
+
+  GL::DrawArrays(GL::EPrimitivesType::LINE_STRIP, inLinePoints.GetNumberOfElements());
 }
 
 template <Renderer::EStateId StateId>

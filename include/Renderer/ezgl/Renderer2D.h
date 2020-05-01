@@ -87,6 +87,7 @@ public:
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);
   void DrawSegments(const Span<Segment2f>& inSegments);
+  void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
 

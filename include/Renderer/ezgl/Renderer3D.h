@@ -123,6 +123,7 @@ public:
   void DrawPoints(const Span<Vec3f>& inPoints);
   void DrawSegment(const Segment3f& inSegment);
   void DrawSegments(const Span<Segment3f>& inSegments);
+  void DrawLineStrip(const Span<Vec3f>& inLinePoints);
   void DrawTriangle(const Triangle3f& inTriangle);
 
   // State

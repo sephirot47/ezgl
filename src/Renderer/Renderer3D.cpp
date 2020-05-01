@@ -225,6 +225,12 @@ void Renderer3D::DrawSegments(const Span<Segment3f>& inSegments)
   DrawSegmentsGeneric(inSegments);
 }
 
+void Renderer3D::DrawLineStrip(const Span<Vec3f>& inLinePoints)
+{
+  SetShaderProgram(sOnlyColorShaderProgram);
+  DrawLineStripGeneric(inLinePoints);
+}
+
 void Renderer3D::DrawTriangle(const Triangle3f& inTriangle)
 {
   Mesh triangle_mesh;
