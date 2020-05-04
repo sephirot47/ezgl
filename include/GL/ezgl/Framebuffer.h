@@ -26,8 +26,6 @@ public:
 
   void SetAttachment(const GL::EFramebufferAttachment inAttachment, const std::shared_ptr<Texture2D>& inTexture);
   void CreateRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment, const GL::ETextureFormat inFormat);
-  void SetRenderbuffer(const GL::EFramebufferAttachment inRenderbufferAttachment,
-      const std::shared_ptr<Texture2D>& inTexture);
   void Resize(const Vec2i& inSize);
   void Resize(const int inWidth, const int inHeight);
 

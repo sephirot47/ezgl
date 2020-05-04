@@ -31,23 +31,22 @@ Renderer::Renderer()
   // Init default render target and default framebuffer
   mDefaultRenderTarget
       = std::make_shared<RenderTarget>(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8);
-  mDefaultFramebuffer = std::make_shared<Framebuffer>();
 
   // Renderer subclasses must call PushAllDefaultValues() in their constructor...!
 }
 
 void Renderer::ClearBackground(const Color4f& inClearColor)
 {
-  const GLBindGuard<GL::EBindingType::FRAMEBUFFER> framebuffer_bind_guard;
-  BindFramebuffer();
+  const RenderTarget::GLGuardType framebuffer_bind_guard;
+  BindRenderTarget();
 
   GL::ClearColor(inClearColor);
 }
 
 void Renderer::ClearDepth(const float inClearDepth)
 {
-  const GLBindGuard<GL::EBindingType::FRAMEBUFFER> framebuffer_bind_guard;
-  BindFramebuffer();
+  const RenderTarget::GLGuardType framebuffer_bind_guard;
+  BindRenderTarget();
 
   GL::ClearDepth(inClearDepth);
 }
@@ -65,8 +64,41 @@ void Renderer::SetBlendEnabled(const bool inBlendEnabled)
 
 void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
 {
-  mState.GetCurrent<Renderer::EStateId::BLEND_SOURCE_FACTOR>() = inBlendSourceFactor;
-  mState.GetCurrent<Renderer::EStateId::BLEND_DEST_FACTOR>() = inBlendDestFactor;
+  SetBlendFuncRGB(inBlendSourceFactor, inBlendDestFactor);
+  SetBlendFuncAlpha(inBlendSourceFactor, inBlendDestFactor);
+}
+
+void Renderer::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB, const GL::EBlendFactor inBlendDestFactorRGB)
+{
+  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB = inBlendSourceFactorRGB;
+  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mDestBlendFactorRGB = inBlendDestFactorRGB;
+}
+
+void Renderer::SetBlendFuncAlpha(const GL::EBlendFactor inBlendSourceFactorAlpha,
+    const GL::EBlendFactor inBlendDestFactorAlpha)
+{
+  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha = inBlendSourceFactorAlpha;
+  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha = inBlendDestFactorAlpha;
+}
+
+GL::EBlendFactor Renderer::GetBlendSourceFactorRGB() const
+{
+  return mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB;
+}
+
+GL::EBlendFactor Renderer::GetBlendDestFactorRGB() const
+{
+  return mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorRGB;
+}
+
+GL::EBlendFactor Renderer::GetBlendSourceFactorAlpha() const
+{
+  return mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha;
+}
+
+GL::EBlendFactor Renderer::GetBlendDestFactorAlpha() const
+{
+  return mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha;
 }
 
 void Renderer::SetPointSize(const float inPointSize)
@@ -89,35 +121,20 @@ void Renderer::SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOv
   mState.GetCurrent<Renderer::EStateId::OVERRIDE_RENDER_TARGET>() = inOverrideRenderTarget;
 }
 
-void Renderer::SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOverrideFramebuffer)
-{
-  mState.GetCurrent<Renderer::EStateId::OVERRIDE_FRAMEBUFFER>() = inOverrideFramebuffer;
-}
-
-void Renderer::BindFramebuffer()
-{
-  auto framebuffer = GetFramebuffer();
-  framebuffer->Bind();
-
-  const auto render_target_to_use = GetRenderTarget();
-  framebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, render_target_to_use->GetColorTexture());
-  if (GL::IsDepthOnlyFormat(render_target_to_use->GetDepthTexture()->GetFormat()))
-  {
-    framebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_STENCIL_ATTACHMENT,
-        render_target_to_use->GetDepthTexture());
-  }
-  else
-  {
-    framebuffer->SetAttachment(GL::EFramebufferAttachment::DEPTH_ATTACHMENT, render_target_to_use->GetDepthTexture());
-  }
-  framebuffer->Resize(render_target_to_use->GetColorTexture()->GetSize());
-  framebuffer->CheckFramebufferIsComplete();
-}
+void Renderer::BindRenderTarget() { GetRenderTarget()->Bind(); }
 
 void Renderer::Blit()
 {
   TextureOperations::DrawFullScreenTexture(*GetRenderTarget()->GetColorTexture(),
       *GetRenderTarget()->GetDepthTexture());
+}
+
+void Renderer::Blit(RenderTarget& ioRenderTarget)
+{
+  const RenderTarget::GLGuardType render_target_guard;
+
+  ioRenderTarget.Bind();
+  Blit();
 }
 
 void Renderer::PushState() { mState.PushAllTops(); }
@@ -154,7 +171,6 @@ void Renderer::AdaptToWindow(const Window& inWindow)
 {
   SetViewport(Recti(Zero<Vec2i>(), inWindow.GetFramebufferSize()));
   GetRenderTarget()->Resize(inWindow.GetFramebufferSize());
-  GetFramebuffer()->Resize(inWindow.GetFramebufferSize());
 }
 
 void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
@@ -211,10 +227,8 @@ void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
   assert(ioDrawSetup.mShaderProgram);
   ioDrawSetup.mShaderProgram->Bind();
 
-  // Prepare framebuffer
-  BindFramebuffer();
-
-  GL::Enable(GL::EEnablable::DEPTH_TEST); // Guarded in DrawSetup
+  // Prepare RenderTarget (if any)
+  BindRenderTarget();
 
   mState.ApplyCurrentState();
 }

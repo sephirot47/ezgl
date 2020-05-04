@@ -31,12 +31,6 @@ void TextureOperations::DrawFullScreenTexture(const Texture2D& inTexture, const 
   const auto draw_full_screen_texture_shader_program = ShaderProgramFactory::GetDrawFullScreenTextureShaderProgram();
   draw_full_screen_texture_shader_program->Bind();
 
-  const GLEnableGuard<GL::EEnablable::BLEND> blend_enable_guard;
-  GL::Enable(GL::EEnablable::BLEND);
-
-  const GLBlendFuncGuard blend_func_guard;
-  GL::BlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
-
   inTexture.BindToTextureUnit(0);
   draw_full_screen_texture_shader_program->SetUniformSafe("UTexture", 0);
 

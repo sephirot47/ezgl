@@ -44,13 +44,12 @@ public:
   {
     OVERRIDE_SHADER_PROGRAM,
     OVERRIDE_RENDER_TARGET,
-    OVERRIDE_FRAMEBUFFER,
     VIEWPORT,
     DEPTH_FUNC,
     DEPTH_WRITE_ENABLED,
     BLEND_ENABLED,
-    BLEND_SOURCE_FACTOR,
-    BLEND_DEST_FACTOR,
+    BLEND_FACTORS,
+    BLEND_COLOR,
     POINT_SIZE,
     LINE_WIDTH
   };
@@ -99,14 +98,23 @@ public:
 
   // Blend func/factors
   void SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor);
-  GL::EBlendFactor GetBlendSourceFactor() const { return mState.GetCurrent<EStateId::BLEND_SOURCE_FACTOR>(); }
-  void PushBlendSourceFactor() { mState.PushTop<EStateId::BLEND_SOURCE_FACTOR>(); }
-  void PopBlendSourceFactor() { mState.Pop<EStateId::BLEND_SOURCE_FACTOR>(); }
-  void ResetBlendSourceactor() { mState.Reset<EStateId::BLEND_SOURCE_FACTOR>(); }
-  GL::EBlendFactor GetBlendDestFactor() const { return mState.GetCurrent<EStateId::BLEND_DEST_FACTOR>(); }
-  void PushBlendDestFactor() { mState.PushTop<EStateId::BLEND_DEST_FACTOR>(); }
-  void PopBlendDestFactor() { mState.Pop<EStateId::BLEND_DEST_FACTOR>(); }
-  void ResetBlendDestFactor() { mState.Reset<EStateId::BLEND_DEST_FACTOR>(); }
+  void SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB, const GL::EBlendFactor inBlendDestFactorRGB);
+  void SetBlendFuncAlpha(const GL::EBlendFactor inBlendSourceFactorAlpha,
+      const GL::EBlendFactor inBlendDestFactorAlpha);
+  GL::EBlendFactor GetBlendSourceFactorRGB() const;
+  GL::EBlendFactor GetBlendDestFactorRGB() const;
+  GL::EBlendFactor GetBlendSourceFactorAlpha() const;
+  GL::EBlendFactor GetBlendDestFactorAlpha() const;
+  void PushBlendFactors() { mState.PushTop<EStateId::BLEND_FACTORS>(); }
+  void PopBlendFactors() { mState.Pop<EStateId::BLEND_FACTORS>(); }
+  void ResetBlendFactors() { mState.Reset<EStateId::BLEND_FACTORS>(); }
+
+  // Blend color
+  void SetBlendColor(const Color4f &inBlendColor) { mState.GetCurrent<EStateId::BLEND_COLOR>() = inBlendColor; }
+  Color4f GetBlendColor() const { return mState.GetCurrent<EStateId::BLEND_COLOR>(); }
+  void PushBlendColor() { mState.PushTop<EStateId::BLEND_COLOR>(); }
+  void PopBlendColor() { mState.Pop<EStateId::BLEND_COLOR>(); }
+  void ResetBlendColor() { mState.Reset<EStateId::BLEND_COLOR>(); }
 
   // Point size
   void SetPointSize(const float inPointSize);
@@ -159,28 +167,8 @@ public:
   void PushOverrideRenderTarget() { mState.PushTop<EStateId::OVERRIDE_RENDER_TARGET>(); }
   void PopOverrideRenderTarget() { mState.Pop<EStateId::OVERRIDE_RENDER_TARGET>(); }
   void ResetOverrideRenderTarget() { mState.Reset<EStateId::OVERRIDE_RENDER_TARGET>(); }
-
-  // Framebuffer
-  std::shared_ptr<Framebuffer> GetDefaultFramebuffer() { return mDefaultFramebuffer; }
-  std::shared_ptr<const Framebuffer> GetDefaultFramebuffer() const { return mDefaultFramebuffer; }
-  std::shared_ptr<Framebuffer> GetFramebuffer()
-  {
-    return GetOverrideFramebuffer() ? GetOverrideFramebuffer() : GetDefaultFramebuffer();
-  }
-  std::shared_ptr<const Framebuffer> GetFramebuffer() const
-  {
-    return GetOverrideFramebuffer() ? GetOverrideFramebuffer() : GetDefaultFramebuffer();
-  }
-  void SetOverrideFramebuffer(const std::shared_ptr<Framebuffer>& inOverrideFramebuffer);
-  std::shared_ptr<Framebuffer> GetOverrideFramebuffer() { return mState.GetCurrent<EStateId::OVERRIDE_FRAMEBUFFER>(); }
-  std::shared_ptr<const Framebuffer> GetOverrideFramebuffer() const
-  {
-    return mState.GetCurrent<EStateId::OVERRIDE_FRAMEBUFFER>();
-  }
-  void PushOverrideFramebuffer() { mState.PushTop<EStateId::OVERRIDE_FRAMEBUFFER>(); }
-  void PopOverrideFramebuffer() { mState.Pop<EStateId::OVERRIDE_FRAMEBUFFER>(); }
-  void ResetOverrideFramebuffer() { mState.Reset<EStateId::OVERRIDE_FRAMEBUFFER>(); }
   void Blit();
+  void Blit(RenderTarget& ioRenderTarget);
 
   // Viewport
   void SetViewport(const Recti& inViewport) { mState.GetCurrent<EStateId::VIEWPORT>() = inViewport; }
@@ -193,13 +181,12 @@ public:
   using StateTupleOfStacks = TupleOfStacks<EStateId,
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
       std::shared_ptr<RenderTarget>,  // EStateId::OVERRIDE_RENDER_TARGET
-      std::shared_ptr<Framebuffer>,   // EStateId::OVERRIDE_FRAMEBUFFER
       Recti,                          // EStateId::VIEWPORT
       GL::EDepthFunc,                 // EStateId::DEPTH_FUNC
       bool,                           // EStateId::DEPTH_WRITE_ENABLED
       bool,                           // EStateId::BLEND_ENABLED
-      GL::EBlendFactor,               // EStateId::BLEND_SOURCE_FACTOR
-      GL::EBlendFactor,               // EStateId::BLEND_DEST_FACTOR
+      GL::BlendFactors,               // EStateId::BLEND_FACTORS
+      Color4f,                        // EStateId::BLEND_COLOR
       float,                          // EStateId::POINT_SIZE
       float>;                         // EStateId::LINE_WIDTH
   using State = RendererStateStacks<Renderer, StateTupleOfStacks>;
@@ -217,8 +204,8 @@ protected:
   std::shared_ptr<ShaderProgram>& GetShaderProgram() { return mShaderProgram; }
   const std::shared_ptr<ShaderProgram>& GetShaderProgram() const { return mShaderProgram; }
 
-  // Framebuffer
-  void BindFramebuffer();
+  // RenderTarget
+  void BindRenderTarget();
 
   // Draw helpers
   virtual void AdaptToWindow(const Window& inWindow);
@@ -285,7 +272,6 @@ private:
   std::shared_ptr<ShaderProgram> mShaderProgram;
 
   // Render texture
-  std::shared_ptr<Framebuffer> mDefaultFramebuffer;
   std::shared_ptr<RenderTarget> mDefaultRenderTarget;
 
   // State functions

@@ -80,6 +80,14 @@ std::array<GL::Int, N> GL::GetIntegers(const GL::EGetEnum inGetIntegerId)
   return ints;
 }
 
+template <std::size_t N>
+std::array<GL::Float, N> GL::GetFloats(const GL::EGetEnum inGetFloatId)
+{
+  std::array<GL::Float, N> floats;
+  glGetFloatv(GL::EnumCast(inGetFloatId), floats.data());
+  return floats;
+}
+
 template <> inline GL::Id GL::Create<GL::EObjectType::EBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAGMENT_SHADER>() { return GL::CreateShader(GL::EShaderType::FRAGMENT); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAMEBUFFER>() { return GL::CreateFramebuffer(); }

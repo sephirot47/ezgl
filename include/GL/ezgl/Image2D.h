@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ezgl/Math.h"
+#include "ezgl/Color.h"
+#include "ezgl/MathInitializers.h"
 #include "ezgl/Span.h"
 #include <filesystem>
 #include <vector>
@@ -32,6 +33,17 @@ public:
   Span<T> GetData() const;
   std::size_t GetWidth() const;
   std::size_t GetHeight() const;
+
+  std::vector<T>::iterator begin() { return mData.begin(); }
+  std::vector<T>::iterator end() { return mData.end(); }
+  std::vector<T>::const_iterator begin() const { return mData.begin(); }
+  std::vector<T>::const_iterator end() const { return mData.end(); }
+  std::vector<T>::const_iterator cbegin() const { return mData.cbegin(); }
+  std::vector<T>::const_iterator cend() const { return mData.cend(); }
+
+  bool operator==(const Image2D& inRHS) const;
+  bool operator!=(const Image2D& inRHS) const;
+  bool IsVeryEqual(const Image2D& inRHS, const T& inEpsilon = All<T>(static_cast<ValueType_t<T>>(1e-6))) const;
 
 private:
   std::vector<T> mData;

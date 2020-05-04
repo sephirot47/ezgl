@@ -1,5 +1,6 @@
 #include "ezgl/Image2D.h"
 #include "ezgl/ImageIO.h"
+#include "ezgl/Math.h"
 
 namespace egl
 {
@@ -79,4 +80,42 @@ std::size_t Image2D<T>::GetHeight() const
   return mHeight;
 }
 
+template <typename T>
+bool Image2D<T>::operator==(const Image2D& inRHS) const
+{
+  return mData == inRHS.mData && mWidth == inRHS.mWidth && mHeight == inRHS.mHeight;
+}
+
+template <typename T>
+bool Image2D<T>::operator!=(const Image2D& inRHS) const
+{
+  return !(*this == inRHS);
+}
+
+template <typename T>
+bool Image2D<T>::IsVeryEqual(const Image2D& inRHS, const T& inEpsilon) const
+{
+  if (mWidth != inRHS.mWidth)
+    return false;
+
+  if (mHeight != inRHS.mHeight)
+    return false;
+
+  auto it = cbegin();
+  auto rhs_it = inRHS.cbegin();
+  while (it != cend())
+  {
+    const auto& pixel = *it;
+    const auto& rhs_pixel = *rhs_it;
+
+    if (!::egl::IsVeryEqual(pixel, rhs_pixel, inEpsilon))
+      return false;
+
+    ++it;
+    ++rhs_it;
+  }
+  assert(it == cend());
+  assert(rhs_it == inRHS.cend());
+  return true;
+}
 }

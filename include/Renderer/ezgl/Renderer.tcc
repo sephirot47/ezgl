@@ -56,7 +56,9 @@ void Renderer::DrawLineStripGeneric(const Span<Vec<T, N>>& inLinePoints)
   const auto draw_setup = PrepareForDraw();
 
   VAO vao;
-  vao.AddVBO(std::make_shared<VBO>(inLinePoints), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
+  vao.AddVBO(std::make_shared<VBO>(inLinePoints),
+      MeshDrawData::PositionAttribLocation(),
+      VAOVertexAttribT<Vec<T, N>>());
   const auto vao_bind_guard = vao.BindGuarded();
 
   GL::DrawArrays(GL::EPrimitivesType::LINE_STRIP, inLinePoints.GetNumberOfElements());
@@ -72,10 +74,6 @@ void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioSta
   else if constexpr (StateId == Renderer::EStateId::OVERRIDE_RENDER_TARGET)
   {
     ioState.GetRenderer().SetOverrideRenderTarget(inValue);
-  }
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
-  {
-    ioState.GetRenderer().SetOverrideFramebuffer(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::VIEWPORT)
   {
@@ -93,13 +91,13 @@ void Renderer::ApplyState(const State::ValueType<StateId>& inValue, State& ioSta
   {
     GL::SetEnabled(GL::EEnablable::BLEND, inValue);
   }
-  else if constexpr (StateId == Renderer::EStateId::BLEND_SOURCE_FACTOR)
+  else if constexpr (StateId == Renderer::EStateId::BLEND_FACTORS)
   {
-    GL::BlendFunc(inValue, ioState.GetCurrent<Renderer::EStateId::BLEND_DEST_FACTOR>());
+    GL::BlendFuncSeparate(inValue);
   }
-  else if constexpr (StateId == Renderer::EStateId::BLEND_DEST_FACTOR)
+  else if constexpr (StateId == Renderer::EStateId::BLEND_COLOR)
   {
-    GL::BlendFunc(ioState.GetCurrent<Renderer::EStateId::BLEND_SOURCE_FACTOR>(), inValue);
+    GL::BlendColor(inValue);
   }
   else if constexpr (StateId == Renderer::EStateId::POINT_SIZE)
   {
@@ -126,10 +124,6 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   {
     return nullptr;
   }
-  else if constexpr (StateId == Renderer::EStateId::OVERRIDE_FRAMEBUFFER)
-  {
-    return nullptr;
-  }
   else if constexpr (StateId == Renderer::EStateId::VIEWPORT)
   {
     return Recti(Zero<Vec2i>(), Zero<Vec2i>());
@@ -146,13 +140,18 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   {
     return true;
   }
-  else if constexpr (StateId == Renderer::EStateId::BLEND_SOURCE_FACTOR)
+  else if constexpr (StateId == Renderer::EStateId::BLEND_FACTORS)
   {
-    return GL::EBlendFactor::SRC_ALPHA;
+    GL::BlendFactors default_blend_factors;
+    default_blend_factors.mSourceBlendFactorRGB = GL::EBlendFactor::SRC_ALPHA;
+    default_blend_factors.mDestBlendFactorRGB = GL::EBlendFactor::ONE_MINUS_SRC_ALPHA;
+    default_blend_factors.mSourceBlendFactorAlpha = GL::EBlendFactor::ONE;
+    default_blend_factors.mDestBlendFactorAlpha = GL::EBlendFactor::ONE;
+    return default_blend_factors;
   }
-  else if constexpr (StateId == Renderer::EStateId::BLEND_DEST_FACTOR)
+  else if constexpr (StateId == Renderer::EStateId::BLEND_COLOR)
   {
-    return GL::EBlendFactor::ONE_MINUS_SRC_ALPHA;
+    return One<Color4f>();
   }
   else if constexpr (StateId == Renderer::EStateId::POINT_SIZE)
   {

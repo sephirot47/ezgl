@@ -671,6 +671,14 @@ public:
     COMPARE_REF_TO_TEXTURE = GL_COMPARE_REF_TO_TEXTURE,
   };
 
+  struct BlendFactors
+  {
+    GL::EBlendFactor mSourceBlendFactorRGB = GL::EBlendFactor::ONE;
+    GL::EBlendFactor mDestBlendFactorRGB = GL::EBlendFactor::ZERO;
+    GL::EBlendFactor mSourceBlendFactorAlpha = GL::EBlendFactor::ONE;
+    GL::EBlendFactor mDestBlendFactorAlpha = GL::EBlendFactor::ZERO;
+  };
+
   static void Enable(const GL::EEnablable inEnablable);
   static void Disable(const GL::EEnablable inEnablable);
   static void SetEnabled(const GL::EEnablable inEnablable, const bool inEnabled);
@@ -687,10 +695,13 @@ public:
       const GL::EBlendFactor inDestBlendFactorRGB,
       const GL::EBlendFactor inSourceBlendFactorAlpha,
       const GL::EBlendFactor inDestBlendFactorAlpha);
+  static void BlendFuncSeparate(const BlendFactors &inBlendFactors);
+  static void BlendColor(const Color4f &inBlendColor);
   static GL::EBlendFactor GetSourceBlendFactorRGB();
   static GL::EBlendFactor GetDestBlendFactorRGB();
   static GL::EBlendFactor GetSourceBlendFactorAlpha();
   static GL::EBlendFactor GetDestBlendFactorAlpha();
+  static Color4f GetBlendColor();
 
   static void PointSize(const float inPointSize);
   static float GetPointSize();
@@ -839,6 +850,9 @@ public:
 
   template <std::size_t N>
   static std::array<GL::Int, N> GetIntegers(const GL::EGetEnum inGetIntegerId);
+
+  template <std::size_t N>
+  static std::array<GL::Float, N> GetFloats(const GL::EGetEnum inGetFloatId);
 
   static void GLAPIENTRY ErrorCallback(GL::Enum inSource,
       GL::Enum inType,

@@ -50,10 +50,16 @@ constexpr T QuarterCircleRads()
 }
 
 template <typename T>
-constexpr T All(const typename T::ValueType& inAllValue)
+constexpr auto All(const ValueType_t<T>& inAllValue)
 {
-  using ValueType = typename T::ValueType;
-  return T(MITAll<ValueType> { static_cast<ValueType>(inAllValue) });
+  if constexpr (IsNumber_v<T>)
+  {
+    return inAllValue;
+  }
+  else
+  {
+    return T(MITAll<ValueType_t<T>> { static_cast<ValueType_t<T>>(inAllValue) });
+  }
 }
 
 template <typename T>
@@ -69,14 +75,13 @@ constexpr T One()
 }
 
 template <typename T>
-constexpr T Diagonal(const typename T::ValueType& inDiagonalValue)
+constexpr T Diagonal(const ValueType_t<T>& inDiagonalValue)
 {
   if constexpr (IsMat_v<T>)
   {
-    using ValueType = T::ValueType;
     static_assert(T::NumRows == T::NumCols, "Diagonal only supported for square matrices.");
 
-    T diagonal_matrix = All<T>(static_cast<ValueType>(0));
+    T diagonal_matrix = All<T>(static_cast<ValueType_t<T>>(0));
     for (std::size_t i = 0; i < T::NumRows; ++i) { diagonal_matrix[i][i] = inDiagonalValue; }
     return diagonal_matrix;
   }
@@ -114,7 +119,7 @@ constexpr auto Identity()
 template <typename TColor>
 constexpr TColor Black()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -128,7 +133,7 @@ constexpr TColor Black()
 template <typename TColor>
 constexpr TColor Gray()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(1));
@@ -142,7 +147,7 @@ constexpr TColor Gray()
 template <typename TColor>
 constexpr TColor White()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1));
@@ -156,7 +161,7 @@ constexpr TColor White()
 template <typename TColor>
 constexpr TColor Red()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -170,7 +175,7 @@ constexpr TColor Red()
 template <typename TColor>
 constexpr TColor Green()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -184,7 +189,7 @@ constexpr TColor Green()
 template <typename TColor>
 constexpr TColor Blue()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1));
@@ -198,7 +203,7 @@ constexpr TColor Blue()
 template <typename TColor>
 constexpr TColor Cyan()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(1));
@@ -211,7 +216,7 @@ constexpr TColor Cyan()
 template <typename TColor>
 constexpr TColor Magenta()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1));
@@ -225,7 +230,7 @@ constexpr TColor Magenta()
 template <typename TColor>
 constexpr TColor Yellow()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(1), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -239,7 +244,7 @@ constexpr TColor Yellow()
 template <typename TColor>
 constexpr TColor Brown()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0.5), static_cast<TValue>(0.25), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -253,7 +258,7 @@ constexpr TColor Brown()
 template <typename TColor>
 constexpr TColor Orange()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(0.5), static_cast<TValue>(0), static_cast<TValue>(1));
@@ -267,7 +272,7 @@ constexpr TColor Orange()
 template <typename TColor>
 constexpr TColor Purple()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(0.5), static_cast<TValue>(0), static_cast<TValue>(1), static_cast<TValue>(1));
@@ -281,7 +286,7 @@ constexpr TColor Purple()
 template <typename TColor>
 constexpr TColor Pink()
 {
-  using TValue = typename TColor::ValueType;
+  using TValue = ValueType_t<TColor>;
   if constexpr (TColor::NumComponents == 4)
   {
     return TColor(static_cast<TValue>(1), static_cast<TValue>(0.5), static_cast<TValue>(0.5), static_cast<TValue>(1));

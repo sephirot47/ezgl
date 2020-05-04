@@ -35,6 +35,12 @@ public:
     bool mDoubleBuffer = true;
   };
 
+  enum class LoopResult
+  {
+    KEEP_LOOPING,
+    END_LOOP
+  };
+
   Window(const Window::CreateOptions& inCreateOptions = Window::CreateOptions());
   Window(const Window& inRHS) = delete;
   Window& operator=(const Window& inRHS) = delete;
@@ -54,7 +60,7 @@ public:
   float GetFramebufferAspectRatio() const;
 
   // Loop callback
-  using LoopCallback = std::function<void(const DeltaTime)>;
+  using LoopCallback = std::function<Window::LoopResult(const DeltaTime)>;
   void Loop(const Window::LoopCallback& inLoopCallback);
 
   // Input callbacks

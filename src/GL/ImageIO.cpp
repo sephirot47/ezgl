@@ -14,14 +14,14 @@ namespace egl
 void ImageIO::Read(const std::filesystem::path& inPath, Image2D<Color4f>& outImage)
 {
   if (!std::filesystem::exists(inPath) || std::filesystem::is_directory(inPath))
-    THROW_EXCEPTION("Path '" << inPath << "' does not exist.");
+    THROW_EXCEPTION("Path " << inPath << " does not exist.");
 
   int read_width = 0;
   int read_height = 0;
   int non_forced_read_num_channels = 0;
 
-  stbi_set_flip_vertically_on_load(true);
-  const uint8_t* read_data = stbi_load(inPath.c_str(), &read_width, &read_height, &non_forced_read_num_channels, STBI_rgb_alpha);
+  const uint8_t* read_data
+      = stbi_load(inPath.c_str(), &read_width, &read_height, &non_forced_read_num_channels, STBI_rgb_alpha);
 
   constexpr auto ForcedNumChannels = 4;
   outImage.Create(read_width, read_height);

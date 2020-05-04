@@ -63,10 +63,24 @@ void GL::BlendFuncSeparate(const GL::EBlendFactor inSourceBlendFactorRGB,
 
 {
   glBlendFuncSeparate(GL::EnumCast(inSourceBlendFactorRGB),
-      GL::EnumCast(inSourceBlendFactorAlpha),
       GL::EnumCast(inDestBlendFactorRGB),
+      GL::EnumCast(inSourceBlendFactorAlpha),
       GL::EnumCast(inDestBlendFactorAlpha));
 }
+
+void GL::BlendFuncSeparate(const BlendFactors& inBlendFactors)
+{
+  GL::BlendFuncSeparate(inBlendFactors.mSourceBlendFactorRGB,
+      inBlendFactors.mDestBlendFactorRGB,
+      inBlendFactors.mSourceBlendFactorAlpha,
+      inBlendFactors.mDestBlendFactorAlpha);
+}
+
+void GL::BlendColor(const Color4f& inBlendColor)
+{
+  glBlendColor(inBlendColor[0], inBlendColor[1], inBlendColor[2], inBlendColor[3]);
+}
+
 GL::EBlendFactor GL::GetSourceBlendFactorRGB()
 {
   return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_SRC_RGB));
@@ -82,6 +96,11 @@ GL::EBlendFactor GL::GetSourceBlendFactorAlpha()
 GL::EBlendFactor GL::GetDestBlendFactorAlpha()
 {
   return static_cast<GL::EBlendFactor>(GL::GetInteger(GL::EGetEnum::BLEND_DST_ALPHA));
+}
+Color4f GL::GetBlendColor()
+{
+  const auto blend_color_comps = GL::GetFloats<4>(GL::EGetEnum::BLEND_COLOR);
+  return Color4f(blend_color_comps[0], blend_color_comps[1], blend_color_comps[2], blend_color_comps[3]);
 }
 
 GL::Id GL::GenBuffer()

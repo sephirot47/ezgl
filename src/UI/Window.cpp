@@ -56,6 +56,11 @@ Window::Window(const Window::CreateOptions& inCreateOptions)
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(&GL::ErrorCallback, 0);
 
+  GL::Enable(GL::EEnablable::DEPTH_TEST);
+  GL::Enable(GL::EEnablable::BLEND);
+  GL::Disable(GL::EEnablable::CULL_FACE);
+  GL::BlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
+
   glfwSetWindowUserPointer(mHandle, this);
 
   // Set input callbacks
@@ -117,7 +122,9 @@ void Window::Loop(const Window::LoopCallback& inLoopCallback)
   {
     const auto delta_time = (Now() - previous_time);
     previous_time = Now();
-    inLoopCallback(delta_time);
+    const auto loop_result = inLoopCallback(delta_time);
+    if (loop_result == Window::LoopResult::END_LOOP)
+      break;
 
     SwapBuffers();
     PollEvents();
