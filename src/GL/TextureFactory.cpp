@@ -1,7 +1,7 @@
-#include "ezgl/TextureFactory.h"
-#include "ezgl/Image2D.h"
-#include "ezgl/Math.h"
-#include "ezgl/Texture2D.h"
+#include "ez/TextureFactory.h"
+#include "ez/Image2D.h"
+#include "ez/Math.h"
+#include "ez/Texture2D.h"
 
 namespace ez
 {

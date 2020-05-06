@@ -1,6 +1,6 @@
-#include "ezgl/RenderTarget.h"
-#include "ezgl/Framebuffer.h"
-#include "ezgl/Texture2D.h"
+#include "ez/RenderTarget.h"
+#include "ez/Framebuffer.h"
+#include "ez/Texture2D.h"
 
 namespace ez
 {

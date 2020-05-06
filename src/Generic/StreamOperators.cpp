@@ -1,5 +1,5 @@
-#include "ezgl/StreamOperators.h"
-#include "ezgl/Mesh.h"
+#include "ez/StreamOperators.h"
+#include "ez/Mesh.h"
 
 namespace ez
 {

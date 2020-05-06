@@ -1,6 +1,6 @@
-#include "ezgl/MeshFactory.h"
-#include "ezgl/Math.h"
-#include "ezgl/Mesh.h"
+#include "ez/MeshFactory.h"
+#include "ez/Math.h"
+#include "ez/Mesh.h"
 
 namespace ez
 {

@@ -1,4 +1,4 @@
-#include "ezgl/FileUtils.h"
+#include "ez/FileUtils.h"
 
 #include <fstream>
 

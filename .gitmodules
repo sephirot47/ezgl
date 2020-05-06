@@ -1,3 +1,6 @@
 [submodule "third_party/assimp"]
 	path = third_party/assimp
 	url = https://github.com/assimp/assimp
+[submodule "ezmath"]
+	path = ezmath
+	url = https://github.com/sephirot47/ezmath

@@ -1,5 +1,5 @@
-#include "ezgl/Framebuffer.h"
-#include "ezgl/GLGuard.h"
+#include "ez/Framebuffer.h"
+#include "ez/GLGuard.h"
 
 namespace ez
 {

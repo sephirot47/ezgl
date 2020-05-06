@@ -1,26 +1,26 @@
 #pragma once
 
-#include "ezgl/Camera.h"
-#include "ezgl/Circle.h"
-#include "ezgl/Color.h"
-#include "ezgl/DirectionalLight.h"
-#include "ezgl/Framebuffer.h"
-#include "ezgl/Macros.h"
-#include "ezgl/Material2D.h"
-#include "ezgl/Math.h"
-#include "ezgl/MeshDrawData.h"
-#include "ezgl/OrthographicCamera.h"
-#include "ezgl/PerspectiveCamera.h"
-#include "ezgl/Plane.h"
-#include "ezgl/PointLight.h"
-#include "ezgl/Renderer.h"
-#include "ezgl/RendererStateStacks.h"
-#include "ezgl/Segment.h"
-#include "ezgl/ShaderProgram.h"
-#include "ezgl/Texture2D.h"
-#include "ezgl/Triangle.h"
-#include "ezgl/UBO.h"
-#include "ezgl/Window.h"
+#include "ez/Camera.h"
+#include "ez/Circle.h"
+#include "ez/Color.h"
+#include "ez/DirectionalLight.h"
+#include "ez/Framebuffer.h"
+#include "ez/Macros.h"
+#include "ez/Material2D.h"
+#include "ez/Math.h"
+#include "ez/MeshDrawData.h"
+#include "ez/OrthographicCamera.h"
+#include "ez/PerspectiveCamera.h"
+#include "ez/Plane.h"
+#include "ez/PointLight.h"
+#include "ez/Renderer.h"
+#include "ez/RendererStateStacks.h"
+#include "ez/Segment.h"
+#include "ez/ShaderProgram.h"
+#include "ez/Texture2D.h"
+#include "ez/Triangle.h"
+#include "ez/UBO.h"
+#include "ez/Window.h"
 #include <any>
 #include <cstdint>
 #include <functional>
@@ -90,7 +90,8 @@ public:
   void DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices = 32);
   void DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices = 32);
   void DrawCircle(const std::size_t inNumVertices = 32);
-  void DrawCircleBoundary(const std::size_t inNumVertices = 32);
+  void DrawCircleBoundary(
+    const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
@@ -145,4 +146,4 @@ template <> struct RendererFromEStateId<Renderer2D::EStateId> { using Type = Ren
 // clang-format on
 }
 
-#include "ezgl/Renderer2D.tcc"
+#include "ez/Renderer2D.tcc"

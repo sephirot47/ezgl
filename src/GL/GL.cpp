@@ -1,4 +1,4 @@
-#include "ezgl/GL.h"
+#include "ez/GL.h"
 
 namespace ez
 {

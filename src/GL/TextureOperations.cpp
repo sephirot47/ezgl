@@ -1,10 +1,10 @@
-#include "ezgl/TextureOperations.h"
-#include "ezgl/MeshDrawData.h"
-#include "ezgl/MeshFactory.h"
-#include "ezgl/ShaderProgram.h"
-#include "ezgl/ShaderProgramFactory.h"
-#include "ezgl/Texture2D.h"
-#include "ezgl/TextureFactory.h"
+#include "ez/TextureOperations.h"
+#include "ez/MeshDrawData.h"
+#include "ez/MeshFactory.h"
+#include "ez/ShaderProgram.h"
+#include "ez/ShaderProgramFactory.h"
+#include "ez/Texture2D.h"
+#include "ez/TextureFactory.h"
 
 namespace ez
 {

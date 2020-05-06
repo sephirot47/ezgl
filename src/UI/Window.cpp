@@ -1,5 +1,5 @@
-#include "ezgl/Window.h"
-#include "ezgl/Macros.h"
+#include "ez/Window.h"
+#include "ez/Macros.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <thread>

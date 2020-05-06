@@ -1,10 +1,10 @@
-#include "ezgl/Mesh.h"
-#include "ezgl/Macros.h"
-#include "ezgl/Math.h"
-#include "ezgl/MeshIO.h"
-#include "ezgl/MeshIterators.h"
-#include "ezgl/StreamOperators.h"
-#include "ezgl/Transformation.h"
+#include "ez/Mesh.h"
+#include "ez/Macros.h"
+#include "ez/Math.h"
+#include "ez/MeshIO.h"
+#include "ez/MeshIterators.h"
+#include "ez/StreamOperators.h"
+#include "ez/Transformation.h"
 #include <algorithm>
 #include <cassert>
 #include <unordered_map>
@@ -542,12 +542,14 @@ void Mesh::ComputeOppositeCornerIds()
   }
 }
 
+#ifdef MESH_IO
 void Mesh::Read(const std::filesystem::path& inMeshPath) { MeshIO::Read(inMeshPath, *this); }
 
 void Mesh::Write(const std::filesystem::path& inMeshPath, const bool inPreserveVerticesIds) const
 {
   MeshIO::Write(*this, inMeshPath, inPreserveVerticesIds);
 }
+#endif
 
 std::ostream& operator<<(std::ostream& ioLHS, const Mesh::Edge& inRHS)
 {

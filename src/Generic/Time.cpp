@@ -1,4 +1,4 @@
-#include "ezgl/Time.h"
+#include "ez/Time.h"
 #include <chrono>
 
 using namespace std::chrono_literals;

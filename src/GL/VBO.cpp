@@ -1,6 +1,6 @@
-#include "ezgl/VBO.h"
-#include "ezgl/GL.h"
-#include "ezgl/Macros.h"
+#include "ez/VBO.h"
+#include "ez/GL.h"
+#include "ez/Macros.h"
 
 namespace ez
 {

@@ -1,6 +1,6 @@
-#include "ezgl/Buffer.h"
-#include "ezgl/GL.h"
-#include "ezgl/Macros.h"
+#include "ez/Buffer.h"
+#include "ez/GL.h"
+#include "ez/Macros.h"
 
 namespace ez
 {

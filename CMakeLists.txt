@@ -2,10 +2,36 @@ cmake_minimum_required(VERSION 3.7)
 
 project(ezgl)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp")
 
-add_library(ezgl SHARED ${SRC_FILES})
+
+# ======================================================================
+# Options ==============================================================
+# ======================================================================
+
+# If enabled, it will support mesh IO but will need
+option(EZGL_COMPILE_MESH_IO "Whether to compile Mesh IO or not. If enabled, assimp library will be required. ON by default. " ON)
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# CMake config =========================================================
+# ======================================================================
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# ezgl library =========================================================
+# ======================================================================
+
+file(GLOB EZGL_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp")
+add_library(ezgl SHARED ${EZGL_SRC_FILES})
+
 target_compile_options(ezgl PRIVATE "-Wall")
 target_compile_options(ezgl PRIVATE "-Wextra")
 target_compile_options(ezgl PRIVATE "-Werror")
@@ -32,27 +58,67 @@ target_compile_features(ezgl PUBLIC "cxx_template_template_parameters")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Camera")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Generic")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/GL")
-target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Math")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Mesh")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Renderer")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/UI")
 
-find_package(assimp REQUIRED)
-target_include_directories(ezgl PUBLIC ${assimp_INCLUDE_DIRS})
-target_link_libraries(ezgl ${assimp_LIBRARIES})
+# ======================================================================
+# ======================================================================
+# ======================================================================
 
+# ======================================================================
+# Defines ==============================================================
+# ======================================================================
+
+if (EZGL_COMPILE_MESH_IO)
+target_compile_definitions(ezgl PRIVATE "MESH_IO")
+endif()
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# Dependencies =========================================================
+# ======================================================================
+
+# assimp
+if (EZGL_COMPILE_MESH_IO)
+  find_package(assimp REQUIRED)
+  target_include_directories(ezgl PUBLIC ${assimp_INCLUDE_DIRS})
+  target_link_libraries(ezgl ${assimp_LIBRARIES})
+endif()
+
+# OpenGL
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
 target_include_directories(ezgl PUBLIC ${OPENGL_INCLUDE_DIRS})
 target_link_libraries(ezgl ${OPENGL_LIBRARIES})
 
+# GLEW
 find_package(GLEW REQUIRED)
 target_include_directories(ezgl PUBLIC ${GLEW_INCLUDE_DIRS})
 target_link_libraries(ezgl ${GLEW_LIBRARIES})
 
+# GLFW
 find_package(glfw3 REQUIRED)
 target_link_libraries(ezgl glfw)
 
-# Tests
+# ezmath
+add_subdirectory(ezmath)
+target_link_libraries(ezgl ezmath)
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# Tests ================================================================
+# ======================================================================
+
 add_subdirectory(tests)
+
+# ======================================================================
+# ======================================================================
+# ======================================================================

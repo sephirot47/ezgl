@@ -1,7 +1,9 @@
-#include "ezgl/MeshIO.h"
-#include "ezgl/Macros.h"
-#include "ezgl/Math.h"
-#include "ezgl/Mesh.h"
+#ifdef MESH_IO
+
+#include "ez/MeshIO.h"
+#include "ez/Macros.h"
+#include "ez/Math.h"
+#include "ez/Mesh.h"
 #include <assimp/Exporter.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -176,3 +178,5 @@ void MeshIO::Write(const Mesh& inMesh, const std::filesystem::path& inMeshPath, 
     THROW_EXCEPTION("Error when exporting mesh to " << inMeshPath << ": " << exporter.GetErrorString());
 }
 }
+
+#endif

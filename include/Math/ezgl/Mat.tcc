@@ -1,6 +1,6 @@
-#include "ezgl/Mat.h"
-#include "ezgl/StreamOperators.h"
-#include "ezgl/VariadicRepeat.h"
+#include "ez/Mat.h"
+#include "ez/StreamOperators.h"
+#include "ez/VariadicRepeat.h"
 #include <cmath>
 
 namespace ez

@@ -1,6 +1,6 @@
-#include "ezgl/ShaderProgramFactory.h"
-#include "ezgl/Shader.h"
-#include "ezgl/ShaderProgram.h"
+#include "ez/ShaderProgramFactory.h"
+#include "ez/Shader.h"
+#include "ez/ShaderProgram.h"
 #include <string_view>
 
 namespace ez

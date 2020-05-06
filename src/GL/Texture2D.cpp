@@ -1,6 +1,6 @@
-#include "ezgl/Texture2D.h"
-#include "ezgl/GL.h"
-#include "ezgl/Image2D.h"
+#include "ez/Texture2D.h"
+#include "ez/GL.h"
+#include "ez/Image2D.h"
 
 namespace ez
 {

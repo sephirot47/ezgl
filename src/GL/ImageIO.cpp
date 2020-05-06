@@ -1,13 +1,13 @@
-#include "ezgl/ImageIO.h"
-#include "ezgl/Image2D.h"
-#include "ezgl/Macros.h"
+#include "ez/ImageIO.h"
+#include "ez/Image2D.h"
+#include "ez/Macros.h"
 #include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "ezgl/stb_image.h"
+#include "ez/stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "ezgl/stb_image_write.h"
+#include "ez/stb_image_write.h"
 
 namespace ez
 {

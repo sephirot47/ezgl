@@ -1,6 +1,6 @@
-#include "ezgl/EBO.h"
-#include "ezgl/GL.h"
-#include "ezgl/Macros.h"
+#include "ez/EBO.h"
+#include "ez/GL.h"
+#include "ez/Macros.h"
 
 namespace ez
 {
