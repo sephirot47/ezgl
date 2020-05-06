@@ -106,7 +106,7 @@ find_package(glfw3 REQUIRED)
 target_link_libraries(ezgl glfw)
 
 # ezmath
-add_subdirectory(ezmath)
+add_subdirectory(deps/ezmath)
 target_link_libraries(ezgl ezmath)
 
 # ======================================================================
