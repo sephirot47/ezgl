@@ -45,7 +45,8 @@ int main(int argc, const char** argv)
   const auto create_test_references_option = "--create-test-references";
   if (argc >= 2 && std::string(argv[1]) != create_test_references_option)
   {
-    std::cerr << "Unknown option " << argv[1] << ". Did you mean " << create_test_references_option << "?" << std::endl;
+    std::cerr << "Unknown option '" << argv[1] << "'. Did you mean '" << create_test_references_option << "'?"
+              << std::endl;
     exit(EXIT_FAILURE);
   }
   const auto create_test_references = (argc >= 2 && std::string(argv[1]) == create_test_references_option);
@@ -103,17 +104,17 @@ int main(int argc, const char** argv)
 
     // Ground plane
     {
-      RendererStateGuard<Renderer3D::EStateId::POINT_LIGHTS> point_lights_guard(renderer3D);
+      const auto point_lights_guard = renderer3D.GetGuard<Renderer3D::EStateId::POINT_LIGHTS>();
       renderer3D.AddPointLight(Up<Vec3f>() * 5.0f, 20.0f, Green<Color3f>());
 
-      RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> model_matrix_guard(renderer3D);
+      const auto model_matrix_guard = renderer3D.GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
       renderer3D.Translate(Up<Vec3f>() * 0.3f);
       renderer3D.Rotate(AngleAxis(QuarterCircleRads(), Right<Vec3f>()));
       renderer3D.Scale(XY1(All<Vec3f>(200.0f)));
 
-      RendererStateGuard<Renderer3D::EStateId::MATERIAL> material_guard(renderer3D);
+      const auto material_guard = renderer3D.GetGuard<Renderer3D::EStateId::MATERIAL>();
 
-      RendererStateGuard<Renderer3D::EStateId::CULL_FACE_ENABLED> cull_face_enabled_guard(renderer3D);
+      const auto cull_face_enabled_guard = renderer3D.GetGuard<Renderer3D::EStateId::CULL_FACE_ENABLED>();
       renderer3D.SetCullFaceEnabled(false);
 
       renderer3D.DrawMesh(plane);
@@ -138,17 +139,17 @@ int main(int argc, const char** argv)
 
     // Some objects
     {
-      RendererStateGuard<Renderer3D::EStateId::MATERIAL> material_guard(renderer3D);
+      const auto material_guard = renderer3D.GetGuard<Renderer3D::EStateId::MATERIAL>();
       renderer3D.GetMaterial().SetSpecularExponent(80.0f);
       renderer3D.GetMaterial().SetLightingEnabled(true);
       renderer3D.GetMaterial().SetSpecularIntensity(2.0f);
 
-      RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> model_matrix_guard(renderer3D);
+      const auto model_matrix_guard = renderer3D.GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
 
       renderer3D.SetBlendEnabled(true);
       {
-        RendererStateGuard<Renderer::EStateId::BLEND_FACTORS> blend_factors_guard(renderer3D);
-        RendererStateGuard<Renderer::EStateId::BLEND_ENABLED> blend_enabled_guard(renderer3D);
+        const auto blend_factors_guard = renderer3D.GetGuard<Renderer::EStateId::BLEND_FACTORS>();
+        const auto blend_enabled_guard = renderer3D.GetGuard<Renderer::EStateId::BLEND_ENABLED>();
         renderer3D.SetBlendFuncRGB(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
 
         renderer3D.GetMaterial().SetDiffuseColor(WithAlpha(Cyan<Color4f>(), 0.8f));
@@ -183,6 +184,30 @@ int main(int argc, const char** argv)
       renderer3D.ResetTransformMatrix();
       renderer3D.SetLineWidth(5.0f);
       renderer3D.DrawLineStrip(MakeSpan({ Vec3f(0.0f, 0.0f, 0.0f), Vec3f(3.0f, 1.0f, 2.0f), Vec3f(1.0f, 5.0f, 0.0f) }));
+
+      {
+        const auto cull_face_guard = renderer3D.GetGuard<Renderer3D::EStateId::CULL_FACE_ENABLED>();
+        renderer3D.SetCullFaceEnabled(false);
+
+        renderer3D.Scale(1.0f);
+        const auto triangles
+            = std::array { Triangle3f(Vec3f(1.0f, 1.0f, 1.0f), Vec3f(2.0f, 2.0f, 2.0f), Vec3f(-3.0f, -4.0f, -2.0f)),
+                Triangle3f(Vec3f(-4.0f, 5.0f, -3.0f), Vec3f(2.0f, 0.0f, 2.0f), Vec3f(-1.0f, 0.0f, 0.0f)) };
+        renderer3D.DrawTriangles(MakeSpan(triangles));
+
+        renderer3D.Translate(Up<Vec3f>() * 3.0f);
+        renderer3D.Scale(1.0f);
+        renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
+        renderer3D.DrawCircle(10);
+        renderer3D.GetMaterial().SetDiffuseColor(Green<Color4f>());
+        renderer3D.DrawCircleBoundary(10);
+
+        renderer3D.Scale(2.0f);
+        renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
+        renderer3D.DrawCircleSection(HalfCircleRads(), 10);
+        renderer3D.GetMaterial().SetDiffuseColor(Green<Color4f>());
+        renderer3D.DrawCircleSectionBoundary(HalfCircleRads(), 10);
+      }
     }
 
     renderer3D.Blit(*render_target);
@@ -200,6 +225,11 @@ int main(int argc, const char** argv)
       renderer2D.SetLineWidth(5.0f);
       renderer2D.GetMaterial().SetColor(Yellow<Color4f>());
       renderer2D.DrawSegments(MakeSpan(segments));
+      renderer2D.Scale(0.8f);
+      renderer2D.GetMaterial().SetColor(Red<Color4f>());
+      renderer2D.DrawTriangle(Triangle2f { points[0], points[1], points[2] });
+      renderer2D.GetMaterial().SetColor(Cyan<Color4f>());
+      renderer2D.DrawTriangleBoundary(Triangle2f { points[0], points[1], points[2] });
 
       renderer2D.SetLineWidth(1.0f);
       renderer2D.Translate(Vec2f(200.0f, 200.0f));
@@ -219,12 +249,25 @@ int main(int argc, const char** argv)
 
       renderer2D.DrawLineStrip(MakeSpan({ Vec2f(0.0f, 10.0f), Vec2f(10.0f, 30.0f) }));
 
-      renderer2D.DrawCircle(Circlef(Vec2f(500.0f, 500.0f), 50.0f), 50);
+      renderer2D.SetLineWidth(10.0f);
 
       renderer2D.ResetTransformMatrix();
       renderer2D.Translate(Vec2f(500.0f, 500.0f));
       renderer2D.Scale(80.0f);
-      renderer2D.DrawCircleSection(FullCircleRads() * 0.3f, 50);
+      renderer2D.DrawCircleSection(FullCircleRads() * 0.3f, 20);
+      renderer2D.PushMaterial();
+      renderer2D.GetMaterial().SetColor(Black<Color4f>());
+      renderer2D.DrawCircleSectionBoundary(FullCircleRads() * 0.3f, 5);
+      renderer2D.PopMaterial();
+
+      renderer2D.ResetTransformMatrix();
+      renderer2D.Translate(Vec2f(500.0f, 500.0f));
+      renderer2D.Scale(40.0f);
+      renderer2D.DrawCircle(10);
+      renderer2D.PushMaterial();
+      renderer2D.GetMaterial().SetColor(Black<Color4f>());
+      renderer2D.DrawCircleBoundary(10);
+      renderer2D.PopMaterial();
 
       renderer2D.Blit(*render_target);
       renderer2D.Blit();

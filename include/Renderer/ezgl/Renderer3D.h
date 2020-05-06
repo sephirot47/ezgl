@@ -125,6 +125,17 @@ public:
   void DrawSegments(const Span<Segment3f>& inSegments);
   void DrawLineStrip(const Span<Vec3f>& inLinePoints);
   void DrawTriangle(const Triangle3f& inTriangle);
+  void DrawTriangles(const Span<Triangle3f>& inTriangles);
+  void DrawCube();
+  void DrawCylinder(std::size_t inNumLongitudes = 32);
+  void DrawTorus(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32, float inHoleSize = 0.5f);
+  void DrawCone(std::size_t inNumLongitudes = 32);
+  void DrawHemisphere(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32);
+  void DrawSphere(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32);
+  void DrawCircle(std::size_t inNumVertices = 32);
+  void DrawCircleBoundary(std::size_t inNumVertices = 32);
+  void DrawCircleSection(const AngleRads inAngle, std::size_t inNumVertices = 32);
+  void DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices = 32);
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer3D::EStateId,

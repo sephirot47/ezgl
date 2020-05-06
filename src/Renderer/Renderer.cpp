@@ -206,7 +206,7 @@ void Renderer::DrawVAOArrays(const VAO& inVAO,
     const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inBeginPrimitiveIndex)
 {
-  constexpr auto draw_arrays = false;
+  constexpr auto draw_arrays = true;
   DrawVAOArraysOrElements(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, draw_arrays, inBeginPrimitiveIndex);
 }
 

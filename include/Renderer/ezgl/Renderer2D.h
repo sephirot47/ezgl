@@ -88,10 +88,13 @@ public:
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);
   void DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices = 32);
-  void DrawCircle(const Circlef& inCircle, const std::size_t inNumVertices = 32);
+  void DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices = 32);
+  void DrawCircle(const std::size_t inNumVertices = 32);
+  void DrawCircleBoundary(const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
+  void DrawTriangles(const Span<Triangle2f>& inTriangles);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
 
   // State

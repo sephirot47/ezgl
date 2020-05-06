@@ -201,11 +201,7 @@ void Renderer3D::DrawAxes()
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
 }
 
-void Renderer3D::DrawPoint(const Vec3f& inPoint)
-{
-  SetShaderProgram(sOnlyColorShaderProgram);
-  DrawPointGeneric(inPoint);
-}
+void Renderer3D::DrawPoint(const Vec3f& inPoint) { DrawPoints(MakeSpan({ inPoint })); }
 
 void Renderer3D::DrawPoints(const Span<Vec3f>& inPoints)
 {
@@ -213,11 +209,7 @@ void Renderer3D::DrawPoints(const Span<Vec3f>& inPoints)
   DrawPointsGeneric(inPoints);
 }
 
-void Renderer3D::DrawSegment(const Segment3f& inSegment)
-{
-  SetShaderProgram(sOnlyColorShaderProgram);
-  DrawSegmentGeneric(inSegment);
-}
+void Renderer3D::DrawSegment(const Segment3f& inSegment) { DrawSegments(MakeSpan({ inSegment })); }
 
 void Renderer3D::DrawSegments(const Span<Segment3f>& inSegments)
 {
@@ -231,20 +223,49 @@ void Renderer3D::DrawLineStrip(const Span<Vec3f>& inLinePoints)
   DrawLineStripGeneric(inLinePoints);
 }
 
-void Renderer3D::DrawTriangle(const Triangle3f& inTriangle)
+void Renderer3D::DrawTriangle(const Triangle3f& inTriangle) { DrawTrianglesGeneric(MakeSpan({ inTriangle })); }
+
+void Renderer3D::DrawTriangles(const Span<Triangle3f>& inTriangles) { DrawTrianglesGeneric(inTriangles); }
+
+void Renderer3D::DrawCube() { DrawMesh(MeshFactory::GetCube()); }
+
+void Renderer3D::DrawCylinder(std::size_t inNumLongitudes) { DrawMesh(MeshFactory::GetCylinder(inNumLongitudes)); }
+
+void Renderer3D::DrawTorus(std::size_t inNumLatitudes, std::size_t inNumLongitudes, float inHoleSize)
 {
-  Mesh triangle_mesh;
-  triangle_mesh.AddVertex(inTriangle[0]);
-  triangle_mesh.AddVertex(inTriangle[1]);
-  triangle_mesh.AddVertex(inTriangle[2]);
-  triangle_mesh.AddFace(0, 1, 2);
+  DrawMesh(MeshFactory::GetTorus(inNumLatitudes, inNumLongitudes, inHoleSize));
+}
 
-  const auto triangle_normal = Normal(inTriangle);
-  triangle_mesh.SetCornerNormal(0, triangle_normal);
-  triangle_mesh.SetCornerNormal(1, triangle_normal);
-  triangle_mesh.SetCornerNormal(2, triangle_normal);
+void Renderer3D::DrawCone(std::size_t inNumLongitudes) { DrawMesh(MeshFactory::GetCone(inNumLongitudes)); }
 
-  DrawMesh(triangle_mesh);
+void Renderer3D::DrawHemisphere(std::size_t inNumLatitudes, std::size_t inNumLongitudes)
+{
+  DrawMesh(MeshFactory::GetHemisphere(inNumLatitudes, inNumLongitudes));
+}
+
+void Renderer3D::DrawSphere(std::size_t inNumLatitudes, std::size_t inNumLongitudes)
+{
+  DrawMesh(MeshFactory::GetSphere(inNumLatitudes, inNumLongitudes));
+}
+
+void Renderer3D::DrawCircle(std::size_t inNumVertices)
+{
+  DrawCircleSectionGeneric<float, 3>(FullCircleRads(), inNumVertices);
+}
+
+void Renderer3D::DrawCircleBoundary(std::size_t inNumVertices)
+{
+  DrawCircleSectionBoundaryGeneric<float, 3>(FullCircleRads(), inNumVertices);
+}
+
+void Renderer3D::DrawCircleSection(const AngleRads inAngle, std::size_t inNumVertices)
+{
+  DrawCircleSectionGeneric<float, 3>(inAngle, inNumVertices);
+}
+
+void Renderer3D::DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices)
+{
+  DrawCircleSectionBoundaryGeneric<float, 3>(inAngle, inNumVertices);
 }
 
 // Helpers ========================================================================================

@@ -138,18 +138,18 @@ Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes,
   return sphere;
 }
 
-Mesh MeshFactory::GetCylinder(const std::size_t inNumVerticesX)
+Mesh MeshFactory::GetCylinder(const std::size_t inNumLongitudes)
 {
-  EXPECTS(inNumVerticesX >= 3);
+  EXPECTS(inNumLongitudes >= 3);
 
   Mesh cylinder;
 
   // Forward and back circle vertices
   for (const auto forward : { true, false })
   {
-    for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
+    for (Mesh::VertexId i = 0; i < inNumLongitudes; ++i)
     {
-      const auto progression = (static_cast<float>(i) / inNumVerticesX);
+      const auto progression = (static_cast<float>(i) / inNumLongitudes);
       const auto angle = Map(progression, 0.0f, 1.0f, 0.0f, FullCircleRads());
       const auto x = std::cos(angle) * 0.5f;
       const auto y = std::sin(angle) * 0.5f;
@@ -164,11 +164,11 @@ Mesh MeshFactory::GetCylinder(const std::size_t inNumVerticesX)
   cylinder.AddVertex(Vec3f { 0.0f, 0.0f, 0.5f });
 
   // Pipe faces
-  for (Mesh::VertexId forward_vertex_id = 0; forward_vertex_id < inNumVerticesX; ++forward_vertex_id)
+  for (Mesh::VertexId forward_vertex_id = 0; forward_vertex_id < inNumLongitudes; ++forward_vertex_id)
   {
-    const auto next_forward_vertex_id = (forward_vertex_id + 1) % inNumVerticesX;
-    const auto back_vertex_id = (forward_vertex_id + inNumVerticesX);
-    const auto next_back_vertex_id = (next_forward_vertex_id + inNumVerticesX);
+    const auto next_forward_vertex_id = (forward_vertex_id + 1) % inNumLongitudes;
+    const auto back_vertex_id = (forward_vertex_id + inNumLongitudes);
+    const auto next_back_vertex_id = (next_forward_vertex_id + inNumLongitudes);
     cylinder.AddFace(forward_vertex_id, next_forward_vertex_id, back_vertex_id);
     cylinder.AddFace(back_vertex_id, next_forward_vertex_id, next_back_vertex_id);
   }
@@ -176,11 +176,11 @@ Mesh MeshFactory::GetCylinder(const std::size_t inNumVerticesX)
   // Cap vertices
   for (const auto forward : { true, false })
   {
-    for (Mesh::VertexId i = 0; i < inNumVerticesX; ++i)
+    for (Mesh::VertexId i = 0; i < inNumLongitudes; ++i)
     {
-      const auto cap_vertex_id = (i + (forward ? 0 : inNumVerticesX));
-      const auto next_cap_vertex_id = (cap_vertex_id + 1) % inNumVerticesX + (forward ? 0 : inNumVerticesX);
-      const auto cap_central_vertex_id = (forward ? (inNumVerticesX * 2) : (inNumVerticesX * 2 + 1));
+      const auto cap_vertex_id = (i + (forward ? 0 : inNumLongitudes));
+      const auto next_cap_vertex_id = (cap_vertex_id + 1) % inNumLongitudes + (forward ? 0 : inNumLongitudes);
+      const auto cap_central_vertex_id = (forward ? (inNumLongitudes * 2) : (inNumLongitudes * 2 + 1));
       if (forward)
         cylinder.AddFace(next_cap_vertex_id, cap_vertex_id, cap_central_vertex_id);
       else
@@ -247,18 +247,18 @@ Mesh MeshFactory::GetTorus(const std::size_t inNumLatitudes, const std::size_t i
   return torus;
 }
 
-Mesh MeshFactory::GetPlane(const std::size_t inNumVerticesX, const std::size_t inNumVerticesY)
+Mesh MeshFactory::GetPlane(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)
 {
-  EXPECTS(inNumVerticesX >= 2);
-  EXPECTS(inNumVerticesY >= 2);
+  EXPECTS(inNumLatitudes >= 2);
+  EXPECTS(inNumLongitudes >= 2);
 
   Mesh plane;
 
-  const auto stride_x = (inNumVerticesX - 1);
-  const auto stride_y = (inNumVerticesY - 1);
-  for (Mesh::VertexId y = 0; y < inNumVerticesY; ++y)
+  const auto stride_x = (inNumLatitudes - 1);
+  const auto stride_y = (inNumLongitudes - 1);
+  for (Mesh::VertexId y = 0; y < inNumLongitudes; ++y)
   {
-    for (Mesh::VertexId x = 0; x < inNumVerticesX; ++x)
+    for (Mesh::VertexId x = 0; x < inNumLatitudes; ++x)
     {
       const auto progression_x = (static_cast<float>(x) / stride_x);
       const auto position_x = Map(progression_x, 0.0f, 1.0f, -0.5f, 0.5f);
@@ -270,14 +270,14 @@ Mesh MeshFactory::GetPlane(const std::size_t inNumVerticesX, const std::size_t i
     }
   }
 
-  for (Mesh::VertexId y = 0; y < (inNumVerticesY - 1); ++y)
+  for (Mesh::VertexId y = 0; y < (inNumLongitudes - 1); ++y)
   {
-    for (Mesh::VertexId x = 0; x < (inNumVerticesX - 1); ++x)
+    for (Mesh::VertexId x = 0; x < (inNumLatitudes - 1); ++x)
     {
-      const auto current_x_current_y_vertex_id = (y * inNumVerticesX + x);
-      const auto next_x_current_y_vertex_id = (y * inNumVerticesX + (x + 1));
-      const auto current_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + x);
-      const auto next_x_next_y_vertex_id = ((y + 1) * inNumVerticesX + (x + 1));
+      const auto current_x_current_y_vertex_id = (y * inNumLatitudes + x);
+      const auto next_x_current_y_vertex_id = (y * inNumLatitudes + (x + 1));
+      const auto current_x_next_y_vertex_id = ((y + 1) * inNumLatitudes + x);
+      const auto next_x_next_y_vertex_id = ((y + 1) * inNumLatitudes + (x + 1));
       plane.AddFace(current_x_current_y_vertex_id, next_x_current_y_vertex_id, next_x_next_y_vertex_id);
       plane.AddFace(current_x_current_y_vertex_id, next_x_next_y_vertex_id, current_x_next_y_vertex_id);
     }

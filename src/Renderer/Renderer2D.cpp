@@ -133,7 +133,7 @@ void Renderer2D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::ED
 void Renderer2D::DrawPoint(const Vec2f& inPoint)
 {
   SetShaderProgram(sShaderProgram);
-  DrawPointGeneric(inPoint);
+  DrawPointsGeneric(MakeSpan({ inPoint }));
 }
 
 void Renderer2D::DrawPoints(const Span<Vec2f>& inPoints)
@@ -145,35 +145,7 @@ void Renderer2D::DrawPoints(const Span<Vec2f>& inPoints)
 void Renderer2D::DrawSegment(const Segment2f& inSegment)
 {
   SetShaderProgram(sShaderProgram);
-  DrawSegmentGeneric(inSegment);
-}
-
-void Renderer2D::DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices)
-{
-  EXPECTS(inNumVertices >= 3);
-
-  SetShaderProgram(sShaderProgram);
-
-  std::vector<Vec2f> circle_points;
-  circle_points.reserve(inNumVertices + 1);
-  for (std::size_t i = 0; i < inNumVertices; ++i)
-  {
-    const auto progress = (i / static_cast<float>(inNumVertices - 1));
-    const auto angle = inAngle * progress;
-    const auto offset = Vec2f(std::cos(angle), std::sin(angle));
-    const auto circle_point = offset;
-    circle_points.push_back(circle_point);
-  }
-
-  DrawLineStripGeneric(MakeSpan(circle_points));
-}
-
-void Renderer2D::DrawCircle(const Circlef& inCircle, const std::size_t inNumVertices)
-{
-  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inCircle.GetCenter());
-  Scale(inCircle.GetRadius());
-  DrawCircleSection(FullCircleRads(), inNumVertices);
+  DrawSegmentsGeneric(MakeSpan({ inSegment }));
 }
 
 void Renderer2D::DrawSegments(const Span<Segment2f>& inSegments)
@@ -188,20 +160,26 @@ void Renderer2D::DrawLineStrip(const Span<Vec2f>& inLinePoints)
   DrawLineStripGeneric(inLinePoints);
 }
 
-void Renderer2D::DrawTriangle(const Triangle2f& inTriangle)
+void Renderer2D::DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices)
 {
-  Mesh triangle_mesh;
-  triangle_mesh.AddVertex(XY0(inTriangle[0]));
-  triangle_mesh.AddVertex(XY0(inTriangle[1]));
-  triangle_mesh.AddVertex(XY0(inTriangle[2]));
-  triangle_mesh.AddFace(0, 1, 2);
-
-  triangle_mesh.SetCornerNormal(0, Forward<Vec3f>());
-  triangle_mesh.SetCornerNormal(1, Forward<Vec3f>());
-  triangle_mesh.SetCornerNormal(2, Forward<Vec3f>());
-
-  DrawMesh(triangle_mesh);
+  DrawCircleSectionGeneric<float, 2>(inAngle, inNumVertices);
 }
+
+void Renderer2D::DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices)
+{
+  DrawCircleSectionBoundaryGeneric<float, 2>(inAngle, inNumVertices);
+}
+
+void Renderer2D::DrawCircle(const std::size_t inNumVertices) { DrawCircleSection(FullCircleRads(), inNumVertices); }
+
+void Renderer2D::DrawCircleBoundary(const std::size_t inNumVertices)
+{
+  DrawCircleSectionBoundary(FullCircleRads(), inNumVertices);
+}
+
+void Renderer2D::DrawTriangle(const Triangle2f& inTriangle) { DrawTrianglesGeneric(MakeSpan({ inTriangle })); }
+
+void Renderer2D::DrawTriangles(const Span<Triangle2f>& inTriangles) { DrawTrianglesGeneric(inTriangles); }
 
 void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
 {

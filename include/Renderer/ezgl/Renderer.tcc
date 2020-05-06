@@ -4,17 +4,82 @@
 
 namespace egl
 {
+
 template <typename T, std::size_t N>
-void Renderer::DrawSegmentGeneric(const Segment<T, N>& inSegment)
+void Renderer::DrawCircleSectionGeneric(const AngleRads inAngle, std::size_t inNumVertices)
 {
-  DrawSegmentsGeneric(MakeSpan({ inSegment }));
+  EXPECTS(inNumVertices >= 3);
+
+  const auto GetCirclePoint = [inAngle, inNumVertices](std::size_t inIndex) {
+    const auto progress = (inIndex / static_cast<T>(inNumVertices - 1));
+    const auto angle = inAngle * progress;
+    auto point = All<Vec<T, N>>(static_cast<T>(0));
+    point[0] = std::cos(angle);
+    point[1] = std::sin(angle);
+    return point;
+  };
+
+  std::vector<Triangle<T, N>> circle_section_triangles;
+  circle_section_triangles.reserve(inNumVertices - 1);
+  for (std::size_t i = 0; i < inNumVertices - 1; ++i)
+  {
+    const auto center = All<Vec<T, N>>(0.0f);
+    const auto circle_point = GetCirclePoint(i);
+    const auto next_circle_point = GetCirclePoint(i + 1);
+    circle_section_triangles.push_back(Triangle<T, N> { center, circle_point, next_circle_point });
+  }
+
+  DrawTrianglesGeneric(MakeSpan(circle_section_triangles));
+}
+
+template <typename T, std::size_t N>
+void Renderer::DrawCircleSectionBoundaryGeneric(const AngleRads inAngle, std::size_t inNumVertices)
+{
+  EXPECTS(inNumVertices >= 3);
+
+  const auto GetCirclePoint = [inAngle, inNumVertices](std::size_t inIndex) {
+    const auto progress = (inIndex / static_cast<T>(inNumVertices - 1));
+    const auto angle = inAngle * progress;
+    auto point = All<Vec<T, N>>(static_cast<T>(0));
+    point[0] = std::cos(angle);
+    point[1] = std::sin(angle);
+    return point;
+  };
+
+  std::vector<Vec<T, N>> circle_section_points;
+  circle_section_points.reserve(inNumVertices);
+  for (std::size_t i = 0; i < inNumVertices; ++i)
+  {
+    const auto circle_point = GetCirclePoint(i);
+    circle_section_points.push_back(circle_point);
+  }
+
+  DrawLineStripGeneric(MakeSpan(circle_section_points));
+}
+
+template <typename T, std::size_t N>
+void Renderer::DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles)
+{
+  VAO vao;
+  vao.AddVBO(std::make_shared<VBO>(inTriangles), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
+  static constexpr auto add_normals = (N == 3);
+  if constexpr (add_normals)
+  {
+    std::vector<Vec<T, N>> normals;
+    normals.reserve(inTriangles.GetNumberOfElements());
+    for (const auto& triangle : inTriangles) { normals.push_back(Normal(triangle)); }
+
+    vao.AddVBO(std::make_shared<VBO>(MakeSpan(normals)),
+        MeshDrawData::NormalAttribLocation(),
+        VAOVertexAttribT<Vec<T, N>>());
+  }
+
+  DrawVAOArrays(vao, inTriangles.GetNumberOfElements() * 3, GL::EPrimitivesType::TRIANGLES, 0);
 }
 
 template <typename T, std::size_t N>
 void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
 {
-  const auto draw_setup = PrepareForDraw();
-
   std::vector<Vec<T, N>> segment_points;
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);
   for (const auto& segment : inSegments)
@@ -27,41 +92,25 @@ void Renderer::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
   vao.AddVBO(std::make_shared<VBO>(MakeSpan(segment_points)),
       MeshDrawData::PositionAttribLocation(),
       VAOVertexAttribT<Vec<T, N>>());
-  const auto vao_bind_guard = vao.BindGuarded();
-
-  GL::DrawArrays(GL::EPrimitivesType::LINES, inSegments.GetNumberOfElements() * 2);
-}
-
-template <typename T, std::size_t N>
-void Renderer::DrawPointGeneric(const Vec<T, N>& inPoint)
-{
-  DrawPointsGeneric(MakeSpan({ inPoint }));
+  DrawVAOArrays(vao, segment_points.size(), GL::EPrimitivesType::LINES);
 }
 
 template <typename T, std::size_t N>
 void Renderer::DrawPointsGeneric(const Span<Vec<T, N>>& inPoints)
 {
-  const auto draw_setup = PrepareForDraw();
-
   VAO vao;
   vao.AddVBO(std::make_shared<VBO>(inPoints), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
-  const auto vao_bind_guard = vao.BindGuarded();
-
-  GL::DrawArrays(GL::EPrimitivesType::POINTS, inPoints.GetNumberOfElements());
+  DrawVAOArrays(vao, inPoints.GetNumberOfElements(), GL::EPrimitivesType::POINTS);
 }
 
 template <typename T, std::size_t N>
 void Renderer::DrawLineStripGeneric(const Span<Vec<T, N>>& inLinePoints)
 {
-  const auto draw_setup = PrepareForDraw();
-
   VAO vao;
   vao.AddVBO(std::make_shared<VBO>(inLinePoints),
       MeshDrawData::PositionAttribLocation(),
       VAOVertexAttribT<Vec<T, N>>());
-  const auto vao_bind_guard = vao.BindGuarded();
-
-  GL::DrawArrays(GL::EPrimitivesType::LINE_STRIP, inLinePoints.GetNumberOfElements());
+  DrawVAOArrays(vao, inLinePoints.GetNumberOfElements(), GL::EPrimitivesType::LINE_STRIP);
 }
 
 template <Renderer::EStateId StateId>
@@ -168,4 +217,14 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   return {};
 }
 
+template <auto TEStateIdToGuard>
+RendererStateGuard<TEStateIdToGuard> Renderer::GetGuard()
+{
+  using RendererType = typename RendererStateGuard<TEStateIdToGuard>::TRenderer;
+  auto renderer_cast = dynamic_cast<RendererType*>(this);
+  if (renderer_cast == nullptr)
+    THROW_EXCEPTION("Trying to get an incompatible guard for a Renderer. Make sure the State enum is of its type or a "
+                    "parent type.");
+  return RendererStateGuard<TEStateIdToGuard> { *renderer_cast };
+}
 }

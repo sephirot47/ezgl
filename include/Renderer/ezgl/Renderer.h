@@ -37,6 +37,9 @@ class ShaderProgram;
 class ShaderProgram;
 class Texture2D;
 
+template <auto StateId>
+class RendererStateGuard;
+
 class Renderer
 {
 public:
@@ -110,7 +113,7 @@ public:
   void ResetBlendFactors() { mState.Reset<EStateId::BLEND_FACTORS>(); }
 
   // Blend color
-  void SetBlendColor(const Color4f &inBlendColor) { mState.GetCurrent<EStateId::BLEND_COLOR>() = inBlendColor; }
+  void SetBlendColor(const Color4f& inBlendColor) { mState.GetCurrent<EStateId::BLEND_COLOR>() = inBlendColor; }
   Color4f GetBlendColor() const { return mState.GetCurrent<EStateId::BLEND_COLOR>(); }
   void PushBlendColor() { mState.PushTop<EStateId::BLEND_COLOR>(); }
   void PopBlendColor() { mState.Pop<EStateId::BLEND_COLOR>(); }
@@ -198,6 +201,9 @@ public:
   State& GetState() { return mState; }
   const State& GetState() const { return mState; }
 
+  template <auto TEStateIdToGuard>
+  [[nodiscard]] RendererStateGuard<TEStateIdToGuard> GetGuard();
+
 protected:
   // Shader
   void SetShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram) { mShaderProgram = inShaderProgram; }
@@ -224,11 +230,13 @@ protected:
       const bool inDrawArrays,
       const GL::Size inBeginArraysPrimitiveIndex);
   template <typename T, std::size_t N>
-  void DrawSegmentGeneric(const Segment<T, N>& inSegment);
+  void DrawCircleSectionGeneric(const AngleRads inAngle, std::size_t inNumVertices);
+  template <typename T, std::size_t N>
+  void DrawCircleSectionBoundaryGeneric(const AngleRads inAngle, std::size_t inNumVertices);
+  template <typename T, std::size_t N>
+  void DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles);
   template <typename T, std::size_t N>
   void DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments);
-  template <typename T, std::size_t N>
-  void DrawPointGeneric(const Vec<T, N>& inPoint);
   template <typename T, std::size_t N>
   void DrawPointsGeneric(const Span<Vec<T, N>>& inPoints);
   template <typename T, std::size_t N>
