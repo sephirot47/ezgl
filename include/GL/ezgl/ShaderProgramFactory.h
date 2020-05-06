@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace egl
+namespace ez
 {
 class ShaderProgram;
 

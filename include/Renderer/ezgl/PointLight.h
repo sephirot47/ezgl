@@ -2,7 +2,7 @@
 
 #include "ezgl/Math.h"
 
-namespace egl
+namespace ez
 {
 class GLSLPointLight final
 {

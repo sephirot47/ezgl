@@ -2,7 +2,7 @@
 #include "ezgl/CameraControllerFly.h"
 #include "ezgl/Window.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T, std::size_t N>

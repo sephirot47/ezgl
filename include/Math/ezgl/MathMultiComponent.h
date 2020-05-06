@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 
-namespace egl
+namespace ez
 {
 template <typename T, auto TGenerateSingleComponentFunction, typename... TExtraArgs>
 constexpr T MathMultiComponentGenerated(TExtraArgs&&... inExtraArgs)

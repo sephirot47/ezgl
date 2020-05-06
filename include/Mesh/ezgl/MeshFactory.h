@@ -2,7 +2,7 @@
 
 #include "ezgl/Mesh.h"
 
-namespace egl
+namespace ez
 {
 class MeshFactory final
 {

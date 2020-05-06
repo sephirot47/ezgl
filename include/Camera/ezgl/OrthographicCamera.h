@@ -3,7 +3,7 @@
 #include "ezgl/Camera.h"
 #include "ezgl/OrthographicParameters.h"
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 class OrthographicCamera final : public Camera<T, N>

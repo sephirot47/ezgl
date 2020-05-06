@@ -7,7 +7,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-namespace egl
+namespace ez
 {
 void MeshIO::Read(const std::filesystem::path& inMeshPath, Mesh& ioMesh)
 {

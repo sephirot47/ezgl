@@ -3,7 +3,7 @@
 #include "ezgl/ShaderProgram.h"
 #include <string_view>
 
-namespace egl
+namespace ez
 {
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sMeshShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DShaderProgram;

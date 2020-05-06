@@ -5,7 +5,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 template <typename TIndexType = std::size_t, typename... TArgs>
 class TupleOfStacks

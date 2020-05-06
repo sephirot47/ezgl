@@ -3,7 +3,7 @@
 #include "ezgl/Texture2D.h"
 #include "ezgl/TextureFactory.h"
 
-namespace egl
+namespace ez
 {
 void Material3D::SetDiffuseColor(const Color4f& inDiffuseColor) { mDiffuseColor = inDiffuseColor; }
 Color4f Material3D::GetDiffuseColor() const { return mDiffuseColor; }

@@ -1,6 +1,6 @@
 #include "ezgl/Renderer2D.h"
 
-namespace egl
+namespace ez
 {
 template <Renderer2D::EStateId StateId>
 void Renderer2D::ApplyState(const State::ValueType<StateId>& inValue, State& ioState)

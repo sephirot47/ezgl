@@ -1,6 +1,6 @@
 #include "ezgl/Segment.h"
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 Segment<T, N>::Segment(const Vec<T, N>& inFromPoint, const Vec<T, N>& inToPoint)

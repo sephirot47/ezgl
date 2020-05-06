@@ -1,7 +1,7 @@
 #include "ezgl/Vec.h"
 #include <cmath>
 
-namespace egl
+namespace ez
 {
 
 template <typename T, std::size_t N>

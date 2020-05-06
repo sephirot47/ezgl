@@ -10,7 +10,7 @@
 #include <ostream>
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 class Vec final

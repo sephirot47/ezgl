@@ -2,7 +2,7 @@
 
 #include <optional>
 
-namespace egl
+namespace ez
 {
 template <typename TMesh>
 class MeshCirculatorVertexNeighborFaceIds final

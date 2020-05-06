@@ -2,7 +2,7 @@
 #include "ezgl/GLGuard.h"
 #include "ezgl/Texture2D.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 void Texture2D::SetData(const GL::Size& inWidth,

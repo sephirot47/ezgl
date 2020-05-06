@@ -1,6 +1,6 @@
 #include "ezgl/EBO.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 EBO::EBO(const Span<T>& inData) : EBO()

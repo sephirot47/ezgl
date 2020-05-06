@@ -9,7 +9,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "ezgl/stb_image_write.h"
 
-namespace egl
+namespace ez
 {
 void ImageIO::Read(const std::filesystem::path& inPath, Image2D<Color4f>& outImage)
 {

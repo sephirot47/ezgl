@@ -1,6 +1,6 @@
 #include "ezgl/Texture.h"
 
-namespace egl
+namespace ez
 {
 
 template <GL::ETextureTarget TTextureTarget>

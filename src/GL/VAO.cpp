@@ -6,7 +6,7 @@
 #include "ezgl/VBO.h"
 #include <GL/glew.h>
 
-namespace egl
+namespace ez
 {
 void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
     const GL::Id inAttribLocation,

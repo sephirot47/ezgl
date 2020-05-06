@@ -28,7 +28,7 @@
 #include <stack>
 #include <tuple>
 
-namespace egl
+namespace ez
 {
 class MeshDrawData;
 class ShaderProgram;

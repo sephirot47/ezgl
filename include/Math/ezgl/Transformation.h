@@ -5,7 +5,7 @@
 #include "ezgl/Quat.h"
 #include "ezgl/Vec.h"
 
-namespace egl
+namespace ez
 {
 // clang-format off
 template <typename TTransformation> struct TransformationRotationType { using Type = void; };

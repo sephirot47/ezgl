@@ -8,7 +8,7 @@
 #include "ezgl/VBO.h"
 #include <memory>
 
-namespace egl
+namespace ez
 {
 class MeshDrawData final
 {

@@ -1,6 +1,6 @@
 #include "ezgl/GLObject.h"
 
-namespace egl
+namespace ez
 {
 
 template <GL::EObjectType TObjectType>

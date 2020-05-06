@@ -4,7 +4,7 @@
 #include "ezgl/TextureFactory.h"
 #include <memory>
 
-namespace egl
+namespace ez
 {
 class ShaderProgram;
 class Texture2D;

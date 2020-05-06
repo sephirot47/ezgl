@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 
 class EBO;

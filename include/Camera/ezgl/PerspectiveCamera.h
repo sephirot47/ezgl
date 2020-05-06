@@ -4,7 +4,7 @@
 #include "ezgl/Math.h"
 #include "ezgl/PerspectiveParameters.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 class PerspectiveCamera final : public Camera<T, 3>

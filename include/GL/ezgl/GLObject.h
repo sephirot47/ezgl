@@ -2,7 +2,7 @@
 
 #include "ezgl/GL.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EObjectType TObjectType>
 class GLObject

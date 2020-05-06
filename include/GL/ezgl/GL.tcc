@@ -1,6 +1,6 @@
 #include "ezgl/GL.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 void GL::BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint)

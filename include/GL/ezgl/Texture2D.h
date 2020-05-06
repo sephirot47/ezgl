@@ -4,7 +4,7 @@
 #include "ezgl/Texture.h"
 #include <memory>
 
-namespace egl
+namespace ez
 {
 template <typename T>
 class Image2D;

@@ -1,6 +1,6 @@
 #include "ezgl/UBO.h"
 
-namespace egl
+namespace ez
 {
 UBO::UBO() : Buffer<GL::EBufferType::UBO>() {}
 

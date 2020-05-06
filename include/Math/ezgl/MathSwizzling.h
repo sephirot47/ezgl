@@ -3,7 +3,7 @@
 #include "ezgl/Vec.h"
 #include <cstdint>
 
-namespace egl
+namespace ez
 {
 // clang-format off
 template <typename T, std::size_t N> constexpr Vec2<T> XX(const Vec<T, N> &inV) { return Vec2<T>{inV[0], inV[0]}; }

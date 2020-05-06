@@ -17,7 +17,7 @@
 #include "ezgl/UBO.h"
 #include "ezgl/Window.h"
 
-namespace egl
+namespace ez
 {
 bool Renderer2D::sStaticResourcesInited = false;
 std::shared_ptr<ShaderProgram> Renderer2D::sShaderProgram;

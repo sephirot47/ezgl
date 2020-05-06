@@ -3,7 +3,7 @@
 #include "ezgl/MathInitializers.h"
 #include "ezgl/Vec.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 class Circle

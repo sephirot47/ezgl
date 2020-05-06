@@ -3,7 +3,7 @@
 #include "ezgl/Texture2D.h"
 #include "ezgl/TextureFactory.h"
 
-namespace egl
+namespace ez
 {
 void Material2D::SetTexture(const std::shared_ptr<Texture2D>& inTexture) { mTexture = inTexture; }
 const std::shared_ptr<Texture2D> Material2D::GetTexture() const { return mTexture; }

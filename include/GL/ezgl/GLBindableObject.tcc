@@ -1,6 +1,6 @@
 #include "ezgl/GLBindableObject.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EBindingType TBindingType, typename TGLGuard>
 void GLBindableObject<TBindingType, TGLGuard>::Bind() const

@@ -16,7 +16,7 @@
 #include "ezgl/UBO.h"
 #include "ezgl/Window.h"
 
-namespace egl
+namespace ez
 {
 bool Renderer::sStaticResourcesInited = false;
 

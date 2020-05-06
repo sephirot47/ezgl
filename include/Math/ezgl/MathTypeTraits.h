@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 // IsVec. Template specialization for Vec is in "Vec.h"
 template <typename T>

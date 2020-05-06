@@ -4,7 +4,7 @@
 #include "ezgl/MathInitializers.h"
 #include "ezgl/MathMultiComponent.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 constexpr auto RandomUnit()

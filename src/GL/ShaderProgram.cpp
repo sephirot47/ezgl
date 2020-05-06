@@ -6,7 +6,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace egl
+namespace ez
 {
 ShaderProgram::ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader)
 {

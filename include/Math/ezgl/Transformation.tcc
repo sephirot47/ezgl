@@ -1,7 +1,7 @@
 #include "ezgl/Math.h"
 #include "ezgl/Transformation.h"
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 Transformation<T, N>::Transformation(const Vec<T, N>& inPosition) : mPosition(inPosition)

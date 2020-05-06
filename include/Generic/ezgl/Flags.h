@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 
 #define DECLARE_FLAGS(TFlagBits)                                                                                       \

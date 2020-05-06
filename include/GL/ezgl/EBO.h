@@ -2,7 +2,7 @@
 
 #include "ezgl/Buffer.h"
 
-namespace egl
+namespace ez
 {
 class EBO final : public Buffer<GL::EBufferType::EBO>
 {

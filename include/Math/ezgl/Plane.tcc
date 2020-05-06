@@ -1,6 +1,6 @@
 #include "ezgl/Plane.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T>

@@ -4,7 +4,7 @@
 #include "ezgl/GLGuard.h"
 #include "ezgl/GLObject.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EBindingType TBindingType, typename TGLGuard = GLBindGuard<TBindingType>>
 class GLBindableObject : public GLObject<GL::GetObjectType<TBindingType>()>

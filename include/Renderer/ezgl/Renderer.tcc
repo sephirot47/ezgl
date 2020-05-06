@@ -2,7 +2,7 @@
 #include "ezgl/VAO.h"
 #include "ezgl/VBO.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T, std::size_t N>

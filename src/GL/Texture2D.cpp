@@ -2,7 +2,7 @@
 #include "ezgl/GL.h"
 #include "ezgl/Image2D.h"
 
-namespace egl
+namespace ez
 {
 Texture2D::Texture2D() : Texture()
 {

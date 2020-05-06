@@ -7,7 +7,7 @@
 #include <array>
 #include <ostream>
 
-namespace egl
+namespace ez
 {
 
 template <typename T>

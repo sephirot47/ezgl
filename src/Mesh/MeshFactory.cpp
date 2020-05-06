@@ -2,7 +2,7 @@
 #include "ezgl/Math.h"
 #include "ezgl/Mesh.h"
 
-namespace egl
+namespace ez
 {
 
 Mesh MeshFactory::GetCube()

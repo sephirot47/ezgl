@@ -4,7 +4,7 @@
 #include "ezgl/Color.h"
 #include "ezgl/MathInitializers.h"
 
-namespace egl
+namespace ez
 {
 class GLSLDirectionalLight
 {

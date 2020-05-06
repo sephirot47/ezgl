@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 template <typename TFirst, typename TSecond>
 std::ostream& operator<<(std::ostream& ioLHS, const std::pair<TFirst, TSecond>& inRHS)

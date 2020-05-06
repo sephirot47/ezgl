@@ -3,7 +3,7 @@
 #include "ezgl/Vec.h"
 #include <cstdint>
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 class Segment final

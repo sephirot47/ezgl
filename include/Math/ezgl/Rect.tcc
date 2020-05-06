@@ -1,6 +1,6 @@
 #include "ezgl/Rect.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T>

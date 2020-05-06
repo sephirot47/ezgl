@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 template <typename TRenderer, typename TTupleOfStacks>
 class RendererStateStacks final : public TTupleOfStacks

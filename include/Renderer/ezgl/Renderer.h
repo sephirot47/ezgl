@@ -30,7 +30,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 class MeshDrawData;
 class ShaderProgram;

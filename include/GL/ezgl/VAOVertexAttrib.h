@@ -3,7 +3,7 @@
 #include "ezgl/GLTypeTraits.h"
 #include <GL/glew.h>
 
-namespace egl
+namespace ez
 {
 struct VAOVertexAttrib
 {

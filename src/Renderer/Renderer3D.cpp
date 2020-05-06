@@ -16,7 +16,7 @@
 #include "ezgl/UBO.h"
 #include "ezgl/Window.h"
 
-namespace egl
+namespace ez
 {
 bool Renderer3D::sStaticResourcesInited = false;
 std::shared_ptr<ShaderProgram> Renderer3D::sOnlyColorShaderProgram;

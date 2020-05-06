@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <tuple>
 
-namespace egl
+namespace ez
 {
 template <typename T>
 constexpr auto Dot(const T& inLHS, const T& inRHS)

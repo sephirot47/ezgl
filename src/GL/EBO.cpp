@@ -2,7 +2,7 @@
 #include "ezgl/GL.h"
 #include "ezgl/Macros.h"
 
-namespace egl
+namespace ez
 {
 EBO::EBO() : Buffer<GL::EBufferType::EBO>() {}
 }

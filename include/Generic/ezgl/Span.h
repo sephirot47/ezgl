@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 template <typename T>
 struct Span final

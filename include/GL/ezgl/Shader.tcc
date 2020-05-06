@@ -1,6 +1,6 @@
 #include "ezgl/Shader.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EShaderType TShaderType>
 Shader<TShaderType>::Shader(const std::string_view inSourceCode) : Shader()

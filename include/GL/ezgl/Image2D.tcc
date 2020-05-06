@@ -2,7 +2,7 @@
 #include "ezgl/ImageIO.h"
 #include "ezgl/Math.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T>
@@ -108,7 +108,7 @@ bool Image2D<T>::IsVeryEqual(const Image2D& inRHS, const T& inEpsilon) const
     const auto& pixel = *it;
     const auto& rhs_pixel = *rhs_it;
 
-    if (!::egl::IsVeryEqual(pixel, rhs_pixel, inEpsilon))
+    if (!::ez::IsVeryEqual(pixel, rhs_pixel, inEpsilon))
       return false;
 
     ++it;

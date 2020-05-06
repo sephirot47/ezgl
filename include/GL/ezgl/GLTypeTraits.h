@@ -5,7 +5,7 @@
 #include "ezgl/Vec.h"
 #include <GL/glew.h>
 
-namespace egl
+namespace ez
 {
 template <typename T, uint8_t TNumComponents = 1>
 struct _GLTypeTraitsBase

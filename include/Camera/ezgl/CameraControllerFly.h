@@ -8,7 +8,7 @@
 #include <chrono>
 #include <memory>
 
-namespace egl
+namespace ez
 {
 struct InputEvent;
 

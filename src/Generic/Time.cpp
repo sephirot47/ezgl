@@ -3,7 +3,7 @@
 
 using namespace std::chrono_literals;
 
-namespace egl
+namespace ez
 {
 TimePoint Now() { return std::chrono::system_clock::now(); }
 }

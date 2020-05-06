@@ -5,7 +5,7 @@
 #include "ezgl/GLObject.h"
 #include "ezgl/Span.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EBufferType TBufferType>
 class Buffer : public GLBindableObject<GL::GetBindingType<TBufferType>()>

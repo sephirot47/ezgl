@@ -3,7 +3,7 @@
 #include "ezgl/GLBindableObject.h"
 #include "ezgl/GLGuard.h"
 
-namespace egl
+namespace ez
 {
 template <GL::ETextureTarget TTextureTarget>
 class Texture : public GLBindableObject<GL::GetBindingType<TTextureTarget>()>

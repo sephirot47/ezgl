@@ -1,7 +1,7 @@
 #include "ezgl/Buffer.h"
 #include "ezgl/GL.h"
 
-namespace egl
+namespace ez
 {
 template <GL::EBufferType TBufferType>
 template <typename T>

@@ -4,7 +4,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace egl
+namespace ez
 {
 
 class GLNoOpGuard final

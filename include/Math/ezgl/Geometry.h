@@ -4,7 +4,7 @@
 #include "ezgl/Plane.h"
 #include "ezgl/Triangle.h"
 
-namespace egl
+namespace ez
 {
 template <typename T, std::size_t N>
 T Area(const Triangle<T, N>& inTriangle)

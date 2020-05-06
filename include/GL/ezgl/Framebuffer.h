@@ -9,7 +9,7 @@
 #include <variant>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 class Framebuffer final : public GLBindableObject<GL::EBindingType::FRAMEBUFFER>
 {

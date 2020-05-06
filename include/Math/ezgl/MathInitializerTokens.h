@@ -1,6 +1,6 @@
 #pragma once
 
-namespace egl
+namespace ez
 {
 template <typename T>
 struct MITAll final

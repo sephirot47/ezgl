@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace egl
+namespace ez
 {
 void Mesh::AddVertex(const Vec3f& inPosition)
 {

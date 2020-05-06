@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-namespace egl
+namespace ez
 {
 std::string GetFileContents(const std::filesystem::path& filepath)
 {

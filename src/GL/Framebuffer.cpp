@@ -1,7 +1,7 @@
 #include "ezgl/Framebuffer.h"
 #include "ezgl/GLGuard.h"
 
-namespace egl
+namespace ez
 {
 Framebuffer::Framebuffer() : Framebuffer(1, 1) {}
 Framebuffer::Framebuffer(const Vec2i& inSize) : Framebuffer(inSize[0], inSize[1]) {}

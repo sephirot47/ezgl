@@ -3,7 +3,7 @@
 #include "ezgl/Vec.h"
 #include "ezgl/MathInitializers.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 struct PerspectiveParameters final

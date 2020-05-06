@@ -1,7 +1,7 @@
 #include "ezgl/GL.h"
 #include "ezgl/ShaderProgram.h"
 
-namespace egl
+namespace ez
 {
 template <typename T>
 void ShaderProgram::SetUniform(const GL::Id inUniformLocation, const T& inValue)

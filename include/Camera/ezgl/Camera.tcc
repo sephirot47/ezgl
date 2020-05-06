@@ -1,6 +1,6 @@
 #include "ezgl/Camera.h"
 
-namespace egl
+namespace ez
 {
 
 template <typename T, std::size_t N>

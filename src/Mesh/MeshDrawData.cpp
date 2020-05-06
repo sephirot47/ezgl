@@ -5,7 +5,7 @@
 #include "ezgl/VBO.h"
 #include <numeric>
 
-namespace egl
+namespace ez
 {
 
 MeshDrawData::MeshDrawData(const Mesh& inMesh) { ComputeFromMesh(inMesh); }

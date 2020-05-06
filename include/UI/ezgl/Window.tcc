@@ -1,5 +1,5 @@
 #include "ezgl/Window.h"
 
-namespace egl
+namespace ez
 {
 }

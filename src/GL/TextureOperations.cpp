@@ -6,7 +6,7 @@
 #include "ezgl/Texture2D.h"
 #include "ezgl/TextureFactory.h"
 
-namespace egl
+namespace ez
 {
 
 std::shared_ptr<MeshDrawData> TextureOperations::sPlaneDrawData;

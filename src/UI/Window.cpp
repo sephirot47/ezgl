@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <thread>
 
-namespace egl
+namespace ez
 {
 
 template <typename TInputEvent>

@@ -3,7 +3,7 @@
 #include "ezgl/Color.h"
 #include <filesystem>
 
-namespace egl
+namespace ez
 {
 template <typename T>
 class Image2D;

@@ -5,7 +5,7 @@
 #include "ezgl/MathInitializers.h"
 #include <memory>
 
-namespace egl
+namespace ez
 {
 class Texture2D;
 class ShaderProgram;

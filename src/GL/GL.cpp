@@ -1,6 +1,6 @@
 #include "ezgl/GL.h"
 
-namespace egl
+namespace ez
 {
 
 void GL::Enable(const GL::EEnablable inEnablable) { glEnable(GL::EnumCast(inEnablable)); }

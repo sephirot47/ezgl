@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <string>
 
-namespace egl
+namespace ez
 {
 
 class GL final

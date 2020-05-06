@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 class Mesh final
 {

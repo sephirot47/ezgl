@@ -10,7 +10,7 @@
 #include <optional>
 #include <string_view>
 
-namespace egl
+namespace ez
 {
 class ShaderProgram final : public GLBindableObject<GL::EBindingType::SHADER_PROGRAM>
 {

@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-namespace egl
+namespace ez
 {
 template <GL::EShaderType TShaderType>
 class Shader final : public GLObject<GL::GetObjectType<TShaderType>()>

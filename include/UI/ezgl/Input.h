@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <variant>
 
-namespace egl
+namespace ez
 {
 enum class Key
 {

@@ -3,7 +3,7 @@
 #include "ezgl/Math.h"
 #include "ezgl/Texture2D.h"
 
-namespace egl
+namespace ez
 {
 std::shared_ptr<Texture2D> TextureFactory::GetOneTexture()
 {

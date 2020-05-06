@@ -11,7 +11,7 @@
 
 class GLFWwindow;
 
-namespace egl
+namespace ez
 {
 struct InputListener;
 

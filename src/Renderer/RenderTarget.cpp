@@ -2,7 +2,7 @@
 #include "ezgl/Framebuffer.h"
 #include "ezgl/Texture2D.h"
 
-namespace egl
+namespace ez
 {
 RenderTarget::RenderTarget() : RenderTarget(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8) {}
 

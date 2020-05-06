@@ -3,7 +3,7 @@
 #include "ezgl/MathInitializerTokens.h"
 #include "ezgl/MathTypeTraits.h"
 
-namespace egl
+namespace ez
 {
 using AngleRads = float;
 

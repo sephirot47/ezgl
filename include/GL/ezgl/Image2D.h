@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <vector>
 
-namespace egl
+namespace ez
 {
 template <typename T = Color4f>
 class Image2D final

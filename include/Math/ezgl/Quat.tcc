@@ -2,7 +2,7 @@
 #include "ezgl/Quat.h"
 #include <cmath>
 
-namespace egl
+namespace ez
 {
 template <typename T>
 constexpr typename std::array<T, 4>::iterator Quat<T>::begin()

@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace egl
+namespace ez
 {
 class Mesh;
 

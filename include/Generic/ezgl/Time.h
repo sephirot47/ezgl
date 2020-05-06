@@ -4,7 +4,7 @@
 
 using namespace std::chrono_literals;
 
-namespace egl
+namespace ez
 {
 using TimeDuration = std::chrono::duration<float, std::ratio<1, 1>>;
 using DeltaTime = TimeDuration;

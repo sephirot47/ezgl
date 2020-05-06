@@ -38,7 +38,7 @@
 #include <string>
 #include <thread>
 
-using namespace egl;
+using namespace ez;
 
 int main(int argc, const char** argv)
 {
