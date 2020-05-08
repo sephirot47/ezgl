@@ -4,7 +4,7 @@
 #include "ez/Flags.h"
 #include "ez/Macros.h"
 #include "ez/Mat.h"
-#include "ez/Rect.h"
+#include "ez/AARect.h"
 #include "ez/Span.h"
 #include "ez/Vec.h"
 #include <GL/glew.h>
@@ -711,8 +711,8 @@ public:
 
   static void Viewport(const int inX, const int inY, const int inWidth, const int inHeight);
   static void Viewport(const Vec2i& inXY, const Vec2i& inSize);
-  static void Viewport(const Recti& inViewport);
-  static Recti GetViewport();
+  static void Viewport(const AARecti& inViewport);
+  static AARecti GetViewport();
 
   static GL::Id GenBuffer();
   static GL::Id CreateBuffer();

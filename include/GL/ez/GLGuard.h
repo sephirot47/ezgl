@@ -97,8 +97,8 @@ template <GL::ETextureParameter TTextureParameter> inline void GLTextureParamete
 template <GL::ETextureParameter TTextureParameter> using GLTextureParameteriGuard = GLGenericGuard<GLTextureParameteriGuardGet<TTextureParameter>, GLTextureParameteriGuardSet<TTextureParameter>, GL::Id>;
 
 // GLViewportGuard
-inline Recti GLViewportGuardGet() { return GL::GetViewport(); }
-inline void GLViewportGuardSet(const Recti &inPreviousViewport) { GL::Viewport(inPreviousViewport); }
+inline AARecti GLViewportGuardGet() { return GL::GetViewport(); }
+inline void GLViewportGuardSet(const AARecti &inPreviousViewport) { GL::Viewport(inPreviousViewport); }
 using GLViewportGuard = GLGenericGuard<GLViewportGuardGet, GLViewportGuardSet>;
 
 // GLPointSizeGuard

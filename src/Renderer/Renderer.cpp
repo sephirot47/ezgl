@@ -68,7 +68,8 @@ void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL
   SetBlendFuncAlpha(inBlendSourceFactor, inBlendDestFactor);
 }
 
-void Renderer::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB, const GL::EBlendFactor inBlendDestFactorRGB)
+void Renderer::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB,
+    const GL::EBlendFactor inBlendDestFactorRGB)
 {
   mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB = inBlendSourceFactorRGB;
   mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mDestBlendFactorRGB = inBlendDestFactorRGB;
@@ -169,7 +170,7 @@ void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDra
 
 void Renderer::AdaptToWindow(const Window& inWindow)
 {
-  SetViewport(Recti(Zero<Vec2i>(), inWindow.GetFramebufferSize()));
+  SetViewport(AARecti(Zero<Vec2i>(), inWindow.GetFramebufferSize()));
   GetRenderTarget()->Resize(inWindow.GetFramebufferSize());
 }
 

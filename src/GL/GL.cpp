@@ -38,16 +38,16 @@ void GL::Viewport(const int inX, const int inY, const int inWidth, const int inH
 
 void GL::Viewport(const Vec2i& inXY, const Vec2i& inSize) { GL::Viewport(inXY[0], inXY[1], inSize[0], inSize[1]); }
 
-void GL::Viewport(const Recti& inViewport) { GL::Viewport(inViewport.GetMin(), inViewport.GetMax()); }
+void GL::Viewport(const AARecti& inViewport) { GL::Viewport(inViewport.GetMin(), inViewport.GetMax()); }
 
-Recti GL::GetViewport()
+AARecti GL::GetViewport()
 {
   const auto x_y_width_height_ints = GL::GetIntegers<4>(GL::EGetEnum::VIEWPORT);
   const auto x = x_y_width_height_ints[0];
   const auto y = x_y_width_height_ints[1];
   const auto width = x_y_width_height_ints[2];
   const auto height = x_y_width_height_ints[3];
-  const auto viewport = Recti(Vec2i(x, y), Vec2i(width, height));
+  const auto viewport = AARecti(Vec2i(x, y), Vec2i(width, height));
   return viewport;
 }
 

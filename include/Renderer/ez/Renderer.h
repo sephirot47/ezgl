@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ez/AARect.h"
 #include "ez/Camera.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
@@ -12,7 +13,6 @@
 #include "ez/PerspectiveCamera.h"
 #include "ez/Plane.h"
 #include "ez/PointLight.h"
-#include "ez/Rect.h"
 #include "ez/RenderTarget.h"
 #include "ez/RendererStateStacks.h"
 #include "ez/Segment.h"
@@ -174,8 +174,8 @@ public:
   void Blit(RenderTarget& ioRenderTarget);
 
   // Viewport
-  void SetViewport(const Recti& inViewport) { mState.GetCurrent<EStateId::VIEWPORT>() = inViewport; }
-  const Recti& GetViewport() const { return mState.GetCurrent<EStateId::VIEWPORT>(); }
+  void SetViewport(const AARecti& inViewport) { mState.GetCurrent<EStateId::VIEWPORT>() = inViewport; }
+  const AARecti& GetViewport() const { return mState.GetCurrent<EStateId::VIEWPORT>(); }
   void PushViewport() { mState.PushTop<EStateId::VIEWPORT>(); }
   void PopViewport() { mState.Pop<EStateId::VIEWPORT>(); }
   void ResetViewport() { mState.Reset<EStateId::VIEWPORT>(); }
@@ -184,7 +184,7 @@ public:
   using StateTupleOfStacks = TupleOfStacks<EStateId,
       std::shared_ptr<ShaderProgram>, // EStateId::OVERRIDE_SHADER_PROGRAM
       std::shared_ptr<RenderTarget>,  // EStateId::OVERRIDE_RENDER_TARGET
-      Recti,                          // EStateId::VIEWPORT
+      AARecti,                        // EStateId::VIEWPORT
       GL::EDepthFunc,                 // EStateId::DEPTH_FUNC
       bool,                           // EStateId::DEPTH_WRITE_ENABLED
       bool,                           // EStateId::BLEND_ENABLED

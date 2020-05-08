@@ -175,7 +175,7 @@ typename Renderer::State::template ValueType<StateId> Renderer::GetDefaultValue(
   }
   else if constexpr (StateId == Renderer::EStateId::VIEWPORT)
   {
-    return Recti(Zero<Vec2i>(), Zero<Vec2i>());
+    return AARecti(Zero<Vec2i>(), Zero<Vec2i>());
   }
   else if constexpr (StateId == Renderer::EStateId::DEPTH_FUNC)
   {
