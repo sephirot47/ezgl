@@ -105,6 +105,12 @@ target_link_libraries(ezgl ${GLEW_LIBRARIES})
 find_package(glfw3 REQUIRED)
 target_link_libraries(ezgl glfw)
 
+# ezcommon
+if (NOT TARGET ezcommon)
+  add_subdirectory(deps/ezcommon)
+  target_link_libraries(ezgl ezcommon)
+endif()
+
 # ezmath
 add_subdirectory(deps/ezmath)
 target_link_libraries(ezgl ezmath)
@@ -118,6 +124,16 @@ target_link_libraries(ezgl ezmath)
 # ======================================================================
 
 add_subdirectory(tests)
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# Examples =============================================================
+# ======================================================================
+
+add_subdirectory(examples)
 
 # ======================================================================
 # ======================================================================

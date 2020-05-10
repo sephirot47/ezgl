@@ -74,6 +74,15 @@ const Vec3f& Mesh::GetFaceNormal(const Mesh::FaceId& inFaceId) const
   return mFacesData.at(inFaceId).mNormal;
 }
 
+Triangle3f Mesh::GetFaceTriangle(const Mesh::FaceId& inFaceId) const
+{
+  EXPECTS(inFaceId < mFacesData.size());
+  const auto& face_data = mFacesData.at(inFaceId);
+  return Triangle3f(mVerticesData.at(face_data.mVerticesIds[0]).mPosition,
+      mVerticesData.at(face_data.mVerticesIds[1]).mPosition,
+      mVerticesData.at(face_data.mVerticesIds[2]).mPosition);
+}
+
 const Vec3f& Mesh::GetCornerNormal(const Mesh::CornerId& inCornerId) const
 {
   EXPECTS(inCornerId < mCornersData.size());
@@ -275,6 +284,15 @@ Mesh::CornerId Mesh::GetPreviousAdjacentFaceId(const Mesh::CornerId inCornerId) 
   if (previous_adjacent_corner_id == Mesh::InvalidId)
     return Mesh::InvalidId;
   return GetFaceIdFromCornerId(previous_adjacent_corner_id);
+}
+
+std::vector<Triangle3f> Mesh::GetMeshTriangles() const
+{
+  std::vector<Triangle3f> mesh_triangles;
+  mesh_triangles.reserve(GetNumberOfFaces());
+  for (std::size_t face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
+  { mesh_triangles.push_back(GetFaceTriangle(face_id)); }
+  return mesh_triangles;
 }
 
 void Mesh::SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition)

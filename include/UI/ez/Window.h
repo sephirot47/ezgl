@@ -1,5 +1,5 @@
-#pragma once
 
+#pragma once
 #include "ez/GL.h"
 #include "ez/Input.h"
 #include "ez/Time.h"
@@ -35,7 +35,7 @@ public:
     bool mDoubleBuffer = true;
   };
 
-  enum class LoopResult
+  enum class ELoopResult
   {
     KEEP_LOOPING,
     END_LOOP
@@ -60,7 +60,7 @@ public:
   float GetFramebufferAspectRatio() const;
 
   // Loop callback
-  using LoopCallback = std::function<Window::LoopResult(const DeltaTime)>;
+  using LoopCallback = std::function<Window::ELoopResult(const DeltaTime)>;
   void Loop(const Window::LoopCallback& inLoopCallback);
 
   // Input callbacks

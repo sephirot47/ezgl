@@ -126,7 +126,11 @@ public:
   void DrawLineStrip(const Span<Vec3f>& inLinePoints);
   void DrawTriangle(const Triangle3f& inTriangle);
   void DrawTriangles(const Span<Triangle3f>& inTriangles);
+  void DrawTriangleBoundary(const Triangle3f& inTriangle);
+  void DrawAACube(const AACubef& inAACube);
+  void DrawAACubeBoundary(const AACubef& inAACube);
   void DrawCube();
+  void DrawCubeBoundary();
   void DrawCylinder(std::size_t inNumLongitudes = 32);
   void DrawTorus(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32, float inHoleSize = 0.5f);
   void DrawCone(std::size_t inNumLongitudes = 32);

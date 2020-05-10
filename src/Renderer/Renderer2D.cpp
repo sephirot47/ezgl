@@ -177,9 +177,13 @@ void Renderer2D::DrawCircleBoundary(const std::size_t inNumVertices)
   DrawCircleSectionBoundary(FullCircleRads(), inNumVertices);
 }
 
-void Renderer2D::DrawTriangle(const Triangle2f& inTriangle) { DrawTrianglesGeneric(MakeSpan({ inTriangle })); }
+void Renderer2D::DrawTriangle(const Triangle2f& inTriangle) { DrawTriangles(MakeSpan({ inTriangle })); }
 
-void Renderer2D::DrawTriangles(const Span<Triangle2f>& inTriangles) { DrawTrianglesGeneric(inTriangles); }
+void Renderer2D::DrawTriangles(const Span<Triangle2f>& inTriangles)
+{
+  SetShaderProgram(sShaderProgram);
+  DrawTrianglesGeneric(inTriangles);
+}
 
 void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
 {

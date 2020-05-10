@@ -793,7 +793,7 @@ public:
   static void BindRenderbuffer(const GL::Id inRenderbufferId);
   static void DeleteRenderbuffer(const GL::Id inRenderbufferId);
 
-  static void ClearColor(const Color4f& inClearColor);
+  static void ClearColor(const Color4f& inClearColor = Black<Color4f>());
   static void ClearDepth(const float inClearDepth = 1.0f);
   static void Clear(const GL::EBufferBitFlags& inBufferBitFlags);
   static void DrawElements(const GL::EPrimitivesType inPrimitivesType,

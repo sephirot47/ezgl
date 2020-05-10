@@ -114,8 +114,8 @@ std::shared_ptr<const Camera3f> Renderer3D::GetCamera() const { return const_cas
 void Renderer3D::AdaptCameraToWindow(const Window& inWindow)
 {
   const auto perspective_camera = GetPerspectiveCamera();
-  assert(perspective_camera != nullptr);
-  perspective_camera->SetAspectRatio(inWindow.GetFramebufferAspectRatio());
+  if (perspective_camera)
+    perspective_camera->SetAspectRatio(inWindow.GetFramebufferAspectRatio());
 }
 
 std::shared_ptr<PerspectiveCameraf> Renderer3D::GetPerspectiveCamera()
@@ -223,11 +223,54 @@ void Renderer3D::DrawLineStrip(const Span<Vec3f>& inLinePoints)
   DrawLineStripGeneric(inLinePoints);
 }
 
-void Renderer3D::DrawTriangle(const Triangle3f& inTriangle) { DrawTrianglesGeneric(MakeSpan({ inTriangle })); }
+void Renderer3D::DrawTriangle(const Triangle3f& inTriangle) { DrawTriangles(MakeSpan({ inTriangle })); }
 
-void Renderer3D::DrawTriangles(const Span<Triangle3f>& inTriangles) { DrawTrianglesGeneric(inTriangles); }
+void Renderer3D::DrawTriangles(const Span<Triangle3f>& inTriangles)
+{
+  SetShaderProgram(sMeshShaderProgram);
+  DrawTrianglesGeneric(inTriangles);
+}
+
+void Renderer3D::DrawTriangleBoundary(const Triangle3f& inTriangle)
+{
+  DrawSegments(MakeSpan({ Segment3f(inTriangle[0], inTriangle[1]),
+      Segment3f(inTriangle[0], inTriangle[2]),
+      Segment3f(inTriangle[1], inTriangle[2]) }));
+}
+
+void Renderer3D::DrawAACube(const AACubef& inAACube)
+{
+  RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(inAACube.GetCenter());
+  Scale(inAACube.GetSize() * 0.5f);
+  DrawCube();
+}
+
+void Renderer3D::DrawAACubeBoundary(const AACubef& inAACube)
+{
+  RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(inAACube.GetCenter());
+  Scale(inAACube.GetSize() * 0.5f);
+  DrawCubeBoundary();
+}
 
 void Renderer3D::DrawCube() { DrawMesh(MeshFactory::GetCube()); }
+
+void Renderer3D::DrawCubeBoundary()
+{
+  DrawSegments(MakeSpan({ Segment3f { Vec3f { -1.0f, -1.0f, -1.0f }, Vec3f { -1.0f, -1.0f, 1.0f } },
+      Segment3f { Vec3f { -1.0f, -1.0f, 1.0f }, Vec3f { 1.0f, -1.0f, 1.0f } },
+      Segment3f { Vec3f { 1.0f, -1.0f, 1.0f }, Vec3f { 1.0f, -1.0f, -1.0f } },
+      Segment3f { Vec3f { 1.0f, -1.0f, -1.0f }, Vec3f { -1.0f, -1.0f, -1.0f } },
+      Segment3f { Vec3f { -1.0f, 1.0f, -1.0f }, Vec3f { -1.0f, 1.0f, 1.0f } },
+      Segment3f { Vec3f { -1.0f, 1.0f, 1.0f }, Vec3f { 1.0f, 1.0f, 1.0f } },
+      Segment3f { Vec3f { 1.0f, 1.0f, 1.0f }, Vec3f { 1.0f, 1.0f, -1.0f } },
+      Segment3f { Vec3f { 1.0f, 1.0f, -1.0f }, Vec3f { -1.0f, 1.0f, -1.0f } },
+      Segment3f { Vec3f { -1.0f, -1.0f, -1.0f }, Vec3f { -1.0f, 1.0f, -1.0f } },
+      Segment3f { Vec3f { -1.0f, -1.0f, 1.0f }, Vec3f { -1.0f, 1.0f, 1.0f } },
+      Segment3f { Vec3f { 1.0f, -1.0f, 1.0f }, Vec3f { 1.0f, 1.0f, 1.0f } },
+      Segment3f { Vec3f { 1.0f, -1.0f, -1.0f }, Vec3f { 1.0f, 1.0f, -1.0f } } }));
+}
 
 void Renderer3D::DrawCylinder(std::size_t inNumLongitudes) { DrawMesh(MeshFactory::GetCylinder(inNumLongitudes)); }
 

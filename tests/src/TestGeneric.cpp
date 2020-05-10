@@ -284,7 +284,7 @@ int main(int argc, const char** argv)
                   << " does not exist). Please execute this program with " << create_test_references_option
                   << " parameter." << std::endl;
         tests_succeeded = false;
-        return Window::LoopResult::END_LOOP;
+        return Window::ELoopResult::END_LOOP;
       }
 
       const auto result_image = render_target->GetColorTexture()->GetImage(true);
@@ -307,7 +307,7 @@ int main(int argc, const char** argv)
       }
     }
 
-    return Window::LoopResult::END_LOOP;
+    return Window::ELoopResult::KEEP_LOOPING;
   });
 
   return tests_succeeded ? EXIT_SUCCESS : EXIT_FAILURE;

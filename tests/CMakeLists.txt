@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.7)
 
 project(ezgl-tests)
 
-add_executable(test.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp")
-target_link_libraries(test.exe ezgl)
+add_executable(TestGeneric.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/TestGeneric.cpp")
+target_link_libraries(TestGeneric.exe ezgl)
 
+add_executable(TestIntersections.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/TestIntersections.cpp")
+target_link_libraries(TestIntersections.exe ezgl)
+
+add_executable(TestOctree.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/TestOctree.cpp")
+target_link_libraries(TestOctree.exe ezgl)

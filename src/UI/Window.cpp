@@ -123,7 +123,7 @@ void Window::Loop(const Window::LoopCallback& inLoopCallback)
     const auto delta_time = (Now() - previous_time);
     previous_time = Now();
     const auto loop_result = inLoopCallback(delta_time);
-    if (loop_result == Window::LoopResult::END_LOOP)
+    if (loop_result == Window::ELoopResult::END_LOOP)
       break;
 
     SwapBuffers();

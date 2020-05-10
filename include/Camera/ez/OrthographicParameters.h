@@ -8,8 +8,6 @@ namespace ez
 template <typename T, std::size_t N>
 struct OrthographicParameters final
 {
-  static constexpr auto VariantIndex = 0;
-
   Vec<T, N> mMin = Zero<Vec<T, N>>();
   Vec<T, N> mMax = One<Vec<T, N>>();
 };

@@ -34,7 +34,6 @@ namespace ez
 {
 class MeshDrawData;
 class ShaderProgram;
-class ShaderProgram;
 class Texture2D;
 
 template <auto StateId>

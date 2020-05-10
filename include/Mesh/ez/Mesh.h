@@ -5,6 +5,7 @@
 #include "ez/MathInitializers.h"
 #include "ez/MeshIterators.h"
 #include "ez/Range.h"
+#include "ez/Triangle.h"
 #include "ez/Vec.h"
 #include <algorithm>
 #include <array>
@@ -101,6 +102,7 @@ public:
   void SetCornerTextureCoordinates(const Mesh::CornerId& inCornerId, const Vec2f& inTextureCoordinates);
   const Vec3f& GetVertexPosition(const Mesh::VertexId& inVertexId) const;
   const Vec3f& GetFaceNormal(const Mesh::CornerId& inCornerId) const;
+  Triangle3f GetFaceTriangle(const Mesh::FaceId& inFaceId) const;
   const Vec3f& GetCornerNormal(const Mesh::FaceId& inFaceId) const;
   const Vec2f& GetCornerTextureCoordinates(const Mesh::CornerId& inCornerId) const;
   Mesh::VertexId GetVertexIdFromCornerId(const Mesh::CornerId inCornerId) const;
@@ -129,6 +131,7 @@ public:
   Mesh::CornerId GetPreviousAdjacentCornerId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetNextAdjacentFaceId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetPreviousAdjacentFaceId(const Mesh::CornerId inCornerId) const;
+  std::vector<Triangle3f> GetMeshTriangles() const;
 
   void Transform(const Mat4f& inTransform);
 
