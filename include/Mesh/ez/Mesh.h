@@ -131,7 +131,7 @@ public:
   Mesh::CornerId GetPreviousAdjacentCornerId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetNextAdjacentFaceId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetPreviousAdjacentFaceId(const Mesh::CornerId inCornerId) const;
-  std::vector<Triangle3f> GetMeshTriangles() const;
+  std::vector<Triangle3f> GetTriangles() const;
 
   void Transform(const Mat4f& inTransform);
 

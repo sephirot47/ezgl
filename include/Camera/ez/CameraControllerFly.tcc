@@ -142,38 +142,38 @@ void CameraControllerFly<T, N>::OnInput(const InputEvent& inInputEvent)
 
   switch (inInputEvent.GetType())
   {
-  case InputEvent::Type::MouseScroll:
+  case InputEvent::EType::MOUSE_SCROLL:
   {
-    const auto& scroll_event = inInputEvent.As<InputEvent::Type::MouseScroll>();
+    const auto& scroll_event = inInputEvent.As<InputEvent::EType::MOUSE_SCROLL>();
     mCurrentFlySpeed += mParameters.mScrollAccelerationFactor * mCurrentFlySpeed * -scroll_event.mDeltaScroll[1];
     mCurrentFlySpeed = Clamp(mCurrentFlySpeed, mParameters.mMinFlySpeed, mParameters.mMaxFlySpeed);
   }
   break;
 
-  case InputEvent::Type::Key:
+  case InputEvent::EType::KEY:
   {
-    const auto& key_event = inInputEvent.As<InputEvent::Type::Key>();
+    const auto& key_event = inInputEvent.As<InputEvent::EType::KEY>();
 
     mWantsToSlowDown = key_event.IsAltModifierPressed();
     mWantsToSpeedUp = key_event.IsShiftModifierPressed();
     switch (key_event.mKey)
     {
-    case Key::W:
+    case EKey::W:
       mWantsToMoveForward = key_event.IsPressOrRepeat();
       break;
-    case Key::S:
+    case EKey::S:
       mWantsToMoveBack = key_event.IsPressOrRepeat();
       break;
-    case Key::A:
+    case EKey::A:
       mWantsToMoveLeft = key_event.IsPressOrRepeat();
       break;
-    case Key::D:
+    case EKey::D:
       mWantsToMoveRight = key_event.IsPressOrRepeat();
       break;
-    case Key::Q:
+    case EKey::Q:
       mWantsToMoveUp = key_event.IsPressOrRepeat();
       break;
-    case Key::E:
+    case EKey::E:
       mWantsToMoveDown = key_event.IsPressOrRepeat();
       break;
     default:
@@ -182,14 +182,14 @@ void CameraControllerFly<T, N>::OnInput(const InputEvent& inInputEvent)
   }
   break;
 
-  case InputEvent::Type::MouseButton:
+  case InputEvent::EType::MOUSE_BUTTON:
   {
-    const auto& mouse_button_event = inInputEvent.As<InputEvent::Type::MouseButton>();
+    const auto& mouse_button_event = inInputEvent.As<InputEvent::EType::MOUSE_BUTTON>();
 
-    if (mouse_button_event.mButton == MouseButton::RIGHT)
+    if (mouse_button_event.mButton == EMouseButton::RIGHT)
       mWantsToRotate = mouse_button_event.IsPress();
 
-    if (mouse_button_event.mButton == MouseButton::MIDDLE)
+    if (mouse_button_event.mButton == EMouseButton::MIDDLE)
       mWantsToPan = mouse_button_event.IsPress();
 
     break;

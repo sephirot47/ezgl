@@ -139,12 +139,12 @@ void Window::SetInputEventCallback(const Window::InputEventCallback& inInputEven
 }
 const Window::InputEventCallback& Window::GetInputEventCallback() const { return mInputEventCallback; }
 
-bool Window::IsMouseButtonPressed(const MouseButton& inMouseButton)
+bool Window::IsMouseButtonPressed(const EMouseButton& inMouseButton)
 {
   return glfwGetMouseButton(mHandle, static_cast<int>(inMouseButton)) == GLFW_PRESS;
 }
 
-bool Window::IsKeyPressed(const Key& inKey) { return glfwGetKey(mHandle, static_cast<int>(inKey)) == GLFW_PRESS; }
+bool Window::IsKeyPressed(const EKey& inKey) { return glfwGetKey(mHandle, static_cast<int>(inKey)) == GLFW_PRESS; }
 
 Vec2f Window::GetMousePosition() const
 {
@@ -153,6 +153,14 @@ Vec2f Window::GetMousePosition() const
   glfwGetCursorPos(mHandle, &mouse_position_x, &mouse_position_y);
   const auto mouse_position = Vec2f(static_cast<float>(mouse_position_x), static_cast<float>(mouse_position_y));
   return mouse_position;
+}
+
+Vec2f Window::GetMousePositionViewport() const
+{
+  const auto normalized_mouse_pos = GetMousePosition() / Vec2f(GetFramebufferSize());
+  const auto normalized_clamped_mouse_pos = Clamp(normalized_mouse_pos, Zero<Vec2f>(), One<Vec2f>());
+  const auto viewport_mouse_pos = Vec2f(normalized_clamped_mouse_pos[0], 1.0f - normalized_clamped_mouse_pos[1]);
+  return viewport_mouse_pos;
 }
 
 template <typename TInputEvent>
@@ -175,9 +183,9 @@ const std::vector<InputListener*>& Window::GetInputListeners() const { return mI
 void GLFWMouseButtonCallback(GLFWwindow* inGLFWWindow, int inButton, int inAction, int inModifiers)
 {
   MouseButtonEvent mouse_button_event;
-  mouse_button_event.mButton = static_cast<MouseButton>(inButton);
-  mouse_button_event.mAction = static_cast<MouseAction>(inAction);
-  mouse_button_event.mModifiers = static_cast<ModifierKey>(inModifiers);
+  mouse_button_event.mButton = static_cast<EMouseButton>(inButton);
+  mouse_button_event.mAction = static_cast<EMouseAction>(inAction);
+  mouse_button_event.mModifiers = static_cast<EModifierKey>(inModifiers);
   CallInputEventCallback(inGLFWWindow, mouse_button_event);
 }
 
@@ -206,9 +214,9 @@ void GLFWKeyCallback(GLFWwindow* inGLFWWindow, int inKey, int inScancode, int in
 {
   UNUSED(inScancode);
   KeyEvent key_event;
-  key_event.mKey = static_cast<Key>(inKey);
-  key_event.mAction = static_cast<KeyAction>(inAction);
-  key_event.mModifiers = static_cast<ModifierKey>(inModifiers);
+  key_event.mKey = static_cast<EKey>(inKey);
+  key_event.mAction = static_cast<EKeyAction>(inAction);
+  key_event.mModifiers = static_cast<EModifierKey>(inModifiers);
   CallInputEventCallback(inGLFWWindow, key_event);
 };
 

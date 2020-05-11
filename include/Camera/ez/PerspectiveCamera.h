@@ -2,6 +2,7 @@
 
 #include "ez/Camera.h"
 #include "ez/Math.h"
+#include "ez/Ray.h"
 #include "ez/PerspectiveParameters.h"
 
 namespace ez
@@ -21,6 +22,8 @@ public:
 
   void SetZFar(const float inZFar) { mPerspectiveParameters.mZFar = inZFar; }
   float GetZFar() const { return mPerspectiveParameters.mZFar; }
+
+  Ray3<T> GetViewportRay(const Vec2<T> inViewportPoint) const; // inViewportPoint in [0..1]
 
   void SetPerspectiveParameters(const PerspectiveParameters<T>& inPerspectiveParameters)
   {
@@ -44,3 +47,5 @@ private:
 
 using PerspectiveCameraf = PerspectiveCamera<float>;
 }
+
+#include "ez/PerspectiveCamera.tcc"

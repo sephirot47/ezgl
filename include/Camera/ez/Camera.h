@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/Vec.h"
 #include "ez/MathInitializers.h"
 #include "ez/Transformation.h"
+#include "ez/Vec.h"
 #include <cstdint>
 
 namespace ez
@@ -32,6 +32,7 @@ public:
   Vec<T, N> GetRight() const { return GetRotation() * Right<Vec<T, N>>(); }
   Vec<T, N> GetUp() const { return GetRotation() * Up<Vec<T, N>>(); }
 
+  const Transformation<T, N>& GetTransformation() const { return mTransformation; }
   SquareMat<T, N + 1> GetModelMatrix() const { return mTransformation.GetMatrix(); }
   SquareMat<T, N + 1> GetViewMatrix() const { return mTransformation.GetInverseMatrix(); }
   virtual SquareMat<T, N + 1> GetProjectionMatrix() const = 0;

@@ -10,3 +10,6 @@ target_link_libraries(TestIntersections.exe ezgl)
 
 add_executable(TestOctree.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/TestOctree.cpp")
 target_link_libraries(TestOctree.exe ezgl)
+
+add_executable(TestRayIntersection.exe "${CMAKE_CURRENT_SOURCE_DIR}/src/TestRayIntersection.cpp")
+target_link_libraries(TestRayIntersection.exe ezgl)

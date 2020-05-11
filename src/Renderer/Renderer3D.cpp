@@ -175,6 +175,23 @@ void Renderer3D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::ED
   Renderer::DrawMesh(inMeshDrawData, inDrawType);
 }
 
+void Renderer3D::DrawVAOElements(const VAO& inVAO,
+    const GL::Size inNumberOfElementsToDraw,
+    const GL::EPrimitivesType inPrimitivesType)
+{
+  SetShaderProgram(sMeshShaderProgram);
+  Renderer::DrawVAOElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType);
+}
+
+void Renderer3D::DrawVAOArrays(const VAO& inVAO,
+    const GL::Size inNumberOfPrimitivesToDraw,
+    const GL::EPrimitivesType inPrimitivesType,
+    const GL::Size inBeginPrimitiveIndex)
+{
+  SetShaderProgram(sMeshShaderProgram);
+  Renderer::DrawVAOArrays(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, inBeginPrimitiveIndex);
+}
+
 void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
 {
   RENDERER_STATE_GUARD(this, Renderer3D::EStateId::TRANSFORM_MATRIX);
@@ -199,6 +216,27 @@ void Renderer3D::DrawAxes()
 
   GetMaterial().SetDiffuseColor(Blue<Color4f>());
   DrawArrow(Segment3f { Zero<Vec3f>(), Back<Vec3f>() });
+}
+
+void Renderer3D::DrawRay(const Ray3f& inRay, const float inRayDistance)
+{
+  DrawSegment(Segment3f { inRay.GetOrigin(), inRay.GetPoint(inRayDistance) });
+}
+
+void Renderer3D::DrawPlane(const Planef& inPlane, const float inPlaneSize)
+{
+  const auto plane_rotation = LookInDirection(inPlane.GetNormal());
+  const auto plane_points = std::array {
+    Rotated(Vec3f(-inPlaneSize, -inPlaneSize, 0.0f), plane_rotation),
+    Rotated(Vec3f(-inPlaneSize, inPlaneSize, 0.0f), plane_rotation),
+    Rotated(Vec3f(inPlaneSize, -inPlaneSize, 0.0f), plane_rotation),
+    Rotated(Vec3f(inPlaneSize, inPlaneSize, 0.0f), plane_rotation),
+  };
+
+  DrawTriangles(MakeSpan({
+      Triangle3f(plane_points[0], plane_points[2], plane_points[1]),
+      Triangle3f(plane_points[1], plane_points[2], plane_points[3]),
+  }));
 }
 
 void Renderer3D::DrawPoint(const Vec3f& inPoint) { DrawPoints(MakeSpan({ inPoint })); }
@@ -243,7 +281,7 @@ void Renderer3D::DrawAACube(const AACubef& inAACube)
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(inAACube.GetCenter());
   Scale(inAACube.GetSize() * 0.5f);
-  DrawCube();
+  DrawAACube();
 }
 
 void Renderer3D::DrawAACubeBoundary(const AACubef& inAACube)
@@ -251,12 +289,12 @@ void Renderer3D::DrawAACubeBoundary(const AACubef& inAACube)
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(inAACube.GetCenter());
   Scale(inAACube.GetSize() * 0.5f);
-  DrawCubeBoundary();
+  DrawAACubeBoundary();
 }
 
-void Renderer3D::DrawCube() { DrawMesh(MeshFactory::GetCube()); }
+void Renderer3D::DrawAACube() { DrawMesh(MeshFactory::GetCube()); }
 
-void Renderer3D::DrawCubeBoundary()
+void Renderer3D::DrawAACubeBoundary()
 {
   DrawSegments(MakeSpan({ Segment3f { Vec3f { -1.0f, -1.0f, -1.0f }, Vec3f { -1.0f, -1.0f, 1.0f } },
       Segment3f { Vec3f { -1.0f, -1.0f, 1.0f }, Vec3f { 1.0f, -1.0f, 1.0f } },

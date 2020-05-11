@@ -6,7 +6,7 @@
 
 namespace ez
 {
-enum class Key
+enum class EKey
 {
   UNKNOWN = GLFW_KEY_UNKNOWN,
   SPACE = GLFW_KEY_SPACE,
@@ -132,7 +132,7 @@ enum class Key
   LAST = GLFW_KEY_LAST,
 };
 
-enum class KeyAction
+enum class EKeyAction
 {
   UNKNOWN = -1,
   PRESS = GLFW_PRESS,
@@ -140,14 +140,14 @@ enum class KeyAction
   RELEASE = GLFW_RELEASE,
 };
 
-enum class MouseAction
+enum class EMouseAction
 {
   UNKNOWN = -1,
   PRESS = GLFW_PRESS,
   RELEASE = GLFW_RELEASE,
 };
 
-enum class MouseButton
+enum class EMouseButton
 {
   UNKNOWN = -1,
   BUTTON_1 = GLFW_MOUSE_BUTTON_1,
@@ -164,7 +164,7 @@ enum class MouseButton
   MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE,
 };
 
-enum class ModifierKey
+enum class EModifierKey
 {
   NONE = 0,
   SHIFT = GLFW_MOD_SHIFT,
@@ -174,38 +174,38 @@ enum class ModifierKey
   CAPS_LOCK = GLFW_MOD_CAPS_LOCK,
   NUM_LOCK = GLFW_MOD_NUM_LOCK,
 };
-DECLARE_FLAGS(ModifierKey);
+DECLARE_FLAGS(EModifierKey);
 
 struct KeyOrButtonEvent
 {
-  ModifierKey mModifiers = ModifierKey::NONE;
+  EModifierKey mModifiers = EModifierKey::NONE;
 
-  bool IsAltModifierPressed() const { return (mModifiers & ModifierKey::ALT) != ModifierKey::NONE; }
-  bool IsShiftModifierPressed() const { return (mModifiers & ModifierKey::SHIFT) != ModifierKey::NONE; }
-  bool IsControlModifierPressed() const { return (mModifiers & ModifierKey::CONTROL) != ModifierKey::NONE; }
-  bool IsCapsLockModifierPressed() const { return (mModifiers & ModifierKey::CAPS_LOCK) != ModifierKey::NONE; }
-  bool IsNumLockModifierPressed() const { return (mModifiers & ModifierKey::NUM_LOCK) != ModifierKey::NONE; }
-  bool IsSuperModifierPressed() const { return (mModifiers & ModifierKey::SUPER) != ModifierKey::NONE; }
+  bool IsAltModifierPressed() const { return (mModifiers & EModifierKey::ALT) != EModifierKey::NONE; }
+  bool IsShiftModifierPressed() const { return (mModifiers & EModifierKey::SHIFT) != EModifierKey::NONE; }
+  bool IsControlModifierPressed() const { return (mModifiers & EModifierKey::CONTROL) != EModifierKey::NONE; }
+  bool IsCapsLockModifierPressed() const { return (mModifiers & EModifierKey::CAPS_LOCK) != EModifierKey::NONE; }
+  bool IsNumLockModifierPressed() const { return (mModifiers & EModifierKey::NUM_LOCK) != EModifierKey::NONE; }
+  bool IsSuperModifierPressed() const { return (mModifiers & EModifierKey::SUPER) != EModifierKey::NONE; }
 };
 
 struct KeyEvent final : public KeyOrButtonEvent
 {
-  KeyAction mAction = KeyAction::UNKNOWN;
-  Key mKey = Key::UNKNOWN;
+  EKeyAction mAction = EKeyAction::UNKNOWN;
+  EKey mKey = EKey::UNKNOWN;
 
-  bool IsPress() const { return mAction == KeyAction::PRESS; }
-  bool IsRepeat() const { return mAction == KeyAction::REPEAT; }
+  bool IsPress() const { return mAction == EKeyAction::PRESS; }
+  bool IsRepeat() const { return mAction == EKeyAction::REPEAT; }
   bool IsPressOrRepeat() const { return IsPress() || IsRepeat(); }
-  bool IsRelease() const { return mAction == KeyAction::RELEASE; }
+  bool IsRelease() const { return mAction == EKeyAction::RELEASE; }
 };
 
 struct MouseButtonEvent final : public KeyOrButtonEvent
 {
-  MouseAction mAction = MouseAction::UNKNOWN;
-  MouseButton mButton = MouseButton::UNKNOWN;
+  EMouseAction mAction = EMouseAction::UNKNOWN;
+  EMouseButton mButton = EMouseButton::UNKNOWN;
 
-  bool IsPress() const { return mAction == MouseAction::PRESS; }
-  bool IsRelease() const { return mAction == MouseAction::RELEASE; }
+  bool IsPress() const { return mAction == EMouseAction::PRESS; }
+  bool IsRelease() const { return mAction == EMouseAction::RELEASE; }
 };
 
 struct MouseMoveEvent final
@@ -229,25 +229,25 @@ struct InputEvent final : public VariantInputEvent
 {
   using VariantInputEvent::operator=;
 
-  enum class Type // Must be in the same order as the variant template types
+  enum class EType // Must be in the same order as the variant template types
   {
-    Key,
-    MouseButton,
-    MouseMove,
-    MouseEnterExit,
-    MouseScroll
+    KEY,
+    MOUSE_BUTTON,
+    MOUSE_MOVE,
+    MOUSE_ENTER_EXIT,
+    MOUSE_SCROLL
   };
 
-  InputEvent::Type GetType() const { return static_cast<Type>(index()); }
+  InputEvent::EType GetType() const { return static_cast<EType>(index()); }
 
-  template <InputEvent::Type InputEventType>
+  template <InputEvent::EType InputEventType>
   auto& As()
   {
     assert(GetType() == InputEventType);
     return std::get<static_cast<int>(InputEventType)>(*this);
   }
 
-  template <InputEvent::Type InputEventType>
+  template <InputEvent::EType InputEventType>
   const auto& As() const
   {
     return const_cast<InputEvent&>(*this).As<InputEventType>();

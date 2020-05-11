@@ -1,4 +1,5 @@
 #include "ez/Camera.h"
+#include "ez/Macros.h"
 
 namespace ez
 {

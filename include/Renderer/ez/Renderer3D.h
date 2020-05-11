@@ -117,8 +117,17 @@ public:
   void AdaptToWindow(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawVAOElements(const VAO& inVAO,
+      const GL::Size inNumberOfElementsToDraw,
+      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
+  void DrawVAOArrays(const VAO& inVAO,
+      const GL::Size inNumberOfPrimitivesToDraw,
+      const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES,
+      const GL::Size inBeginPrimitiveIndex = 0);
   void DrawArrow(const Segment3f& inArrowSegment);
   void DrawAxes();
+  void DrawRay(const Ray3f& inRay, const float inDistance = 999999.9f);
+  void DrawPlane(const Planef& inPlane, const float inPlaneSize = 5.0f);
   void DrawPoint(const Vec3f& inPoint);
   void DrawPoints(const Span<Vec3f>& inPoints);
   void DrawSegment(const Segment3f& inSegment);
@@ -129,8 +138,8 @@ public:
   void DrawTriangleBoundary(const Triangle3f& inTriangle);
   void DrawAACube(const AACubef& inAACube);
   void DrawAACubeBoundary(const AACubef& inAACube);
-  void DrawCube();
-  void DrawCubeBoundary();
+  void DrawAACube();
+  void DrawAACubeBoundary();
   void DrawCylinder(std::size_t inNumLongitudes = 32);
   void DrawTorus(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32, float inHoleSize = 0.5f);
   void DrawCone(std::size_t inNumLongitudes = 32);

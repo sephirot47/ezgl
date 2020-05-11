@@ -286,7 +286,7 @@ Mesh::CornerId Mesh::GetPreviousAdjacentFaceId(const Mesh::CornerId inCornerId) 
   return GetFaceIdFromCornerId(previous_adjacent_corner_id);
 }
 
-std::vector<Triangle3f> Mesh::GetMeshTriangles() const
+std::vector<Triangle3f> Mesh::GetTriangles() const
 {
   std::vector<Triangle3f> mesh_triangles;
   mesh_triangles.reserve(GetNumberOfFaces());

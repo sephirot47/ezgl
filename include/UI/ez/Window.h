@@ -74,9 +74,10 @@ public:
   const std::vector<InputListener*>& GetInputListeners() const;
 
   // Input direct
-  bool IsMouseButtonPressed(const MouseButton& inMouseButton);
-  bool IsKeyPressed(const Key& inKey);
+  bool IsMouseButtonPressed(const EMouseButton& inMouseButton);
+  bool IsKeyPressed(const EKey& inKey);
   Vec2f GetMousePosition() const;
+  Vec2f GetMousePositionViewport() const; // [0..1]
 
 private:
   GLFWwindow* mHandle = nullptr;
