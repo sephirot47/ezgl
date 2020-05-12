@@ -93,7 +93,7 @@ public:
   void ComputeFaceNormals();
   void ComputeCornerNormals(const float inMinEdgeAngleToSmooth);
   void ComputeNormals(const float inMinEdgeAngleToSmooth);
-  void ComputeOppositeCornerIds();
+  void ComputeCornerTable();
   void Clear();
 
   void SetVertexPosition(const Mesh::VertexId inVertexId, const Vec3f& inPosition);
@@ -160,7 +160,7 @@ public:
 #endif
 
 private:
-  bool mOppositeCornerIdsComputed = false;
+  bool mCornerTableComputed = false;
   std::vector<Mesh::VertexData> mVerticesData;
   std::vector<Mesh::CornerData> mCornersData;
   std::vector<Mesh::FaceData> mFacesData;

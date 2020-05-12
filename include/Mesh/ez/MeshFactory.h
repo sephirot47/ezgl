@@ -27,7 +27,7 @@ public:
 
 private:
   static Mesh GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const bool inIsHemisphere);
-  static void ConsolidateMesh(Mesh& ioMesh, const bool inUpdateNormals = true);
+  static void ConsolidateMesh(Mesh& ioMesh);
 };
 
 }

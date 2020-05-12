@@ -333,14 +333,9 @@ Mesh MeshFactory::GetCircle(const std::size_t inNumVertices)
   return GetCircleSection(inNumVertices, FullCircleRads());
 }
 
-void MeshFactory::ConsolidateMesh(Mesh& ioMesh, const bool inUpdateNormals)
+void MeshFactory::ConsolidateMesh(Mesh& ioMesh)
 {
   constexpr auto max_smooth_angle = DegreeToRad(45.0f);
-  ioMesh.ComputeOppositeCornerIds();
-
-  if (inUpdateNormals)
-  {
-    ioMesh.ComputeNormals(max_smooth_angle);
-  }
+  ioMesh.ComputeNormals(max_smooth_angle);
 }
 }

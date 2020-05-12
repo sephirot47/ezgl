@@ -70,8 +70,6 @@ void MeshIO::Read(const std::filesystem::path& inMeshPath, Mesh& ioMesh)
       ioMesh.SetCornerTextureCoordinates(corner_id, corner_texture_coordinates);
     }
   }
-
-  ioMesh.ComputeOppositeCornerIds();
 }
 
 void MeshIO::Write(const Mesh& inMesh, const std::filesystem::path& inMeshPath, const bool inPreserveVerticesIds)

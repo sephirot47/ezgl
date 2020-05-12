@@ -16,16 +16,16 @@ int main(int argc, const char** argv)
 {
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Octrees";
+  window_create_options.mTitle = "Test Ray Intersection";
   const auto window = std::make_shared<Window>(window_create_options);
 
   // Create meshes
-  const auto mesh = MeshFactory::GetCone(32);
+  const auto mesh = MeshFactory::GetTorus(500, 500, 0.5f);
 
   // Camera
   const auto camera = std::make_shared<PerspectiveCameraf>();
-  // camera->SetPosition(Left<Vec3f>() * 3.0f + Forward<Vec3f>() * 0.75f);
-  // camera->LookAtPoint(Forward<Vec3f>() * 0.75f);
+  camera->SetPosition(5.0f * Left<Vec3f>() + 5.0f * Forward<Vec3f>());
+  camera->LookAtPoint(Zero<Vec3f>());
 
   // Camera controller
   CameraControllerFly3f camera_controller_fly;
@@ -33,19 +33,16 @@ int main(int argc, const char** argv)
   camera_controller_fly.SetWindow(window);
 
   // Create octree
-  const auto octrees = std::array {
-    Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 1),
-    Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 2),
-    Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 3),
-    Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 4),
-    // Octree<Triangle3f>(MakeSpan(mesh.GetMeshTriangles()), 0, 5),
-  };
+  const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 8, 4);
 
   // Create renderer
   Renderer3D renderer;
 
+  AACubef cube(Vec3f(-1.0f, -2.0f, -1.5f), Vec3f(0.0f, 0.5f, 2.0f));
+
   std::vector<Ray3f> rays;
   std::vector<Triangle3f> hit_triangles;
+  std::vector<Vec3f> hit_points;
   window->SetInputEventCallback([&](const InputEvent& inInputEvent) {
     if (inInputEvent.GetType() == InputEvent::EType::MOUSE_BUTTON)
     {
@@ -55,13 +52,26 @@ int main(int argc, const char** argv)
         const auto mouse_position = window->GetMousePositionViewport();
         const auto mouse_ray = camera->GetViewportRay(mouse_position);
         const auto mesh_triangles = mesh.GetTriangles();
-        for (const auto& mesh_triangle : mesh_triangles)
+
+        for (int i = 0; i < 100; ++i)
         {
-          if (const auto intersection_point = Intersect(mouse_ray, mesh_triangle))
+          const auto mesh_intersections = octree.IntersectAll(mouse_ray);
+          for (const auto& mesh_intersection_distance : mesh_intersections)
           {
-            hit_triangles.push_back(mesh_triangle);
+            hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_distance));
+            // hit_triangles.push_back(mesh_triangle);
           }
         }
+
+        /*
+        const auto aacube_intersection_distances = Intersect(mouse_ray, cube);
+        for (const auto& aacube_intersection_distance : aacube_intersection_distances)
+        {
+          if (aacube_intersection_distance)
+            hit_points.push_back(mouse_ray.GetPoint(*aacube_intersection_distance));
+        }
+        */
+
         rays.push_back(mouse_ray);
       }
     }
@@ -70,12 +80,6 @@ int main(int argc, const char** argv)
   // Window loop
   int selected_octree = 0;
   window->Loop([&](const DeltaTime& inDeltaTime) {
-    if (window->IsKeyPressed(EKey::UP))
-    {
-      selected_octree = (selected_octree + 1) % octrees.size();
-    }
-    const auto& octree = octrees[selected_octree];
-
     // Prepare renderer
     renderer.ResetState();
     renderer.Clear();
@@ -85,8 +89,6 @@ int main(int argc, const char** argv)
     renderer.GetMaterial().SetLightingEnabled(false);
     renderer.GetMaterial().SetDiffuseColor(White<Color4f>());
     renderer.SetCullFaceEnabled(false);
-    const auto plane = Planef(NormalizedSafe(Vec3f(0.0f, 1.0f, 1.0f)), Zero<Vec3f>());
-    renderer.DrawPlane(plane);
 
     renderer.GetMaterial().SetDiffuseColor(Green<Color4f>());
 
@@ -97,6 +99,13 @@ int main(int argc, const char** argv)
     {
       renderer.SetLineWidth(5.0f);
       renderer.DrawTriangleBoundary(hit_triangle);
+    }
+
+    renderer.GetMaterial().SetDiffuseColor(Red<Color4f>());
+    for (const auto& hit_point : hit_points)
+    {
+      renderer.SetPointSize(6.0f);
+      renderer.DrawPoint(hit_point);
     }
 
     /*
@@ -122,7 +131,8 @@ int main(int argc, const char** argv)
     renderer.ResetTransformMatrix();
     renderer.GetMaterial().SetLightingEnabled(true);
     renderer.GetMaterial().SetDiffuseColor(Cyan<Color4f>());
-    renderer.DrawMesh(mesh); // Draw sphere
+    renderer.DrawMesh(mesh);
+    // renderer.DrawAACube(cube);
 
     // Blit image to window
     GL::ClearDepth();

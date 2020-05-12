@@ -17,7 +17,7 @@ void Mesh::AddVertex(const Vec3f& inPosition)
   Mesh::VertexData vertex_data;
   vertex_data.mPosition = inPosition;
   mVerticesData.push_back(std::move(vertex_data));
-  mOppositeCornerIdsComputed = false;
+  mCornerTableComputed = false;
 }
 
 void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
@@ -41,7 +41,7 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
   // For each vertex of the new face, create corners
   for (Mesh::InternalCornerId internal_corner_id = 0; internal_corner_id < 3; ++internal_corner_id)
   { mCornersData.emplace_back(); }
-  mOppositeCornerIdsComputed = false;
+  mCornerTableComputed = false;
 }
 
 void Mesh::SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f& inFaceNormal)
@@ -117,7 +117,7 @@ Mesh::FaceId Mesh::GetFaceIdFromCornerId(const Mesh::CornerId inCornerId) const
 
 Mesh::CornerId Mesh::GetOppositeCornerId(const Mesh::CornerId inCornerId) const
 {
-  EXPECTS(mOppositeCornerIdsComputed);
+  EXPECTS(mCornerTableComputed);
   EXPECTS(inCornerId < mCornersData.size());
   return mCornersData.at(inCornerId).mOppositeCornedId;
 }
@@ -473,8 +473,10 @@ void Mesh::ComputeNormals(const float inMinEdgeAngleToSmooth)
   ComputeCornerNormals(inMinEdgeAngleToSmooth);
 }
 
-void Mesh::ComputeOppositeCornerIds()
+void Mesh::ComputeCornerTable()
 {
+  // TODO: This is very slow for very big meshes. There must be a better way.
+
   // Create auxiliar map that maps each edge to its two adjacent faces
   std::unordered_map<Edge, std::pair<FaceId, FaceId>, Edge::Hash> edge_to_adjacent_faces;
   for (Mesh::FaceId face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
@@ -528,7 +530,7 @@ void Mesh::ComputeOppositeCornerIds()
     mCornersData.at(second_corner_id).mOppositeCornedId = first_corner_id;
   }
 
-  mOppositeCornerIdsComputed = true;
+  mCornerTableComputed = true;
 
   // Set all mFaceId in VertexData so that they point to the most CW face in the boundary (if boundary)
   // This is so that we can use the circulators using next->next->next...and make sure we traverse all faces
