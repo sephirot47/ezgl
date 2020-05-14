@@ -335,6 +335,7 @@ Mesh MeshFactory::GetCircle(const std::size_t inNumVertices)
 
 void MeshFactory::ConsolidateMesh(Mesh& ioMesh)
 {
+  ioMesh.ComputeCornerTable();
   constexpr auto max_smooth_angle = DegreeToRad(45.0f);
   ioMesh.ComputeNormals(max_smooth_angle);
 }

@@ -46,7 +46,7 @@ private:
     const auto& vertex_neighbor_faces_ids = mMesh.GetVerticesData().at(mVertexId).mNeighborFacesId;
     if (mCurrentNeighborFaceId >= vertex_neighbor_faces_ids.size())
       return std::nullopt;
-    return std::make_optional(vertex_neighbor_faces_ids.at(mCurrentNeighborFaceId));
+    return vertex_neighbor_faces_ids.at(mCurrentNeighborFaceId);
   }
 };
 

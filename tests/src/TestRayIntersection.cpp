@@ -20,11 +20,11 @@ int main(int argc, const char** argv)
   const auto window = std::make_shared<Window>(window_create_options);
 
   // Create meshes
-  const auto mesh = MeshFactory::GetTorus(500, 500, 0.5f);
+  const auto mesh = MeshFactory::GetTorus(30, 30, 0.5f);
 
   // Camera
   const auto camera = std::make_shared<PerspectiveCameraf>();
-  camera->SetPosition(5.0f * Left<Vec3f>() + 5.0f * Forward<Vec3f>());
+  camera->SetPosition(2.0f * Left<Vec3f>() + 2.0f * Forward<Vec3f>());
   camera->LookAtPoint(Zero<Vec3f>());
 
   // Camera controller
@@ -33,7 +33,7 @@ int main(int argc, const char** argv)
   camera_controller_fly.SetWindow(window);
 
   // Create octree
-  const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 8, 4);
+  const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 6);
 
   // Create renderer
   Renderer3D renderer;
@@ -53,15 +53,18 @@ int main(int argc, const char** argv)
         const auto mouse_ray = camera->GetViewportRay(mouse_position);
         const auto mesh_triangles = mesh.GetTriangles();
 
-        for (int i = 0; i < 100; ++i)
+        const auto time_before = Now();
+        for (int i = 0; i < 1000; ++i)
         {
           const auto mesh_intersections = octree.IntersectAll(mouse_ray);
           for (const auto& mesh_intersection_distance : mesh_intersections)
           {
-            hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_distance));
+            if (i == 0)
+              hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_distance));
             // hit_triangles.push_back(mesh_triangle);
           }
         }
+        PEEK(TimeDuration(Now() - time_before).count());
 
         /*
         const auto aacube_intersection_distances = Intersect(mouse_ray, cube);
@@ -80,6 +83,13 @@ int main(int argc, const char** argv)
   // Window loop
   int selected_octree = 0;
   window->Loop([&](const DeltaTime& inDeltaTime) {
+    if (window->IsKeyPressed(EKey::R))
+    {
+      hit_triangles.clear();
+      hit_points.clear();
+      rays.clear();
+    }
+
     // Prepare renderer
     renderer.ResetState();
     renderer.Clear();
@@ -95,16 +105,18 @@ int main(int argc, const char** argv)
     renderer.SetLineWidth(1.0f);
     for (const auto& ray : rays) renderer.DrawRay(ray);
 
+    renderer.DrawAxes();
+
     for (const auto& hit_triangle : hit_triangles)
     {
       renderer.SetLineWidth(5.0f);
       renderer.DrawTriangleBoundary(hit_triangle);
     }
 
-    renderer.GetMaterial().SetDiffuseColor(Red<Color4f>());
+    renderer.GetMaterial().SetDiffuseColor(Purple<Color4f>());
     for (const auto& hit_point : hit_points)
     {
-      renderer.SetPointSize(6.0f);
+      renderer.SetPointSize(5.0f);
       renderer.DrawPoint(hit_point);
     }
 
