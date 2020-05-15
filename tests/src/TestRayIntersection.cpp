@@ -33,7 +33,10 @@ int main(int argc, const char** argv)
   camera_controller_fly.SetWindow(window);
 
   // Create octree
+  PRINT("AAAAAAAAAAAAAAAAAAAAA");
+  const auto before = Now();
   const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 6);
+  PEEK(TimeDuration(Now() - before).count());
 
   // Create renderer
   Renderer3D renderer;
@@ -54,26 +57,18 @@ int main(int argc, const char** argv)
         const auto mesh_triangles = mesh.GetTriangles();
 
         const auto time_before = Now();
-        for (int i = 0; i < 1000; ++i)
+        const auto mesh_intersections = octree.Intersect<EOctreeIntersectFlags::SORT_RESULTS>(mouse_ray);
+        const auto mesh_intersections_stopped
+            = octree.Intersect<EOctreeIntersectFlags::STOP_AT_FIRST_INTERSECTION>(mouse_ray);
+        for (const auto& mesh_intersection : mesh_intersections)
         {
-          const auto mesh_intersections = octree.IntersectAll(mouse_ray);
-          for (const auto& mesh_intersection_distance : mesh_intersections)
-          {
-            if (i == 0)
-              hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_distance));
-            // hit_triangles.push_back(mesh_triangle);
-          }
+          hit_points.push_back(mouse_ray.GetPoint(mesh_intersection.mDistance));
+          hit_triangles.push_back(mesh_triangles.at(mesh_intersection.mPrimitiveIndex));
+          PEEK(mesh_intersection.mDistance);
+          PEEK(mesh_intersection.mPrimitiveIndex);
         }
+        PRINT("-----");
         PEEK(TimeDuration(Now() - time_before).count());
-
-        /*
-        const auto aacube_intersection_distances = Intersect(mouse_ray, cube);
-        for (const auto& aacube_intersection_distance : aacube_intersection_distances)
-        {
-          if (aacube_intersection_distance)
-            hit_points.push_back(mouse_ray.GetPoint(*aacube_intersection_distance));
-        }
-        */
 
         rays.push_back(mouse_ray);
       }
