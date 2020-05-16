@@ -17,6 +17,9 @@ int main(int argc, const char** argv)
 
   // Window loop
   window.Loop([&](const DeltaTime& inDeltaTime) {
+
+    GL::Viewport(Zero<Vec2i>(), window.GetFramebufferSize());
+
     // Prepare renderer
     renderer.ResetState();
     renderer.AdaptToWindow(window);

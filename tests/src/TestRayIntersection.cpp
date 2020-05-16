@@ -14,13 +14,16 @@ using namespace ez;
 
 int main(int argc, const char** argv)
 {
+  // Create meshes
+  const auto mesh = MeshFactory::GetTorus(30, 30, 0.5f);
+
+  // Create octree
+  const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 8, 6);
+
   // Create window
   Window::CreateOptions window_create_options;
   window_create_options.mTitle = "Test Ray Intersection";
   const auto window = std::make_shared<Window>(window_create_options);
-
-  // Create meshes
-  const auto mesh = MeshFactory::GetTorus(30, 30, 0.5f);
 
   // Camera
   const auto camera = std::make_shared<PerspectiveCameraf>();
@@ -31,12 +34,6 @@ int main(int argc, const char** argv)
   CameraControllerFly3f camera_controller_fly;
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
-
-  // Create octree
-  PRINT("AAAAAAAAAAAAAAAAAAAAA");
-  const auto before = Now();
-  const auto octree = Octree<Triangle3f>(MakeSpan(mesh.GetTriangles()), 0, 6);
-  PEEK(TimeDuration(Now() - before).count());
 
   // Create renderer
   Renderer3D renderer;
@@ -57,9 +54,7 @@ int main(int argc, const char** argv)
         const auto mesh_triangles = mesh.GetTriangles();
 
         const auto time_before = Now();
-        const auto mesh_intersections = octree.Intersect<EOctreeIntersectFlags::SORT_RESULTS>(mouse_ray);
-        const auto mesh_intersections_stopped
-            = octree.Intersect<EOctreeIntersectFlags::STOP_AT_FIRST_INTERSECTION>(mouse_ray);
+        const auto mesh_intersections = octree.Intersect(mouse_ray);
         for (const auto& mesh_intersection : mesh_intersections)
         {
           hit_points.push_back(mouse_ray.GetPoint(mesh_intersection.mDistance));
@@ -84,6 +79,8 @@ int main(int argc, const char** argv)
       hit_points.clear();
       rays.clear();
     }
+
+    GL::Viewport(Zero<Vec2i>(), window->GetFramebufferSize());
 
     // Prepare renderer
     renderer.ResetState();

@@ -475,91 +475,56 @@ void Mesh::ComputeNormals(const float inMinEdgeAngleToSmooth)
 
 void Mesh::ComputeCornerTable()
 {
-  // TODO: This is very slow for very big meshes. There must be a better way.
+  std::vector<std::vector<FaceId>> vertex_to_neighbor_faces_ids(GetNumberOfVertices());
+  std::for_each(vertex_to_neighbor_faces_ids.begin(), vertex_to_neighbor_faces_ids.end(), [](auto& v) {
+    v.reserve(6);
+  });
 
-  // Create auxiliar map that maps each edge to its two adjacent faces
-  std::unordered_map<Edge, std::pair<FaceId, FaceId>, Edge::Hash> edge_to_adjacent_faces;
-  for (Mesh::FaceId face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
+  for (FaceId face_id = 0; face_id < GetNumberOfFaces(); ++face_id)
   {
-    const auto face_edges = GetFaceEdges(face_id);
-    for (const auto& face_edge : face_edges)
-    {
-      assert(face_edge[0] < face_edge[1]);
-      const auto it = edge_to_adjacent_faces.find(face_edge);
-      if (it != edge_to_adjacent_faces.end())
-      {
-        auto& adjacent_faces_pair = it->second;
-        assert(adjacent_faces_pair.first != Mesh::InvalidId);
-
-        if (adjacent_faces_pair.second != Mesh::InvalidId)
-          THROW_EXCEPTION("Found non-manifold edge " << face_edge << " with at least these faces ("
-                                                     << adjacent_faces_pair.first << ", " << adjacent_faces_pair.second
-                                                     << ", " << face_id << ").");
-        adjacent_faces_pair.second = face_id;
-      }
-      else
-      {
-        auto& adjacent_faces = edge_to_adjacent_faces[face_edge];
-        adjacent_faces.first = face_id;
-        adjacent_faces.second = Mesh::InvalidId;
-      }
-    }
+    const auto face_vertices_ids = mFacesData.at(face_id).mVerticesIds;
+    for (const auto& face_vertex_id : face_vertices_ids)
+    { vertex_to_neighbor_faces_ids.at(face_vertex_id).push_back(face_id); }
   }
 
-  // Update corner opposites
-  for (const auto& edge_to_adjacent_faces_kv_pair : edge_to_adjacent_faces)
+  for (VertexId vertex_id = 0; vertex_id < GetNumberOfVertices(); ++vertex_id)
   {
-    const auto& edge = edge_to_adjacent_faces_kv_pair.first;
-    const auto& adjacent_faces_pair = edge_to_adjacent_faces_kv_pair.second;
-    const auto& first_adjacent_face = adjacent_faces_pair.first;
-    const auto& second_adjacent_face = adjacent_faces_pair.second;
-    if (first_adjacent_face == Mesh::InvalidId || second_adjacent_face == Mesh::InvalidId)
-      continue;
+    const auto& vertex_neighbor_faces_ids = vertex_to_neighbor_faces_ids.at(vertex_id);
+    for (const auto& vertex_neighbor_face_id : vertex_neighbor_faces_ids)
+    {
+      const auto face_other_vertices_id = GetFaceOtherVertexIds(vertex_neighbor_face_id, vertex_id);
+      for (const auto& other_vertex_neighbor_face_id : vertex_neighbor_faces_ids)
+      {
+        const auto other_face_other_vertices_id = GetFaceOtherVertexIds(other_vertex_neighbor_face_id, vertex_id);
+        auto matching_face_other_vertices_corner_id = Max<InternalCornerId>();
+        auto matching_other_face_other_vertices_corner_id = Max<InternalCornerId>();
+        if (face_other_vertices_id[0] == other_face_other_vertices_id[1])
+        {
+          matching_face_other_vertices_corner_id = 0;
+          matching_other_face_other_vertices_corner_id = 1;
+        }
+        else if (face_other_vertices_id[0] == other_face_other_vertices_id[1])
+        {
+          matching_face_other_vertices_corner_id = 1;
+          matching_other_face_other_vertices_corner_id = 0;
+        }
 
-    const auto first_other_vertex_id = GetFaceOtherVertexId(first_adjacent_face, edge[0], edge[1]);
-    const auto second_other_vertex_id = GetFaceOtherVertexId(second_adjacent_face, edge[0], edge[1]);
-    assert(first_other_vertex_id < GetNumberOfVertices());
-    assert(second_other_vertex_id < GetNumberOfVertices());
-    const auto first_corner_id = GetCornerIdFromFaceIdAndVertexId(first_adjacent_face, first_other_vertex_id);
-    const auto second_corner_id = GetCornerIdFromFaceIdAndVertexId(second_adjacent_face, second_other_vertex_id);
-    assert(first_corner_id < GetNumberOfCorners());
-    assert(second_corner_id < GetNumberOfCorners());
-    assert(first_corner_id != second_corner_id);
-
-    mCornersData.at(first_corner_id).mOppositeCornedId = second_corner_id;
-    mCornersData.at(second_corner_id).mOppositeCornedId = first_corner_id;
+        const auto found_matching_other_vertex_id = (matching_face_other_vertices_corner_id <= 1);
+        if (found_matching_other_vertex_id)
+        {
+          const auto corner_id = GetCornerIdFromFaceIdAndVertexId(vertex_neighbor_face_id,
+              face_other_vertices_id[1 - matching_face_other_vertices_corner_id]);
+          const auto other_corner_id = GetCornerIdFromFaceIdAndVertexId(other_vertex_neighbor_face_id,
+              other_face_other_vertices_id[1 - matching_other_face_other_vertices_corner_id]);
+          mCornersData.at(corner_id).mOppositeCornedId = other_corner_id;
+          mCornersData.at(other_corner_id).mOppositeCornedId = corner_id;
+          break;
+        }
+      }
+    }
   }
 
   mCornerTableComputed = true;
-
-  // Set all mFaceId in VertexData so that they point to the most CW face in the boundary (if boundary)
-  // This is so that we can use the circulators using next->next->next...and make sure we traverse all faces
-  for (const auto& edge_to_adjacent_faces_kv_pair : edge_to_adjacent_faces)
-  {
-    const auto& edge = edge_to_adjacent_faces_kv_pair.first;
-    const auto& adjacent_faces_pair = edge_to_adjacent_faces_kv_pair.second;
-    const auto& first_adjacent_face = adjacent_faces_pair.first;
-    const auto& second_adjacent_face = adjacent_faces_pair.second;
-
-    auto boundary_face_id = Mesh::InvalidId;
-    if (first_adjacent_face == Mesh::InvalidId)
-      boundary_face_id = second_adjacent_face;
-    else if (second_adjacent_face == Mesh::InvalidId)
-      boundary_face_id = first_adjacent_face;
-
-    if (boundary_face_id == Mesh::InvalidId)
-      continue;
-
-    for (const auto& boundary_face_vertex_id : { edge[0], edge[1] })
-    {
-      const auto boundary_face_corner_id = GetCornerIdFromFaceIdAndVertexId(boundary_face_id, boundary_face_vertex_id);
-      if (GetPreviousAdjacentFaceId(boundary_face_corner_id) == Mesh::InvalidId)
-      {
-        mVerticesData.at(boundary_face_vertex_id).mFaceId = boundary_face_id;
-        break;
-      }
-    }
-  }
 }
 
 #ifdef MESH_IO
