@@ -54,16 +54,21 @@ int main(int argc, const char** argv)
         const auto mesh_triangles = mesh.GetTriangles();
 
         const auto time_before = Now();
-        const auto mesh_intersections = octree.Intersect(mouse_ray);
+        const auto mesh_intersections = IntersectAll(octree, mouse_ray);
         for (const auto& mesh_intersection : mesh_intersections)
         {
           hit_points.push_back(mouse_ray.GetPoint(mesh_intersection.mDistance));
           hit_triangles.push_back(mesh_triangles.at(mesh_intersection.mPrimitiveIndex));
-          PEEK(mesh_intersection.mDistance);
-          PEEK(mesh_intersection.mPrimitiveIndex);
         }
-        PRINT("-----");
-        PEEK(TimeDuration(Now() - time_before).count());
+
+        const auto mesh_intersection_closest = IntersectClosest(octree, mouse_ray);
+        if (mesh_intersection_closest)
+        {
+          hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_closest->mDistance));
+          hit_triangles.push_back(mesh_triangles.at(mesh_intersection_closest->mPrimitiveIndex));
+        }
+
+        PEEK(IntersectCheck(octree, mouse_ray));
 
         rays.push_back(mouse_ray);
       }
