@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ez/Camera.h"
-#include "ez/Circle.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
 #include "ez/Framebuffer.h"
