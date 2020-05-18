@@ -12,7 +12,7 @@ public:
   MeshFactory() = delete;
 
   // 3D
-  static Mesh GetCube();
+  static Mesh GetBox();
   static Mesh GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
   static Mesh GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
   static Mesh GetCone(const std::size_t inNumLongitudes);

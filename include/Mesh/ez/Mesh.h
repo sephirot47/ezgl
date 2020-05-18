@@ -68,7 +68,7 @@ public:
 
   struct CornerData
   {
-    Mesh::CornerId mOppositeCornedId = Mesh::InvalidId;
+    Mesh::CornerId mOppositeCornerId = Mesh::InvalidId;
     Vec3f mNormal = Zero<Vec3f>();
     Vec2f mTextureCoordinates = Zero<Vec2f>();
   };

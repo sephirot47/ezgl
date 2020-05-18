@@ -119,7 +119,7 @@ Mesh::CornerId Mesh::GetOppositeCornerId(const Mesh::CornerId inCornerId) const
 {
   EXPECTS(mCornerTableComputed);
   EXPECTS(inCornerId < mCornersData.size());
-  return mCornersData.at(inCornerId).mOppositeCornedId;
+  return mCornersData.at(inCornerId).mOppositeCornerId;
 }
 
 Mesh::FaceId Mesh::GetOppositeFaceId(const Mesh::CornerId inCornerId) const
@@ -393,14 +393,14 @@ std::vector<Mesh::CornerId> Mesh::GetVertexCornersIds(const Mesh::VertexId inVer
   corner_ids.reserve(6);
 
   const auto& vertex_data = mVerticesData.at(inVertexId);
-  const auto start_neighbor_corner_id = GetCornerIdFromFaceIdAndVertexId(vertex_data.mFaceId, inVertexId);
+  const auto start_corner_id = GetCornerIdFromFaceIdAndVertexId(vertex_data.mFaceId, inVertexId);
 
-  auto neighbor_corner_id = start_neighbor_corner_id;
+  auto corner_id = start_corner_id;
   do
   {
-    corner_ids.push_back(neighbor_corner_id);
-    neighbor_corner_id = GetNextAdjacentCornerId(neighbor_corner_id);
-  } while (neighbor_corner_id != Mesh::InvalidId && neighbor_corner_id != start_neighbor_corner_id);
+    corner_ids.push_back(corner_id);
+    corner_id = GetNextAdjacentCornerId(corner_id);
+  } while (corner_id != Mesh::InvalidId && corner_id != start_corner_id);
 
   return corner_ids;
 }
@@ -493,31 +493,36 @@ void Mesh::ComputeCornerTable()
     for (const auto& vertex_neighbor_face_id : vertex_neighbor_faces_ids)
     {
       const auto face_other_vertices_id = GetFaceOtherVertexIds(vertex_neighbor_face_id, vertex_id);
-      for (const auto& other_vertex_neighbor_face_id : vertex_neighbor_faces_ids)
+      for (std::size_t i = 0; i <= 1; ++i)
       {
-        const auto other_face_other_vertices_id = GetFaceOtherVertexIds(other_vertex_neighbor_face_id, vertex_id);
-        auto matching_face_other_vertices_corner_id = Max<InternalCornerId>();
-        auto matching_other_face_other_vertices_corner_id = Max<InternalCornerId>();
-        if (face_other_vertices_id[0] == other_face_other_vertices_id[1])
+        for (const auto& other_vertex_neighbor_face_id : vertex_neighbor_faces_ids)
         {
-          matching_face_other_vertices_corner_id = 0;
-          matching_other_face_other_vertices_corner_id = 1;
-        }
-        else if (face_other_vertices_id[0] == other_face_other_vertices_id[1])
-        {
-          matching_face_other_vertices_corner_id = 1;
-          matching_other_face_other_vertices_corner_id = 0;
-        }
+          if (vertex_neighbor_face_id == other_vertex_neighbor_face_id)
+            continue;
 
-        const auto found_matching_other_vertex_id = (matching_face_other_vertices_corner_id <= 1);
-        if (found_matching_other_vertex_id)
-        {
+          const auto other_face_other_vertices_id = GetFaceOtherVertexIds(other_vertex_neighbor_face_id, vertex_id);
+          auto matching_face_other_vertices_corner_i = Max<InternalCornerId>();
+          auto matching_other_face_other_vertices_corner_i = Max<InternalCornerId>();
+          for (std::size_t j = 0; j <= 1; ++j)
+          {
+            if (face_other_vertices_id[i] == other_face_other_vertices_id[j])
+            {
+              matching_face_other_vertices_corner_i = i;
+              matching_other_face_other_vertices_corner_i = j;
+              break;
+            }
+          }
+
+          const auto found_matching_other_vertex_id = (matching_face_other_vertices_corner_i <= 1);
+          if (!found_matching_other_vertex_id)
+            continue;
+
           const auto corner_id = GetCornerIdFromFaceIdAndVertexId(vertex_neighbor_face_id,
-              face_other_vertices_id[1 - matching_face_other_vertices_corner_id]);
+              face_other_vertices_id[1 - matching_face_other_vertices_corner_i]);
           const auto other_corner_id = GetCornerIdFromFaceIdAndVertexId(other_vertex_neighbor_face_id,
-              other_face_other_vertices_id[1 - matching_other_face_other_vertices_corner_id]);
-          mCornersData.at(corner_id).mOppositeCornedId = other_corner_id;
-          mCornersData.at(other_corner_id).mOppositeCornedId = corner_id;
+              other_face_other_vertices_id[1 - matching_other_face_other_vertices_corner_i]);
+          mCornersData.at(corner_id).mOppositeCornerId = other_corner_id;
+          mCornersData.at(other_corner_id).mOppositeCornerId = corner_id;
           break;
         }
       }

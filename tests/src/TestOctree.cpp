@@ -68,7 +68,7 @@ int main(int argc, const char** argv)
       octrees_stack.pop();
 
       if (child_octree.IsLeaf())
-        renderer.DrawAACubeBoundary(child_octree.GetAACube());
+        renderer.DrawAABoxBoundary(child_octree.GetAABox());
 
       for (const auto& grandchild_octree : child_octree) { octrees_stack.push(&grandchild_octree); }
     }

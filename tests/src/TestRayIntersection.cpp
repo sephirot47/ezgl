@@ -1,4 +1,5 @@
 #include "ez/CameraControllerFly.h"
+#include "ez/HyperSphere.h"
 #include "ez/MeshFactory.h"
 #include "ez/Octree.h"
 #include "ez/PerspectiveCamera.h"
@@ -27,7 +28,7 @@ int main(int argc, const char** argv)
 
   // Camera
   const auto camera = std::make_shared<PerspectiveCameraf>();
-  camera->SetPosition(2.0f * Left<Vec3f>() + 2.0f * Forward<Vec3f>());
+  camera->SetPosition(5.0f * Forward<Vec3f>());
   camera->LookAtPoint(Zero<Vec3f>());
 
   // Camera controller
@@ -38,7 +39,12 @@ int main(int argc, const char** argv)
   // Create renderer
   Renderer3D renderer;
 
-  AACubef cube(Vec3f(-1.0f, -2.0f, -1.5f), Vec3f(0.0f, 0.5f, 2.0f));
+  const auto box_position = 3.0f * Right<Vec3f>();
+  AABoxf box(box_position + Vec3f(-1.0f, -1.0f, -1.0f), box_position + Vec3f(0.0f, 0.6f, 1.2f));
+
+  Spheref sphere;
+  sphere.SetRadius(1.3f);
+  sphere.SetCenter(6.0f * Right<Vec3f>());
 
   std::vector<Ray3f> rays;
   std::vector<Triangle3f> hit_triangles;
@@ -51,9 +57,10 @@ int main(int argc, const char** argv)
       {
         const auto mouse_position = window->GetMousePositionViewport();
         const auto mouse_ray = camera->GetViewportRay(mouse_position);
-        const auto mesh_triangles = mesh.GetTriangles();
 
-        const auto time_before = Now();
+        rays.push_back(mouse_ray);
+
+        const auto mesh_triangles = mesh.GetTriangles();
         const auto mesh_intersections = IntersectAll(octree, mouse_ray);
         for (const auto& mesh_intersection : mesh_intersections)
         {
@@ -61,22 +68,24 @@ int main(int argc, const char** argv)
           hit_triangles.push_back(mesh_triangles.at(mesh_intersection.mPrimitiveIndex));
         }
 
-        const auto mesh_intersection_closest = IntersectClosest(octree, mouse_ray);
-        if (mesh_intersection_closest)
+        const auto sphere_intersection_result = IntersectAll(mouse_ray, sphere);
+        for (const auto& sphere_intersection : sphere_intersection_result)
         {
-          hit_points.push_back(mouse_ray.GetPoint(mesh_intersection_closest->mDistance));
-          hit_triangles.push_back(mesh_triangles.at(mesh_intersection_closest->mPrimitiveIndex));
+          if (sphere_intersection)
+            hit_points.push_back(mouse_ray.GetPoint(*sphere_intersection));
         }
 
-        PEEK(IntersectCheck(octree, mouse_ray));
-
-        rays.push_back(mouse_ray);
+        const auto box_intersection_result = IntersectAll(mouse_ray, box);
+        for (const auto& box_intersection : box_intersection_result)
+        {
+          if (box_intersection)
+            hit_points.push_back(mouse_ray.GetPoint(*box_intersection));
+        }
       }
     }
   });
 
   // Window loop
-  int selected_octree = 0;
   window->Loop([&](const DeltaTime& inDeltaTime) {
     if (window->IsKeyPressed(EKey::R))
     {
@@ -127,21 +136,22 @@ int main(int argc, const char** argv)
       octrees_stack.pop();
 
       if (child_octree.IsLeaf())
-        renderer.DrawAACubeBoundary(child_octree.GetAACube());
+        renderer.DrawAABoxBoundary(child_octree.GetAABox());
 
       for (const auto& grandchild_octree : child_octree) { octrees_stack.push(&grandchild_octree); }
     }
     */
 
     // Add a light
-    renderer.AddDirectionalLight(Down<Vec3f>(), White<Color3f>());
+    renderer.AddDirectionalLight(Normalized(Vec3f(-1.0f, -1.5f, 2.0f)), White<Color3f>());
 
-    // Draw a sphere
     renderer.ResetTransformMatrix();
     renderer.GetMaterial().SetLightingEnabled(true);
     renderer.GetMaterial().SetDiffuseColor(Cyan<Color4f>());
+
     renderer.DrawMesh(mesh);
-    // renderer.DrawAACube(cube);
+    renderer.DrawAABox(box);
+    renderer.DrawSphere(sphere);
 
     // Blit image to window
     GL::ClearDepth();

@@ -6,14 +6,14 @@ namespace ez
 {
 class GLSLPointLight final
 {
-  public:
+public:
   Vec3f mPosition = Zero<Vec3f>();
   float mRange = 10.0f;
 
-  public:
+public:
   Vec3f mColor = White<Vec3f>();
 
-  private:
+private:
   float mPadding0 = 0.0f;
 };
 }

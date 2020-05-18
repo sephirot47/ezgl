@@ -121,9 +121,7 @@ void MeshIO::Write(const Mesh& inMesh, const std::filesystem::path& inMeshPath, 
       ai_mesh.mNumVertices = inMesh.GetNumberOfVertices();
       ai_mesh.mVertices = new aiVector3D[inMesh.GetNumberOfVertices()];
       for (Mesh::VertexId vertex_id = 0; vertex_id < inMesh.GetNumberOfVertices(); ++vertex_id)
-      {
-        ai_mesh.mVertices[vertex_id] = Vec3fToAiVector3D(inMesh.GetVerticesData().at(vertex_id).mPosition);
-      }
+      { ai_mesh.mVertices[vertex_id] = Vec3fToAiVector3D(inMesh.GetVerticesData().at(vertex_id).mPosition); }
     }
     else
     {

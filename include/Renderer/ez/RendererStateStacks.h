@@ -21,7 +21,7 @@ public:
   using TTupleOfStacks::Pop;
   using TTupleOfStacks::Push;
 
-  RendererStateStacks(TRenderer& ioRenderer) : mRenderer(ioRenderer) { }
+  RendererStateStacks(TRenderer& ioRenderer) : mRenderer(ioRenderer) {}
 
   template <TEStateId StateId>
   auto& GetCurrent()

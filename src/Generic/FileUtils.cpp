@@ -1,5 +1,4 @@
 #include "ez/FileUtils.h"
-
 #include <fstream>
 
 namespace ez

@@ -90,8 +90,7 @@ public:
   void DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices = 32);
   void DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices = 32);
   void DrawCircle(const std::size_t inNumVertices = 32);
-  void DrawCircleBoundary(
-    const std::size_t inNumVertices = 32);
+  void DrawCircleBoundary(const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);

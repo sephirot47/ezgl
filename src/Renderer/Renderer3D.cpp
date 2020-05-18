@@ -6,6 +6,7 @@
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
 #include "ez/Geometry.h"
+#include "ez/HyperSphere.h"
 #include "ez/Math.h"
 #include "ez/MeshDrawData.h"
 #include "ez/MeshFactory.h"
@@ -276,25 +277,25 @@ void Renderer3D::DrawTriangleBoundary(const Triangle3f& inTriangle)
       Segment3f(inTriangle[1], inTriangle[2]) }));
 }
 
-void Renderer3D::DrawAACube(const AACubef& inAACube)
+void Renderer3D::DrawAABox(const AABoxf& inAABox)
 {
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAACube.GetCenter());
-  Scale(inAACube.GetSize() * 0.5f);
-  DrawAACube();
+  Translate(inAABox.GetCenter());
+  Scale(inAABox.GetSize() * 0.5f);
+  DrawAABox();
 }
 
-void Renderer3D::DrawAACubeBoundary(const AACubef& inAACube)
+void Renderer3D::DrawAABoxBoundary(const AABoxf& inAABox)
 {
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAACube.GetCenter());
-  Scale(inAACube.GetSize() * 0.5f);
-  DrawAACubeBoundary();
+  Translate(inAABox.GetCenter());
+  Scale(inAABox.GetSize() * 0.5f);
+  DrawAABoxBoundary();
 }
 
-void Renderer3D::DrawAACube() { DrawMesh(MeshFactory::GetCube()); }
+void Renderer3D::DrawAABox() { DrawMesh(MeshFactory::GetBox()); }
 
-void Renderer3D::DrawAACubeBoundary()
+void Renderer3D::DrawAABoxBoundary()
 {
   DrawSegments(MakeSpan({ Segment3f { Vec3f { -1.0f, -1.0f, -1.0f }, Vec3f { -1.0f, -1.0f, 1.0f } },
       Segment3f { Vec3f { -1.0f, -1.0f, 1.0f }, Vec3f { 1.0f, -1.0f, 1.0f } },
@@ -327,6 +328,14 @@ void Renderer3D::DrawHemisphere(std::size_t inNumLatitudes, std::size_t inNumLon
 void Renderer3D::DrawSphere(std::size_t inNumLatitudes, std::size_t inNumLongitudes)
 {
   DrawMesh(MeshFactory::GetSphere(inNumLatitudes, inNumLongitudes));
+}
+
+void Renderer3D::DrawSphere(const Spheref& inSphere, std::size_t inNumLatitudes, std::size_t inNumLongitudes)
+{
+  RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(inSphere.GetCenter());
+  Scale(inSphere.GetRadius());
+  DrawSphere(inNumLatitudes, inNumLongitudes);
 }
 
 void Renderer3D::DrawCircle(std::size_t inNumVertices)

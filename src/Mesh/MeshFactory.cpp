@@ -6,34 +6,34 @@
 namespace ez
 {
 
-Mesh MeshFactory::GetCube()
+Mesh MeshFactory::GetBox()
 {
-  Mesh cube;
+  Mesh box;
 
-  cube.AddVertex(Vec3f { -1.0f, -1.0f, -1.0f }); // 0
-  cube.AddVertex(Vec3f { -1.0f, -1.0f, 1.0f });  // 1
-  cube.AddVertex(Vec3f { -1.0f, 1.0f, -1.0f });  // 2
-  cube.AddVertex(Vec3f { -1.0f, 1.0f, 1.0f });   // 3
-  cube.AddVertex(Vec3f { 1.0f, -1.0f, -1.0f });  // 4
-  cube.AddVertex(Vec3f { 1.0f, -1.0f, 1.0f });   // 5
-  cube.AddVertex(Vec3f { 1.0f, 1.0f, -1.0f });   // 6
-  cube.AddVertex(Vec3f { 1.0f, 1.0f, 1.0f });    // 7
+  box.AddVertex(Vec3f { -1.0f, -1.0f, -1.0f }); // 0
+  box.AddVertex(Vec3f { -1.0f, -1.0f, 1.0f });  // 1
+  box.AddVertex(Vec3f { -1.0f, 1.0f, -1.0f });  // 2
+  box.AddVertex(Vec3f { -1.0f, 1.0f, 1.0f });   // 3
+  box.AddVertex(Vec3f { 1.0f, -1.0f, -1.0f });  // 4
+  box.AddVertex(Vec3f { 1.0f, -1.0f, 1.0f });   // 5
+  box.AddVertex(Vec3f { 1.0f, 1.0f, -1.0f });   // 6
+  box.AddVertex(Vec3f { 1.0f, 1.0f, 1.0f });    // 7
 
-  cube.AddFace(0, 4, 1); // Y-
-  cube.AddFace(1, 4, 5); // Y-
-  cube.AddFace(1, 5, 3); // Z+
-  cube.AddFace(3, 5, 7); // Z+
-  cube.AddFace(1, 3, 2); // X+
-  cube.AddFace(0, 1, 2); // X+
-  cube.AddFace(3, 7, 2); // Y-
-  cube.AddFace(7, 6, 2); // Y-
-  cube.AddFace(4, 6, 5); // X-
-  cube.AddFace(5, 6, 7); // X-
-  cube.AddFace(0, 6, 4); // Z-
-  cube.AddFace(0, 2, 6); // Z-
+  box.AddFace(1, 3, 2); // 0 X-
+  box.AddFace(0, 1, 2); // 1 X-
+  box.AddFace(0, 4, 1); // 2 Y-
+  box.AddFace(1, 4, 5); // 3 Y-
+  box.AddFace(0, 6, 4); // 4 Z-
+  box.AddFace(0, 2, 6); // 5 Z-
+  box.AddFace(4, 6, 5); // 6 X+
+  box.AddFace(5, 6, 7); // 7 X+
+  box.AddFace(3, 7, 2); // 8 Y+
+  box.AddFace(7, 6, 2); // 9 Y+
+  box.AddFace(1, 5, 3); // 10 Z+
+  box.AddFace(3, 5, 7); // 11 Z+
 
-  ConsolidateMesh(cube);
-  return cube;
+  ConsolidateMesh(box);
+  return box;
 }
 
 Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes)

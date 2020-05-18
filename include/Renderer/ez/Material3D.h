@@ -2,7 +2,6 @@
 
 #include "ez/Color.h"
 #include "ez/GLGuard.h"
-#include "ez/Color.h"
 #include "ez/MathInitializers.h"
 #include <memory>
 

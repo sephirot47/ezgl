@@ -63,7 +63,7 @@ int main(int argc, const char** argv)
   const auto sphere = MeshFactory::GetSphere(35, 42);
   const auto hemisphere = MeshFactory::GetHemisphere(22, 15);
   const auto torus = MeshFactory::GetTorus(25, 36, 0.8f);
-  const auto cube = MeshFactory::GetCube();
+  const auto box = MeshFactory::GetBox();
   const auto plane = MeshFactory::GetPlane(5, 9);
   const auto cone = MeshFactory::GetCone(35);
 
@@ -160,7 +160,7 @@ int main(int argc, const char** argv)
         renderer3D.Rotate(AngleAxis(0.47f, NormalizedSafe(Vec3f(1.0f, -1.0f, -1.0f))));
         renderer3D.Scale(0.5f);
         renderer3D.GetMaterial().SetDiffuseColor(WithAlpha(Red<Color4f>(), 0.3f));
-        renderer3D.DrawMesh(cube);
+        renderer3D.DrawMesh(box);
 
         renderer3D.SetBlendEnabled(false);
       }

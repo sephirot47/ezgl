@@ -1,4 +1,4 @@
-#include "ez/AACube.h"
+#include "ez/AABox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/OrthographicCamera.h"
@@ -15,15 +15,15 @@ int main(int argc, const char** argv)
   srand(1234);
 
   constexpr auto NumTriangles = 20;
-  constexpr auto NumAACubes = 20;
+  constexpr auto NumAABoxs = 20;
   constexpr auto SpaceSize = 5.0f;
   constexpr auto TriSize = 3.0f;
 
-  std::array<AACubef, NumAACubes> aa_cubes;
-  for (auto& aa_cube : aa_cubes)
+  std::array<AABoxf, NumAABoxs> aa_boxes;
+  for (auto& aa_box : aa_boxes)
   {
-    aa_cube = AACubef(Random(All<Vec3f>(-1.0f), All<Vec3f>(0.0f)), Random(All<Vec3f>(0.0f), All<Vec3f>(1.0f)));
-    aa_cube = Transformed(aa_cube, TranslationMat(Random(All<Vec3f>(-SpaceSize), All<Vec3f>(SpaceSize))));
+    aa_box = AABoxf(Random(All<Vec3f>(-1.0f), All<Vec3f>(0.0f)), Random(All<Vec3f>(0.0f), All<Vec3f>(1.0f)));
+    aa_box = Transformed(aa_box, TranslationMat(Random(All<Vec3f>(-SpaceSize), All<Vec3f>(SpaceSize))));
   }
 
   std::array<Triangle3f, NumTriangles> triangles;
@@ -70,7 +70,7 @@ int main(int argc, const char** argv)
     const auto IntersectsWithSomething = [&](const auto& inObject) {
       return std::any_of(triangles.begin(), triangles.end(), [&](const auto& inOther) {
         return Intersects(inObject, inOther);
-      }) || std::any_of(aa_cubes.begin(), aa_cubes.end(), [&](const auto& inOther) {
+      }) || std::any_of(aa_boxes.begin(), aa_boxes.end(), [&](const auto& inOther) {
         return Intersects(inObject, inOther);
       });
     };
@@ -87,13 +87,13 @@ int main(int argc, const char** argv)
     }
 
     renderer.SetCullFaceEnabled(true);
-    for (const auto& aa_cube : aa_cubes)
+    for (const auto& aa_box : aa_boxes)
     {
-      const auto intersect = IntersectsWithSomething(aa_cube);
+      const auto intersect = IntersectsWithSomething(aa_box);
       renderer.GetMaterial().SetDiffuseColor(WithAlpha(intersect ? Red<Color4f>() : Green<Color4f>(), 0.5f));
-      renderer.DrawAACube(aa_cube);
+      renderer.DrawAABox(aa_box);
       renderer.GetMaterial().SetDiffuseColor(White<Color4f>());
-      renderer.DrawAACubeBoundary(aa_cube);
+      renderer.DrawAABoxBoundary(aa_box);
     }
 
     // Blit image to window

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "ez/AARect.h"
 #include "ez/Color.h"
 #include "ez/Flags.h"
 #include "ez/Macros.h"
 #include "ez/Mat.h"
-#include "ez/AARect.h"
 #include "ez/Span.h"
 #include "ez/Vec.h"
 #include <GL/glew.h>
@@ -24,7 +24,7 @@ public:
   using Boolean = GLboolean;
   using Int = GLint;
   using Float = GLfloat;
-  using Double= GLdouble;
+  using Double = GLdouble;
   using Id = GLuint;
   using Size = GLsizei;
   using Enum = GLenum;
@@ -695,8 +695,8 @@ public:
       const GL::EBlendFactor inDestBlendFactorRGB,
       const GL::EBlendFactor inSourceBlendFactorAlpha,
       const GL::EBlendFactor inDestBlendFactorAlpha);
-  static void BlendFuncSeparate(const BlendFactors &inBlendFactors);
-  static void BlendColor(const Color4f &inBlendColor);
+  static void BlendFuncSeparate(const BlendFactors& inBlendFactors);
+  static void BlendColor(const Color4f& inBlendColor);
   static GL::EBlendFactor GetSourceBlendFactorRGB();
   static GL::EBlendFactor GetDestBlendFactorRGB();
   static GL::EBlendFactor GetSourceBlendFactorAlpha();
