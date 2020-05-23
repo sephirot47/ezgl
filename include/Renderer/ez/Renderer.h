@@ -78,7 +78,7 @@ public:
   void Clear(const Color4f& inClearColor = Black<Color4f>(), const float inClearDepth = 1.0f);
 
   // Depth func
-  void SetDepthFunc(const GL::EDepthFunc inDepthFunc);
+  void SetDepthFunc(const GL::EDepthFunc inDepthFunc) { mState.GetCurrent<EStateId::DEPTH_FUNC>() = inDepthFunc; }
   GL::EDepthFunc GetDepthFunc() const { return mState.GetCurrent<EStateId::DEPTH_FUNC>(); }
   void PushDepthFunc() { mState.PushTop<EStateId::DEPTH_FUNC>(); }
   void PopDepthFunc() { mState.Pop<EStateId::DEPTH_FUNC>(); }
@@ -234,6 +234,8 @@ protected:
   void DrawCircleSectionBoundaryGeneric(const AngleRads inAngle, std::size_t inNumVertices);
   template <typename T, std::size_t N>
   void DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles);
+  template <typename T>
+  void DrawAARectsGeneric(const Span<AARect<T>>& inAARects);
   template <typename T, std::size_t N>
   void DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments);
   template <typename T, std::size_t N>

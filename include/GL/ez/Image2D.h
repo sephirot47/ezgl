@@ -14,6 +14,7 @@ class Image2D final
 public:
   Image2D();
   explicit Image2D(const std::filesystem::path& inImagePath);
+  Image2D(const std::size_t inWidth, const std::size_t inHeight);
   Image2D(const std::size_t inWidth, const std::size_t inHeight, const T& inFillValue);
   Image2D(const Image2D& inImage2D) = default;
   Image2D& operator=(const Image2D& inImage2D) = default;
@@ -30,7 +31,8 @@ public:
   void Read(const std::filesystem::path& inPath);
   void Write(const std::filesystem::path& inPath) const;
 
-  Span<T> GetData() const;
+  MutableSpan<T> GetData();
+  const Span<T> GetData() const;
   std::size_t GetWidth() const;
   std::size_t GetHeight() const;
 

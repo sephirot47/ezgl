@@ -18,9 +18,15 @@ Image2D<T>::Image2D(const std::filesystem::path& inImagePath)
 }
 
 template <typename T>
-Image2D<T>::Image2D(const std::size_t inWidth, const std::size_t inHeight, const T& inFillValue)
+Image2D<T>::Image2D(const std::size_t inWidth, const std::size_t inHeight)
 {
   Create(inWidth, inHeight);
+}
+
+template <typename T>
+Image2D<T>::Image2D(const std::size_t inWidth, const std::size_t inHeight, const T& inFillValue)
+    : Image2D(inWidth, inHeight)
+{
   Fill(inFillValue);
 }
 
@@ -63,7 +69,13 @@ void Image2D<T>::Write(const std::filesystem::path& inPath) const
 }
 
 template <typename T>
-Span<T> Image2D<T>::GetData() const
+MutableSpan<T> Image2D<T>::GetData()
+{
+  return MakeMutableSpan(mData, mWidth * mHeight);
+}
+
+template <typename T>
+const Span<T> Image2D<T>::GetData() const
 {
   return MakeSpan(mData, mWidth * mHeight);
 }

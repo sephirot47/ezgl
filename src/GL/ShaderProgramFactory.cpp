@@ -6,6 +6,7 @@
 namespace ez
 {
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sMeshShaderProgram;
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::sTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sDrawFullScreenTextureShaderProgram;
@@ -21,12 +22,25 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetMeshShaderProgram()
   if (!sMeshShaderProgram)
   {
     sMeshShaderProgram = CreateShaderProgram(
-#include "/home/sephirot47/ezgl/res/Shaders/Mesh.vert"
+#include "Shaders/Mesh.vert"
         ,
-#include "/home/sephirot47/ezgl/res/Shaders/Mesh.frag"
+#include "Shaders/Mesh.frag"
     );
   }
   return sMeshShaderProgram;
+}
+
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetTextShaderProgram()
+{
+  if (!sTextShaderProgram)
+  {
+    sTextShaderProgram = CreateShaderProgram(
+#include "Shaders/Text.vert"
+        ,
+#include "Shaders/Text.frag"
+    );
+  }
+  return sTextShaderProgram;
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DShaderProgram()
@@ -34,9 +48,9 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DShaderProgram()
   if (!s2DShaderProgram)
   {
     s2DShaderProgram = CreateShaderProgram(
-#include "/home/sephirot47/ezgl/res/Shaders/2D.vert"
+#include "Shaders/2D.vert"
         ,
-#include "/home/sephirot47/ezgl/res/Shaders/2D.frag"
+#include "Shaders/2D.frag"
     );
   }
   return s2DShaderProgram;
@@ -47,9 +61,9 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetOnlyColorShaderProgram()
   if (!sOnlyColorShaderProgram)
   {
     sOnlyColorShaderProgram = CreateShaderProgram(
-#include "/home/sephirot47/ezgl/res/Shaders/OnlyColor.vert"
+#include "Shaders/OnlyColor.vert"
         ,
-#include "/home/sephirot47/ezgl/res/Shaders/OnlyColor.frag"
+#include "Shaders/OnlyColor.frag"
     );
   }
   return sOnlyColorShaderProgram;
@@ -60,9 +74,9 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetDrawFullScreenTextureSha
   if (!sDrawFullScreenTextureShaderProgram)
   {
     sDrawFullScreenTextureShaderProgram = CreateShaderProgram(
-#include "/home/sephirot47/ezgl/res/Shaders/DrawFullScreenTexture.vert"
+#include "Shaders/DrawFullScreenTexture.vert"
         ,
-#include "/home/sephirot47/ezgl/res/Shaders/DrawFullScreenTexture.frag"
+#include "Shaders/DrawFullScreenTexture.frag"
     );
   }
   return sDrawFullScreenTextureShaderProgram;

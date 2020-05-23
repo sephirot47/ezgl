@@ -95,6 +95,10 @@ public:
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangles(const Span<Triangle2f>& inTriangles);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
+  void DrawAARect();
+  void DrawAARect(const AARectf& inAARect);
+  void DrawAARectBoundary();
+  void DrawAARectBoundary(const AARectf& inAARect);
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,

@@ -192,6 +192,30 @@ void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
       Segment2f { inTriangle[2], inTriangle[0] } }));
 }
 
+void Renderer2D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
+
+void Renderer2D::DrawAARect(const AARectf& inAARect)
+{
+  Translate(inAARect.GetCenter());
+  Scale(inAARect.GetSize() * 0.5f);
+  DrawMesh(MeshFactory::GetPlane());
+}
+
+void Renderer2D::DrawAARectBoundary()
+{
+  DrawSegments(MakeSpan({ Segment2f { Vec2f { -1.0f, -1.0f }, Vec2f { -1.0f, 1.0f } },
+      Segment2f { Vec2f { -1.0f, 1.0f }, Vec2f { 1.0f, 1.0f } },
+      Segment2f { Vec2f { 1.0f, 1.0f }, Vec2f { 1.0f, -1.0f } },
+      Segment2f { Vec2f { 1.0f, -1.0f }, Vec2f { -1.0f, -1.0f } } }));
+}
+
+void Renderer2D::DrawAARectBoundary(const AARectf& inAARect)
+{
+  Translate(inAARect.GetCenter());
+  Scale(inAARect.GetSize() * 0.5f);
+  DrawAARectBoundary();
+}
+
 // Helpers ========================================================================================
 
 void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)

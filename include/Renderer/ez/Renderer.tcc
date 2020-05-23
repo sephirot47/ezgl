@@ -62,7 +62,7 @@ void Renderer::DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles)
 {
   VAO vao;
   vao.AddVBO(std::make_shared<VBO>(inTriangles), MeshDrawData::PositionAttribLocation(), VAOVertexAttribT<Vec<T, N>>());
-  static constexpr auto add_normals = (N == 3);
+  constexpr auto add_normals = (N == 3);
   if constexpr (add_normals)
   {
     std::vector<Vec<T, N>> normals;
@@ -75,6 +75,64 @@ void Renderer::DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles)
   }
 
   DrawVAOArrays(vao, inTriangles.GetNumberOfElements() * 3, GL::EPrimitivesType::TRIANGLES, 0);
+}
+
+template <typename T>
+void Renderer::DrawAARectsGeneric(const Span<AARect<T>>& inAARects)
+{
+  // DrawMesh(MeshFactory::GetPlane());
+  /*
+  static_assert(N == 2 || N == 3);
+
+  std::vector<Vec<T, N>> aa_rects_points;
+  aa_rects_points.reserve(inAARects.GetNumberOfElements() * 6);
+  for (const auto& aa_rect : inAARects)
+  {
+    auto aa_rect_point_n = Zero<Vec<T, N>>();
+
+    aa_rect_point_n[0] = aa_rect.GetMin()[0];
+    aa_rect_point_n[1] = aa_rect.GetMin()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+
+    aa_rect_point_n[0] = aa_rect.GetMax()[0];
+    aa_rect_point_n[1] = aa_rect.GetMin()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+
+    aa_rect_point_n[0] = aa_rect.GetMin()[0];
+    aa_rect_point_n[1] = aa_rect.GetMax()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+
+    aa_rect_point_n[0] = aa_rect.GetMin()[0];
+    aa_rect_point_n[1] = aa_rect.GetMax()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+
+    aa_rect_point_n[0] = aa_rect.GetMax()[0];
+    aa_rect_point_n[1] = aa_rect.GetMin()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+
+    aa_rect_point_n[0] = aa_rect.GetMax()[0];
+    aa_rect_point_n[1] = aa_rect.GetMax()[1];
+    aa_rects_points.push_back(aa_rect_point_n);
+  }
+
+  VAO vao;
+  vao.AddVBO(std::make_shared<VBO>(aa_rects_points),
+      MeshDrawData::PositionAttribLocation(),
+      VAOVertexAttribT<Vec<T, N>>());
+  constexpr auto add_normals = (N == 3);
+  if constexpr (add_normals)
+  {
+    std::vector<Vec<T, N>> normals;
+    normals.reserve(inAARects.GetNumberOfElements());
+    for (const auto& aa_rect : inAARects) { normals.push_back(Forward<Vec3f>()); }
+
+    vao.AddVBO(std::make_shared<VBO>(MakeSpan(normals)),
+        MeshDrawData::NormalAttribLocation(),
+        VAOVertexAttribT<Vec<T, N>>());
+  }
+
+  DrawVAOArrays(vao, aa_rects_points.size(), GL::EPrimitivesType::TRIANGLES, 0);
+  */
 }
 
 template <typename T, std::size_t N>

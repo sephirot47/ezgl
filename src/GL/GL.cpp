@@ -270,7 +270,7 @@ void GL::BlitFramebuffer(const GL::Id inReadFramebufferId,
     const Vec2i& inDrawMin,
     const Vec2i& inDrawMax,
     const GL::EBufferBitFlags inBufferMask,
-    const GL::EFilterType inFilterType)
+    const GL::EFilterMode inFilterType)
 {
   glBlitNamedFramebuffer(inReadFramebufferId,
       inDrawFramebufferId,

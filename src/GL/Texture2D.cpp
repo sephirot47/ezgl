@@ -6,20 +6,15 @@ namespace ez
 {
 Texture2D::Texture2D() : Texture()
 {
-  const auto texture_bind_guard = BindGuarded();
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  SetWrapMode(GL::EWrapMode::CLAMP_TO_EDGE);
+  SetMinFilterMode(GL::EMinFilterMode::LINEAR);
+  SetMagFilterMode(GL::EMagFilterMode::LINEAR);
 }
 
 Texture2D::Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat) : Texture2D()
 {
   SetEmptyData(inWidth, inHeight, inFormat);
 }
-
-Texture2D::Texture2D(const Image2D<Color4f>& inImage2D) : Texture2D() { SetData(inImage2D); }
 
 void Texture2D::Resize(const Vec2i& inSize) { Resize(inSize[0], inSize[1]); }
 void Texture2D::Resize(const int inWidth, const int inHeight)
@@ -31,19 +26,6 @@ void Texture2D::Resize(const int inWidth, const int inHeight)
     return;
 
   SetEmptyData(inWidth, inHeight, GetFormat(), 0);
-}
-
-void Texture2D::SetData(const Image2D<Color4f>& inImage2D,
-    const GL::ETextureFormat& inFormat,
-    const GL::Int& inMipMapLevel)
-{
-  SetData(inImage2D.GetWidth(),
-      inImage2D.GetHeight(),
-      GL::ETextureInputFormat::RGBA,
-      GL::ETextureInputComponentFormat::FLOAT,
-      inImage2D.GetData(),
-      inFormat,
-      inMipMapLevel);
 }
 
 void Texture2D::SetEmptyData(const GL::Size inWidth,

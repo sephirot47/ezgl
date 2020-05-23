@@ -86,8 +86,8 @@ public:
   Mesh& operator=(Mesh&& inRHS) = default;
   ~Mesh() = default;
 
-  void AddVertex(const Vec3f& inPosition);
-  void AddFace(const Mesh::VertexId& inFaceVertexId0,
+  Mesh::VertexId AddVertex(const Vec3f& inPosition);
+  Mesh::FaceId AddFace(const Mesh::VertexId& inFaceVertexId0,
       const Mesh::VertexId& inFaceVertexId1,
       const Mesh::VertexId& inFaceVertexId2);
   void ComputeFaceNormals();
@@ -125,6 +125,8 @@ public:
       const Mesh::VertexId inVertexId0,
       const Mesh::VertexId inVertexId1) const;
   Mesh::CornerId GetCornerIdFromFaceIdAndVertexId(const Mesh::FaceId inFaceId, const Mesh::VertexId inVertexId) const;
+  Mesh::CornerId GetCornerIdFromFaceIdAndInternalCornerId(const Mesh::FaceId inFaceId,
+      const Mesh::InternalCornerId inInternalCornerId) const;
   Mesh::CornerId GetPreviousCornerId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetNextCornerId(const Mesh::CornerId inCornerId) const;
   Mesh::CornerId GetNextAdjacentCornerId(const Mesh::CornerId inCornerId) const;

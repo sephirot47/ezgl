@@ -57,9 +57,14 @@ void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
   ClearDepth(inClearDepth);
 }
 
+void Renderer::SetDepthWriteEnabled(const bool inDepthWriteEnabled)
+{
+  mState.GetCurrent<EStateId::DEPTH_WRITE_ENABLED>() = inDepthWriteEnabled;
+}
+
 void Renderer::SetBlendEnabled(const bool inBlendEnabled)
 {
-  mState.GetCurrent<Renderer::EStateId::BLEND_ENABLED>() = inBlendEnabled;
+  mState.GetCurrent<EStateId::BLEND_ENABLED>() = inBlendEnabled;
 }
 
 void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
@@ -71,15 +76,15 @@ void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL
 void Renderer::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB,
     const GL::EBlendFactor inBlendDestFactorRGB)
 {
-  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB = inBlendSourceFactorRGB;
-  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mDestBlendFactorRGB = inBlendDestFactorRGB;
+  mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB = inBlendSourceFactorRGB;
+  mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorRGB = inBlendDestFactorRGB;
 }
 
 void Renderer::SetBlendFuncAlpha(const GL::EBlendFactor inBlendSourceFactorAlpha,
     const GL::EBlendFactor inBlendDestFactorAlpha)
 {
-  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha = inBlendSourceFactorAlpha;
-  mState.GetCurrent<Renderer::EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha = inBlendDestFactorAlpha;
+  mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha = inBlendSourceFactorAlpha;
+  mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha = inBlendDestFactorAlpha;
 }
 
 GL::EBlendFactor Renderer::GetBlendSourceFactorRGB() const
@@ -102,24 +107,18 @@ GL::EBlendFactor Renderer::GetBlendDestFactorAlpha() const
   return mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha;
 }
 
-void Renderer::SetPointSize(const float inPointSize)
-{
-  mState.GetCurrent<Renderer::EStateId::POINT_SIZE>() = inPointSize;
-}
+void Renderer::SetPointSize(const float inPointSize) { mState.GetCurrent<EStateId::POINT_SIZE>() = inPointSize; }
 
-void Renderer::SetLineWidth(const float inLineWidth)
-{
-  mState.GetCurrent<Renderer::EStateId::LINE_WIDTH>() = inLineWidth;
-}
+void Renderer::SetLineWidth(const float inLineWidth) { mState.GetCurrent<EStateId::LINE_WIDTH>() = inLineWidth; }
 
 void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
 {
-  mState.GetCurrent<Renderer::EStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
+  mState.GetCurrent<EStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
 void Renderer::SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOverrideRenderTarget)
 {
-  mState.GetCurrent<Renderer::EStateId::OVERRIDE_RENDER_TARGET>() = inOverrideRenderTarget;
+  mState.GetCurrent<EStateId::OVERRIDE_RENDER_TARGET>() = inOverrideRenderTarget;
 }
 
 void Renderer::BindRenderTarget() { GetRenderTarget()->Bind(); }

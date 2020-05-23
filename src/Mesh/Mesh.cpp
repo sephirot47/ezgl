@@ -12,15 +12,18 @@
 
 namespace ez
 {
-void Mesh::AddVertex(const Vec3f& inPosition)
+Mesh::VertexId Mesh::AddVertex(const Vec3f& inPosition)
 {
   Mesh::VertexData vertex_data;
   vertex_data.mPosition = inPosition;
   mVerticesData.push_back(std::move(vertex_data));
   mCornerTableComputed = false;
+
+  const auto new_vertex_id = mVerticesData.size() - 1;
+  return new_vertex_id;
 }
 
-void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
+Mesh::FaceId Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
     const Mesh::VertexId& inFaceVertexId1,
     const Mesh::VertexId& inFaceVertexId2)
 {
@@ -42,6 +45,8 @@ void Mesh::AddFace(const Mesh::VertexId& inFaceVertexId0,
   for (Mesh::InternalCornerId internal_corner_id = 0; internal_corner_id < 3; ++internal_corner_id)
   { mCornersData.emplace_back(); }
   mCornerTableComputed = false;
+
+  return new_face_id;
 }
 
 void Mesh::SetFaceNormal(const Mesh::FaceId inFaceId, const Vec3f& inFaceNormal)
@@ -238,6 +243,12 @@ Mesh::CornerId Mesh::GetCornerIdFromFaceIdAndVertexId(const Mesh::FaceId inFaceI
     return (inFaceId * 3 + 1);
 
   return (inFaceId * 3 + 2);
+}
+
+Mesh::CornerId Mesh::GetCornerIdFromFaceIdAndInternalCornerId(const Mesh::FaceId inFaceId,
+    const Mesh::InternalCornerId inInternalCornerId) const
+{
+  return inFaceId * 3 + inInternalCornerId;
 }
 
 Mesh::CornerId Mesh::GetPreviousCornerId(const Mesh::CornerId inCornerId) const

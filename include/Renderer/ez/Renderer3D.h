@@ -3,6 +3,8 @@
 #include "ez/Camera.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
+#include "ez/ETextHAlignment.h"
+#include "ez/ETextVAlignment.h"
 #include "ez/Framebuffer.h"
 #include "ez/Macros.h"
 #include "ez/Material3D.h"
@@ -30,6 +32,7 @@
 
 namespace ez
 {
+class Font;
 class MeshDrawData;
 class ShaderProgram;
 
@@ -140,6 +143,10 @@ public:
   void DrawAABoxBoundary(const AABoxf& inAABox);
   void DrawAABox();
   void DrawAABoxBoundary();
+  void DrawAARect();
+  void DrawAARect(const AARectf& inAARect);
+  void DrawAARectBoundary();
+  void DrawAARectBoundary(const AARectf& inAARect);
   void DrawCylinder(std::size_t inNumLongitudes = 32);
   void DrawTorus(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32, float inHoleSize = 0.5f);
   void DrawCone(std::size_t inNumLongitudes = 32);
@@ -150,6 +157,12 @@ public:
   void DrawCircleBoundary(std::size_t inNumVertices = 32);
   void DrawCircleSection(const AngleRads inAngle, std::size_t inNumVertices = 32);
   void DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices = 32);
+  void DrawText(const std::string_view inText,
+      const Font& inFont,
+      const ETextHAlignment& inHAlignment = ETextHAlignment::CENTER,
+      const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER,
+      bool inBillboard = false,
+      bool inConstantScale = false);
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer3D::EStateId,
@@ -177,6 +190,7 @@ private:
   static bool sStaticResourcesInited;
   static std::shared_ptr<ShaderProgram> sOnlyColorShaderProgram;
   static std::shared_ptr<ShaderProgram> sMeshShaderProgram;
+  static std::shared_ptr<ShaderProgram> sTextShaderProgram;
   static std::shared_ptr<MeshDrawData> sCone;
 
   // State

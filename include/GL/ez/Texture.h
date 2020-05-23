@@ -18,6 +18,14 @@ public:
 
   void BindToTextureUnit(const GL::Size& inTextureUnit) const;
 
+  void SetWrapMode(const GL::EWrapMode inWrapMode);
+  void SetWrapModeR(const GL::EWrapMode inWrapMode);
+  void SetWrapModeS(const GL::EWrapMode inWrapMode);
+  void SetWrapModeT(const GL::EWrapMode inWrapMode);
+
+  void SetMinFilterMode(const GL::EMinFilterMode inMinFilterMode);
+  void SetMagFilterMode(const GL::EMagFilterMode inMagFilterMode);
+
   void GenerateMipMap();
 
   using GLBindableObject<BindingType>::GetGLId;

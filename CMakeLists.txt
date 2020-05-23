@@ -56,12 +56,14 @@ target_compile_features(ezgl PUBLIC "cxx_variadic_templates")
 target_compile_features(ezgl PUBLIC "cxx_template_template_parameters")
 
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Camera")
+target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Font")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Generic")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/GL")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Mesh")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Renderer")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/UI")
+target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/res/")
 
 # ======================================================================
 # ======================================================================
@@ -73,6 +75,23 @@ target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/UI")
 
 if (EZGL_COMPILE_MESH_IO)
 target_compile_definitions(ezgl PRIVATE "MESH_IO")
+endif()
+
+# ======================================================================
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# Sanitizers ===========================================================
+# ======================================================================
+
+set (USE_SANITIZER OFF)
+if (${USE_SANITIZER})
+  target_compile_options(ezgl PUBLIC $<$<CONFIG:DEBUG>:-fsanitize=address>)
+  target_compile_options(ezgl PUBLIC $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+  target_compile_options(ezgl PUBLIC $<$<CONFIG:DEBUG>:-g3>)
+  target_compile_options(ezgl PUBLIC $<$<CONFIG:DEBUG>:-fno-omit-frame-pointer>)
+  target_link_libraries(ezgl debug "-fsanitize=address -fsanitize=undefined")
 endif()
 
 # ======================================================================

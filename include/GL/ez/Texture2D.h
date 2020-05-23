@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ez/GLTypeTraits.h"
 #include "ez/Math.h"
 #include "ez/Texture.h"
 #include <memory>
@@ -15,7 +16,8 @@ public:
   using GLGuardType = GLBindGuard<GL::EBindingType::TEXTURE_2D>;
 
   Texture2D(const int inWidth, const int inHeight, const GL::ETextureFormat inFormat);
-  explicit Texture2D(const Image2D<Color4f>& inImage2D);
+  template <typename TImageValueType>
+  explicit Texture2D(const Image2D<TImageValueType>& inImage2D);
   Texture2D(Texture2D&& ioRHS) noexcept = default;
   Texture2D& operator=(Texture2D&& ioRHS) = default;
   ~Texture2D() override = default;
@@ -32,8 +34,9 @@ public:
       const GL::ETextureFormat& inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int& inMipMapLevel = 0);
 
-  void SetData(const Image2D<Color4f>& inImage2D,
-      const GL::ETextureFormat& inFormat = GL::ETextureFormat::RGBA8,
+  template <typename TImageValueType>
+  void SetData(const Image2D<TImageValueType>& inImage2D,
+      const GL::ETextureFormat& inFormat = GLTypeTraits<TImageValueType>::GLTextureFormat,
       const GL::Int& inMipMapLevel = 0);
 
   void SetEmptyData(const GL::Size inWidth,

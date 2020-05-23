@@ -64,7 +64,7 @@ void ImageIO::Write(const Image2D<Color4f>& inImage, const std::filesystem::path
     }
   }
 
-  const auto write_data = static_cast<const void*>(image_uint.GetData().GetData());
+  const auto write_data = static_cast<const void*>(&image_uint.GetData().GetData()[0]);
   if (lower_case_extension == ".png")
   {
     const auto row_stride = 4 * sizeof(uint8_t) * width;

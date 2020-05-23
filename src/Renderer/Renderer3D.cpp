@@ -2,6 +2,7 @@
 #include "ez/Camera.h"
 #include "ez/DirectionalLight.h"
 #include "ez/FileUtils.h"
+#include "ez/Font.h"
 #include "ez/GL.h"
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
@@ -22,6 +23,7 @@ namespace ez
 bool Renderer3D::sStaticResourcesInited = false;
 std::shared_ptr<ShaderProgram> Renderer3D::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> Renderer3D::sMeshShaderProgram;
+std::shared_ptr<ShaderProgram> Renderer3D::sTextShaderProgram;
 std::shared_ptr<MeshDrawData> Renderer3D::sCone;
 
 Renderer3D::Renderer3D()
@@ -31,6 +33,7 @@ Renderer3D::Renderer3D()
   {
     sOnlyColorShaderProgram = ShaderProgramFactory::GetOnlyColorShaderProgram();
     sMeshShaderProgram = ShaderProgramFactory::GetMeshShaderProgram();
+    sTextShaderProgram = ShaderProgramFactory::GetTextShaderProgram();
 
     sCone = std::make_shared<MeshDrawData>(MeshFactory::GetCone(32));
 
@@ -311,6 +314,30 @@ void Renderer3D::DrawAABoxBoundary()
       Segment3f { Vec3f { 1.0f, -1.0f, -1.0f }, Vec3f { 1.0f, 1.0f, -1.0f } } }));
 }
 
+void Renderer3D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
+
+void Renderer3D::DrawAARect(const AARectf& inAARect)
+{
+  Translate(XY0(inAARect.GetCenter()));
+  Scale(XY1(inAARect.GetSize()) * 0.5f);
+  DrawMesh(MeshFactory::GetPlane());
+}
+
+void Renderer3D::DrawAARectBoundary()
+{
+  DrawSegments(MakeSpan({ Segment3f { Vec3f { -1.0f, -1.0f, 0.0f }, Vec3f { -1.0f, 1.0f, 0.0f } },
+      Segment3f { Vec3f { -1.0f, 1.0f, 0.0f }, Vec3f { 1.0f, 1.0f, 0.0f } },
+      Segment3f { Vec3f { 1.0f, 1.0f, 0.0f }, Vec3f { 1.0f, -1.0f, 0.0f } },
+      Segment3f { Vec3f { 1.0f, -1.0f, 0.0f }, Vec3f { -1.0f, -1.0f, 0.0f } } }));
+}
+
+void Renderer3D::DrawAARectBoundary(const AARectf& inAARect)
+{
+  Translate(XY0(inAARect.GetCenter()));
+  Scale(XY1(inAARect.GetSize()) * 0.5f);
+  DrawAARectBoundary();
+}
+
 void Renderer3D::DrawCylinder(std::size_t inNumLongitudes) { DrawMesh(MeshFactory::GetCylinder(inNumLongitudes)); }
 
 void Renderer3D::DrawTorus(std::size_t inNumLatitudes, std::size_t inNumLongitudes, float inHoleSize)
@@ -356,6 +383,49 @@ void Renderer3D::DrawCircleSection(const AngleRads inAngle, std::size_t inNumVer
 void Renderer3D::DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices)
 {
   DrawCircleSectionBoundaryGeneric<float, 3>(inAngle, inNumVertices);
+}
+
+void Renderer3D::DrawText(const std::string_view inText,
+    const Font& inFont,
+    const ETextHAlignment& inHAlignment,
+    const ETextVAlignment& inVAlignment,
+    bool inBillboard,
+    bool inConstantScale)
+{
+  RendererStateGuard<Renderer3D::EStateId::MATERIAL> material_guard(*this);
+  const auto& font_atlas_texture = inFont.GetAtlasTexture();
+  GetMaterial().SetTexture(font_atlas_texture);
+
+  RendererStateGuard<Renderer3D::EStateId::CULL_FACE_ENABLED> cull_face_enabled_guard(*this);
+  SetCullFaceEnabled(false);
+
+  if (inBillboard || inConstantScale)
+  {
+    PushTransformMatrix();
+
+    const auto translation_world = Translation(GetTransformMatrix());
+    const auto translation_to_camera = (GetCamera()->GetPosition() - translation_world);
+    if (inBillboard)
+    {
+      const auto dir_to_camera = NormalizedSafe(translation_to_camera);
+      const auto billboard_rotation = LookInDirection(-dir_to_camera);
+      Rotate(billboard_rotation);
+    }
+
+    if (inConstantScale)
+    {
+      const auto distance_to_camera = Length(translation_to_camera);
+      Scale(Max(0.00001f, distance_to_camera));
+    }
+  }
+
+  SetShaderProgram(sTextShaderProgram);
+
+  const auto text_mesh = inFont.GetTextMesh(inText, inHAlignment, inVAlignment);
+  Renderer::DrawMesh(text_mesh);
+
+  if (inBillboard || inConstantScale)
+    PopTransformMatrix();
 }
 
 // Helpers ========================================================================================
