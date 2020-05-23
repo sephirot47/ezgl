@@ -387,6 +387,7 @@ void Renderer3D::DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t 
 
 void Renderer3D::DrawText(const std::string_view inText,
     const Font& inFont,
+    const float inScale,
     const ETextHAlignment& inHAlignment,
     const ETextVAlignment& inVAlignment,
     bool inBillboard,
@@ -399,10 +400,11 @@ void Renderer3D::DrawText(const std::string_view inText,
   RendererStateGuard<Renderer3D::EStateId::CULL_FACE_ENABLED> cull_face_enabled_guard(*this);
   SetCullFaceEnabled(false);
 
+  RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Scale(inScale);
+
   if (inBillboard || inConstantScale)
   {
-    PushTransformMatrix();
-
     const auto translation_world = Translation(GetTransformMatrix());
     const auto translation_to_camera = (GetCamera()->GetPosition() - translation_world);
     if (inBillboard)
@@ -415,7 +417,7 @@ void Renderer3D::DrawText(const std::string_view inText,
     if (inConstantScale)
     {
       const auto distance_to_camera = Length(translation_to_camera);
-      Scale(Max(0.00001f, distance_to_camera));
+      Scale(Max(distance_to_camera, 0.00001f));
     }
   }
 
@@ -423,9 +425,6 @@ void Renderer3D::DrawText(const std::string_view inText,
 
   const auto text_mesh = inFont.GetTextMesh(inText, inHAlignment, inVAlignment);
   Renderer::DrawMesh(text_mesh);
-
-  if (inBillboard || inConstantScale)
-    PopTransformMatrix();
 }
 
 // Helpers ========================================================================================

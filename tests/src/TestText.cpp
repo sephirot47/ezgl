@@ -3,6 +3,7 @@
 #include "ez/Image2D.h"
 #include "ez/MeshFactory.h"
 #include "ez/PerspectiveCamera.h"
+#include "ez/Renderer2D.h"
 #include "ez/Renderer3D.h"
 #include "ez/Window.h"
 #include <cstdlib>
@@ -31,42 +32,46 @@ int main(int argc, const char** argv)
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
 
-  // Create renderer
-  Renderer3D renderer;
+  // Create renderers
+  Renderer2D renderer2D;
+  Renderer3D renderer3D;
 
   // Window loop
   auto time = 0.0f;
   window->Loop([&](const DeltaTime& inDeltaTime) {
     GL::Viewport(Zero<Vec2i>(), window->GetFramebufferSize());
 
-    // Prepare renderer
-    renderer.ResetState();
-    renderer.SetCamera(camera);
-    renderer.AdaptToWindow(*window);
-    renderer.Clear(Black<Color4f>());
+    // Prepare renderers
+    renderer3D.ResetState();
+    renderer3D.SetCamera(camera);
+    renderer3D.AdaptToWindow(*window);
+    renderer3D.Clear(Black<Color4f>());
+
+    renderer2D.ResetState();
+    renderer2D.AdaptToWindow(*window);
+    renderer2D.Clear(Black<Color4f>());
 
     // Add a light
-    renderer.AddDirectionalLight(NormalizedSafe(Vec3f(-1.2f, -1.0f, -1.4f)), White<Color3f>());
+    renderer3D.AddDirectionalLight(NormalizedSafe(Vec3f(-1.2f, -1.0f, -1.4f)), White<Color3f>());
 
     constexpr auto long_text
         = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=;,:.()[]{}\"-_?!+*/\\%&$#@|^<>'";
 
     time += inDeltaTime.count();
-    renderer.Rotate(AngleAxis((FullCircleRads() * time * 0.02f), Up<Vec3f>()));
-    renderer.Scale(0.001f);
-    constexpr auto NumIterations = 30;
+    renderer3D.Rotate(AngleAxis((FullCircleRads() * time * 0.02f), Up<Vec3f>()));
+    constexpr auto NumIterations = 40;
     for (int i = 0; i < NumIterations; ++i)
     {
-      renderer.Translate(Down<Vec3f>() * 100.0f);
-      renderer.Rotate(AngleAxis((FullCircleRads() / NumIterations), Up<Vec3f>()));
-      renderer.GetMaterial().SetDiffuseColor(
+      renderer3D.Translate(Down<Vec3f>() * 0.15f);
+      renderer3D.Rotate(AngleAxis((FullCircleRads() / NumIterations), Up<Vec3f>()));
+      renderer3D.GetMaterial().SetDiffuseColor(
           HSVToRGB(Color4f(static_cast<float>(i) / NumIterations, 1.0f, 1.0f, 1.0f)));
-      renderer.DrawText(long_text, font_big);
+      renderer3D.DrawText(long_text, font_big, 0.001f);
     }
 
-    renderer.ResetTransformMatrix();
-    renderer.Translate(Down<Vec3f>() * 6.0f);
-    renderer.Scale(0.3f);
+    renderer3D.ResetTransformMatrix();
+    renderer3D.Translate(Down<Vec3f>() * 8.0f);
+    renderer3D.Scale(0.3f);
 
     constexpr auto h_alignment_names = std::array { "left", "center", "right" };
     constexpr auto v_alignment_names = std::array { "top", "center", "baseline", "bottom" };
@@ -75,47 +80,49 @@ int main(int argc, const char** argv)
       for (const auto v_alignment :
           { ETextVAlignment::TOP, ETextVAlignment::CENTER, ETextVAlignment::BASELINE, ETextVAlignment::BOTTOM })
       {
-        renderer.GetMaterial().SetDiffuseColor(Red<Color4f>());
-        renderer.DrawSegment(Segment3f { Down<Vec3f>(), Up<Vec3f>() });
-        renderer.DrawSegment(Segment3f { Left<Vec3f>() * 10.0f, Right<Vec3f>() * 10.0f });
-        renderer.PushTransformMatrix();
-        renderer.Scale(0.04f);
+        renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
+        renderer3D.DrawSegment(Segment3f { Down<Vec3f>(), Up<Vec3f>() });
+        renderer3D.DrawSegment(Segment3f { Left<Vec3f>() * 10.0f, Right<Vec3f>() * 10.0f });
 
         auto text = std::string {};
         text += h_alignment_names[static_cast<int>(h_alignment)];
         text += "_";
         text += v_alignment_names[static_cast<int>(v_alignment)];
 
-        renderer.GetMaterial().SetDiffuseColor(Blue<Color4f>());
-        renderer.DrawText(text, font_small, h_alignment, v_alignment);
-        renderer.PopTransformMatrix();
-
-        renderer.Translate(Down<Vec3f>() * 4.0f);
+        renderer3D.GetMaterial().SetDiffuseColor(Blue<Color4f>());
+        renderer3D.DrawText(text, font_small, 0.04f, h_alignment, v_alignment);
+        renderer3D.Translate(Down<Vec3f>() * 4.0f);
       }
     }
 
-    renderer.Translate(Down<Vec3f>() * 2.0f);
-    renderer.PushTransformMatrix();
-    renderer.Scale(0.04f);
-    renderer.DrawText("Billboard", font_big, ETextHAlignment::CENTER, ETextVAlignment::CENTER, true, false);
-    renderer.PopTransformMatrix();
-    renderer.Translate(Down<Vec3f>() * 6.0f);
+    renderer3D.Translate(Down<Vec3f>() * 2.0f);
+    renderer3D.DrawText("Billboard", font_big, 0.04f, ETextHAlignment::CENTER, ETextVAlignment::CENTER, true, false);
+    renderer3D.Translate(Down<Vec3f>() * 6.0f);
+    renderer3D
+        .DrawText("ConstantScale", font_big, 0.004f, ETextHAlignment::CENTER, ETextVAlignment::CENTER, false, true);
+    renderer3D.Translate(Down<Vec3f>() * 10.0f);
+    renderer3D.DrawText("Billboard & ConstantScale",
+        font_big,
+        0.004f,
+        ETextHAlignment::CENTER,
+        ETextVAlignment::CENTER,
+        true,
+        true);
 
-    renderer.PushTransformMatrix();
-    renderer.Scale(0.004f);
-    renderer.DrawText("ConstantScale", font_big, ETextHAlignment::CENTER, ETextVAlignment::CENTER, false, true);
-    renderer.PopTransformMatrix();
-    renderer.Translate(Down<Vec3f>() * 10.0f);
+    renderer2D.Translate(Vec2f { 0.0f, static_cast<float>(window->GetFramebufferSize()[1]) });
+    renderer2D.GetMaterial().SetColor(Red<Color4f>());
+    renderer2D.DrawText("Text in 2D", font_big, 0.2f, ETextHAlignment::LEFT, ETextVAlignment::TOP);
 
-    renderer.PushTransformMatrix();
-    renderer.Scale(0.004f);
-    renderer
-        .DrawText("Billboard & ConstantScale", font_big, ETextHAlignment::CENTER, ETextVAlignment::CENTER, true, true);
-    renderer.PopTransformMatrix();
+    renderer2D.GetMaterial().SetColor(Red<Color4f>());
+    renderer2D.Translate(Vec2f { static_cast<float>(window->GetFramebufferSize()[0]), 0.0f });
+    renderer2D.DrawAARect(AARectf { Vec2f { -110.0f, -30.0f }, Vec2f { 0.0f, 0.0f } });
+    renderer2D.GetMaterial().SetColor(White<Color4f>());
+    renderer2D.DrawText("Text in 2D", font_big, 0.2f, ETextHAlignment::RIGHT, ETextVAlignment::TOP);
 
     // Blit image to window
     GL::ClearDepth();
-    renderer.Blit();
+    renderer2D.Blit();
+    renderer3D.Blit();
 
     camera_controller_fly.Update(inDeltaTime);
 

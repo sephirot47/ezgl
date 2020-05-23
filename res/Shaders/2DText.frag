@@ -3,7 +3,7 @@ R""(
 #version 430 core
 
 uniform sampler2D UMaterialTexture;
-uniform vec4 UMaterialDiffuseColor;
+uniform vec4 UMaterialColor;
 
 layout(location = 2) in vec2 in_texture_coordinate;
 
@@ -15,7 +15,7 @@ void main()
   if (atlas_texture_value == 0.0f)
     discard;
 
-  out_color = UMaterialDiffuseColor * vec4(1, 1, 1, atlas_texture_value);
+  out_color = UMaterialColor * vec4(1, 1, 1, atlas_texture_value);
 }
 
 )""

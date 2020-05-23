@@ -3,6 +3,8 @@
 #include "ez/Camera.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
+#include "ez/ETextHAlignment.h"
+#include "ez/ETextVAlignment.h"
 #include "ez/Framebuffer.h"
 #include "ez/Macros.h"
 #include "ez/Material2D.h"
@@ -30,6 +32,7 @@
 
 namespace ez
 {
+class Font;
 class MeshDrawData;
 class ShaderProgram;
 
@@ -99,6 +102,11 @@ public:
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
   void DrawAARectBoundary(const AARectf& inAARect);
+  void DrawText(const std::string_view inText,
+      const Font& inFont,
+      const float inScale = 1.0f,
+      const ETextHAlignment& inHAlignment = ETextHAlignment::CENTER,
+      const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER);
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,
@@ -117,6 +125,7 @@ private:
   // Static resources
   static bool sStaticResourcesInited;
   static std::shared_ptr<ShaderProgram> sShaderProgram;
+  static std::shared_ptr<ShaderProgram> sTextShaderProgram;
 
   // State
   State mState { *this };

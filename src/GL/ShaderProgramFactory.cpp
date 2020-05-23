@@ -8,6 +8,7 @@ namespace ez
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sMeshShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DShaderProgram;
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sDrawFullScreenTextureShaderProgram;
 
@@ -54,6 +55,19 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DShaderProgram()
     );
   }
   return s2DShaderProgram;
+}
+
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DTextShaderProgram()
+{
+  if (!s2DTextShaderProgram)
+  {
+    s2DTextShaderProgram = CreateShaderProgram(
+#include "Shaders/2D.vert"
+        ,
+#include "Shaders/2DText.frag"
+    );
+  }
+  return s2DTextShaderProgram;
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetOnlyColorShaderProgram()

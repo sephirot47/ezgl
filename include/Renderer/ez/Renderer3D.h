@@ -159,6 +159,7 @@ public:
   void DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices = 32);
   void DrawText(const std::string_view inText,
       const Font& inFont,
+      const float inScale = 1.0f,
       const ETextHAlignment& inHAlignment = ETextHAlignment::CENTER,
       const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER,
       bool inBillboard = false,

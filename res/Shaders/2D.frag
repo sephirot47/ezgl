@@ -4,12 +4,14 @@ R""(
 
 uniform vec4 UMaterialColor;
 
-layout(location = 0) out vec4 of_color;
+layout(location = 2) in vec2 in_texture_coordinates;
+
+layout(location = 0) out vec4 out_color;
 
 void main()
 {
   gl_FragDepth = 0.0f;
-  of_color = UMaterialColor;
+  out_color = UMaterialColor;
 }
 
 )""

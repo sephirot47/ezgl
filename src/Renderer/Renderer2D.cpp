@@ -2,6 +2,7 @@
 #include "ez/Camera.h"
 #include "ez/DirectionalLight.h"
 #include "ez/FileUtils.h"
+#include "ez/Font.h"
 #include "ez/GL.h"
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
@@ -21,6 +22,7 @@ namespace ez
 {
 bool Renderer2D::sStaticResourcesInited = false;
 std::shared_ptr<ShaderProgram> Renderer2D::sShaderProgram;
+std::shared_ptr<ShaderProgram> Renderer2D::sTextShaderProgram;
 
 Renderer2D::Renderer2D()
 {
@@ -28,6 +30,7 @@ Renderer2D::Renderer2D()
   if (!sStaticResourcesInited)
   {
     sShaderProgram = ShaderProgramFactory::Get2DShaderProgram();
+    sTextShaderProgram = ShaderProgramFactory::Get2DTextShaderProgram();
     sStaticResourcesInited = true;
   }
 
@@ -196,8 +199,9 @@ void Renderer2D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
 
 void Renderer2D::DrawAARect(const AARectf& inAARect)
 {
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(inAARect.GetCenter());
-  Scale(inAARect.GetSize() * 0.5f);
+  Scale(inAARect.GetSize());
   DrawMesh(MeshFactory::GetPlane());
 }
 
@@ -214,6 +218,25 @@ void Renderer2D::DrawAARectBoundary(const AARectf& inAARect)
   Translate(inAARect.GetCenter());
   Scale(inAARect.GetSize() * 0.5f);
   DrawAARectBoundary();
+}
+
+void Renderer2D::DrawText(const std::string_view inText,
+    const Font& inFont,
+    const float inScale,
+    const ETextHAlignment& inHAlignment,
+    const ETextVAlignment& inVAlignment)
+{
+  RendererStateGuard<Renderer2D::EStateId::MATERIAL> material_guard(*this);
+  const auto& font_atlas_texture = inFont.GetAtlasTexture();
+  GetMaterial().SetTexture(font_atlas_texture);
+
+  SetShaderProgram(sTextShaderProgram);
+
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Scale(inScale);
+
+  const auto text_mesh = inFont.GetTextMesh(inText, inHAlignment, inVAlignment);
+  Renderer::DrawMesh(text_mesh);
 }
 
 // Helpers ========================================================================================
