@@ -11,8 +11,11 @@ template <typename T>
 class PerspectiveCamera final : public Camera<T, 3>
 {
 public:
-  void SetAngleOfView(const AngleRads inAngleOfView) { mPerspectiveParameters.mAngleOfView = inAngleOfView; }
-  AngleRads GetAngleOfView() const { return mPerspectiveParameters.mAngleOfView; }
+  void SetFullAngleOfView(const AngleRads inFullAngleOfView)
+  {
+    mPerspectiveParameters.mFullAngleOfView = inFullAngleOfView;
+  }
+  AngleRads GetFullAngleOfView() const { return mPerspectiveParameters.mFullAngleOfView; }
 
   void SetAspectRatio(const float inAspectRatio) { mPerspectiveParameters.mAspectRatio = inAspectRatio; }
   float GetAspectRatio() const { return mPerspectiveParameters.mAspectRatio; }
@@ -23,7 +26,8 @@ public:
   void SetZFar(const float inZFar) { mPerspectiveParameters.mZFar = inZFar; }
   float GetZFar() const { return mPerspectiveParameters.mZFar; }
 
-  Ray3<T> GetViewportRay(const Vec2<T> inViewportPoint) const; // inViewportPoint in [0..1]
+  Ray3<T> GetViewportRay(const Vec2<T> &inViewportPoint) const; // inViewportPoint in [0..1]
+  Ray3<T> GetViewportRay(const Vec3<T> &inViewportPoint) const; // inViewportPoint in [0..1]
 
   void SetPerspectiveParameters(const PerspectiveParameters<T>& inPerspectiveParameters)
   {
@@ -34,7 +38,7 @@ public:
 
   virtual Mat4<T> GetProjectionMatrix() const final override
   {
-    const auto perspective_projection_matrix = PerspectiveMat(mPerspectiveParameters.mAngleOfView,
+    const auto perspective_projection_matrix = PerspectiveMat(mPerspectiveParameters.mFullAngleOfView,
         mPerspectiveParameters.mAspectRatio,
         mPerspectiveParameters.mZNear,
         mPerspectiveParameters.mZFar);

@@ -1,4 +1,4 @@
-#include "ez/Renderer.h"
+#include "ez/RendererGPU.h"
 #include "ez/Camera.h"
 #include "ez/DirectionalLight.h"
 #include "ez/FileUtils.h"
@@ -18,24 +18,16 @@
 
 namespace ez
 {
-bool Renderer::sStaticResourcesInited = false;
-
-Renderer::Renderer()
+RendererGPU::RendererGPU()
 {
-  // Init static resources
-  if (!sStaticResourcesInited)
-  {
-    sStaticResourcesInited = true;
-  }
-
   // Init default render target and default framebuffer
   mDefaultRenderTarget
       = std::make_shared<RenderTarget>(GL::ETextureFormat::RGBA8, GL::ETextureFormat::DEPTH24_STENCIL8);
 
-  // Renderer subclasses must call PushAllDefaultValues() in their constructor...!
+  // Renderer leaf subclasses must call PushAllDefaultValues() in their constructor...!
 }
 
-void Renderer::ClearBackground(const Color4f& inClearColor)
+void RendererGPU::ClearBackground(const Color4f& inClearColor)
 {
   const RenderTarget::GLGuardType framebuffer_bind_guard;
   BindRenderTarget();
@@ -43,7 +35,7 @@ void Renderer::ClearBackground(const Color4f& inClearColor)
   GL::ClearColor(inClearColor);
 }
 
-void Renderer::ClearDepth(const float inClearDepth)
+void RendererGPU::ClearDepth(const float inClearDepth)
 {
   const RenderTarget::GLGuardType framebuffer_bind_guard;
   BindRenderTarget();
@@ -51,85 +43,85 @@ void Renderer::ClearDepth(const float inClearDepth)
   GL::ClearDepth(inClearDepth);
 }
 
-void Renderer::Clear(const Color4f& inClearColor, const float inClearDepth)
+void RendererGPU::Clear(const Color4f& inClearColor, const float inClearDepth)
 {
   ClearBackground(inClearColor);
   ClearDepth(inClearDepth);
 }
 
-void Renderer::SetDepthWriteEnabled(const bool inDepthWriteEnabled)
+void RendererGPU::SetDepthWriteEnabled(const bool inDepthWriteEnabled)
 {
   mState.GetCurrent<EStateId::DEPTH_WRITE_ENABLED>() = inDepthWriteEnabled;
 }
 
-void Renderer::SetBlendEnabled(const bool inBlendEnabled)
+void RendererGPU::SetBlendEnabled(const bool inBlendEnabled)
 {
   mState.GetCurrent<EStateId::BLEND_ENABLED>() = inBlendEnabled;
 }
 
-void Renderer::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
+void RendererGPU::SetBlendFunc(const GL::EBlendFactor inBlendSourceFactor, const GL::EBlendFactor inBlendDestFactor)
 {
   SetBlendFuncRGB(inBlendSourceFactor, inBlendDestFactor);
   SetBlendFuncAlpha(inBlendSourceFactor, inBlendDestFactor);
 }
 
-void Renderer::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB,
+void RendererGPU::SetBlendFuncRGB(const GL::EBlendFactor inBlendSourceFactorRGB,
     const GL::EBlendFactor inBlendDestFactorRGB)
 {
   mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB = inBlendSourceFactorRGB;
   mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorRGB = inBlendDestFactorRGB;
 }
 
-void Renderer::SetBlendFuncAlpha(const GL::EBlendFactor inBlendSourceFactorAlpha,
+void RendererGPU::SetBlendFuncAlpha(const GL::EBlendFactor inBlendSourceFactorAlpha,
     const GL::EBlendFactor inBlendDestFactorAlpha)
 {
   mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha = inBlendSourceFactorAlpha;
   mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha = inBlendDestFactorAlpha;
 }
 
-GL::EBlendFactor Renderer::GetBlendSourceFactorRGB() const
+GL::EBlendFactor RendererGPU::GetBlendSourceFactorRGB() const
 {
   return mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorRGB;
 }
 
-GL::EBlendFactor Renderer::GetBlendDestFactorRGB() const
+GL::EBlendFactor RendererGPU::GetBlendDestFactorRGB() const
 {
   return mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorRGB;
 }
 
-GL::EBlendFactor Renderer::GetBlendSourceFactorAlpha() const
+GL::EBlendFactor RendererGPU::GetBlendSourceFactorAlpha() const
 {
   return mState.GetCurrent<EStateId::BLEND_FACTORS>().mSourceBlendFactorAlpha;
 }
 
-GL::EBlendFactor Renderer::GetBlendDestFactorAlpha() const
+GL::EBlendFactor RendererGPU::GetBlendDestFactorAlpha() const
 {
   return mState.GetCurrent<EStateId::BLEND_FACTORS>().mDestBlendFactorAlpha;
 }
 
-void Renderer::SetPointSize(const float inPointSize) { mState.GetCurrent<EStateId::POINT_SIZE>() = inPointSize; }
+void RendererGPU::SetPointSize(const float inPointSize) { mState.GetCurrent<EStateId::POINT_SIZE>() = inPointSize; }
 
-void Renderer::SetLineWidth(const float inLineWidth) { mState.GetCurrent<EStateId::LINE_WIDTH>() = inLineWidth; }
+void RendererGPU::SetLineWidth(const float inLineWidth) { mState.GetCurrent<EStateId::LINE_WIDTH>() = inLineWidth; }
 
-void Renderer::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
+void RendererGPU::SetOverrideShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram)
 {
   mState.GetCurrent<EStateId::OVERRIDE_SHADER_PROGRAM>() = inShaderProgram;
 }
 
-void Renderer::SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOverrideRenderTarget)
+void RendererGPU::SetOverrideRenderTarget(const std::shared_ptr<RenderTarget>& inOverrideRenderTarget)
 {
   mState.GetCurrent<EStateId::OVERRIDE_RENDER_TARGET>() = inOverrideRenderTarget;
 }
 
-void Renderer::BindRenderTarget() { GetRenderTarget()->Bind(); }
+void RendererGPU::BindRenderTarget() { GetRenderTarget()->Bind(); }
 
-void Renderer::Blit()
+void RendererGPU::Blit()
 {
   TextureOperations::DrawFullScreenTexture(*GetRenderTarget()->GetColorTexture(),
       *GetRenderTarget()->GetDepthTexture());
 }
 
-void Renderer::Blit(RenderTarget& ioRenderTarget)
+void RendererGPU::Blit(RenderTarget& ioRenderTarget)
 {
   const RenderTarget::GLGuardType render_target_guard;
 
@@ -137,24 +129,24 @@ void Renderer::Blit(RenderTarget& ioRenderTarget)
   Blit();
 }
 
-void Renderer::PushState() { mState.PushAllTops(); }
+void RendererGPU::PushState() { mState.PushAllTops(); }
 
-void Renderer::PopState() { mState.PopAll(); }
+void RendererGPU::PopState() { mState.PopAll(); }
 
-void Renderer::ResetState()
+void RendererGPU::ResetState()
 {
   PopState();
   PushAllDefaultStateValues();
 }
 
-void Renderer::PushAllDefaultStateValues() { mState.PushAllDefaultValues(); }
+void RendererGPU::PushAllDefaultStateValues() { mState.PushAllDefaultValues(); }
 
-void Renderer::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
+void RendererGPU::DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType)
 {
   const auto mesh_draw_data = MeshDrawData { inMesh };
   DrawMesh(mesh_draw_data, inDrawType);
 }
-void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
+void RendererGPU::DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType)
 {
   if (inDrawType == EDrawType::WIREFRAME)
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -167,13 +159,13 @@ void Renderer::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDra
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // TODO: Restore this properly
 }
 
-void Renderer::AdaptToWindow(const Window& inWindow)
+void RendererGPU::AdaptToWindow(const Window& inWindow)
 {
   SetViewport(AARecti(Zero<Vec2i>(), inWindow.GetFramebufferSize()));
   GetRenderTarget()->Resize(inWindow.GetFramebufferSize());
 }
 
-void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
+void RendererGPU::DrawVAOArraysOrElements(const VAO& inVAO,
     const GL::Size inNumberOfElementsToDraw,
     const GL::EPrimitivesType inPrimitivesType,
     const bool inDrawArrays,
@@ -193,7 +185,7 @@ void Renderer::DrawVAOArraysOrElements(const VAO& inVAO,
   }
 }
 
-void Renderer::DrawVAOElements(const VAO& inVAO,
+void RendererGPU::DrawVAOElements(const VAO& inVAO,
     const GL::Size inNumberOfElementsToDraw,
     const GL::EPrimitivesType inPrimitivesType)
 {
@@ -201,7 +193,7 @@ void Renderer::DrawVAOElements(const VAO& inVAO,
   DrawVAOArraysOrElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType, draw_arrays, 0);
 }
 
-void Renderer::DrawVAOArrays(const VAO& inVAO,
+void RendererGPU::DrawVAOArrays(const VAO& inVAO,
     const GL::Size inNumberOfPrimitivesToDraw,
     const GL::EPrimitivesType inPrimitivesType,
     const GL::Size inBeginPrimitiveIndex)
@@ -210,14 +202,14 @@ void Renderer::DrawVAOArrays(const VAO& inVAO,
   DrawVAOArraysOrElements(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, draw_arrays, inBeginPrimitiveIndex);
 }
 
-std::unique_ptr<Renderer::DrawSetup> Renderer::PrepareForDraw()
+std::unique_ptr<RendererGPU::DrawSetup> RendererGPU::PrepareForDraw()
 {
   std::unique_ptr<DrawSetup> draw_setup_ptr = CreateDrawSetup();
   PrepareForDraw(*draw_setup_ptr);
   return draw_setup_ptr;
 }
 
-void Renderer::PrepareForDraw(DrawSetup& ioDrawSetup)
+void RendererGPU::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
   EXPECTS(GetShaderProgram());
 

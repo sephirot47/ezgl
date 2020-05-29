@@ -65,29 +65,29 @@ void Renderer2D::SetMaterial(const Material2D& inMaterial)
 
 void Renderer2D::PushState()
 {
-  Renderer::PushState();
+  RendererGPU::PushState();
   mState.PushAllTops();
 }
 
 void Renderer2D::PopState()
 {
-  Renderer::PopState();
+  RendererGPU::PopState();
   mState.PopAll();
 }
 
 void Renderer2D::PushAllDefaultStateValues()
 {
-  Renderer::PushAllDefaultStateValues();
+  RendererGPU::PushAllDefaultStateValues();
   mState.PushAllDefaultValues();
 
   // Override default states
-  Renderer::GetState().Top<Renderer::EStateId::DEPTH_FUNC>() = GL::EDepthFunc::ALWAYS;
-  Renderer::GetState().Top<Renderer::EStateId::DEPTH_WRITE_ENABLED>() = true;
+  RendererGPU::GetState().Top<RendererGPU::EStateId::DEPTH_FUNC>() = GL::EDepthFunc::ALWAYS;
+  RendererGPU::GetState().Top<RendererGPU::EStateId::DEPTH_WRITE_ENABLED>() = true;
 }
 
 void Renderer2D::AdaptToWindow(const Window& inWindow)
 {
-  Renderer::AdaptToWindow(inWindow);
+  RendererGPU::AdaptToWindow(inWindow);
 
   AdaptCameraToWindow(inWindow);
 }
@@ -121,16 +121,16 @@ void Renderer2D::AdaptCameraToWindow(const Window& inWindow)
   GetCamera()->SetOrthographicParameters(orthographic_params);
 }
 
-void Renderer2D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
+void Renderer2D::DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType)
 {
   SetShaderProgram(sShaderProgram);
-  Renderer::DrawMesh(inMesh, inDrawType);
+  RendererGPU::DrawMesh(inMesh, inDrawType);
 }
 
-void Renderer2D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
+void Renderer2D::DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType)
 {
   SetShaderProgram(sShaderProgram);
-  Renderer::DrawMesh(inMeshDrawData, inDrawType);
+  RendererGPU::DrawMesh(inMeshDrawData, inDrawType);
 }
 
 void Renderer2D::DrawPoint(const Vec2f& inPoint)
@@ -236,14 +236,14 @@ void Renderer2D::DrawText(const std::string_view inText,
   Scale(inScale);
 
   const auto text_mesh = inFont.GetTextMesh(inText, inHAlignment, inVAlignment);
-  Renderer::DrawMesh(text_mesh);
+  RendererGPU::DrawMesh(text_mesh);
 }
 
 // Helpers ========================================================================================
 
 void Renderer2D::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
-  Renderer::PrepareForDraw(ioDrawSetup);
+  RendererGPU::PrepareForDraw(ioDrawSetup);
 
   const auto& draw_setup_2d = static_cast<const DrawSetup2D&>(ioDrawSetup);
   assert(draw_setup_2d.mShaderProgram);

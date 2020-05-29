@@ -63,6 +63,7 @@ target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Mesh
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/Renderer")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/ThirdParty")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/UI")
+target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/SceneGraph")
 target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/res/")
 
 # ======================================================================

@@ -14,7 +14,7 @@
 #include "ez/PerspectiveCamera.h"
 #include "ez/Plane.h"
 #include "ez/PointLight.h"
-#include "ez/Renderer.h"
+#include "ez/RendererGPU.h"
 #include "ez/RendererStateStacks.h"
 #include "ez/Segment.h"
 #include "ez/ShaderProgram.h"
@@ -36,7 +36,7 @@ class Font;
 class MeshDrawData;
 class ShaderProgram;
 
-class Renderer2D final : public Renderer
+class Renderer2D final : public RendererGPU
 {
 public:
   enum class EStateId
@@ -84,8 +84,8 @@ public:
 
   // Draw
   void AdaptToWindow(const Window& inWindow);
-  void DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
-  void DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType = Renderer::EDrawType::SOLID);
+  void DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
+  void DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
   void DrawPoint(const Vec2f& inPoint);
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);

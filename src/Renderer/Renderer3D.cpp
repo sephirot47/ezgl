@@ -144,39 +144,39 @@ std::shared_ptr<const OrthographicCamera3f> Renderer3D::GetOrthographicCamera() 
 
 void Renderer3D::PushState()
 {
-  Renderer::PushState();
+  RendererGPU::PushState();
   mState.PushAllTops();
 }
 
 void Renderer3D::PopState()
 {
-  Renderer::PopState();
+  RendererGPU::PopState();
   mState.PopAll();
 }
 
 void Renderer3D::PushAllDefaultStateValues()
 {
-  Renderer::PushAllDefaultStateValues();
+  RendererGPU::PushAllDefaultStateValues();
   mState.PushAllDefaultValues();
 }
 
 void Renderer3D::AdaptToWindow(const Window& inWindow)
 {
-  Renderer::AdaptToWindow(inWindow);
+  RendererGPU::AdaptToWindow(inWindow);
 
   AdaptCameraToWindow(inWindow);
 }
 
-void Renderer3D::DrawMesh(const Mesh& inMesh, const Renderer::EDrawType inDrawType)
+void Renderer3D::DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType)
 {
   SetShaderProgram(sMeshShaderProgram);
-  Renderer::DrawMesh(inMesh, inDrawType);
+  RendererGPU::DrawMesh(inMesh, inDrawType);
 }
 
-void Renderer3D::DrawMesh(const MeshDrawData& inMeshDrawData, const Renderer::EDrawType inDrawType)
+void Renderer3D::DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType)
 {
   SetShaderProgram(sMeshShaderProgram);
-  Renderer::DrawMesh(inMeshDrawData, inDrawType);
+  RendererGPU::DrawMesh(inMeshDrawData, inDrawType);
 }
 
 void Renderer3D::DrawVAOElements(const VAO& inVAO,
@@ -184,7 +184,7 @@ void Renderer3D::DrawVAOElements(const VAO& inVAO,
     const GL::EPrimitivesType inPrimitivesType)
 {
   SetShaderProgram(sMeshShaderProgram);
-  Renderer::DrawVAOElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType);
+  RendererGPU::DrawVAOElements(inVAO, inNumberOfElementsToDraw, inPrimitivesType);
 }
 
 void Renderer3D::DrawVAOArrays(const VAO& inVAO,
@@ -193,7 +193,7 @@ void Renderer3D::DrawVAOArrays(const VAO& inVAO,
     const GL::Size inBeginPrimitiveIndex)
 {
   SetShaderProgram(sMeshShaderProgram);
-  Renderer::DrawVAOArrays(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, inBeginPrimitiveIndex);
+  RendererGPU::DrawVAOArrays(inVAO, inNumberOfPrimitivesToDraw, inPrimitivesType, inBeginPrimitiveIndex);
 }
 
 void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
@@ -424,14 +424,14 @@ void Renderer3D::DrawText(const std::string_view inText,
   SetShaderProgram(sTextShaderProgram);
 
   const auto text_mesh = inFont.GetTextMesh(inText, inHAlignment, inVAlignment);
-  Renderer::DrawMesh(text_mesh);
+  RendererGPU::DrawMesh(text_mesh);
 }
 
 // Helpers ========================================================================================
 
 void Renderer3D::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
-  Renderer::PrepareForDraw(ioDrawSetup);
+  RendererGPU::PrepareForDraw(ioDrawSetup);
 
   const auto& draw_setup_3d = static_cast<DrawSetup3D&>(ioDrawSetup);
   assert(draw_setup_3d.mShaderProgram);
