@@ -18,41 +18,49 @@ int main(int argc, const char** argv)
   RendererRayTracingCPU rendererRTCPU;
   {
     const auto camera = std::make_shared<PerspectiveCameraf>();
-    camera->SetPosition(Back<Vec3f>() * 10.0f);
+    camera->SetPosition(Vec3f { 0.0f, 2.0f, 9.0f });
     camera->LookAtPoint(Zero<Vec3f>());
     camera->SetFullAngleOfView(QuarterCircleRads());
 
     rendererRTCPU.SetCamera(camera);
-    rendererRTCPU.SetSize(Vec2ul { 512, 512 });
+    rendererRTCPU.SetSize(Vec2ul { 256, 256 });
     rendererRTCPU.AdaptCameraAspectRatio();
 
-    auto scene = MakeSceneGraphNode<DrawableRayTracing>();
-
-    // scene.AddChild(DrawableRayTracing { Spheref(One<Vec3f>(), 1.0f) }, Identity<Transformation3f>());
-    // scene.AddChild(DrawableRayTracing { Spheref(Zero<Vec3f>(), 2.0f) }, Identity<Transformation3f>());
-
-    for (int i = 0; i < 100; ++i)
+    auto scene = MakeSceneGraphNode<ObjectRayTracing>();
+    scene->SetLocalTransformation(Transformation3f { Zero<Vec3f>(), AxisAngle(Vec3f { 0.0f, -1.0f, -1.0f }, 0.1f) });
     {
-      const auto material_raytracing = MaterialRayTracing { XYZ1(HSVToRGB(Color3f(RandomUnit<float>(), 1.0f, 1.0f))) };
-      const auto transformation = Transformation3f { Random<Vec3f>(All<Vec3f>(-5.0f), All<Vec3f>(5.0f)),
-        AxisAngle(NormalizedSafe(RandomUnit<Vec3f>()), Random<float>(0.0f, 4.0f)),
-        Random<Vec3f>(All<Vec3f>(0.05f), All<Vec3f>(0.3f)) };
+      // Floor
+      const auto floor_material = MaterialRayTracing { White<Color4f>() };
+      const auto floor_aabox = MakeAAHyperBoxFromCenterHalfSize(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(20.0f, 1.0f, 20.0f));
+      const auto floor
+          = scene->AddChild(ObjectRayTracing { floor_aabox, floor_material }, Identity<Transformation3f>());
 
-      if (i % 2 == 0)
-      {
-        const auto sphere = Spheref(Zero<Vec3f>(), 2.0f);
-        scene->AddChild(DrawableRayTracing { sphere, material_raytracing }, transformation);
-      }
-      else
-      {
-        const auto box = MakeAAHyperBoxFromCenterHalfSize(RandomUnit<Vec3f>() * 5.0f, RandomUnit<Vec3f>() * 5.0f);
-        scene->AddChild(DrawableRayTracing { box, material_raytracing }, transformation);
-      }
+      // Spheres
+      scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Blue<Color4f>() } },
+          Transformation3f { Vec3f { -2.0f, 2.0f, 2.0f }, Identity<Quatf>(), Vec3f { 0.5f, 0.9f, 1.0f } });
+      scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Pink<Color4f>() } },
+          Transformation3f { Vec3f { 2.0f, 2.0f, 2.0f }, Identity<Quatf>(), Vec3f { 0.5f, 2.0f, 1.0f } });
+      scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Orange<Color4f>() } },
+          Transformation3f { Vec3f { 0.0f, -1.0f, 7.0f }, Identity<Quatf>(), Vec3f { 2.0f, 2.0f, 1.0f } });
+
+      // Boxes
+      scene->AddChild(ObjectRayTracing { MakeAAHyperBoxFromMinSize(Zero<Vec3f>(), All<Vec3f>(2.0f)),
+                          MaterialRayTracing { Purple<Color4f>() } },
+          Transformation3f { Vec3f { -3.0f, 2.0f, 0.0f },
+              AxisAngle(Vec3f { 0.0f, 1.0f, 0.0f }, 1.0f),
+              Vec3f { 0.5f, 0.9f, 1.0f } });
+      /*
+       */
     }
+
+    // Lights
+    DirectionalLight dir_light;
+    dir_light.mColor = White<Color3f>();
+    dir_light.mDirection = NormalizedSafe(Vec3f(1.0f, -1.3f, -1.0f));
+    scene->AddChild(ObjectRayTracing { dir_light });
+
     rendererRTCPU.DrawScene(*scene);
   }
-
-  rendererRTCPU.GetRenderTarget().Write("test.png");
 
   // Present results in Window
   {

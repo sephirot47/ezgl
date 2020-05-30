@@ -7,7 +7,8 @@ namespace ez
 class MaterialRayTracing
 {
 public:
-  MaterialRayTracing(const Color4f& inColor) : mColor { inColor } {}
+  MaterialRayTracing() = default;
+  explicit MaterialRayTracing(const Color4f& inColor) : mColor { inColor } {}
 
   void SetColor(const Color4f& inColor) { mColor = inColor; }
   const Color4f& GetColor() const { return mColor; }

@@ -38,10 +38,10 @@ std::shared_ptr<SceneGraphNode<T>> SceneGraphNode<T>::AddChild(std::shared_ptr<S
 }
 
 template <typename T>
-Transformation3f SceneGraphNode<T>::GetTransformation() const
+Mat4f SceneGraphNode<T>::GetWorldTransformationMatrix() const
 {
   if (const auto parent = mParent.lock())
-    return parent->GetTransformation() * mLocalTransformation;
-  return mLocalTransformation;
+    return parent->GetWorldTransformationMatrix() * mLocalTransformation.GetMatrix();
+  return mLocalTransformation.GetMatrix();
 }
 }

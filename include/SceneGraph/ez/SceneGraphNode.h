@@ -15,7 +15,7 @@ public:
 
   void SetLocalTransformation(const Transformation3f& inLocalTransformation);
   const Transformation3f& GetLocalTransformation() const { return mLocalTransformation; }
-  Transformation3f GetTransformation() const;
+  Mat4f GetWorldTransformationMatrix() const;
 
   void SetParent(std::shared_ptr<SceneGraphNode> inSceneGraphNode);
   const std::weak_ptr<SceneGraphNode> GetParent() { return mParent; }

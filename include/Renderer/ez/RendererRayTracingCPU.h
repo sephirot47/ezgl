@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/DrawableRayTracing.h"
-#include "ez/DrawableRayTracingWrapper.h"
 #include "ez/HyperSphere.h"
 #include "ez/Image2D.h"
+#include "ez/ObjectRayTracing.h"
+#include "ez/ObjectRayTracingInSpace.h"
 #include "ez/Octree.h"
 #include "ez/OrthographicCamera.h"
 #include "ez/PerspectiveCamera.h"
@@ -31,7 +31,7 @@ public:
   void SetSize(const Vec2ul& inSize);
   Vec2ul GetSize() const;
 
-  void DrawScene(const SceneGraphNode<DrawableRayTracing>& inScene);
+  void DrawScene(const SceneGraphNode<ObjectRayTracing>& inScene);
 
   // Camera
   void SetCamera(const std::shared_ptr<Camera3f>& inCamera);
@@ -77,15 +77,24 @@ private:
   template <RendererRayTracingCPU::EStateId StateId>
   static State::ValueType<StateId> GetDefaultValue();
 
-  std::optional<Color4f> RayTraceInScene(const Octree<DrawableRayTracingWrapper>& inSceneOctree,
-      const std::vector<DrawableRayTracingWrapper>& inSceneDrawables,
-      const Ray3f& inRay);
+  struct SceneElements
+  {
+    Octree<ObjectRayTracingInSpace> mDrawableWorldAABBoxesOctree;
+    std::vector<ObjectRayTracingInSpace> mDrawables;
+    std::vector<DirectionalLight> mDirectionalLights;
+  };
+
+  struct IntersectionResult
+  {
+    Color3f mColor = Zero<Color3f>();
+    float mDistance = Max<float>();
+  };
+
+  template <EIntersectMode TIntersectMode>
+  auto RayTraceInScene(const SceneElements& inSceneElements, const Ray3f& inRay, const std::size_t inCurrentBounces);
 
   void RayTraceFullRenderTarget(const std::function<Color4f(const Ray3f&)>& inRayTraceFunction);
-
-  void CreateSceneOctree(const SceneGraphNode<DrawableRayTracing>& inScene,
-      Octree<DrawableRayTracingWrapper>& outOctree,
-      std::vector<DrawableRayTracingWrapper>& outDrawables) const;
+  SceneElements CreateSceneElements(const SceneGraphNode<ObjectRayTracing>& inScene) const;
 };
 }
 

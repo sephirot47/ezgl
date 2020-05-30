@@ -76,75 +76,17 @@ std::shared_ptr<const OrthographicCamera3f> RendererRayTracingCPU::GetOrthograph
   return const_cast<RendererRayTracingCPU&>(*this).GetOrthographicCamera();
 }
 
-std::optional<Color4f> RendererRayTracingCPU::RayTraceInScene(const Octree<DrawableRayTracingWrapper>& inSceneOctree,
-    const std::vector<DrawableRayTracingWrapper>& inSceneDrawables,
-    const Ray3f& inRay)
+void RendererRayTracingCPU::DrawScene(const SceneGraphNode<ObjectRayTracing>& inScene)
 {
-  UNUSED(inSceneOctree);
-  UNUSED(inSceneDrawables);
-
-  //*
-  // Get intersection of the ray with all the AABBoxes of drawables, using the world space AABBox octree,
-  // and sort it from closest to furthest
-  auto world_aabbox_intersections = IntersectAll(inSceneOctree, inRay);
-  std::sort(world_aabbox_intersections.begin(),
-      world_aabbox_intersections.end(),
-      [](const auto& inLHS, const auto& inRHS) { return inLHS.mDistance < inRHS.mDistance; });
-
-  // Now, for each AABBox intersected, test intersection with the drawable itself (which can be a geometric primitive or
-  // another octree of a mesh for example)
-  auto closest_intersection_color = std::optional<Color4f>();
-  auto closest_intersection_distance = Max<float>();
-  for (const auto& world_aabbox_intersection : world_aabbox_intersections)
-  {
-    // We have intersected a drawable AABBox, now cast against the drawable itself
-    const auto& intersected_drawable_index = world_aabbox_intersection.mPrimitiveIndex;
-    const auto& intersected_drawable_wrapper = inSceneDrawables.at(intersected_drawable_index);
-    const auto& intersected_drawable = *intersected_drawable_wrapper.mDrawable;
-    const auto& intersected_drawable_transformation = intersected_drawable_wrapper.mWorldTransformation;
-    const auto local_ray
-        = InverseTransformed(inRay, intersected_drawable_transformation); // Ray in drawable/local space
-    const auto drawable_intersection_distance_opt = IntersectClosest(intersected_drawable, local_ray);
-    if (!drawable_intersection_distance_opt)
-      continue;
-
-    const auto& drawable_intersection_distance = *drawable_intersection_distance_opt;
-    if (drawable_intersection_distance > closest_intersection_distance)
-      continue;
-
-    closest_intersection_distance = drawable_intersection_distance;
-
-    const auto& material = intersected_drawable.GetMaterial();
-    closest_intersection_color = material.GetColor();
-  }
-
-  return closest_intersection_color;
-  /*/
-
-  // Below: without scene ABBox Octree for testing purposes
-  UNUSED(inSceneOctree);
-  for (const auto& drawable_wrapper : inSceneDrawables)
-  {
-    const auto local_ray = InverseTransformed(inRay, drawable_wrapper.mWorldTransformation);
-    const auto drawable_intersection_result = IntersectClosest(*drawable_wrapper.mDrawable, local_ray);
-    if (drawable_intersection_result)
-      return Red<Color4f>();
-  }
-  return Zero<Color4f>();
-  //*/
-}
-
-void RendererRayTracingCPU::DrawScene(const SceneGraphNode<DrawableRayTracing>& inScene)
-{
-  // Calculate scene octree,
-  Octree<DrawableRayTracingWrapper> scene_octree;
-  std::vector<DrawableRayTracingWrapper> scene_drawables;
-  CreateSceneOctree(inScene, scene_octree, scene_drawables);
+  // Calculate scene elements,
+  const auto scene_elements = CreateSceneElements(inScene);
 
   // RayTrace each pixel
   RayTraceFullRenderTarget([&](const auto& inRay) {
-    const auto hit_color = RayTraceInScene(scene_octree, scene_drawables, inRay);
-    return hit_color.value_or(Zero<Color4f>());
+    const auto intersection_result = RayTraceInScene<EIntersectMode::ONLY_CLOSEST>(scene_elements, inRay, 0);
+    if (!intersection_result)
+      return Zero<Color4f>();
+    return XYZ1(intersection_result->mColor);
   });
 }
 
@@ -167,6 +109,7 @@ void RendererRayTracingCPU::RayTraceFullRenderTarget(const std::function<Color4f
   for (std::size_t y = 0; y < mRenderTarget.GetHeight(); ++y)
   {
     const auto ray_dir_y = z_neared_half_angle_of_view_tan[1] * y_ndc;
+    PRINT(y << "/" << mRenderTarget.GetHeight());
 
     auto x_ndc = -1.0f;
     for (std::size_t x = 0; x < mRenderTarget.GetWidth(); ++x)
@@ -185,31 +128,45 @@ void RendererRayTracingCPU::RayTraceFullRenderTarget(const std::function<Color4f
   }
 }
 
-void RendererRayTracingCPU::CreateSceneOctree(const SceneGraphNode<DrawableRayTracing>& inScene,
-    Octree<DrawableRayTracingWrapper>& outOctree,
-    std::vector<DrawableRayTracingWrapper>& outDrawables) const
+RendererRayTracingCPU::SceneElements RendererRayTracingCPU::CreateSceneElements(
+    const SceneGraphNode<ObjectRayTracing>& inScene) const
 {
-  std::queue<const SceneGraphNode<DrawableRayTracing>*> nodes_to_process;
+  SceneElements scene_elements;
+
+  std::queue<const SceneGraphNode<ObjectRayTracing>*> nodes_to_process;
   nodes_to_process.push(&inScene);
   while (!nodes_to_process.empty())
   {
     const auto node = nodes_to_process.front();
     nodes_to_process.pop();
 
-    if (const auto drawable = node->GetObject())
-    {
-      const auto world_transformation = node->GetTransformation();
-      const auto local_bounding_aabox = BoundingAABox(*drawable);
-      const auto world_bounding_aabox = BoundingAABoxTransformed(local_bounding_aabox, world_transformation);
-      outDrawables.emplace_back(drawable, world_transformation, world_bounding_aabox);
-    }
-
     for (const auto& child_node : *node) nodes_to_process.push(child_node.get());
+
+    const auto object = node->GetObject();
+    if (!object)
+      continue;
+
+    const auto world_transformation_matrix = node->GetWorldTransformationMatrix();
+    if (object->IsDrawable())
+    {
+      const auto local_bounding_aabox = BoundingAABox(*object);
+      const auto world_bounding_aabox = Transformed(local_bounding_aabox, world_transformation_matrix);
+      scene_elements.mDrawables.emplace_back(object, world_transformation_matrix, world_bounding_aabox);
+    }
+    else if (object->IsLight())
+    {
+      auto world_light = object->GetObject<DirectionalLight>();
+      world_light.mDirection = XYZ(Transformed(XYZ0(world_light.mDirection), world_transformation_matrix));
+      scene_elements.mDirectionalLights.push_back(world_light);
+    }
   }
 
   constexpr auto MaxPrimitivesAtLeafNodes = 1;
-  constexpr auto MaxLevels = 5; // There needs to be a max level, because bboxes can be inter-contained
-  outOctree = Octree<DrawableRayTracingWrapper> { MakeSpan(outDrawables), MaxPrimitivesAtLeafNodes, MaxLevels };
+  constexpr auto MaxLevels = 5; // There needs to be a max level, because bboxes can be inter-contained or coincident
+  scene_elements.mDrawableWorldAABBoxesOctree
+      = Octree<ObjectRayTracingInSpace> { MakeSpan(scene_elements.mDrawables), MaxPrimitivesAtLeafNodes, MaxLevels };
+
+  return scene_elements;
 }
 
 }
