@@ -67,8 +67,10 @@ void MeshDrawData::ComputeFromMesh(const Mesh& inMesh)
         corners_normals_pool.reserve(inMesh.GetNumberOfCorners());
         for (Mesh::CornerId corner_id = 0; corner_id < inMesh.GetNumberOfCorners(); ++corner_id)
         {
-          const auto& corner_normal = inMesh.GetCornerNormal(corner_id);
-          corners_normals_pool.push_back(corner_normal);
+          auto normal = inMesh.GetCornerNormal(corner_id);
+          if (normal == Zero<Vec3f>())
+            normal = inMesh.GetFaceNormal(inMesh.GetFaceIdFromCornerId(corner_id));
+          corners_normals_pool.push_back(normal);
         }
       }
       corners_normals_pool_vbo = std::make_shared<VBO>(MakeSpan(corners_normals_pool));
