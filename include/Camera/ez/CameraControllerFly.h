@@ -22,12 +22,10 @@ public:
     {
       if constexpr (N == 2) // Adjust default parameters better for 2D
       {
-        mInitFlySpeed *= 30.0f;
         mMaxFlySpeed *= 30.0f;
       }
     }
 
-    float mInitFlySpeed = 10.0f;
     float mMinFlySpeed = 0.05f;
     float mMaxFlySpeed = 100.0f;
 
@@ -59,7 +57,7 @@ public:
 private:
   Parameters mParameters;
   std::weak_ptr<Camera<T, N>> mCamera;
-  float mCurrentFlySpeed = mParameters.mInitFlySpeed;
+  float mCurrentFlySpeed = (mParameters.mMinFlySpeed + mParameters.mMaxFlySpeed) * 0.5f;
 
   bool mWantsToMoveForward = false;
   bool mWantsToMoveBack = false;
