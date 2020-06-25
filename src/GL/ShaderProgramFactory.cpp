@@ -12,7 +12,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sDrawFullScreenTextureShaderProgram;
 
-std::shared_ptr<ShaderProgram> CreateShaderProgram(const std::string_view inVertexShaderCode,
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateShaderProgram(const std::string_view inVertexShaderCode,
     const std::string_view inFragmentShaderCode)
 {
   return std::make_shared<ShaderProgram>(VertexShader(inVertexShaderCode), FragmentShader(inFragmentShaderCode));

@@ -809,6 +809,16 @@ public:
       const GL::ETextureFormat& inTextureFormat,
       const GL::Int& inMipMapLevel = 0);
   template <typename T>
+  static void TexImage3D(const GL::ETextureTarget& inTextureTarget,
+      const GL::Size& inWidth,
+      const GL::Size& inHeight,
+      const GL::Size& inDepth,
+      const GL::ETextureInputFormat& inInputFormat,
+      const GL::ETextureInputComponentFormat& inInputComponentFormat,
+      const Span<T>& inData,
+      const GL::ETextureFormat& inTextureFormat,
+      const GL::Int& inMipMapLevel = 0);
+  template <typename T>
   static std::vector<T> GetTextureImage(const GL::Id inTextureId,
       const GL::ETextureInputFormat inFormatToConvertTo,
       const GL::EDataType inDataTypeToConvertTo,

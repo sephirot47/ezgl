@@ -4,6 +4,14 @@ namespace ez
 {
 
 template <GL::ETextureTarget TTextureTarget>
+Texture<TTextureTarget>::Texture()
+{
+  // For texture completeness
+  SetMinFilterMode(GL::EMinFilterMode::NEAREST);
+  SetMagFilterMode(GL::EMagFilterMode::NEAREST);
+}
+
+template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::BindToTextureUnit(const GL::Size& inTextureUnit) const
 {
   EXPECTS((inTextureUnit + GL_TEXTURE0) <= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
