@@ -1,6 +1,9 @@
 #pragma once
 
+#include "ez/Span.h"
+#include <filesystem>
 #include <memory>
+#include <string_view>
 
 namespace ez
 {
@@ -17,7 +20,8 @@ public:
   static std::shared_ptr<ShaderProgram> GetDrawFullScreenTextureShaderProgram();
 
   static std::shared_ptr<ShaderProgram> CreateShaderProgram(const std::string_view inVertexShaderCode,
-      const std::string_view inFragmentShaderCode);
+      const std::string_view inFragmentShaderCode,
+      const Span<std::filesystem::path>& inIncludeDirs = MakeEmptySpan<std::filesystem::path>());
 
   ShaderProgramFactory() = delete;
 
