@@ -44,6 +44,29 @@ void GL::TexImage2D(const GL::ETextureTarget& inTextureTarget,
 }
 
 template <typename T>
+void GL::TexImage3D(const GL::ETextureTarget& inTextureTarget,
+    const GL::Size& inWidth,
+    const GL::Size& inHeight,
+    const GL::Size& inDepth,
+    const GL::ETextureInputFormat& inInputFormat,
+    const GL::ETextureInputComponentFormat& inInputComponentFormat,
+    const Span<T>& inData,
+    const GL::ETextureFormat& inFormat,
+    const GL::Int& inMipMapLevel)
+{
+  glTexImage3D(GL::EnumCast(inTextureTarget),
+      inMipMapLevel,
+      GL::EnumCast(inFormat),
+      inWidth,
+      inHeight,
+      inDepth,
+      0,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputComponentFormat),
+      inData.GetData());
+}
+
+template <typename T>
 std::vector<T> GL::GetTextureImage(const GL::Id inTextureId,
     const GL::ETextureInputFormat inFormatToConvertTo,
     const GL::EDataType inDataTypeToConvertTo,
@@ -150,7 +173,7 @@ template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXT
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_1D_ARRAY>() { return GL::EObjectType::TEXTURE_1D_ARRAY; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_2D>() { return GL::EObjectType::TEXTURE_2D; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_2D_ARRAY>() { return GL::EObjectType::TEXTURE_2D_ARRAY; }
-template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_3D>() { return GL::EObjectType::TEXTURE_1D; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_3D>() { return GL::EObjectType::TEXTURE_3D; }
 
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::EBO>() { return GL::EObjectType::EBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::UBO>() { return GL::EObjectType::UBO; }

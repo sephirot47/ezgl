@@ -26,8 +26,8 @@ public:
   void Resize(const int inWidth, const int inHeight);
 
   template <typename T>
-  void SetData(const GL::Size& inWidth,
-      const GL::Size& inHeight,
+  void SetData(const GL::Size inWidth,
+      const GL::Size inHeight,
       const GL::ETextureInputFormat& inInputFormat,
       const GL::ETextureInputComponentFormat& inInputComponentFormat,
       const Span<T>& inData,

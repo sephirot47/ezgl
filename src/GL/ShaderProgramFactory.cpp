@@ -1,5 +1,6 @@
 #include "ez/ShaderProgramFactory.h"
 #include "ez/Shader.h"
+#include "ez/ShaderPreprocessor.h"
 #include "ez/ShaderProgram.h"
 #include <string_view>
 
@@ -12,10 +13,14 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sDrawFullScreenTextureShaderProgram;
 
-std::shared_ptr<ShaderProgram> CreateShaderProgram(const std::string_view inVertexShaderCode,
-    const std::string_view inFragmentShaderCode)
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateShaderProgram(const std::string_view inVertexShaderCode,
+    const std::string_view inFragmentShaderCode,
+    const Span<std::filesystem::path>& inIncludeDirs)
 {
-  return std::make_shared<ShaderProgram>(VertexShader(inVertexShaderCode), FragmentShader(inFragmentShaderCode));
+  const auto preprocessed_vertex_shader_code = ShaderPreprocessor::PreprocessShaderCode(inVertexShaderCode, inIncludeDirs);
+  const auto preprocessed_fragment_shader_code = ShaderPreprocessor::PreprocessShaderCode(inFragmentShaderCode, inIncludeDirs);
+  return std::make_shared<ShaderProgram>(VertexShader { preprocessed_vertex_shader_code },
+      FragmentShader { preprocessed_fragment_shader_code });
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetMeshShaderProgram()

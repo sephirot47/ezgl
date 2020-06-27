@@ -11,8 +11,8 @@ Texture2D::Texture2D(const Image2D<TImageValueType>& inImage2D) : Texture2D()
 }
 
 template <typename T>
-void Texture2D::SetData(const GL::Size& inWidth,
-    const GL::Size& inHeight,
+void Texture2D::SetData(const GL::Size inWidth,
+    const GL::Size inHeight,
     const GL::ETextureInputFormat& inInputFormat,
     const GL::ETextureInputComponentFormat& inInputComponentFormat,
     const Span<T>& inData,

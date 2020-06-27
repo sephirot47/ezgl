@@ -12,7 +12,7 @@ public:
   static constexpr auto TextureTarget = TTextureTarget;
   static constexpr auto BindingType = GL::GetBindingType<TTextureTarget>();
 
-  Texture() = default;
+  Texture();
   Texture(Texture&& ioRHS) noexcept = default;
   virtual ~Texture() override = default;
 
