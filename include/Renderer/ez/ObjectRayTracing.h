@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ez/AABox.h"
+#include "ez/CommonTypeTraits.h"
 #include "ez/DirectionalLight.h"
 #include "ez/HyperSphere.h"
 #include "ez/MaterialRayTracing.h"

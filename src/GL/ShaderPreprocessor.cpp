@@ -19,8 +19,10 @@ std::string ShaderPreprocessor::PreprocessShaderCode(const std::string_view inSh
   std::string preprocessed_code = inShaderCode.data();
 
   // Remove verbatim markers
-  const auto verbatim_markers_regex = std::regex { "( ( R\"\"\\( ) | ( \\)\"\") )" };
-  preprocessed_code = std::regex_replace(preprocessed_code, verbatim_markers_regex, "");
+  const auto verbatim_marker_open_regex = std::regex { "R\"\"\\(" };
+  const auto verbatim_marker_close_regex = std::regex { "\\)\"\"" };
+  preprocessed_code = std::regex_replace(preprocessed_code, verbatim_marker_open_regex, "");
+  preprocessed_code = std::regex_replace(preprocessed_code, verbatim_marker_close_regex, "");
 
   // Substitute includes
   const auto include_regex = std::regex { "#include[\\s]+[<\"]([a-zA-Z_\\-\\.0-9\\s/]+)[>\"]" };
