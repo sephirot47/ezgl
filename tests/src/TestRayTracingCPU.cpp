@@ -23,7 +23,7 @@ int main(int argc, const char** argv)
     camera->SetFullAngleOfView(QuarterCircleRads());
 
     rendererRTCPU.SetCamera(camera);
-    rendererRTCPU.SetSize(Vec2ul { 256, 256 });
+    rendererRTCPU.SetSize(Vec2ul { 512, 512 });
     rendererRTCPU.AdaptCameraAspectRatio();
 
     auto scene = MakeSceneGraphNode<ObjectRayTracing>();
@@ -41,7 +41,9 @@ int main(int argc, const char** argv)
       scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Pink<Color4f>() } },
           Transformation3f { Vec3f { 2.0f, 2.0f, 2.0f }, Identity<Quatf>(), Vec3f { 0.5f, 2.0f, 1.0f } });
       scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Orange<Color4f>() } },
-          Transformation3f { Vec3f { 0.0f, -1.0f, 7.0f }, Identity<Quatf>(), Vec3f { 2.0f, 2.0f, 1.0f } });
+          Transformation3f { Vec3f { 0.0f, -1.0f, 3.0f }, Identity<Quatf>(), Vec3f { 2.0f, 2.0f, 1.0f } });
+      scene->AddChild(ObjectRayTracing { Spheref { Zero<Vec3f>(), 1.0f }, MaterialRayTracing { Red<Color4f>() } },
+          Transformation3f { Vec3f { 0.0f, 2.0f, -2.0f }, Identity<Quatf>(), Vec3f { 1.0f, 1.0f, 1.0f } });
 
       // Boxes
       scene->AddChild(ObjectRayTracing { MakeAAHyperBoxFromMinSize(Zero<Vec3f>(), All<Vec3f>(2.0f)),
@@ -55,8 +57,8 @@ int main(int argc, const char** argv)
 
     // Lights
     DirectionalLight dir_light;
-    dir_light.mColor = White<Color3f>();
-    dir_light.mDirection = NormalizedSafe(Vec3f(1.0f, -1.3f, -1.0f));
+    dir_light.mColor = White<Color3f>() * 0.5f;
+    dir_light.mDirection = NormalizedSafe(Vec3f(0.0f, -1.3f, -2.0f));
     scene->AddChild(ObjectRayTracing { dir_light });
 
     rendererRTCPU.DrawScene(*scene);

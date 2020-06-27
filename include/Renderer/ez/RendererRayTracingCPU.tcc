@@ -145,9 +145,9 @@ auto RendererRayTracingCPU::RayTraceInScene(const SceneElements& inSceneElements
   for (const auto& directional_light : inSceneElements.mDirectionalLights)
   {
     constexpr auto Epsilon = 1e-3f;
-    /*
-    const auto reflected_ray_direction = Normalized(Reflect(inRay.GetDirection(), surface_normal));
+    const auto reflected_ray_direction = material.GetReflectDirection(inRay.GetDirection(), surface_normal);
     const auto reflected_ray_origin = surface_point + (reflected_ray_direction * Epsilon);
+    /*
     const auto reflected_ray = Ray3f { reflected_ray_origin, reflected_ray_direction };
     const auto reflected_ray_intersection = RayTraceInScene(inSceneElements, reflected_ray, inCurrentBounces + 1);
     */
@@ -161,10 +161,15 @@ auto RendererRayTracingCPU::RayTraceInScene(const SceneElements& inSceneElements
     if (is_in_shadow)
       continue;
 
-    const auto directional_light_color = directional_light.mColor;
-    const auto incidence = Max(Dot(-directional_light.mDirection, surface_normal), 0.0f);
-    const auto light_apportation = (directional_light_color * incidence);
-    surface_color += XYZ(material_color) * light_apportation;
+    const auto& directional_light_color = directional_light.mColor;
+    const auto light_dot = Max(Dot(-directional_light.mDirection, reflected_ray_direction), 0.0f);
+    const auto specular_incidence = light_dot;
+    const auto diffuse_incidence = (1.0f - specular_incidence) * light_dot;
+
+    const auto specular = specular_incidence * directional_light_color;
+    const auto diffuse = diffuse_incidence * directional_light_color * XYZ(material_color);
+    const auto light = (specular + diffuse);
+    surface_color += light;
   }
 
   if constexpr (TIntersectMode == EIntersectMode::ONLY_CLOSEST)
