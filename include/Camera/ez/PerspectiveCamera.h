@@ -26,8 +26,7 @@ public:
   void SetZFar(const float inZFar) { mPerspectiveParameters.mZFar = inZFar; }
   float GetZFar() const { return mPerspectiveParameters.mZFar; }
 
-  Ray3<T> GetViewportRay(const Vec2<T> &inViewportPoint) const; // inViewportPoint in [0..1]
-  Ray3<T> GetViewportRay(const Vec3<T> &inViewportPoint) const; // inViewportPoint in [0..1]
+  Ray3<T> GetViewportRay(const Vec2<T>& inViewportPoint) const; // inViewportPoint in [0..1]
 
   void SetPerspectiveParameters(const PerspectiveParameters<T>& inPerspectiveParameters)
   {
