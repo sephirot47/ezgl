@@ -200,6 +200,23 @@ void GL::BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& in
   glBindTexture(GL::EnumCast(inTextureTarget), inTextureId);
 }
 
+void GL::BindImageTexture(const GL::Uint inTextureUnit,
+    const GL::Id inTextureId,
+    const GL::ETextureFormat inFormat,
+    const GL::EAccess inAccess,
+    const GL::Int inLevel,
+    const GL::Boolean inLayered,
+    const GL::Int inLayer)
+{
+  glBindImageTexture(inTextureUnit,
+      inTextureId,
+      inLevel,
+      inLayered,
+      inLayer,
+      GL::EnumCast(inAccess),
+      GL::EnumCast(inFormat));
+}
+
 void GL::GenerateTextureMipMap(const GL::Id& inTextureId) { glGenerateTextureMipmap(inTextureId); }
 
 void GL::ActiveTexture(const GL::Id& inTextureUnit) { glActiveTexture(inTextureUnit); }
@@ -510,6 +527,18 @@ void GL::UniformBlockBinding(const GL::Id inShaderProgramId,
     const GL::Id inBindingPoint)
 {
   glUniformBlockBinding(inShaderProgramId, inUniformBlockIndex, inBindingPoint);
+}
+
+void GL::MemoryBarrier(const GL::EMemoryBarrierBitFlags inMemoryBarrierBitFlags)
+{
+  glMemoryBarrier(GL::EnumCast(inMemoryBarrierBitFlags));
+}
+
+void GL::DispatchCompute(const GL::Uint inNumWorkGroupsX,
+    const GL::Uint inNumWorkGroupsY,
+    const GL::Uint inNumWorkGroupsZ)
+{
+  glDispatchCompute(inNumWorkGroupsX, inNumWorkGroupsY, inNumWorkGroupsZ);
 }
 
 void GL::TextureParameteri(const GL::Id inTextureId,

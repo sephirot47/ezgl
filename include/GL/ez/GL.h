@@ -34,7 +34,8 @@ public:
   enum class EShaderType
   {
     VERTEX = GL_VERTEX_SHADER,
-    FRAGMENT = GL_FRAGMENT_SHADER
+    FRAGMENT = GL_FRAGMENT_SHADER,
+    COMPUTE = GL_COMPUTE_SHADER
   };
 
   enum class EError
@@ -77,6 +78,7 @@ public:
     SHADER_PROGRAM,
     FRAGMENT_SHADER,
     VERTEX_SHADER,
+    COMPUTE_SHADER,
   };
 
   enum class EBindingType
@@ -115,12 +117,36 @@ public:
     STREAM_COPY = GL_STREAM_COPY
   };
 
+  enum class EAccess
+  {
+    READ_ONLY = GL_READ_ONLY,
+    WRITE_ONLY = GL_WRITE_ONLY,
+    READ_WRITE = GL_READ_WRITE
+  };
+
   enum class EBufferBitFlags
   {
     COLOR = GL_COLOR_BUFFER_BIT,
     DEPTH = GL_DEPTH_BUFFER_BIT,
     ACCUM = GL_ACCUM_BUFFER_BIT,
     STENCIL = GL_STENCIL_BUFFER_BIT
+  };
+
+  enum class EMemoryBarrierBitFlags
+  {
+    VERTEX_ATTRIB_ARRAY_BARRIER_BIT = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
+    ELEMENT_ARRAY_BARRIER_BIT = GL_ELEMENT_ARRAY_BARRIER_BIT,
+    UNIFORM_BARRIER_BIT = GL_UNIFORM_BARRIER_BIT,
+    TEXTURE_FETCH_BARRIER_BIT = GL_TEXTURE_FETCH_BARRIER_BIT,
+    SHADER_IMAGE_ACCESS_BARRIER_BIT = GL_SHADER_IMAGE_ACCESS_BARRIER_BIT,
+    COMMAND_BARRIER_BIT = GL_COMMAND_BARRIER_BIT,
+    PIXEL_BUFFER_BARRIER_BIT = GL_PIXEL_BUFFER_BARRIER_BIT,
+    TEXTURE_UPDATE_BARRIER_BIT = GL_TEXTURE_UPDATE_BARRIER_BIT,
+    BUFFER_UPDATE_BARRIER_BIT = GL_BUFFER_UPDATE_BARRIER_BIT,
+    FRAMEBUFFER_BARRIER_BIT = GL_FRAMEBUFFER_BARRIER_BIT,
+    TRANSFORM_FEEDBACK_BARRIER_BIT = GL_TRANSFORM_FEEDBACK_BARRIER_BIT,
+    ATOMIC_COUNTER_BARRIER_BIT = GL_ATOMIC_COUNTER_BARRIER_BIT,
+    SHADER_STORAGE_BARRIER_BIT = GL_SHADER_STORAGE_BARRIER_BIT
   };
 
   enum class EDataType
@@ -799,6 +825,13 @@ public:
   static GL::Id GenTexture();
   static GL::Id CreateTexture(const GL::ETextureTarget& inTextureTarget);
   static void BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& inTextureId);
+  static void BindImageTexture(const GL::Uint inTextureUnit,
+      const GL::Id inTextureId,
+      const GL::ETextureFormat inFormat,
+      const GL::EAccess inAccess,
+      const GL::Int inLevel = 0,
+      const GL::Boolean inLayered = false,
+      const GL::Int inLayer = 0);
   template <typename T>
   static void TexImage2D(const GL::ETextureTarget& inTextureTarget,
       const GL::Size& inWidth,
@@ -911,6 +944,11 @@ public:
   UniformBlockBinding(const GL::Id inShaderProgramId, const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint);
   static void DeleteProgram(const GL::Id inShaderProgramId);
 
+  static void MemoryBarrier(const GL::EMemoryBarrierBitFlags inMemoryBarrierBitFlags);
+  static void DispatchCompute(const GL::Uint inNumWorkGroupsX = 1u,
+      const GL::Uint inNumWorkGroupsY = 1u,
+      const GL::Uint inNumWorkGroupsZ = 1u);
+
   static bool GetBoolean(const GL::EGetEnum inGetBooleanId);
   static GL::Int GetInteger(const GL::EGetEnum inGetIntegerId);
   static GL::Float GetFloat(const GL::EGetEnum inGetFloatId);
@@ -982,6 +1020,7 @@ public:
 // clang-format on
 
 DECLARE_FLAGS(GL::EBufferBitFlags);
+DECLARE_FLAGS(GL::EMemoryBarrierBitFlags);
 
 }
 

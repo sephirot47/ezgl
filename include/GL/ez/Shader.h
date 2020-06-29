@@ -26,6 +26,7 @@ public:
 };
 
 using VertexShader = Shader<GL::EShaderType::VERTEX>;
+using ComputeShader = Shader<GL::EShaderType::COMPUTE>;
 using FragmentShader = Shader<GL::EShaderType::FRAGMENT>;
 }
 

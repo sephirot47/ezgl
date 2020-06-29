@@ -15,6 +15,12 @@ ShaderProgram::ShaderProgram(const VertexShader& inVertexShader, const FragmentS
   GL::LinkProgram(GetGLId());
 }
 
+ShaderProgram::ShaderProgram(const ComputeShader& inComputeShader)
+{
+  GL::AttachShader(GetGLId(), inComputeShader.GetGLId());
+  GL::LinkProgram(GetGLId());
+}
+
 std::optional<GL::Id> ShaderProgram::GetAttribLocation(const std::string_view inAttribName) const
 {
   const auto attrib_location = GL::GetAttribLocation(GetGLId(), inAttribName);

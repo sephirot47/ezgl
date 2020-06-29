@@ -13,21 +13,33 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::s2DTextShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sOnlyColorShaderProgram;
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::sDrawFullScreenTextureShaderProgram;
 
-std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateShaderProgram(const std::string_view inVertexShaderCode,
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateVertexFragmentShaderProgram(
+    const std::string_view inVertexShaderCode,
     const std::string_view inFragmentShaderCode,
     const Span<std::filesystem::path>& inIncludeDirs)
 {
-  const auto preprocessed_vertex_shader_code = ShaderPreprocessor::PreprocessShaderCode(inVertexShaderCode, inIncludeDirs);
-  const auto preprocessed_fragment_shader_code = ShaderPreprocessor::PreprocessShaderCode(inFragmentShaderCode, inIncludeDirs);
+  const auto preprocessed_vertex_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(inVertexShaderCode, inIncludeDirs);
+  const auto preprocessed_fragment_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(inFragmentShaderCode, inIncludeDirs);
   return std::make_shared<ShaderProgram>(VertexShader { preprocessed_vertex_shader_code },
       FragmentShader { preprocessed_fragment_shader_code });
+}
+
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateComputeShaderProgram(
+    const std::string_view inComputeShaderCode,
+    const Span<std::filesystem::path>& inIncludeDirs)
+{
+  const auto preprocessed_compute_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(inComputeShaderCode, inIncludeDirs);
+  return std::make_shared<ShaderProgram>(ComputeShader { preprocessed_compute_shader_code });
 }
 
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetMeshShaderProgram()
 {
   if (!sMeshShaderProgram)
   {
-    sMeshShaderProgram = CreateShaderProgram(
+    sMeshShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/Mesh.vert"
         ,
 #include "Shaders/Mesh.frag"
@@ -40,7 +52,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetTextShaderProgram()
 {
   if (!sTextShaderProgram)
   {
-    sTextShaderProgram = CreateShaderProgram(
+    sTextShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/Text.vert"
         ,
 #include "Shaders/Text.frag"
@@ -53,7 +65,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DShaderProgram()
 {
   if (!s2DShaderProgram)
   {
-    s2DShaderProgram = CreateShaderProgram(
+    s2DShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/2D.vert"
         ,
 #include "Shaders/2D.frag"
@@ -66,7 +78,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::Get2DTextShaderProgram()
 {
   if (!s2DTextShaderProgram)
   {
-    s2DTextShaderProgram = CreateShaderProgram(
+    s2DTextShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/2D.vert"
         ,
 #include "Shaders/2DText.frag"
@@ -79,7 +91,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetOnlyColorShaderProgram()
 {
   if (!sOnlyColorShaderProgram)
   {
-    sOnlyColorShaderProgram = CreateShaderProgram(
+    sOnlyColorShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/OnlyColor.vert"
         ,
 #include "Shaders/OnlyColor.frag"
@@ -92,7 +104,7 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetDrawFullScreenTextureSha
 {
   if (!sDrawFullScreenTextureShaderProgram)
   {
-    sDrawFullScreenTextureShaderProgram = CreateShaderProgram(
+    sDrawFullScreenTextureShaderProgram = CreateVertexFragmentShaderProgram(
 #include "Shaders/DrawFullScreenTexture.vert"
         ,
 #include "Shaders/DrawFullScreenTexture.frag"

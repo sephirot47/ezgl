@@ -111,6 +111,7 @@ std::array<GL::Float, N> GL::GetFloats(const GL::EGetEnum inGetFloatId)
   return floats;
 }
 
+template <> inline GL::Id GL::Create<GL::EObjectType::COMPUTE_SHADER>() { return GL::CreateShader(GL::EShaderType::COMPUTE); }
 template <> inline GL::Id GL::Create<GL::EObjectType::EBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAGMENT_SHADER>() { return GL::CreateShader(GL::EShaderType::FRAGMENT); }
 template <> inline GL::Id GL::Create<GL::EObjectType::FRAMEBUFFER>() { return GL::CreateFramebuffer(); }
@@ -126,6 +127,7 @@ template <> inline GL::Id GL::Create<GL::EObjectType::VAO>() { return GL::Create
 template <> inline GL::Id GL::Create<GL::EObjectType::VBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::VERTEX_SHADER>() { return GL::CreateShader(GL::EShaderType::VERTEX ); }
 
+template <> inline void GL::Delete<GL::EObjectType::COMPUTE_SHADER>(const GL::Id inId) { GL::DeleteShader(inId); }
 template <> inline void GL::Delete<GL::EObjectType::EBO>(const GL::Id inId) { GL::DeleteBuffer(inId); }
 template <> inline void GL::Delete<GL::EObjectType::FRAGMENT_SHADER>(const GL::Id inId) { GL::DeleteShader(inId); }
 template <> inline void GL::Delete<GL::EObjectType::FRAMEBUFFER>(const GL::Id inId) { GL::DeleteFramebuffer(inId); }
@@ -168,6 +170,7 @@ template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::VAO>()
 
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::VERTEX>() { return GL::EObjectType::VERTEX_SHADER; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::FRAGMENT>() { return GL::EObjectType::FRAGMENT_SHADER; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EShaderType::COMPUTE>() { return GL::EObjectType::COMPUTE_SHADER; }
 
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_1D>() { return GL::EObjectType::TEXTURE_1D; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_1D_ARRAY>() { return GL::EObjectType::TEXTURE_1D_ARRAY; }

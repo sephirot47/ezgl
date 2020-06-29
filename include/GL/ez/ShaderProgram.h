@@ -19,6 +19,7 @@ public:
   using GLBindableObject<GL::EBindingType::SHADER_PROGRAM>::GetGLId;
 
   ShaderProgram(const VertexShader& inVertexShader, const FragmentShader& inFragmentShader);
+  ShaderProgram(const ComputeShader& inComputeShader);
   ShaderProgram(ShaderProgram&& ioRHS) = default;
   ~ShaderProgram() = default;
 
