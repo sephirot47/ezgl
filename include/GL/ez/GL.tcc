@@ -122,6 +122,7 @@ template <> inline GL::Id GL::Create<GL::EObjectType::TEXTURE_1D_ARRAY>() { retu
 template <> inline GL::Id GL::Create<GL::EObjectType::TEXTURE_2D>() { return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D); }
 template <> inline GL::Id GL::Create<GL::EObjectType::TEXTURE_2D_ARRAY>() { return GL::CreateTexture(GL::ETextureTarget::TEXTURE_2D_ARRAY); }
 template <> inline GL::Id GL::Create<GL::EObjectType::TEXTURE_3D>() { return GL::CreateTexture(GL::ETextureTarget::TEXTURE_3D); }
+template <> inline GL::Id GL::Create<GL::EObjectType::SSBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::UBO>() { return GL::CreateBuffer(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::VAO>() { return GL::CreateVertexArray(); }
 template <> inline GL::Id GL::Create<GL::EObjectType::VBO>() { return GL::CreateBuffer(); }
@@ -138,6 +139,7 @@ template <> inline void GL::Delete<GL::EObjectType::TEXTURE_1D_ARRAY>(const GL::
 template <> inline void GL::Delete<GL::EObjectType::TEXTURE_2D>(const GL::Id inId) { GL::DeleteTexture(inId); }
 template <> inline void GL::Delete<GL::EObjectType::TEXTURE_2D_ARRAY>(const GL::Id inId) { GL::DeleteTexture(inId); }
 template <> inline void GL::Delete<GL::EObjectType::TEXTURE_3D>(const GL::Id inId) { GL::DeleteTexture(inId); }
+template <> inline void GL::Delete<GL::EObjectType::SSBO>(const GL::Id inId) { GL::DeleteBuffer(inId); }
 template <> inline void GL::Delete<GL::EObjectType::UBO>(const GL::Id inId) { GL::DeleteBuffer(inId); }
 template <> inline void GL::Delete<GL::EObjectType::VAO>(const GL::Id inId) { GL::DeleteVertexArray(inId); }
 template <> inline void GL::Delete<GL::EObjectType::VBO>(const GL::Id inId) { GL::DeleteBuffer(inId); }
@@ -152,6 +154,7 @@ template <> inline void GL::Bind<GL::EBindingType::TEXTURE_1D_ARRAY>(const GL::I
 template <> inline void GL::Bind<GL::EBindingType::TEXTURE_2D>(const GL::Id inId) { GL::BindTexture(GL::ETextureTarget::TEXTURE_2D, inId); }
 template <> inline void GL::Bind<GL::EBindingType::TEXTURE_2D_ARRAY>(const GL::Id inId) { GL::BindTexture(GL::ETextureTarget::TEXTURE_2D_ARRAY, inId); }
 template <> inline void GL::Bind<GL::EBindingType::TEXTURE_3D>(const GL::Id inId) { GL::BindTexture(GL::ETextureTarget::TEXTURE_3D, inId); }
+template <> inline void GL::Bind<GL::EBindingType::SSBO>(const GL::Id inId) { GL::BindBuffer(GL::EBufferType::SSBO, inId); }
 template <> inline void GL::Bind<GL::EBindingType::UBO>(const GL::Id inId) { GL::BindBuffer(GL::EBufferType::UBO, inId); }
 template <> inline void GL::Bind<GL::EBindingType::VAO>(const GL::Id inId) { GL::BindVertexArray(inId); }
 template <> inline void GL::Bind<GL::EBindingType::VBO>(const GL::Id inId) { GL::BindBuffer(GL::EBufferType::VBO, inId); }
@@ -164,6 +167,7 @@ template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTUR
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_2D>() { return GL::EObjectType::TEXTURE_2D; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_2D_ARRAY>() { return GL::EObjectType::TEXTURE_2D_ARRAY; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::TEXTURE_3D>() { return GL::EObjectType::TEXTURE_3D; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::SSBO>() { return GL::EObjectType::SSBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::UBO>() { return GL::EObjectType::UBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::VBO>() { return GL::EObjectType::VBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBindingType::VAO>() { return GL::EObjectType::VAO; }
@@ -179,6 +183,7 @@ template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXT
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::ETextureTarget::TEXTURE_3D>() { return GL::EObjectType::TEXTURE_3D; }
 
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::EBO>() { return GL::EObjectType::EBO; }
+template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::SSBO>() { return GL::EObjectType::SSBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::UBO>() { return GL::EObjectType::UBO; }
 template <> constexpr GL::EObjectType GL::GetObjectType<GL::EBufferType::VBO>() { return GL::EObjectType::VBO; }
 
@@ -191,6 +196,7 @@ template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::TEXTU
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::TEXTURE_2D>() { return GL::EBindingType::TEXTURE_2D; }
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::TEXTURE_2D_ARRAY>() { return GL::EBindingType::TEXTURE_2D_ARRAY; }
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::TEXTURE_3D>() { return GL::EBindingType::TEXTURE_3D; }
+template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::SSBO>() { return GL::EBindingType::SSBO; }
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::UBO>() { return GL::EBindingType::UBO; }
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::VAO>() { return GL::EBindingType::VAO; }
 template <> constexpr GL::EBindingType GL::GetBindingType<GL::EObjectType::VBO>() { return GL::EBindingType::VBO; }

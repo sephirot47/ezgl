@@ -55,11 +55,13 @@ public:
     ARRAY_BUFFER = GL_ARRAY_BUFFER,
     ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER,
     UNIFORM_BUFFER = GL_UNIFORM_BUFFER,
+    SHADER_STORAGE_BUFFER = GL_SHADER_STORAGE_BUFFER,
 
     // Aliases
     EBO = GL_ELEMENT_ARRAY_BUFFER,
     VBO = GL_ARRAY_BUFFER,
     UBO = GL_UNIFORM_BUFFER,
+    SSBO = GL_SHADER_STORAGE_BUFFER,
   };
 
   enum class EObjectType
@@ -75,6 +77,7 @@ public:
     VAO,
     VBO,
     UBO,
+    SSBO,
     SHADER_PROGRAM,
     FRAGMENT_SHADER,
     VERTEX_SHADER,
@@ -94,11 +97,13 @@ public:
     TEXTURE_2D_ARRAY = GL_TEXTURE_BINDING_2D_ARRAY,
     TEXTURE_3D = GL_TEXTURE_BINDING_3D,
     UNIFORM_BUFFER = GL_UNIFORM_BUFFER_BINDING,
+    SHADER_STORAGE_BUFFER = GL_SHADER_STORAGE_BUFFER_BINDING,
     VERTEX_ARRAY = GL_VERTEX_ARRAY_BINDING,
 
     // Aliases
     EBO = GL_ELEMENT_ARRAY_BUFFER_BINDING,
     SHADER_PROGRAM = GL_CURRENT_PROGRAM,
+    SSBO = GL_SHADER_STORAGE_BUFFER_BINDING,
     UBO = GL_UNIFORM_BUFFER_BINDING,
     VAO = GL_VERTEX_ARRAY_BINDING,
     VBO = GL_ARRAY_BUFFER_BINDING,
@@ -807,6 +812,8 @@ public:
   template <typename T>
   static void BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset);
   static GL::EBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
+  static void* MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAccess);
+  static void UnmapBuffer(const GL::EBufferType inBufferType);
   static void DeleteBuffer(const GL::Id inBufferId);
 
   static GL::Id GenVertexArray();

@@ -137,10 +137,19 @@ GL::EBindingType GL::GetBufferBindingType(const GL::EBufferType inBufferType)
     return GL::EBindingType::ELEMENT_ARRAY;
   case GL::EBufferType::UNIFORM_BUFFER:
     return GL::EBindingType::UNIFORM_BUFFER;
+  case GL::EBufferType::SHADER_STORAGE_BUFFER:
+    return GL::EBindingType::SHADER_STORAGE_BUFFER;
   }
   assert(false);
   return static_cast<GL::EBindingType>(-1);
 }
+
+void* GL::MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAccess)
+{
+  return glMapBuffer(GL::EnumCast(inBufferType), GL::EnumCast(inAccess));
+}
+
+void GL::UnmapBuffer(const GL::EBufferType inBufferType) { glUnmapBuffer(GL::EnumCast(inBufferType)); }
 
 void GL::DeleteBuffer(const GL::Id inBufferId) { glDeleteBuffers(1, &inBufferId); }
 

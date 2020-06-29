@@ -26,6 +26,11 @@ public:
   void BufferData(const Span<T>& inData);
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
+  void* MapBuffer(const GL::EAccess inAccess);
+  void UnmapBuffer();
+
+  template <typename T>
+  T ReadData();
 
   using GLBindableObject<BindingType>::GetGLId;
 

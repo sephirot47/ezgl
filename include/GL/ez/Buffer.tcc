@@ -33,4 +33,31 @@ void Buffer<TBufferType>::BufferSubData(const Span<T>& inData, const GL::Size in
 
   GL::BufferSubData(GetGLId(), inData, inOffset);
 }
+
+template <GL::EBufferType TBufferType>
+void* Buffer<TBufferType>::MapBuffer(const GL::EAccess inAccess)
+{
+  EXPECTS(IsBound());
+  return GL::MapBuffer(GL::EBufferType::SHADER_STORAGE_BUFFER, inAccess);
+}
+
+template <GL::EBufferType TBufferType>
+void Buffer<TBufferType>::UnmapBuffer()
+{
+  EXPECTS(IsBound());
+  GL::UnmapBuffer(GL::EBufferType::SHADER_STORAGE_BUFFER);
+}
+
+template <GL::EBufferType TBufferType>
+template <typename T>
+T Buffer<TBufferType>::ReadData()
+{
+  EXPECTS(IsBound());
+
+  const auto pointer = static_cast<T*>(MapBuffer(GL::EAccess::READ_ONLY));
+  const auto value = *pointer;
+  UnmapBuffer();
+
+  return value;
+}
 }
