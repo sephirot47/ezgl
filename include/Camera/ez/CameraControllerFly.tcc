@@ -134,6 +134,12 @@ void CameraControllerFly<T, N>::Update(const DeltaTime& inDeltaTime)
 }
 
 template <typename T, std::size_t N>
+void CameraControllerFly<T, N>::ApplyParameters()
+{
+  mCurrentFlySpeed = (mParameters.mMinFlySpeed + mParameters.mMaxFlySpeed) * 0.5f;
+}
+
+template <typename T, std::size_t N>
 void CameraControllerFly<T, N>::OnInput(const InputEvent& inInputEvent)
 {
   const auto camera = mCamera.lock();

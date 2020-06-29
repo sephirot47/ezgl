@@ -83,6 +83,10 @@ void Window::SwapBuffers() { glfwSwapBuffers(mHandle); }
 
 void Window::PollEvents() { glfwPollEvents(); }
 
+void Window::Maximize() { glfwMaximizeWindow(mHandle); }
+
+void Window::Minimize() { glfwIconifyWindow(mHandle); }
+
 void Window::SetInterFrameRestTime(const TimeDuration& inInterFrameRestTime)
 {
   mInterFrameRestTime = inInterFrameRestTime;

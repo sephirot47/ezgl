@@ -52,6 +52,7 @@ public:
   CameraControllerFly::Parameters& GetParameters() { return mParameters; }
   const CameraControllerFly::Parameters& GetParameters() const { return mParameters; }
 
+  void ApplyParameters();
   virtual void OnInput(const InputEvent& inInputEvent) override;
 
 private:

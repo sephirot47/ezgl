@@ -52,6 +52,9 @@ public:
   void SwapBuffers();
   void PollEvents();
 
+  void Maximize();
+  void Minimize();
+
   void SetInterFrameRestTime(const TimeDuration& inInterFrameRestTime);
 
   Vec2i GetSize() const;
