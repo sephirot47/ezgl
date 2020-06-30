@@ -148,8 +148,13 @@ void* GL::MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAcce
 {
   return glMapBuffer(GL::EnumCast(inBufferType), GL::EnumCast(inAccess));
 }
+void* GL::MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess)
+{
+  return glMapNamedBuffer(inBufferId, GL::EnumCast(inAccess));
+}
 
 void GL::UnmapBuffer(const GL::EBufferType inBufferType) { glUnmapBuffer(GL::EnumCast(inBufferType)); }
+void GL::UnmapBuffer(const GL::Id inBufferId) { glUnmapNamedBuffer(inBufferId); }
 
 void GL::DeleteBuffer(const GL::Id inBufferId) { glDeleteBuffers(1, &inBufferId); }
 
@@ -209,7 +214,7 @@ void GL::BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& in
   glBindTexture(GL::EnumCast(inTextureTarget), inTextureId);
 }
 
-void GL::BindImageTexture(const GL::Uint inTextureUnit,
+void GL::BindImageTexture(const GL::Uint inImageUnit,
     const GL::Id inTextureId,
     const GL::ETextureFormat inFormat,
     const GL::EAccess inAccess,
@@ -217,7 +222,7 @@ void GL::BindImageTexture(const GL::Uint inTextureUnit,
     const GL::Boolean inLayered,
     const GL::Int inLayer)
 {
-  glBindImageTexture(inTextureUnit,
+  glBindImageTexture(inImageUnit,
       inTextureId,
       inLevel,
       inLayered,
@@ -409,7 +414,30 @@ void GL::DeleteShader(const GL::Id inShaderId) { glDeleteShader(inShaderId); }
 
 GL::Id GL::CreateProgram() { return glCreateProgram(); }
 
-void GL::UseProgram(const GL::Id inShaderProgramId) { glUseProgram(inShaderProgramId); }
+void GL::UseProgram(const GL::Id inShaderProgramId)
+{
+  glUseProgram(inShaderProgramId);
+
+#ifndef NDEBUG
+  if (inShaderProgramId != 0)
+  {
+    glValidateProgram(inShaderProgramId);
+    int validate_status = 0;
+    glGetProgramiv(inShaderProgramId, GL_VALIDATE_STATUS, &validate_status);
+    if (validate_status == GL_FALSE)
+    {
+      int info_length = 0;
+      char info_buffer[1024];
+      glGetShaderInfoLog(inShaderProgramId, sizeof(info_buffer), &info_length, info_buffer);
+      assert(info_length >= 0 && info_length < static_cast<int>(sizeof(info_buffer)));
+      info_buffer[info_length] = '\0';
+
+      const auto info = std::string { info_buffer };
+      THROW_EXCEPTION("glValidateProgram failed for ShaderProgram with id " << inShaderProgramId << ": " << info);
+    }
+  }
+#endif
+}
 
 void GL::AttachShader(const GL::Id inShaderProgramId, const GL::Id inShaderId)
 {
@@ -417,6 +445,8 @@ void GL::AttachShader(const GL::Id inShaderProgramId, const GL::Id inShaderId)
 }
 
 void GL::LinkProgram(const GL::Id inShaderProgramId) { glLinkProgram(inShaderProgramId); }
+
+void GL::ValidateProgram(const GL::Id inShaderProgramId) { glValidateProgram(inShaderProgramId); }
 
 GL::Id GL::GetAttribLocation(const GL::Id inShaderProgramId, const std::string_view inAttribName)
 {

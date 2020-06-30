@@ -813,7 +813,9 @@ public:
   static void BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset);
   static GL::EBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void* MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAccess);
+  static void* MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess);
   static void UnmapBuffer(const GL::EBufferType inBufferType);
+  static void UnmapBuffer(const GL::Id inBufferId);
   static void DeleteBuffer(const GL::Id inBufferId);
 
   static GL::Id GenVertexArray();
@@ -832,7 +834,7 @@ public:
   static GL::Id GenTexture();
   static GL::Id CreateTexture(const GL::ETextureTarget& inTextureTarget);
   static void BindTexture(const GL::ETextureTarget& inTextureTarget, const GL::Id& inTextureId);
-  static void BindImageTexture(const GL::Uint inTextureUnit,
+  static void BindImageTexture(const GL::Uint inImageUnit,
       const GL::Id inTextureId,
       const GL::ETextureFormat inFormat,
       const GL::EAccess inAccess,
@@ -923,6 +925,7 @@ public:
   static void UseProgram(const GL::Id inShaderProgramId);
   static void AttachShader(const GL::Id inShaderProgramId, const GL::Id inShaderId);
   static void LinkProgram(const GL::Id inShaderProgramId);
+  static void ValidateProgram(const GL::Id inShaderProgramId);
   static GL::Id GetAttribLocation(const GL::Id inShaderProgramId, const std::string_view inAttribName);
   static GL::Id GetUniformLocation(const GL::Id inShaderProgramId, const std::string_view inUniformName);
   static GL::Id GetUniformBlockIndex(const GL::Id inShaderProgramId, const std::string_view inUniformBlockName);

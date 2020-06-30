@@ -47,13 +47,11 @@ public:
   GL::Size GetWidth() const;
   GL::Size GetHeight() const;
   const Vec2i& GetSize() const;
-  GL::ETextureFormat GetFormat() const;
 
   Image2D<Color4f> GetImage(const bool inInvertY = false, const int inMipmapLevel = 0) const;
 
 private:
   Vec2i mSize = Zero<Vec2i>();
-  GL::ETextureFormat mFormat = GL::ETextureFormat::RED;
 
   Texture2D();
 };

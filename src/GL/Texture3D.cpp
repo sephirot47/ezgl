@@ -49,5 +49,4 @@ GL::Size Texture3D::GetWidth() const { return mSize[0]; }
 GL::Size Texture3D::GetHeight() const { return mSize[1]; }
 GL::Size Texture3D::GetDepth() const { return mSize[2]; }
 const Vec3i& Texture3D::GetSize() const { return mSize; }
-GL::ETextureFormat Texture3D::GetFormat() const { return mFormat; }
 }

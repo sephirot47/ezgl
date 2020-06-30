@@ -11,16 +11,16 @@ Buffer<TBufferType>::Buffer(const Span<T>& inData) : Buffer()
 }
 
 template <GL::EBufferType TBufferType>
-void Buffer<TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes)
+void Buffer<TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes, const GL::EAccessHint inAccessHint)
 {
-  BufferData(Span<uint8_t>(nullptr, inSizeInBytes));
+  BufferData(Span<uint8_t>(nullptr, inSizeInBytes), inAccessHint);
 }
 
 template <GL::EBufferType TBufferType>
 template <typename T>
-void Buffer<TBufferType>::BufferData(const Span<T>& inData)
+void Buffer<TBufferType>::BufferData(const Span<T>& inData, const GL::EAccessHint inAccessHint)
 {
-  GL::BufferData(GetGLId(), inData, GL::EAccessHint::STATIC_DRAW);
+  GL::BufferData(GetGLId(), inData, inAccessHint);
   mInitialized = true;
 }
 
@@ -37,23 +37,19 @@ void Buffer<TBufferType>::BufferSubData(const Span<T>& inData, const GL::Size in
 template <GL::EBufferType TBufferType>
 void* Buffer<TBufferType>::MapBuffer(const GL::EAccess inAccess)
 {
-  EXPECTS(IsBound());
-  return GL::MapBuffer(GL::EBufferType::SHADER_STORAGE_BUFFER, inAccess);
+  return GL::MapBuffer(GetGLId(), inAccess);
 }
 
 template <GL::EBufferType TBufferType>
 void Buffer<TBufferType>::UnmapBuffer()
 {
-  EXPECTS(IsBound());
-  GL::UnmapBuffer(GL::EBufferType::SHADER_STORAGE_BUFFER);
+  GL::UnmapBuffer(GetGLId());
 }
 
 template <GL::EBufferType TBufferType>
 template <typename T>
 T Buffer<TBufferType>::ReadData()
 {
-  EXPECTS(IsBound());
-
   const auto pointer = static_cast<T*>(MapBuffer(GL::EAccess::READ_ONLY));
   const auto value = *pointer;
   UnmapBuffer();

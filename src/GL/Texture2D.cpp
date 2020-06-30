@@ -51,7 +51,6 @@ void Texture2D::SetEmptyData(const GL::Size inWidth,
 GL::Size Texture2D::GetWidth() const { return mSize[0]; }
 GL::Size Texture2D::GetHeight() const { return mSize[1]; }
 const Vec2i& Texture2D::GetSize() const { return mSize; }
-GL::ETextureFormat Texture2D::GetFormat() const { return mFormat; }
 
 Image2D<Color4f> Texture2D::GetImage(const bool inInvertY, const int inMipmapLevel) const
 {

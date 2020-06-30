@@ -40,11 +40,9 @@ public:
   GL::Size GetHeight() const;
   GL::Size GetDepth() const;
   const Vec3i& GetSize() const;
-  GL::ETextureFormat GetFormat() const;
 
 private:
   Vec3i mSize = Zero<Vec3i>();
-  GL::ETextureFormat mFormat = GL::ETextureFormat::RED;
 
   Texture3D();
 };

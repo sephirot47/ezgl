@@ -19,6 +19,16 @@ void Texture<TTextureTarget>::BindToTextureUnit(const GL::Size& inTextureUnit) c
 }
 
 template <GL::ETextureTarget TTextureTarget>
+void Texture<TTextureTarget>::BindImageTexture(const GL::Uint inImageUnit,
+    const GL::EAccess inAccess,
+    const GL::Int inLevel,
+    const GL::Boolean inLayered,
+    const GL::Int inLayer)
+{
+  GL::BindImageTexture(inImageUnit, GetGLId(), GetFormat(), inAccess, inLevel, inLayered, inLayer);
+}
+
+template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::GenerateMipMap()
 {
   GL::GenerateTextureMipMap(GetGLId());

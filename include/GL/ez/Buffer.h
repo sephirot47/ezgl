@@ -21,9 +21,9 @@ public:
   Buffer(Buffer&& ioRHS) noexcept = default;
   virtual ~Buffer() = default;
 
-  void BufferDataEmpty(const GL::Size inSizeInBytes);
+  void BufferDataEmpty(const GL::Size inSizeInBytes, const GL::EAccessHint inAccessHint = GL::EAccessHint::STATIC_DRAW);
   template <typename T>
-  void BufferData(const Span<T>& inData);
+  void BufferData(const Span<T>& inData, const GL::EAccessHint inAccessHint = GL::EAccessHint::STATIC_DRAW);
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
   void* MapBuffer(const GL::EAccess inAccess);
