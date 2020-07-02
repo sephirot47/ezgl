@@ -23,7 +23,7 @@ void Texture<TTextureTarget>::BindImageTexture(const GL::Uint inImageUnit,
     const GL::EAccess inAccess,
     const GL::Int inLevel,
     const GL::Boolean inLayered,
-    const GL::Int inLayer)
+    const GL::Int inLayer) const
 {
   GL::BindImageTexture(inImageUnit, GetGLId(), GetFormat(), inAccess, inLevel, inLayered, inLayer);
 }

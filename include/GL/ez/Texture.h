@@ -21,7 +21,7 @@ public:
       const GL::EAccess inAccess,
       const GL::Int inLevel = 0,
       const GL::Boolean inLayered = false,
-      const GL::Int inLayer = 0);
+      const GL::Int inLayer = 0) const;
 
   void SetWrapMode(const GL::EWrapMode inWrapMode);
   void SetWrapModeR(const GL::EWrapMode inWrapMode);
