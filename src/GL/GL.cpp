@@ -152,6 +152,21 @@ void* GL::MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess)
 {
   return glMapNamedBuffer(inBufferId, GL::EnumCast(inAccess));
 }
+void* GL::MapBufferRange(const GL::EBufferType inBufferType,
+    const std::size_t inOffset,
+    const std::size_t inLength,
+    const GL::EAccessBitFlags inAccessBitFlags)
+{
+  return glMapBufferRange(GL::EnumCast(inBufferType), inOffset, inLength, GL::EnumCast(inAccessBitFlags));
+}
+
+void* GL::MapBufferRange(const GL::Id inBufferId,
+    const std::size_t inOffset,
+    const std::size_t inLength,
+    const GL::EAccessBitFlags inAccessBitFlags)
+{
+  return glMapNamedBufferRange(inBufferId, inOffset, inLength, GL::EnumCast(inAccessBitFlags));
+}
 
 void GL::UnmapBuffer(const GL::EBufferType inBufferType) { glUnmapBuffer(GL::EnumCast(inBufferType)); }
 void GL::UnmapBuffer(const GL::Id inBufferId) { glUnmapNamedBuffer(inBufferId); }

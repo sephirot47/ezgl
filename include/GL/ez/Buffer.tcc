@@ -41,6 +41,14 @@ void* Buffer<TBufferType>::MapBuffer(const GL::EAccess inAccess)
 }
 
 template <GL::EBufferType TBufferType>
+void* Buffer<TBufferType>::MapBufferRange(const std::size_t inOffset,
+    const std::size_t inLength,
+    const GL::EAccessBitFlags inAccessBitFlags)
+{
+  return GL::MapBufferRange(GetGLId(), inOffset, inLength, inAccessBitFlags);
+}
+
+template <GL::EBufferType TBufferType>
 void Buffer<TBufferType>::UnmapBuffer()
 {
   GL::UnmapBuffer(GetGLId());

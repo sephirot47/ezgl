@@ -129,6 +129,18 @@ public:
     READ_WRITE = GL_READ_WRITE
   };
 
+  enum class EAccessBitFlags
+  {
+    MAP_READ_BIT = GL_MAP_READ_BIT,
+    MAP_WRITE_BIT = GL_MAP_WRITE_BIT,
+    MAP_PERSISTENT_BIT = GL_MAP_PERSISTENT_BIT,
+    MAP_COHERENT_BIT = GL_MAP_COHERENT_BIT,
+    MAP_INVALIDATE_RANGE_BIT = GL_MAP_INVALIDATE_RANGE_BIT,
+    MAP_INVALIDATE_BUFFER_BIT = GL_MAP_INVALIDATE_BUFFER_BIT,
+    MAP_FLUSH_EXPLICIT_BIT = GL_MAP_FLUSH_EXPLICIT_BIT,
+    MAP_UNSYNCHRONIZED_BIT = GL_MAP_UNSYNCHRONIZED_BIT,
+  };
+
   enum class EBufferBitFlags
   {
     COLOR = GL_COLOR_BUFFER_BIT,
@@ -814,6 +826,8 @@ public:
   static GL::EBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void* MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAccess);
   static void* MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess);
+  static void* MapBufferRange(const GL::EBufferType inBufferType, const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
+  static void* MapBufferRange(const GL::Id inBufferId, const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
   static void UnmapBuffer(const GL::EBufferType inBufferType);
   static void UnmapBuffer(const GL::Id inBufferId);
   static void DeleteBuffer(const GL::Id inBufferId);
@@ -1031,6 +1045,7 @@ public:
 
 DECLARE_FLAGS(GL::EBufferBitFlags);
 DECLARE_FLAGS(GL::EMemoryBarrierBitFlags);
+DECLARE_FLAGS(GL::EAccessBitFlags);
 
 }
 

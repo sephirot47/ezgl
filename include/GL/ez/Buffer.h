@@ -27,6 +27,7 @@ public:
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
   void* MapBuffer(const GL::EAccess inAccess);
+  void* MapBufferRange(const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
   void UnmapBuffer();
 
   template <typename T>
