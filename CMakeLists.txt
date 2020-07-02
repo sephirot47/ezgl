@@ -75,7 +75,7 @@ target_include_directories(ezgl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/res/")
 # ======================================================================
 
 if (EZGL_COMPILE_MESH_IO)
-target_compile_definitions(ezgl PRIVATE "MESH_IO")
+target_compile_definitions(ezgl PUBLIC "MESH_IO")
 endif()
 
 # ======================================================================
