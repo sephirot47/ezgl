@@ -55,7 +55,7 @@ public:
   void Maximize();
   void Minimize();
 
-  void SetInterFrameRestTime(const TimeDuration& inInterFrameRestTime);
+  void SetInterFrameRestTime(const Seconds& inInterFrameRestTime);
 
   Vec2i GetSize() const;
   Vec2i GetFramebufferSize() const;
@@ -86,7 +86,7 @@ private:
   GLFWwindow* mHandle = nullptr;
   InputEventCallback mInputEventCallback;
   std::vector<InputListener*> mInputListeners;
-  TimeDuration mInterFrameRestTime = 1ms;
+  Seconds mInterFrameRestTime = 1ms;
 };
 
 class InputListener

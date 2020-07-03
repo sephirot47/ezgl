@@ -77,7 +77,7 @@ int main(int argc, const char** argv)
   camera_controller_fly.SetCamera(camera3d);
   camera_controller_fly.SetWindow(window);
 
-  auto time = TimeDuration { 0 };
+  auto time = Seconds { 0 };
   Renderer2D renderer2D;
   Renderer3D renderer3D;
   bool tests_succeeded = true;
