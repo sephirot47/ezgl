@@ -53,15 +53,4 @@ void Buffer<TBufferType>::UnmapBuffer()
 {
   GL::UnmapBuffer(GetGLId());
 }
-
-template <GL::EBufferType TBufferType>
-template <typename T>
-T Buffer<TBufferType>::ReadData()
-{
-  const auto pointer = static_cast<T*>(MapBuffer(GL::EAccess::READ_ONLY));
-  const auto value = *pointer;
-  UnmapBuffer();
-
-  return value;
-}
 }

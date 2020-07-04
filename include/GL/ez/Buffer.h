@@ -30,9 +30,6 @@ public:
   void* MapBufferRange(const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
   void UnmapBuffer();
 
-  template <typename T>
-  T ReadData();
-
   using GLBindableObject<BindingType>::GetGLId;
 
 private:
