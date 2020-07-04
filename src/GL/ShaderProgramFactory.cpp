@@ -113,7 +113,4 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::GetDrawFullScreenTextureSha
   return sDrawFullScreenTextureShaderProgram;
 }
 
-#undef SHADER_BEGIN
-#undef SHADER_END
-
 }
