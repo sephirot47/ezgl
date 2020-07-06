@@ -25,9 +25,7 @@ public:
   ~Texture2D() override = default;
 
   template <typename TImageValueType>
-  void LoadImage(const Image2D<TImageValueType>& inImage2D,
-      const GL::ETextureFormat& inFormat = GLTypeTraits<TImageValueType>::GLTextureFormat,
-      const GL::Int& inMipMapLevel = 0);
+  void LoadImage(const Image2D<TImageValueType>& inImage2D, const GL::Int& inMipMapLevel = 0);
 
   using Texture::TexImage;
   using Texture::TexImageEmpty;

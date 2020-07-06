@@ -50,16 +50,17 @@ public:
       const GL::ETextureFormat inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int inMipMapLevel = 0);
 
+  void TexImageEmpty(const Veci<N>& inSize, const GL::ETextureFormat inFormat = GL::ETextureFormat::RGBA8);
+
+  void
+  TextureStorage(const Veci<N>& inSize, const GL::ETextureFormat inTextureFormat, const GL::Size inMipMapLevels = 1);
+
   template <typename T>
   void TextureSubImage(const Veci<N>& inOffset,
       const Veci<N>& inSize,
       const GL::ETextureInputFormat inInputFormat,
       const GL::EDataType inInputDataType,
       const Span<T>& inData,
-      const GL::Int inMipMapLevel = 0);
-
-  void TexImageEmpty(const Veci<N>& inSize,
-      const GL::ETextureFormat inFormat = GL::ETextureFormat::RGBA8,
       const GL::Int inMipMapLevel = 0);
 
   void SetWrapMode(const GL::EWrapMode inWrapMode);

@@ -941,6 +941,21 @@ public:
       const GL::EDataType inInputDataType,
       const Span<T>& inData,
       const GL::Int inMipMapLevel = 0);
+static void TextureStorage1D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inMipMapLevels = 1);
+static void TextureStorage2D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inMipMapLevels = 1);
+static void TextureStorage3D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inDepth,
+    const GL::Size inMipMapLevels = 1);
   template <typename T>
   static std::vector<T> GetTextureImage(const GL::Id inTextureId,
       const GL::ETextureInputFormat inFormatToConvertTo,

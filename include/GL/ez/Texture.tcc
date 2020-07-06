@@ -85,6 +85,28 @@ void Texture<TTextureTarget>::TexImage(const Veci<N>& inSize,
 }
 
 template <GL::ETextureTarget TTextureTarget>
+void Texture<TTextureTarget>::TextureStorage(const Veci<N>& inSize,
+    const GL::ETextureFormat inTextureFormat,
+    const GL::Size inMipMapLevels)
+{
+  mSize = inSize;
+  mFormat = inTextureFormat;
+
+  if constexpr (N == 1)
+  {
+    GL::TextureStorage1D(GetGLId(), inTextureFormat, inSize[0], inMipMapLevels);
+  }
+  else if constexpr (N == 2)
+  {
+    GL::TextureStorage2D(GetGLId(), inTextureFormat, inSize[0], inSize[1], inMipMapLevels);
+  }
+  else if constexpr (N == 3)
+  {
+    GL::TextureStorage3D(GetGLId(), inTextureFormat, inSize[0], inSize[1], inSize[2], inMipMapLevels);
+  }
+}
+
+template <GL::ETextureTarget TTextureTarget>
 template <typename T>
 void Texture<TTextureTarget>::TextureSubImage(const Veci<N>& inOffset,
     const Veci<N>& inSize,
@@ -132,9 +154,7 @@ void Texture<TTextureTarget>::TextureSubImage(const Veci<N>& inOffset,
 }
 
 template <GL::ETextureTarget TTextureTarget>
-void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize,
-    const GL::ETextureFormat inFormat,
-    const GL::Int inMipMapLevel)
+void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize, const GL::ETextureFormat inFormat)
 {
   auto texture_input_format = GL::ETextureInputFormat::RED;
   if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))
@@ -142,12 +162,7 @@ void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize,
     texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
   }
 
-  TexImage(inSize,
-      texture_input_format,
-      GL::ETextureInputComponentFormat::FLOAT,
-      Span<float>(nullptr, 0),
-      inFormat,
-      inMipMapLevel);
+  TexImage(inSize, texture_input_format, GL::ETextureInputComponentFormat::FLOAT, Span<float>(nullptr, 0), inFormat, 0);
 }
 
 template <GL::ETextureTarget TTextureTarget>
@@ -202,6 +217,6 @@ void Texture<TTextureTarget>::Resize(const Veci<N>& inSize)
   if (inSize == mSize)
     return;
 
-  TexImageEmpty(inSize, GetFormat(), 0);
+  TexImageEmpty(inSize, GetFormat());
 }
 }

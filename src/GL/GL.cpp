@@ -626,6 +626,33 @@ GL::Int GL::GetTextureParameteri(const GL::Id inTextureId, const GL::ETexturePar
   return value;
 }
 
+void GL::TextureStorage1D(const GL::Id inTextureId,
+    const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inMipMapLevels)
+{
+  glTextureStorage1D(inTextureId, inMipMapLevels, GL::EnumCast(inTextureFormat), inWidth);
+}
+
+void GL::TextureStorage2D(const GL::Id inTextureId,
+    const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inMipMapLevels)
+{
+  glTextureStorage2D(inTextureId, inMipMapLevels, GL::EnumCast(inTextureFormat), inWidth, inHeight);
+}
+
+void GL::TextureStorage3D(const GL::Id inTextureId,
+    const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inDepth,
+    const GL::Size inMipMapLevels)
+{
+  glTextureStorage3D(inTextureId, inMipMapLevels, GL::EnumCast(inTextureFormat), inWidth, inHeight, inDepth);
+}
+
 bool GL::GetBoolean(const GL::EGetEnum inGetBooleanId)
 {
   GL::Boolean result = 0;

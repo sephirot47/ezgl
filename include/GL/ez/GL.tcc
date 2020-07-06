@@ -123,7 +123,7 @@ void GL::TextureSubImage2D(const GL::Id inTextureId,
     const Span<T>& inData,
     const GL::Int inMipMapLevel)
 {
-  glTextureSubImage1D(inTextureId,
+  glTextureSubImage2D(inTextureId,
       inMipMapLevel,
       inXOffset,
       inYOffset,
