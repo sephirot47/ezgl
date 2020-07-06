@@ -11,26 +11,36 @@ Buffer<TBufferType>::Buffer(const Span<T>& inData) : Buffer()
 }
 
 template <GL::EBufferType TBufferType>
-void Buffer<TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes, const GL::EAccessHint inAccessHint)
+void Buffer<TBufferType>::BufferDataEmpty(const GL::Size inSizeInBytes, const GL::EBufferDataAccessHint inAccessHint)
 {
   BufferData(Span<uint8_t>(nullptr, inSizeInBytes), inAccessHint);
 }
 
 template <GL::EBufferType TBufferType>
 template <typename T>
-void Buffer<TBufferType>::BufferData(const Span<T>& inData, const GL::EAccessHint inAccessHint)
+void Buffer<TBufferType>::BufferData(const Span<T>& inData, const GL::EBufferDataAccessHint inAccessHint)
 {
   GL::BufferData(GetGLId(), inData, inAccessHint);
-  mInitialized = true;
+}
+
+template <GL::EBufferType TBufferType>
+void Buffer<TBufferType>::BufferStorageEmpty(const GL::Size inSizeInBytes,
+    const GL::EBufferStorageAccessHintBitFlags inAccessHint)
+{
+  BufferStorage(Span<uint8_t>(nullptr, inSizeInBytes), inAccessHint);
+}
+
+template <GL::EBufferType TBufferType>
+template <typename T>
+void Buffer<TBufferType>::BufferStorage(const Span<T>& inData, const GL::EBufferStorageAccessHintBitFlags inAccessHint)
+{
+  GL::BufferStorage(GetGLId(), inData, inAccessHint);
 }
 
 template <GL::EBufferType TBufferType>
 template <typename T>
 void Buffer<TBufferType>::BufferSubData(const Span<T>& inData, const GL::Size inOffset)
 {
-  if (!mInitialized)
-    THROW_EXCEPTION("Before using BufferSubData, you must initialize the Buffer by calling BufferData");
-
   GL::BufferSubData(GetGLId(), inData, inOffset);
 }
 
@@ -43,7 +53,7 @@ void* Buffer<TBufferType>::MapBuffer(const GL::EAccess inAccess)
 template <GL::EBufferType TBufferType>
 void* Buffer<TBufferType>::MapBufferRange(const std::size_t inOffset,
     const std::size_t inLength,
-    const GL::EAccessBitFlags inAccessBitFlags)
+    const GL::EMapBufferAccessBitFlags inAccessBitFlags)
 {
   return GL::MapBufferRange(GetGLId(), inOffset, inLength, inAccessBitFlags);
 }

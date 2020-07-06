@@ -28,6 +28,7 @@ public:
   using Id = GLuint;
   using Size = GLsizei;
   using Enum = GLenum;
+  using Sync = GLsync;
 
   static constexpr auto InvalidId = static_cast<GL::Id>(-1);
 
@@ -109,7 +110,7 @@ public:
     VBO = GL_ARRAY_BUFFER_BINDING,
   };
 
-  enum class EAccessHint
+  enum class EBufferDataAccessHint
   {
     STATIC_DRAW = GL_STATIC_DRAW,
     DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
@@ -122,6 +123,16 @@ public:
     STREAM_COPY = GL_STREAM_COPY
   };
 
+  enum class EBufferStorageAccessHintBitFlags
+  {
+    DYNAMIC_STORAGE_BIT = GL_DYNAMIC_STORAGE_BIT,
+    MAP_READ_BIT = GL_MAP_READ_BIT,
+    MAP_WRITE_BIT = GL_MAP_WRITE_BIT,
+    MAP_PERSISTENT_BIT = GL_MAP_PERSISTENT_BIT,
+    MAP_COHERENT_BIT = GL_MAP_COHERENT_BIT,
+    CLIENT_STORAGE_BIT = GL_CLIENT_STORAGE_BIT,
+  };
+
   enum class EAccess
   {
     READ_ONLY = GL_READ_ONLY,
@@ -129,7 +140,7 @@ public:
     READ_WRITE = GL_READ_WRITE
   };
 
-  enum class EAccessBitFlags
+  enum class EMapBufferAccessBitFlags
   {
     MAP_READ_BIT = GL_MAP_READ_BIT,
     MAP_WRITE_BIT = GL_MAP_WRITE_BIT,
@@ -164,6 +175,14 @@ public:
     TRANSFORM_FEEDBACK_BARRIER_BIT = GL_TRANSFORM_FEEDBACK_BARRIER_BIT,
     ATOMIC_COUNTER_BARRIER_BIT = GL_ATOMIC_COUNTER_BARRIER_BIT,
     SHADER_STORAGE_BARRIER_BIT = GL_SHADER_STORAGE_BARRIER_BIT
+  };
+
+  enum class EClientWaitSyncResult
+  {
+    ALREADY_SIGNALED = GL_ALREADY_SIGNALED,
+    TIMEOUT_EXPIRED = GL_TIMEOUT_EXPIRED,
+    CONDITION_SATISFIED = GL_CONDITION_SATISFIED,
+    WAIT_FAILED = GL_WAIT_FAILED,
   };
 
   enum class EDataType
@@ -820,14 +839,24 @@ public:
   static void BindBuffer(const GL::EBufferType inBufferType, const GL::Id inBufferId);
   static void BindBufferBase(const GL::EBufferType inBufferType, const GL::Id inBindingPoint, const GL::Id inBufferId);
   template <typename T>
-  static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint);
+  static void BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EBufferDataAccessHint inAccessHint);
+  template <typename T>
+  static void BufferStorage(const GL::Id inBufferId,
+      const Span<T>& inData,
+      const GL::EBufferStorageAccessHintBitFlags inAccessHint);
   template <typename T>
   static void BufferSubData(const GL::Id inBufferId, const Span<T>& inData, const GL::Size inOffset);
   static GL::EBindingType GetBufferBindingType(const GL::EBufferType inBufferType);
   static void* MapBuffer(const GL::EBufferType inBufferType, const GL::EAccess inAccess);
   static void* MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess);
-  static void* MapBufferRange(const GL::EBufferType inBufferType, const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
-  static void* MapBufferRange(const GL::Id inBufferId, const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
+  static void* MapBufferRange(const GL::EBufferType inBufferType,
+      const std::size_t inOffset,
+      const std::size_t inLength,
+      const GL::EMapBufferAccessBitFlags inAccessBitFlags);
+  static void* MapBufferRange(const GL::Id inBufferId,
+      const std::size_t inOffset,
+      const std::size_t inLength,
+      const GL::EMapBufferAccessBitFlags inAccessBitFlags);
   static void UnmapBuffer(const GL::EBufferType inBufferType);
   static void UnmapBuffer(const GL::Id inBufferId);
   static void DeleteBuffer(const GL::Id inBufferId);
@@ -856,6 +885,14 @@ public:
       const GL::Boolean inLayered = false,
       const GL::Int inLayer = 0);
   template <typename T>
+  static void TexImage1D(const GL::ETextureTarget& inTextureTarget,
+      const GL::Size& inWidth,
+      const GL::ETextureInputFormat& inInputFormat,
+      const GL::ETextureInputComponentFormat& inInputComponentFormat,
+      const Span<T>& inData,
+      const GL::ETextureFormat& inTextureFormat,
+      const GL::Int& inMipMapLevel = 0);
+  template <typename T>
   static void TexImage2D(const GL::ETextureTarget& inTextureTarget,
       const GL::Size& inWidth,
       const GL::Size& inHeight,
@@ -874,6 +911,51 @@ public:
       const Span<T>& inData,
       const GL::ETextureFormat& inTextureFormat,
       const GL::Int& inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage1D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Size inWidth,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage2D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Int inYOffset,
+      const GL::Size inWidth,
+      const GL::Size inHeight,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage3D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Int inYOffset,
+      const GL::Int inZOffset,
+      const GL::Size inWidth,
+      const GL::Size inHeight,
+      const GL::Size inDepth,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
+static void TextureStorage1D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inMipMapLevels = 1);
+static void TextureStorage2D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inMipMapLevels = 1);
+static void TextureStorage3D(const GL::Id inTextureId,
+  	const GL::ETextureFormat inTextureFormat,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inDepth,
+    const GL::Size inMipMapLevels = 1);
   template <typename T>
   static std::vector<T> GetTextureImage(const GL::Id inTextureId,
       const GL::ETextureInputFormat inFormatToConvertTo,
@@ -968,6 +1050,11 @@ public:
   UniformBlockBinding(const GL::Id inShaderProgramId, const GL::Id inUniformBlockIndex, const GL::Id inBindingPoint);
   static void DeleteProgram(const GL::Id inShaderProgramId);
 
+  static GL::Sync FenceSync();
+  static void WaitSync(const GL::Sync inSync, const uint64_t inTimeout = Max<uint64_t>());
+  static GL::EClientWaitSyncResult
+  ClientWaitSync(const GL::Sync inSync, const bool inFlush, const uint64_t inTimeout = Max<uint64_t>());
+  static void DeleteSync(const GL::Sync inSync);
   static void MemoryBarrier(const GL::EMemoryBarrierBitFlags inMemoryBarrierBitFlags);
   static void DispatchCompute(const GL::Uint inNumWorkGroupsX = 1u,
       const GL::Uint inNumWorkGroupsY = 1u,
@@ -1045,7 +1132,8 @@ public:
 
 DECLARE_FLAGS(GL::EBufferBitFlags);
 DECLARE_FLAGS(GL::EMemoryBarrierBitFlags);
-DECLARE_FLAGS(GL::EAccessBitFlags);
+DECLARE_FLAGS(GL::EMapBufferAccessBitFlags);
+DECLARE_FLAGS(GL::EBufferStorageAccessHintBitFlags);
 
 }
 
