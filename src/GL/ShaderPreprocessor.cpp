@@ -49,14 +49,13 @@ std::string ShaderPreprocessor::PreprocessShaderCode(const std::string_view inSh
       if (full_include_path.empty())
         THROW_EXCEPTION("Included path " << partial_include_path
                                          << " does not exist or was not found using the provided include paths");
-
-      if (ioAlreadyProcessedFiles.count(full_include_path) == 1)
-        THROW_EXCEPTION("Include path loop detected when adding " << full_include_path);
     }
+
+    const auto first_time_included = (ioAlreadyProcessedFiles.count(full_include_path) == 0);
     ioAlreadyProcessedFiles.insert(full_include_path);
 
     // Add the preprocessed contents of the included file
-    const auto include_path_content = GetFileContents(full_include_path);
+    const auto include_path_content = (first_time_included ? GetFileContents(full_include_path) : "");
     const auto preprocessed_include_path_content
         = PreprocessShaderCode(include_path_content, inIncludeDirs, ioAlreadyProcessedFiles);
 
