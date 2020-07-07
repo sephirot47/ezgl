@@ -885,6 +885,14 @@ public:
       const GL::Boolean inLayered = false,
       const GL::Int inLayer = 0);
   template <typename T>
+  static void TexImage1D(const GL::ETextureTarget& inTextureTarget,
+      const GL::Size& inWidth,
+      const GL::ETextureInputFormat& inInputFormat,
+      const GL::ETextureInputComponentFormat& inInputComponentFormat,
+      const Span<T>& inData,
+      const GL::ETextureFormat& inTextureFormat,
+      const GL::Int& inMipMapLevel = 0);
+  template <typename T>
   static void TexImage2D(const GL::ETextureTarget& inTextureTarget,
       const GL::Size& inWidth,
       const GL::Size& inHeight,
@@ -903,6 +911,36 @@ public:
       const Span<T>& inData,
       const GL::ETextureFormat& inTextureFormat,
       const GL::Int& inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage1D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Size inWidth,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage2D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Int inYOffset,
+      const GL::Size inWidth,
+      const GL::Size inHeight,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
+  template <typename T>
+  static void TextureSubImage3D(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Int inYOffset,
+      const GL::Int inZOffset,
+      const GL::Size inWidth,
+      const GL::Size inHeight,
+      const GL::Size inDepth,
+      const GL::ETextureInputFormat inInputFormat,
+      const GL::EDataType inInputDataType,
+      const Span<T>& inData,
+      const GL::Int inMipMapLevel = 0);
   template <typename T>
   static std::vector<T> GetTextureImage(const GL::Id inTextureId,
       const GL::ETextureInputFormat inFormatToConvertTo,

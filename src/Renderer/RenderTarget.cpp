@@ -11,8 +11,8 @@ RenderTarget::RenderTarget(const GL::ETextureFormat inColorFormat, const GL::ETe
   EXPECTS(GL::IsColorFormat(inColorFormat));
   EXPECTS(GL::IsDepthOnlyFormat(inDepthFormat) || GL::IsDepthStencilFormat(inDepthFormat));
 
-  mColorTexture = std::make_shared<Texture2D>(1, 1, inColorFormat);
-  mDepthTexture = std::make_shared<Texture2D>(1, 1, inDepthFormat);
+  mColorTexture = std::make_shared<Texture2D>(Vec2i { 1, 1 }, inColorFormat);
+  mDepthTexture = std::make_shared<Texture2D>(Vec2i { 1, 1 }, inDepthFormat);
 
   mFramebuffer = std::make_shared<Framebuffer>(1, 1);
   mFramebuffer->SetAttachment(GL::EFramebufferAttachment::COLOR_ATTACHMENT0, mColorTexture);

@@ -72,7 +72,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
   for (auto& texture : mColorTextures)
   {
     if (texture)
-      texture->Resize(inWidth, inHeight);
+      texture->Resize(mSize);
   }
 
   if (mCreatedRenderbufferId != GL::InvalidId)
@@ -84,7 +84,7 @@ void Framebuffer::Resize(const int inWidth, const int inHeight)
   }
   else if (mRenderbufferTexture)
   {
-    mRenderbufferTexture->Resize(inWidth, inHeight);
+    mRenderbufferTexture->Resize(Vec2i { inWidth, inHeight });
   }
 }
 

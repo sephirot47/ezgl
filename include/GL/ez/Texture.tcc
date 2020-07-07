@@ -7,8 +7,15 @@ template <GL::ETextureTarget TTextureTarget>
 Texture<TTextureTarget>::Texture()
 {
   // For texture completeness
+  SetWrapMode(GL::EWrapMode::CLAMP_TO_EDGE);
   SetMinFilterMode(GL::EMinFilterMode::NEAREST);
   SetMagFilterMode(GL::EMagFilterMode::NEAREST);
+}
+
+template <GL::ETextureTarget TTextureTarget>
+Texture<TTextureTarget>::Texture(const Veci<N>& inSize, const GL::ETextureFormat inFormat) : Texture()
+{
+  TexImageEmpty(inSize, inFormat);
 }
 
 template <GL::ETextureTarget TTextureTarget>
@@ -26,6 +33,121 @@ void Texture<TTextureTarget>::BindImageTexture(const GL::Uint inImageUnit,
     const GL::Int inLayer) const
 {
   GL::BindImageTexture(inImageUnit, GetGLId(), GetFormat(), inAccess, inLevel, inLayered, inLayer);
+}
+
+template <GL::ETextureTarget TTextureTarget>
+template <typename T>
+void Texture<TTextureTarget>::TexImage(const Veci<N>& inSize,
+    const GL::ETextureInputFormat inInputFormat,
+    const GL::ETextureInputComponentFormat inInputComponentFormat,
+    const Span<T>& inData,
+    const GL::ETextureFormat inFormat,
+    const GL::Int inMipMapLevel)
+{
+  const auto texture_bind_guard = this->BindGuarded();
+
+  mSize = inSize;
+  mFormat = inFormat;
+
+  if constexpr (N == 1)
+  {
+    GL::TexImage1D(GetTextureTarget(),
+        inSize[0],
+        inInputFormat,
+        inInputComponentFormat,
+        inData,
+        inFormat,
+        inMipMapLevel);
+  }
+  else if constexpr (N == 2)
+  {
+    GL::TexImage2D(GetTextureTarget(),
+        inSize[0],
+        inSize[1],
+        inInputFormat,
+        inInputComponentFormat,
+        inData,
+        inFormat,
+        inMipMapLevel);
+  }
+  else if constexpr (N == 3)
+  {
+    GL::TexImage3D(GetTextureTarget(),
+        inSize[0],
+        inSize[1],
+        inSize[2],
+        inInputFormat,
+        inInputComponentFormat,
+        inData,
+        inFormat,
+        inMipMapLevel);
+  }
+}
+
+template <GL::ETextureTarget TTextureTarget>
+template <typename T>
+void Texture<TTextureTarget>::TextureSubImage(const Veci<N>& inOffset,
+    const Veci<N>& inSize,
+    const GL::ETextureInputFormat inInputFormat,
+    const GL::EDataType inInputDataType,
+    const Span<T>& inData,
+    const GL::Int inMipMapLevel)
+{
+  if constexpr (N == 1)
+  {
+    GL::TextureSubImage1D(this->GetGLId(),
+        inOffset[0],
+        inSize[0],
+        inInputFormat,
+        inInputDataType,
+        inData,
+        inMipMapLevel);
+  }
+  else if constexpr (N == 2)
+  {
+    GL::TextureSubImage2D(this->GetGLId(),
+        inOffset[0],
+        inOffset[1],
+        inSize[0],
+        inSize[1],
+        inInputFormat,
+        inInputDataType,
+        inData,
+        inMipMapLevel);
+  }
+  else if constexpr (N == 3)
+  {
+    GL::TextureSubImage3D(this->GetGLId(),
+        inOffset[0],
+        inOffset[1],
+        inOffset[2],
+        inSize[0],
+        inSize[1],
+        inSize[2],
+        inInputFormat,
+        inInputDataType,
+        inData,
+        inMipMapLevel);
+  }
+}
+
+template <GL::ETextureTarget TTextureTarget>
+void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize,
+    const GL::ETextureFormat inFormat,
+    const GL::Int inMipMapLevel)
+{
+  auto texture_input_format = GL::ETextureInputFormat::RED;
+  if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))
+  {
+    texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
+  }
+
+  TexImage(inSize,
+      texture_input_format,
+      GL::ETextureInputComponentFormat::FLOAT,
+      Span<float>(nullptr, 0),
+      inFormat,
+      inMipMapLevel);
 }
 
 template <GL::ETextureTarget TTextureTarget>
@@ -72,4 +194,14 @@ void Texture<TTextureTarget>::SetMagFilterMode(const GL::EMagFilterMode inMagFil
   GL::TextureParameteri(GetGLId(), GL::ETextureParameter::TEXTURE_MAG_FILTER, GL::EnumCast(inMagFilterMode));
 }
 
+template <GL::ETextureTarget TTextureTarget>
+void Texture<TTextureTarget>::Resize(const Veci<N>& inSize)
+{
+  EXPECTS(inSize >= One<Veci<N>>());
+
+  if (inSize == mSize)
+    return;
+
+  TexImageEmpty(inSize, GetFormat(), 0);
+}
 }

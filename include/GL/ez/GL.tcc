@@ -32,6 +32,25 @@ GL::Enum GL::EnumCast(const T& inGLEnum)
 }
 
 template <typename T>
+void GL::TexImage1D(const GL::ETextureTarget& inTextureTarget,
+    const GL::Size& inWidth,
+    const GL::ETextureInputFormat& inInputFormat,
+    const GL::ETextureInputComponentFormat& inInputComponentFormat,
+    const Span<T>& inData,
+    const GL::ETextureFormat& inFormat,
+    const GL::Int& inMipMapLevel)
+{
+  glTexImage1D(GL::EnumCast(inTextureTarget),
+      inMipMapLevel,
+      GL::EnumCast(inFormat),
+      inWidth,
+      0,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputComponentFormat),
+      inData.GetData());
+}
+
+template <typename T>
 void GL::TexImage2D(const GL::ETextureTarget& inTextureTarget,
     const GL::Size& inWidth,
     const GL::Size& inHeight,
@@ -72,6 +91,72 @@ void GL::TexImage3D(const GL::ETextureTarget& inTextureTarget,
       0,
       GL::EnumCast(inInputFormat),
       GL::EnumCast(inInputComponentFormat),
+      inData.GetData());
+}
+
+template <typename T>
+void GL::TextureSubImage1D(const GL::Id inTextureId,
+    const GL::Int inXOffset,
+    const GL::Size inWidth,
+    const GL::ETextureInputFormat inInputFormat,
+    const GL::EDataType inInputDataType,
+    const Span<T>& inData,
+    const GL::Int inMipMapLevel)
+{
+  glTextureSubImage1D(inTextureId,
+      inMipMapLevel,
+      inXOffset,
+      inWidth,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputDataType),
+      inData.GetData());
+}
+
+template <typename T>
+void GL::TextureSubImage2D(const GL::Id inTextureId,
+    const GL::Int inXOffset,
+    const GL::Int inYOffset,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::ETextureInputFormat inInputFormat,
+    const GL::EDataType inInputDataType,
+    const Span<T>& inData,
+    const GL::Int inMipMapLevel)
+{
+  glTextureSubImage1D(inTextureId,
+      inMipMapLevel,
+      inXOffset,
+      inYOffset,
+      inWidth,
+      inHeight,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputDataType),
+      inData.GetData());
+}
+
+template <typename T>
+void GL::TextureSubImage3D(const GL::Id inTextureId,
+    const GL::Int inXOffset,
+    const GL::Int inYOffset,
+    const GL::Int inZOffset,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inDepth,
+    const GL::ETextureInputFormat inInputFormat,
+    const GL::EDataType inInputDataType,
+    const Span<T>& inData,
+    const GL::Int inMipMapLevel)
+{
+  glTextureSubImage3D(inTextureId,
+      inMipMapLevel,
+      inXOffset,
+      inYOffset,
+      inZOffset,
+      inWidth,
+      inHeight,
+      inDepth,
+      GL::EnumCast(inInputFormat),
+      GL::EnumCast(inInputDataType),
       inData.GetData());
 }
 
