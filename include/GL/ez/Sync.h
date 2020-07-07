@@ -16,6 +16,8 @@ public:
 
   void Set();
   GL::EClientWaitSyncResult ClientWait(const bool inFlush = true, const uint64_t inTimeout = Max<uint64_t>()) const;
+  GL::EClientWaitSyncResult SetAndClientWait(const bool inFlush = true, const uint64_t inTimeout = Max<uint64_t>());
+  static GL::EClientWaitSyncResult StaticClientWait(const bool inFlush = true, const uint64_t inTimeout = Max<uint64_t>());
 
 private:
   GL::Sync mSync = 0;

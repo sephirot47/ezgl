@@ -29,6 +29,17 @@ GL::EClientWaitSyncResult Sync::ClientWait(const bool inFlush, const uint64_t in
   return GL::ClientWaitSync(mSync, inFlush, inTimeout);
 }
 
+GL::EClientWaitSyncResult Sync::SetAndClientWait(const bool inFlush, const uint64_t inTimeout)
+{
+  Set();
+  return ClientWait(inFlush, inTimeout);
+}
+
+GL::EClientWaitSyncResult Sync::StaticClientWait(const bool inFlush, const uint64_t inTimeout)
+{
+  return Sync {}.SetAndClientWait(inFlush, inTimeout);
+}
+
 void Sync::DeleteIfNonNull()
 {
   if (mSync != 0)
