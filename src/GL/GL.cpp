@@ -155,7 +155,7 @@ void* GL::MapBuffer(const GL::Id inBufferId, const GL::EAccess inAccess)
 void* GL::MapBufferRange(const GL::EBufferType inBufferType,
     const std::size_t inOffset,
     const std::size_t inLength,
-    const GL::EAccessBitFlags inAccessBitFlags)
+    const GL::EMapBufferAccessBitFlags inAccessBitFlags)
 {
   return glMapBufferRange(GL::EnumCast(inBufferType), inOffset, inLength, GL::EnumCast(inAccessBitFlags));
 }
@@ -163,7 +163,7 @@ void* GL::MapBufferRange(const GL::EBufferType inBufferType,
 void* GL::MapBufferRange(const GL::Id inBufferId,
     const std::size_t inOffset,
     const std::size_t inLength,
-    const GL::EAccessBitFlags inAccessBitFlags)
+    const GL::EMapBufferAccessBitFlags inAccessBitFlags)
 {
   return glMapNamedBufferRange(inBufferId, inOffset, inLength, GL::EnumCast(inAccessBitFlags));
 }
@@ -582,6 +582,18 @@ void GL::UniformBlockBinding(const GL::Id inShaderProgramId,
 {
   glUniformBlockBinding(inShaderProgramId, inUniformBlockIndex, inBindingPoint);
 }
+
+GL::Sync GL::FenceSync() { return glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0); }
+
+void GL::WaitSync(const GL::Sync inSync, const uint64_t inTimeout) { glWaitSync(inSync, 0, inTimeout); }
+
+GL::EClientWaitSyncResult GL::ClientWaitSync(const GL::Sync inSync, const bool inFlush, const uint64_t inTimeout)
+{
+  return static_cast<GL::EClientWaitSyncResult>(
+      glClientWaitSync(inSync, inFlush ? GL_SYNC_FLUSH_COMMANDS_BIT : 0, inTimeout));
+}
+
+void GL::DeleteSync(const GL::Sync inSync) { glDeleteSync(inSync); }
 
 void GL::MemoryBarrier(const GL::EMemoryBarrierBitFlags inMemoryBarrierBitFlags)
 {

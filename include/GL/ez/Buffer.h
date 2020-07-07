@@ -21,22 +21,29 @@ public:
   Buffer(Buffer&& ioRHS) noexcept = default;
   virtual ~Buffer() = default;
 
-  void BufferDataEmpty(const GL::Size inSizeInBytes, const GL::EAccessHint inAccessHint = GL::EAccessHint::STATIC_DRAW);
+  void BufferDataEmpty(const GL::Size inSizeInBytes,
+      const GL::EBufferDataAccessHint inAccessHint = GL::EBufferDataAccessHint::STATIC_DRAW);
   template <typename T>
-  void BufferData(const Span<T>& inData, const GL::EAccessHint inAccessHint = GL::EAccessHint::STATIC_DRAW);
+  void BufferData(const Span<T>& inData,
+      const GL::EBufferDataAccessHint inAccessHint = GL::EBufferDataAccessHint::STATIC_DRAW);
+
+  void BufferStorageEmpty(const GL::Size inSizeInBytes, const GL::EBufferStorageAccessHintBitFlags inAccessHint);
+  template <typename T>
+  void BufferStorage(const Span<T>& inData, const GL::EBufferStorageAccessHintBitFlags inAccessHint);
+
   template <typename T>
   void BufferSubData(const Span<T>& inData, const GL::Size inOffset = 0);
+
   void* MapBuffer(const GL::EAccess inAccess);
-  void* MapBufferRange(const std::size_t inOffset, const std::size_t inLength, const GL::EAccessBitFlags inAccessBitFlags);
+  void* MapBufferRange(const std::size_t inOffset,
+      const std::size_t inLength,
+      const GL::EMapBufferAccessBitFlags inAccessBitFlags);
   void UnmapBuffer();
 
   template <typename T>
   T ReadData();
 
   using GLBindableObject<BindingType>::GetGLId;
-
-private:
-  bool mInitialized = false;
 };
 }
 

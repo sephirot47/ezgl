@@ -3,10 +3,19 @@
 namespace ez
 {
 template <typename T>
-void GL::BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EAccessHint inAccessHint)
+void GL::BufferData(const GL::Id inBufferId, const Span<T>& inData, const GL::EBufferDataAccessHint inAccessHint)
 {
   EXPECTS(inBufferId != 0);
   glNamedBufferData(inBufferId, inData.GetSizeInBytes(), inData.GetData(), GL::EnumCast(inAccessHint));
+}
+
+template <typename T>
+void GL::BufferStorage(const GL::Id inBufferId,
+    const Span<T>& inData,
+    const GL::EBufferStorageAccessHintBitFlags inAccessHint)
+{
+  EXPECTS(inBufferId != 0);
+  glNamedBufferStorage(inBufferId, inData.GetSizeInBytes(), inData.GetData(), GL::EnumCast(inAccessHint));
 }
 
 template <typename T>
