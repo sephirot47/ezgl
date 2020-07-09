@@ -872,6 +872,12 @@ public:
       const bool inNormalized,
       const GL::Size inStride,
       const GL::Size inOffset = 0);
+  static void VertexAttribIPointer(const GL::Id inAttribLocation,
+      const GL::Size inNumComponents,
+      const GL::EDataType inDataType,
+      const GL::Size inStride,
+      const GL::Size inOffset = 0);
+      static bool IsFloatingType(const GL::EDataType inDataType);
   static void DisableVertexAttribArray(const GL::Id inAttribLocation);
   static void DeleteVertexArray(const GL::Id inVAOId);
 

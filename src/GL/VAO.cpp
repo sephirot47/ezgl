@@ -36,12 +36,26 @@ void VAO::AddVertexAttrib(const GL::Id inAttribLocation, const VAOVertexAttrib& 
   const auto vao_bind_guard = BindGuarded();
 
   GL::EnableVertexAttribArray(inAttribLocation);
-  GL::VertexAttribPointer(inAttribLocation,
-      inVertexAttrib.mNumComponents,
-      inVertexAttrib.mType,
-      inVertexAttrib.mNormalized,
-      inVertexAttrib.mStride,
-      inVertexAttrib.mOffset);
+  if (GL::IsFloatingType(inVertexAttrib.mType))
+  {
+    GL::VertexAttribPointer(inAttribLocation,
+        inVertexAttrib.mNumComponents,
+        inVertexAttrib.mType,
+        inVertexAttrib.mNormalized,
+        inVertexAttrib.mStride,
+        inVertexAttrib.mOffset);
+  }
+  else
+  {
+    if (inVertexAttrib.mNormalized)
+      THROW_EXCEPTION("Integer vertex attributes can't be normalized");
+
+    GL::VertexAttribIPointer(inAttribLocation,
+        inVertexAttrib.mNumComponents,
+        inVertexAttrib.mType,
+        inVertexAttrib.mStride,
+        inVertexAttrib.mOffset);
+  }
 }
 
 void VAO::RemoveVertexAttrib(const GL::Id inAttribLocation)

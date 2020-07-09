@@ -206,6 +206,30 @@ void GL::VertexAttribPointer(const GL::Id inAttribLocation,
       reinterpret_cast<const void*>(inOffset));
 }
 
+void GL::VertexAttribIPointer(const GL::Id inAttribLocation,
+    const GL::Size inNumComponents,
+    const GL::EDataType inDataType,
+    const GL::Size inStride,
+    const GL::Size inOffset)
+{
+  glVertexAttribIPointer(inAttribLocation,
+      inNumComponents,
+      GL::EnumCast(inDataType),
+      inStride,
+      reinterpret_cast<const void*>(inOffset));
+}
+
+bool GL::IsFloatingType(const GL::EDataType inDataType)
+{
+  return (inDataType == GL::EDataType::FLOAT || inDataType == GL::EDataType::DOUBLE
+      || inDataType == GL::EDataType::FLOAT_VEC2 || inDataType == GL::EDataType::FLOAT_VEC3
+      || inDataType == GL::EDataType::FLOAT_VEC4 || inDataType == GL::EDataType::DOUBLE_VEC2
+      || inDataType == GL::EDataType::DOUBLE_VEC3 || inDataType == GL::EDataType::DOUBLE_VEC4
+      || inDataType == GL::EDataType::FLOAT_MAT2 || inDataType == GL::EDataType::DOUBLE_MAT2
+      || inDataType == GL::EDataType::FLOAT_MAT3 || inDataType == GL::EDataType::DOUBLE_MAT3
+      || inDataType == GL::EDataType::FLOAT_MAT4 || inDataType == GL::EDataType::DOUBLE_MAT4);
+}
+
 void GL::DisableVertexAttribArray(const GL::Id inAttribLocation) { glDisableVertexAttribArray(inAttribLocation); }
 
 void GL::DeleteVertexArray(const GL::Id inVAOId) { glDeleteVertexArrays(1, &inVAOId); }
