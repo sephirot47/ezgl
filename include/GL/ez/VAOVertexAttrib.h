@@ -7,6 +7,7 @@ namespace ez
 {
 struct VAOVertexAttrib
 {
+  VAOVertexAttrib() = default;
   explicit VAOVertexAttrib(uint32_t inNumComponents,
       GL::EDataType inType,
       uint32_t inStride,
