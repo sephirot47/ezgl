@@ -19,8 +19,14 @@ public:
   static std::shared_ptr<ShaderProgram> GetOnlyColorShaderProgram();
   static std::shared_ptr<ShaderProgram> GetDrawFullScreenTextureShaderProgram();
 
+  static std::shared_ptr<ShaderProgram> CreateVertexFragmentShaderProgramFromPath(const std::filesystem::path &inVertexShaderPath,
+      const std::filesystem::path &inFragmentShaderCode,
+      const Span<std::filesystem::path>& inIncludeDirs = MakeEmptySpan<std::filesystem::path>());
   static std::shared_ptr<ShaderProgram> CreateVertexFragmentShaderProgram(const std::string_view inVertexShaderCode,
       const std::string_view inFragmentShaderCode,
+      const Span<std::filesystem::path>& inIncludeDirs = MakeEmptySpan<std::filesystem::path>());
+
+  static std::shared_ptr<ShaderProgram> CreateComputeShaderProgramFromPath(const std::filesystem::path & inComputeShaderPath,
       const Span<std::filesystem::path>& inIncludeDirs = MakeEmptySpan<std::filesystem::path>());
   static std::shared_ptr<ShaderProgram> CreateComputeShaderProgram(const std::string_view inComputeShaderCode,
       const Span<std::filesystem::path>& inIncludeDirs = MakeEmptySpan<std::filesystem::path>());

@@ -1,4 +1,6 @@
+#include "ez/FileUtils.h"
 #include "ez/Shader.h"
+#include "ez/ShaderPreprocessor.h"
 
 namespace ez
 {
@@ -18,7 +20,8 @@ void Shader<TShaderType>::Compile(const std::string_view inSourceCode)
   if (!compiled_correctly)
   {
     const auto error_msg = GL::GetShaderInfoLog(GetGLId());
-    THROW_EXCEPTION("Error compiling shader: " << error_msg);
+    const auto preprocessed_error_msg = ShaderPreprocessor::PreprocessShaderErrorMessage(error_msg);
+    THROW_EXCEPTION("Error compiling shader: " << preprocessed_error_msg);
   }
 }
 }

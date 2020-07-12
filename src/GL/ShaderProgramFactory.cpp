@@ -26,6 +26,34 @@ std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateVertexFragmentShaderP
       FragmentShader { preprocessed_fragment_shader_code });
 }
 
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateVertexFragmentShaderProgramFromPath(
+    const std::filesystem::path& inVertexShaderPath,
+    const std::filesystem::path& inFragmentShaderPath,
+    const Span<std::filesystem::path>& inIncludeDirs)
+{
+  const auto preprocessed_vertex_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(GetFileContents(inVertexShaderPath),
+          inIncludeDirs,
+          inVertexShaderPath);
+  const auto preprocessed_fragment_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(GetFileContents(inFragmentShaderPath),
+          inIncludeDirs,
+          inFragmentShaderPath);
+  return std::make_shared<ShaderProgram>(VertexShader { preprocessed_vertex_shader_code },
+      FragmentShader { preprocessed_fragment_shader_code });
+}
+
+std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateComputeShaderProgramFromPath(
+    const std::filesystem::path& inComputeShaderPath,
+    const Span<std::filesystem::path>& inIncludeDirs)
+{
+  const auto preprocessed_compute_shader_code
+      = ShaderPreprocessor::PreprocessShaderCode(GetFileContents(inComputeShaderPath),
+          inIncludeDirs,
+          inComputeShaderPath);
+  return std::make_shared<ShaderProgram>(ComputeShader { preprocessed_compute_shader_code });
+}
+
 std::shared_ptr<ShaderProgram> ShaderProgramFactory::CreateComputeShaderProgram(
     const std::string_view inComputeShaderCode,
     const Span<std::filesystem::path>& inIncludeDirs)
