@@ -16,20 +16,34 @@ std::string ShaderPreprocessor::PreprocessShaderCode(const std::string_view inSh
     const Span<std::filesystem::path>& inIncludeDirs,
     std::set<std::filesystem::path>& ioAlreadyProcessedFiles)
 {
-  std::string preprocessed_code = inShaderCode.data();
+  std::string preprocessed_code = "";
+  const auto original_code = std::string { inShaderCode.data() };
 
-  // Remove verbatim markers
-  const auto verbatim_marker_open_regex = std::regex { "R\"\"\\(" };
-  const auto verbatim_marker_close_regex = std::regex { "\\)\"\"" };
-  preprocessed_code = std::regex_replace(preprocessed_code, verbatim_marker_open_regex, "");
-  preprocessed_code = std::regex_replace(preprocessed_code, verbatim_marker_close_regex, "");
-
-  // Substitute includes
   const auto include_regex = std::regex { "#include[\\s]+[<\"]([a-zA-Z_\\-\\.0-9\\s/]+)[>\"]" };
-  std::smatch includes_matches;
-  std::string::const_iterator search_begin { preprocessed_code.cbegin() };
-  while (std::regex_search(search_begin, preprocessed_code.cend(), includes_matches, include_regex))
+  const auto verbatim_marker_open_regex = std::regex { "R\"\"\\(\\s*" };
+  const auto verbatim_marker_close_regex = std::regex { "\\)\"\"\\s*" };
+
+  std::vector<std::string> original_code_lines = { "" };
   {
+    std::stringstream original_code_stream { original_code };
+    while (std::getline(original_code_stream, original_code_lines.back(), '\n')) { original_code_lines.emplace_back(); }
+  }
+
+  // Process line by line
+  for (std::size_t original_line_number = 0; original_line_number < original_code_lines.size(); ++original_line_number)
+  {
+    const auto& line = original_code_lines.at(original_line_number);
+
+    // Remove verbatim markers
+    if (std::regex_match(line, verbatim_marker_open_regex) || std::regex_match(line, verbatim_marker_close_regex))
+      continue;
+
+    std::smatch includes_matches;
+    if (!std::regex_search(line.cbegin(), line.cend(), includes_matches, include_regex))
+    {
+      preprocessed_code += line + "\n";
+      continue;
+    }
     std::filesystem::path partial_include_path = includes_matches[1].str();
 
     // Search include path using include dirs
@@ -59,15 +73,11 @@ std::string ShaderPreprocessor::PreprocessShaderCode(const std::string_view inSh
     const auto preprocessed_include_path_content
         = PreprocessShaderCode(include_path_content, inIncludeDirs, ioAlreadyProcessedFiles);
 
-    // Replace include contents in shader code
-    const std::size_t include_statement_pos = includes_matches[0].first - preprocessed_code.cbegin();
-    const std::size_t include_statement_length = includes_matches[0].length();
-    preprocessed_code.replace(include_statement_pos, include_statement_length, preprocessed_include_path_content);
-
-    // Prepare next begin iterator
-    search_begin = (preprocessed_code.cbegin() + include_statement_pos + include_path_content.length());
+    // Add include contents in preprocessed code
+    preprocessed_code += std::string { "#line 2" } + "\n";
+    preprocessed_code += preprocessed_include_path_content;
+    preprocessed_code += "#line " + std::to_string(original_line_number + 2) + "\n";
   }
-
   return preprocessed_code;
 }
 }
