@@ -1047,6 +1047,9 @@ public:
   static void Uniform(const GL::Id inUniformLocation, int8_t inValue);
   static void Uniform(const GL::Id inUniformLocation, int16_t inValue);
   static void Uniform(const GL::Id inUniformLocation, int32_t inValue);
+  static void Uniform(const GL::Id inUniformLocation, uint8_t inValue);
+  static void Uniform(const GL::Id inUniformLocation, uint16_t inValue);
+  static void Uniform(const GL::Id inUniformLocation, uint32_t inValue);
   static void Uniform(const GL::Id inUniformLocation, float inValue);
   static void Uniform(const GL::Id inUniformLocation, double inValue);
   static void Uniform(const GL::Id inUniformLocation, const Vec2i& inValue);

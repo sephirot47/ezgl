@@ -521,6 +521,18 @@ void GL::Uniform(const GL::Id inUniformLocation, int16_t inValue)
 
 void GL::Uniform(const GL::Id inUniformLocation, int32_t inValue) { glUniform1i(inUniformLocation, inValue); }
 
+void GL::Uniform(const GL::Id inUniformLocation, uint8_t inValue)
+{
+  GL::Uniform(inUniformLocation, static_cast<uint32_t>(inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, uint16_t inValue)
+{
+  GL::Uniform(inUniformLocation, static_cast<uint32_t>(inValue));
+}
+
+void GL::Uniform(const GL::Id inUniformLocation, uint32_t inValue) { glUniform1ui(inUniformLocation, inValue); }
+
 void GL::Uniform(const GL::Id inUniformLocation, float inValue) { glUniform1f(inUniformLocation, inValue); }
 
 void GL::Uniform(const GL::Id inUniformLocation, double inValue) { glUniform1d(inUniformLocation, inValue); }
