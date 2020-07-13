@@ -63,6 +63,13 @@ public:
       const Span<T>& inData,
       const GL::Int inMipMapLevel = 0);
 
+  void CopySubData(const Veci<N>& inSourcePosition,
+      const Veci<N>& inSourceSize,
+      Texture<TTextureTarget>& ioDestinationTexture,
+      const Veci<N>& inDestinationPosition,
+      const GL::Int inSourceLevel = 0,
+      const GL::Int inDestinationLevel = 0) const;
+
   void SetWrapMode(const GL::EWrapMode inWrapMode);
   void SetWrapModeR(const GL::EWrapMode inWrapMode);
   void SetWrapModeS(const GL::EWrapMode inWrapMode);

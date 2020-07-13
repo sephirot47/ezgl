@@ -959,6 +959,23 @@ public:
       const GL::EDataType inInputDataType,
       const Span<T>& inData,
       const GL::Int inMipMapLevel = 0);
+
+  static void CopyImageSubData(const GL::Id inSourceTextureId,
+      const GL::ETextureTarget inSourceTarget,
+      const GL::Int inSourceX,
+      const GL::Int inSourceY,
+      const GL::Int inSourceZ,
+      const GL::Size inSourceWidth,
+      const GL::Size inSourceHeight,
+      const GL::Size inSourceDepth,
+      const GL::Id inDestinationTextureId,
+      const GL::ETextureTarget inDestinationTarget,
+      const GL::Int inDestinationX,
+      const GL::Int inDestinationY,
+      const GL::Int inDestinationZ,
+      const GL::Int inSourceLevel = 0,
+      const GL::Int inDestinationLevel = 0);
+
   static void TextureStorage1D(const GL::Id inTextureId,
       const GL::ETextureFormat inTextureFormat,
       const GL::Size inWidth,
@@ -991,6 +1008,7 @@ public:
   static bool IsColorFormat(const GL::ETextureFormat inTextureFormat);
   static bool IsDepthOnlyFormat(const GL::ETextureFormat inTextureFormat);
   static bool IsDepthStencilFormat(const GL::ETextureFormat inTextureFormat);
+  static bool IsIntegerFormat(const GL::ETextureFormat inTextureFormat);
   static void DeleteTexture(const GL::Id& inTextureId);
 
   static GL::Id GenFramebuffer();

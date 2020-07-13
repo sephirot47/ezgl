@@ -298,6 +298,23 @@ bool GL::IsDepthStencilFormat(const GL::ETextureFormat inTextureFormat)
       || inTextureFormat == GL::ETextureFormat::DEPTH32F_STENCIL8);
 }
 
+bool GL::IsIntegerFormat(const GL::ETextureFormat inTextureFormat)
+{
+  return (inTextureFormat == GL::ETextureFormat::R8I || inTextureFormat == GL::ETextureFormat::R16I
+      || inTextureFormat == GL::ETextureFormat::R32I || inTextureFormat == GL::ETextureFormat::R8UI
+      || inTextureFormat == GL::ETextureFormat::R16UI || inTextureFormat == GL::ETextureFormat::R32UI
+      || inTextureFormat == GL::ETextureFormat::RG8I || inTextureFormat == GL::ETextureFormat::RG16I
+      || inTextureFormat == GL::ETextureFormat::RG32I || inTextureFormat == GL::ETextureFormat::RG8UI
+      || inTextureFormat == GL::ETextureFormat::RG16UI || inTextureFormat == GL::ETextureFormat::RG32UI
+      || inTextureFormat == GL::ETextureFormat::RGB8I || inTextureFormat == GL::ETextureFormat::RGB16I
+      || inTextureFormat == GL::ETextureFormat::RGB32I || inTextureFormat == GL::ETextureFormat::RGB8UI
+      || inTextureFormat == GL::ETextureFormat::RGB16UI || inTextureFormat == GL::ETextureFormat::RGB32UI
+      || inTextureFormat == GL::ETextureFormat::RGBA8I || inTextureFormat == GL::ETextureFormat::RGBA16I
+      || inTextureFormat == GL::ETextureFormat::RGBA32I || inTextureFormat == GL::ETextureFormat::RGBA8UI
+      || inTextureFormat == GL::ETextureFormat::RGBA16UI || inTextureFormat == GL::ETextureFormat::RGBA32UI
+      || inTextureFormat == GL::ETextureFormat::RGB10_A2UI);
+}
+
 void GL::DeleteTexture(const GL::Id& inTextureId) { glDeleteTextures(1, &inTextureId); }
 
 GL::Id GL::GenFramebuffer()
@@ -687,6 +704,39 @@ void GL::TextureStorage3D(const GL::Id inTextureId,
     const GL::Size inMipMapLevels)
 {
   glTextureStorage3D(inTextureId, inMipMapLevels, GL::EnumCast(inTextureFormat), inWidth, inHeight, inDepth);
+}
+
+void GL::CopyImageSubData(const GL::Id inSourceTextureId,
+    const GL::ETextureTarget inSourceTarget,
+    const GL::Int inSourceX,
+    const GL::Int inSourceY,
+    const GL::Int inSourceZ,
+    const GL::Size inSourceWidth,
+    const GL::Size inSourceHeight,
+    const GL::Size inSourceDepth,
+    const GL::Id inDestinationTextureId,
+    const GL::ETextureTarget inDestinationTarget,
+    const GL::Int inDestinationX,
+    const GL::Int inDestinationY,
+    const GL::Int inDestinationZ,
+    const GL::Int inSourceLevel,
+    const GL::Int inDestinationLevel)
+{
+  glCopyImageSubData(inSourceTextureId,
+      GL::EnumCast(inSourceTarget),
+      inSourceLevel,
+      inSourceX,
+      inSourceY,
+      inSourceZ,
+      inDestinationTextureId,
+      GL::EnumCast(inDestinationTarget),
+      inDestinationLevel,
+      inDestinationX,
+      inDestinationY,
+      inDestinationZ,
+      inSourceWidth,
+      inSourceHeight,
+      inSourceDepth);
 }
 
 bool GL::GetBoolean(const GL::EGetEnum inGetBooleanId)

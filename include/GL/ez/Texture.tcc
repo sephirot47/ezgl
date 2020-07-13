@@ -154,15 +154,59 @@ void Texture<TTextureTarget>::TextureSubImage(const Veci<N>& inOffset,
 }
 
 template <GL::ETextureTarget TTextureTarget>
+void Texture<TTextureTarget>::CopySubData(const Veci<N>& inSourcePosition,
+    const Veci<N>& inSourceSize,
+    Texture<TTextureTarget>& ioDestinationTexture,
+    const Veci<N>& inDestinationPosition,
+    const GL::Int inSourceLevel,
+    const GL::Int inDestinationLevel) const
+{
+  EXPECTS(ioDestinationTexture.GetFormat() == GetFormat());
+  EXPECTS(inDestinationPosition + inSourceSize <= ioDestinationTexture.GetSize());
+
+  auto source_position = One<Vec3i>();
+  auto source_size = One<Vec3i>();
+  auto destination_position = One<Vec3i>();
+  for (int i = 0; i < N; ++i)
+  {
+    source_position[i] = inSourcePosition[i];
+    source_size[i] = inSourceSize[i];
+    destination_position[i] = inDestinationPosition[i];
+  }
+
+  GL::CopyImageSubData(GetGLId(),
+      TTextureTarget,
+      source_position[0],
+      source_position[1],
+      source_position[2],
+      source_size[0],
+      source_size[1],
+      source_size[2],
+      ioDestinationTexture.GetGLId(),
+      TTextureTarget,
+      destination_position[0],
+      destination_position[1],
+      destination_position[2],
+      inSourceLevel,
+      inDestinationLevel);
+}
+
+template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize, const GL::ETextureFormat inFormat)
 {
   auto texture_input_format = GL::ETextureInputFormat::RED;
+  auto texture_input_data_type = GL::ETextureInputComponentFormat::FLOAT;
   if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))
   {
     texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
   }
+  else if (GL::IsIntegerFormat(inFormat))
+  {
+    texture_input_format = GL::ETextureInputFormat::RED_INTEGER;
+    texture_input_data_type = GL::ETextureInputComponentFormat::INT;
+  }
 
-  TexImage(inSize, texture_input_format, GL::ETextureInputComponentFormat::FLOAT, Span<float>(nullptr, 0), inFormat, 0);
+  TexImage(inSize, texture_input_format, texture_input_data_type, Span<float>(nullptr, 0), inFormat, 0);
 }
 
 template <GL::ETextureTarget TTextureTarget>
