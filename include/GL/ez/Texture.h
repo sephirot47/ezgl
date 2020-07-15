@@ -36,7 +36,13 @@ public:
   virtual ~Texture() override = default;
 
   void BindToTextureUnit(const GL::Size& inTextureUnit) const;
+  [[nodiscard]] GLBindTextureToUnitGuard<BindingType> BindToTextureUnitGuarded(const GL::Uint inTextureUnit) const;
   void BindImageTexture(const GL::Uint inImageUnit,
+      const GL::EAccess inAccess,
+      const GL::Int inLevel = 0,
+      const GL::Boolean inLayered = false,
+      const GL::Int inLayer = 0) const;
+  [[nodiscard]] GLBindImageTextureToUnitGuard BindImageTextureGuarded(const GL::Uint inImageUnit,
       const GL::EAccess inAccess,
       const GL::Int inLevel = 0,
       const GL::Boolean inLayered = false,

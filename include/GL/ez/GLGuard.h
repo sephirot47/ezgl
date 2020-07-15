@@ -17,8 +17,8 @@ class GLGenericGuard final
 public:
   using TValue = std::remove_const_t<std::remove_reference_t<decltype(TGetFunction(std::declval<TExtraValues>()...))>>;
 
-  GLGenericGuard(TExtraValues&&... ioExtraValues)
-      : mExtraValues(std::forward<TExtraValues>(ioExtraValues)...), mValueOpt([&]() {
+  GLGenericGuard(const TExtraValues&... ioExtraValues)
+      : mExtraValues(ioExtraValues...), mValueOpt([&]() {
           if constexpr (sizeof...(TExtraValues) == 0)
           {
             return TGetFunction();
@@ -111,6 +111,32 @@ inline float GLLineWidthGuardGet() { return GL::GetLineWidth(); }
 inline void GLLineWidthGuardSet(const float inPreviousLineWidth) { GL::LineWidth(inPreviousLineWidth); }
 using GLLineWidthGuard = GLGenericGuard<GLLineWidthGuardGet, GLLineWidthGuardSet>;
 
+// GLBindTextureUnitGuard
+template <GL::EBindingType TBindingType> inline GL::Id GLBindTextureToUnitGuardGet(const std::tuple<GL::Uint> &inTextureUnit)
+{
+  /*
+  const auto previous_active_texture_unit = GL::GetInteger(GL::EGetEnum::ACTIVE_TEXTURE);
+  GL::ActiveTexture(GL_TEXTURE0 + std::get<0>(inTextureUnit));
+  const auto current_bound_texture_to_unit = GL::GetInteger(static_cast<GL::EGetEnum>(TBindingType));
+  GL::ActiveTexture(previous_active_texture_unit);
+  return current_bound_texture_to_unit;
+  */
+  GL::Int current_bound_texture_to_unit = -1;
+  glGetIntegeri_v(GL::EnumCast(TBindingType), std::get<0>(inTextureUnit), &current_bound_texture_to_unit);
+  return current_bound_texture_to_unit;
+}
+template <GL::EBindingType TBindingType> inline void GLBindTextureToUnitGuardSet(const GL::Id &inPreviousTextureId, const std::tuple<GL::Uint> &inTextureUnit) { GL::BindTextureUnit(std::get<0>(inTextureUnit), inPreviousTextureId); }
+template <GL::EBindingType TBindingType> using GLBindTextureToUnitGuard = GLGenericGuard<GLBindTextureToUnitGuardGet<TBindingType>, GLBindTextureToUnitGuardSet<TBindingType>, GL::Uint>;
+
+// GLBindImageTextureGuard
+inline GL::Id GLBindImageTextureToUnitGuardGet(const std::tuple<GL::Uint> &inImageUnit)
+{
+  GL::Int current_bound_image_to_unit = -1;
+  glGetIntegeri_v(GL_IMAGE_BINDING_NAME, std::get<0>(inImageUnit), &current_bound_image_to_unit);
+  return current_bound_image_to_unit;
+}
+inline void GLBindImageTextureToUnitGuardSet(const GL::Id &inPreviousImageId, const std::tuple<GL::Uint> &inImageUnit) { GL::BindImageTexture(std::get<0>(inImageUnit), inPreviousImageId, GL::ETextureFormat::RGBA8, GL::EAccess::READ_ONLY ); }
+using GLBindImageTextureToUnitGuard = GLGenericGuard<GLBindImageTextureToUnitGuardGet, GLBindImageTextureToUnitGuardSet, GL::Uint>;
 
 // GetGLGuard
 template <typename T> decltype(auto) GetGLGuard() { return typename T::GLGuardType{}; };

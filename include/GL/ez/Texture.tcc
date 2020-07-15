@@ -26,6 +26,15 @@ void Texture<TTextureTarget>::BindToTextureUnit(const GL::Size& inTextureUnit) c
 }
 
 template <GL::ETextureTarget TTextureTarget>
+GLBindTextureToUnitGuard<Texture<TTextureTarget>::BindingType> Texture<TTextureTarget>::BindToTextureUnitGuarded(
+    const GL::Uint inTextureUnit) const
+{
+  GLBindTextureToUnitGuard<BindingType> guard { inTextureUnit };
+  BindToTextureUnit(inTextureUnit);
+  return guard;
+}
+
+template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::BindImageTexture(const GL::Uint inImageUnit,
     const GL::EAccess inAccess,
     const GL::Int inLevel,
@@ -33,6 +42,18 @@ void Texture<TTextureTarget>::BindImageTexture(const GL::Uint inImageUnit,
     const GL::Int inLayer) const
 {
   GL::BindImageTexture(inImageUnit, GetGLId(), GetFormat(), inAccess, inLevel, inLayered, inLayer);
+}
+
+template <GL::ETextureTarget TTextureTarget>
+GLBindImageTextureToUnitGuard Texture<TTextureTarget>::BindImageTextureGuarded(const GL::Uint inImageUnit,
+    const GL::EAccess inAccess,
+    const GL::Int inLevel,
+    const GL::Boolean inLayered,
+    const GL::Int inLayer) const
+{
+  GLBindImageTextureToUnitGuard guard { inImageUnit };
+  BindImageTexture(inImageUnit, inAccess, inLevel, inLayered, inLayer);
+  return guard;
 }
 
 template <GL::ETextureTarget TTextureTarget>
