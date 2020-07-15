@@ -270,6 +270,11 @@ void GL::BindImageTexture(const GL::Uint inImageUnit,
       GL::EnumCast(inFormat));
 }
 
+void GL::UnBindImageTexture(const GL::Uint inImageUnit)
+{
+  GL::BindImageTexture(inImageUnit, 0, GL::ETextureFormat::RGBA8, GL::EAccess::READ_ONLY, 0, false, 0);
+}
+
 void GL::GenerateTextureMipMap(const GL::Id& inTextureId) { glGenerateTextureMipmap(inTextureId); }
 
 void GL::ActiveTexture(const GL::Id& inTextureUnit) { glActiveTexture(inTextureUnit); }

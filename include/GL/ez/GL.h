@@ -908,6 +908,7 @@ public:
       const GL::Int inLevel = 0,
       const GL::Boolean inLayered = false,
       const GL::Int inLayer = 0);
+  static void UnBindImageTexture(const GL::Uint inImageUnit);
   template <typename T>
   static void TexImage1D(const GL::ETextureTarget& inTextureTarget,
       const GL::Size& inWidth,
