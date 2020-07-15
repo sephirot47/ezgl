@@ -194,19 +194,33 @@ void Texture<TTextureTarget>::CopySubData(const Veci<N>& inSourcePosition,
 template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize, const GL::ETextureFormat inFormat)
 {
-  auto texture_input_format = GL::ETextureInputFormat::RED;
-  auto texture_input_data_type = GL::ETextureInputComponentFormat::FLOAT;
   if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))
   {
-    texture_input_format = GL::ETextureInputFormat::DEPTH_COMPONENT;
+    TexImage(inSize,
+        GL::ETextureInputFormat::DEPTH_COMPONENT,
+        GL::ETextureInputComponentFormat::FLOAT,
+        Span<float>(nullptr, 0),
+        inFormat,
+        0);
   }
   else if (GL::IsIntegerFormat(inFormat))
   {
-    texture_input_format = GL::ETextureInputFormat::RED_INTEGER;
-    texture_input_data_type = GL::ETextureInputComponentFormat::INT;
+    TexImage(inSize,
+        GL::ETextureInputFormat::RED_INTEGER,
+        GL::ETextureInputComponentFormat::INT,
+        Span<int>(nullptr, 0),
+        inFormat,
+        0);
   }
-
-  TexImage(inSize, texture_input_format, texture_input_data_type, Span<float>(nullptr, 0), inFormat, 0);
+  else
+  {
+    TexImage(inSize,
+        GL::ETextureInputFormat::RED,
+        GL::ETextureInputComponentFormat::FLOAT,
+        Span<float>(nullptr, 0),
+        inFormat,
+        0);
+  }
 }
 
 template <GL::ETextureTarget TTextureTarget>
