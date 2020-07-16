@@ -9,13 +9,7 @@ template <typename T, std::size_t N>
 void CameraControllerFly<T, N>::SetCamera(const std::shared_ptr<Camera<T, N>>& inCamera)
 {
   mCamera = inCamera;
-  if constexpr (N == 3)
-  {
-    if (inCamera)
-    {
-      mCurrentRotationAngle = YX(AngleAxis(inCamera->GetRotation()));
-    }
-  }
+  ApplyParameters();
 }
 
 template <typename T, std::size_t N>
@@ -137,6 +131,12 @@ template <typename T, std::size_t N>
 void CameraControllerFly<T, N>::ApplyParameters()
 {
   mCurrentFlySpeed = (mParameters.mMinFlySpeed + mParameters.mMaxFlySpeed) * 0.5f;
+
+  if constexpr (N == 3)
+  {
+    const auto camera = mCamera.lock();
+    mCurrentRotationAngle = YX(AngleAxis(camera->GetRotation()));
+  }
 }
 
 template <typename T, std::size_t N>

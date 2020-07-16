@@ -15,7 +15,9 @@ void VAO::AddVBO(const std::shared_ptr<VBO>& inVBO,
   const GLBindGuard<GL::EBindingType::VBO> vbo_bind_guard; // First VBO so that the guard is released the latest
   const auto vao_bind_guard = BindGuarded();
 
-  mVBOs.push_back(inVBO);
+  mVBOs.resize(std::max(inAttribLocation + 1ul, mVBOs.size()));
+  mVBOs[inAttribLocation] = inVBO;
+
   inVBO->Bind();
   AddVertexAttrib(inAttribLocation, inVertexAttrib);
 }
