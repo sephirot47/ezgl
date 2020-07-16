@@ -213,6 +213,39 @@ void Texture<TTextureTarget>::CopySubData(const Veci<N>& inSourcePosition,
 }
 
 template <GL::ETextureTarget TTextureTarget>
+template <typename T>
+void Texture<TTextureTarget>::GetTextureSubImage(const Veci<N>& inOffset,
+    const Veci<N>& inSize,
+    const GL::ETextureOutputFormat inOutputFormat,
+    const GL::ETextureOutputComponentFormat inOutputDataType,
+    const GL::Int inMipMapLevel,
+    const MutableSpan<T>& outData
+    ) const
+{
+  EXPECTS(inOffset + inSize <= GetSize());
+
+  auto offset = One<Vec3i>();
+  auto size = One<Vec3i>();
+  for (int i = 0; i < N; ++i)
+  {
+    offset[i] = inOffset[i];
+    size[i] = inSize[i];
+  }
+
+  GL::GetTextureSubImage(GetGLId(),
+      offset[0],
+      offset[1],
+      offset[2],
+      size[0],
+      size[1],
+      size[2],
+      inOutputFormat,
+      inOutputDataType,
+      inMipMapLevel,
+      outData);
+}
+
+template <GL::ETextureTarget TTextureTarget>
 void Texture<TTextureTarget>::TexImageEmpty(const Veci<N>& inSize, const GL::ETextureFormat inFormat)
 {
   if (GL::IsDepthOnlyFormat(inFormat) || GL::IsDepthStencilFormat(inFormat))

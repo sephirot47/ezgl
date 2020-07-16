@@ -450,6 +450,41 @@ public:
     UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV,
   };
 
+  enum class ETextureOutputFormat
+  {
+    RED = GL_RED,
+    RG = GL_RG,
+    RGB = GL_RGB,
+    BGR = GL_BGR,
+    RGBA = GL_RGBA,
+    BGRA = GL_BGRA,
+    DEPTH_COMPONENT = GL_DEPTH_COMPONENT,
+    STENCIL_INDEX = GL_STENCIL_INDEX
+  };
+
+  enum class ETextureOutputComponentFormat
+  {
+    UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+    BYTE = GL_BYTE,
+    UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
+    SHORT = GL_SHORT,
+    UNSIGNED_INT = GL_UNSIGNED_INT,
+    INT = GL_INT,
+    FLOAT = GL_FLOAT,
+    UNSIGNED_BYTE_3_3_2 = GL_UNSIGNED_BYTE_3_3_2,
+    UNSIGNED_BYTE_2_3_3_REV = GL_UNSIGNED_BYTE_2_3_3_REV,
+    UNSIGNED_SHORT_5_6_5 = GL_UNSIGNED_SHORT_5_6_5,
+    UNSIGNED_SHORT_5_6_5_REV = GL_UNSIGNED_SHORT_5_6_5_REV,
+    UNSIGNED_SHORT_4_4_4_4 = GL_UNSIGNED_SHORT_4_4_4_4,
+    UNSIGNED_SHORT_4_4_4_4_REV = GL_UNSIGNED_SHORT_4_4_4_4_REV,
+    UNSIGNED_SHORT_5_5_5_1 = GL_UNSIGNED_SHORT_5_5_5_1,
+    UNSIGNED_SHORT_1_5_5_5_REV = GL_UNSIGNED_SHORT_1_5_5_5_REV,
+    UNSIGNED_INT_8_8_8_8 = GL_UNSIGNED_INT_8_8_8_8,
+    UNSIGNED_INT_8_8_8_8_REV = GL_UNSIGNED_INT_8_8_8_8_REV,
+    UNSIGNED_INT_10_10_10_2 = GL_UNSIGNED_INT_10_10_10_2,
+    UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV
+  };
+
   enum class ETextureTarget
   {
     TEXTURE_1D = GL_TEXTURE_1D,
@@ -966,6 +1001,19 @@ public:
       const GL::EDataType inInputDataType,
       const Span<T>& inData,
       const GL::Int inMipMapLevel = 0);
+
+  template <typename T>
+  static void GetTextureSubImage(const GL::Id inTextureId,
+      const GL::Int inXOffset,
+      const GL::Int inYOffset,
+      const GL::Int inZOffset,
+      const GL::Size inWidth,
+      const GL::Size inHeight,
+      const GL::Size inDepth,
+      const GL::ETextureOutputFormat inOutputFormat,
+      const GL::ETextureOutputComponentFormat inOutputDataType,
+      const GL::Int inMipMapLevel,
+      MutableSpan<T> outPixels);
 
   static void CopyImageSubData(const GL::Id inSourceTextureId,
       const GL::ETextureTarget inSourceTarget,

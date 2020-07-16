@@ -161,6 +161,33 @@ void GL::TextureSubImage3D(const GL::Id inTextureId,
 }
 
 template <typename T>
+void GL::GetTextureSubImage(const GL::Id inTextureId,
+    const GL::Int inXOffset,
+    const GL::Int inYOffset,
+    const GL::Int inZOffset,
+    const GL::Size inWidth,
+    const GL::Size inHeight,
+    const GL::Size inDepth,
+    const GL::ETextureOutputFormat inOutputFormat,
+    const GL::ETextureOutputComponentFormat inOutputDataType,
+    const GL::Int inMipMapLevel,
+    MutableSpan<T> outPixels)
+{
+  glGetTextureSubImage(inTextureId,
+      inMipMapLevel,
+      inXOffset,
+      inYOffset,
+      inZOffset,
+      inWidth,
+      inHeight,
+      inDepth,
+      GL::EnumCast(inOutputFormat),
+      GL::EnumCast(inOutputDataType),
+      outPixels.GetSizeInBytes(),
+      outPixels.GetData());
+}
+
+template <typename T>
 std::vector<T> GL::GetTextureImage(const GL::Id inTextureId,
     const GL::ETextureInputFormat inFormatToConvertTo,
     const GL::EDataType inDataTypeToConvertTo,

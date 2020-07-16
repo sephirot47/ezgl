@@ -76,6 +76,14 @@ public:
       const GL::Int inSourceLevel = 0,
       const GL::Int inDestinationLevel = 0) const;
 
+  template <typename T>
+  void GetTextureSubImage(const Veci<N>& inOffset,
+      const Veci<N>& inSize,
+      const GL::ETextureOutputFormat inOutputFormat,
+      const GL::ETextureOutputComponentFormat inOutputDataType,
+      const GL::Int inMipMapLevel,
+      const MutableSpan<T>& outData) const;
+
   void SetWrapMode(const GL::EWrapMode inWrapMode);
   void SetWrapModeR(const GL::EWrapMode inWrapMode);
   void SetWrapModeS(const GL::EWrapMode inWrapMode);
