@@ -217,8 +217,6 @@ std::unique_ptr<RendererGPU::DrawSetup> RendererGPU::PrepareForDraw()
 
 void RendererGPU::PrepareForDraw(DrawSetup& ioDrawSetup)
 {
-  EXPECTS(GetShaderProgram());
-
   // Prepare shader program
   const auto override_shader_program = GetOverrideShaderProgram();
   ioDrawSetup.mShaderProgram = (override_shader_program ? override_shader_program : GetShaderProgram());
