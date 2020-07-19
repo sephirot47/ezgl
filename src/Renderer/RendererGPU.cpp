@@ -141,6 +141,12 @@ void RendererGPU::ResetState()
 
 void RendererGPU::PushAllDefaultStateValues() { mState.PushAllDefaultValues(); }
 
+void RendererGPU::DrawCustom(const std::function<void()>& inCustomDrawFunction)
+{
+  const auto draw_setup = PrepareForDraw();
+  inCustomDrawFunction();
+}
+
 void RendererGPU::DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType)
 {
   const auto mesh_draw_data = MeshDrawData { inMesh };
@@ -216,8 +222,8 @@ void RendererGPU::PrepareForDraw(DrawSetup& ioDrawSetup)
   // Prepare shader program
   const auto override_shader_program = GetOverrideShaderProgram();
   ioDrawSetup.mShaderProgram = (override_shader_program ? override_shader_program : GetShaderProgram());
-  assert(ioDrawSetup.mShaderProgram);
-  ioDrawSetup.mShaderProgram->Bind();
+  if (ioDrawSetup.mShaderProgram)
+    ioDrawSetup.mShaderProgram->Bind();
 
   // Prepare RenderTarget (if any)
   BindRenderTarget();

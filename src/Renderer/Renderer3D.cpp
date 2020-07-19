@@ -167,6 +167,11 @@ void Renderer3D::AdaptToWindow(const Window& inWindow)
   AdaptCameraToWindow(inWindow);
 }
 
+void Renderer3D::DrawCustom(const std::function<void()> &inCustomDrawFunction)
+{
+  RendererGPU::DrawCustom(inCustomDrawFunction);
+}
+
 void Renderer3D::DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType)
 {
   SetShaderProgram(sMeshShaderProgram);
