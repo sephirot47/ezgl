@@ -87,10 +87,12 @@ void Window::Maximize() { glfwMaximizeWindow(mHandle); }
 
 void Window::Minimize() { glfwIconifyWindow(mHandle); }
 
-void Window::SetInterFrameRestTime(const Seconds& inInterFrameRestTime)
+void Window::SetCursorMode(const Window::ECursorMode inCursorMode)
 {
-  mInterFrameRestTime = inInterFrameRestTime;
+  glfwSetInputMode(mHandle, GLFW_CURSOR, static_cast<int>(inCursorMode));
 }
+
+void Window::SetInterFrameRestTime(const Seconds& inInterFrameRestTime) { mInterFrameRestTime = inInterFrameRestTime; }
 
 Vec2i Window::GetSize() const
 {

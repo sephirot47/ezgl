@@ -35,6 +35,13 @@ public:
     bool mDoubleBuffer = true;
   };
 
+  enum class ECursorMode
+  {
+    NORMAL = GLFW_CURSOR_NORMAL,
+    HIDDEN = GLFW_CURSOR_HIDDEN,
+    DISABLED = GLFW_CURSOR_DISABLED,
+  };
+
   enum class ELoopResult
   {
     KEEP_LOOPING,
@@ -55,6 +62,7 @@ public:
   void Maximize();
   void Minimize();
 
+  void SetCursorMode(const Window::ECursorMode inCursorMode);
   void SetInterFrameRestTime(const Seconds& inInterFrameRestTime);
 
   Vec2i GetSize() const;
