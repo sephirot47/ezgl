@@ -215,6 +215,7 @@ void Renderer2D::DrawAARectBoundary()
 
 void Renderer2D::DrawAARectBoundary(const AARectf& inAARect)
 {
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(inAARect.GetCenter());
   Scale(inAARect.GetSize() * 0.5f);
   DrawAARectBoundary();
