@@ -4,6 +4,7 @@
 #include "ez/OrthographicCamera.h"
 #include "ez/PerspectiveCamera.h"
 #include "ez/Renderer3D.h"
+#include "ez/Triangle.h"
 #include "ez/Window.h"
 #include <cstdlib>
 
@@ -15,7 +16,7 @@ int main(int argc, const char** argv)
   srand(1234);
 
   constexpr auto NumTriangles = 20;
-  constexpr auto NumAABoxs = 20;
+  constexpr auto NumAABoxs = 30;
   constexpr auto SpaceSize = 5.0f;
   constexpr auto TriSize = 3.0f;
 
@@ -64,7 +65,7 @@ int main(int argc, const char** argv)
     camera_controller_fly.Update(inDeltaTime);
 
     const auto Intersects = [](const auto& lhs, const auto& rhs) {
-      return (reinterpret_cast<const void*>(&lhs) != reinterpret_cast<const void*>(&rhs)) && Intersect(lhs, rhs);
+      return (reinterpret_cast<const void*>(&lhs) != reinterpret_cast<const void*>(&rhs)) && IntersectCheck(lhs, rhs);
     };
 
     const auto IntersectsWithSomething = [&](const auto& inObject) {
