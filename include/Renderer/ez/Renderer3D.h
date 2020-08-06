@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ez/AACube.h"
 #include "ez/Camera.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
@@ -118,9 +119,10 @@ public:
 
   // Draw - 3D
   void AdaptToWindow(const Window& inWindow);
-  void DrawCustom(const std::function<void()> &inCustomDrawFunction);
+  void DrawCustom(const std::function<void()>& inCustomDrawFunction);
   void DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
-  void DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
+  void DrawMesh(const MeshDrawData& inMeshDrawData,
+      const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
   void DrawVAOElements(const VAO& inVAO,
       const GL::Size inNumberOfElementsToDraw,
       const GL::EPrimitivesType inPrimitivesType = GL::EPrimitivesType::TRIANGLES);
@@ -144,6 +146,10 @@ public:
   void DrawAABoxBoundary(const AABoxf& inAABox);
   void DrawAABox();
   void DrawAABoxBoundary();
+  void DrawAACube(const AACubef& inAACube) { DrawAABox(MakeAAHyperBoxFromAAHyperCube(inAACube)); }
+  void DrawAACubeBoundary(const AACubef& inAACube) { DrawAABoxBoundary(MakeAAHyperBoxFromAAHyperCube(inAACube)); }
+  void DrawAACube() { DrawAABox(); }
+  void DrawAACubeBoundary() { DrawAABoxBoundary(); }
   void DrawAARect();
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
@@ -165,6 +171,16 @@ public:
       const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER,
       bool inBillboard = false,
       bool inConstantScale = false);
+
+  // Overloaded
+  void Draw(const Planef& inPlane) { DrawPlane(inPlane); }
+  void Draw(const Segment3f& inSegment) { DrawSegment(inSegment); }
+  void Draw(const Spheref& inSphere) { DrawSphere(inSphere); }
+  void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
+  void Draw(const AABoxf& inAABox) { DrawAABox(inAABox); }
+  void Draw(const AACubef& inAACube) { DrawAACube(inAACube); }
+  void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
+  void DrawBoundary(const AABoxf& inAABox) { DrawAABoxBoundary(inAABox); }
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer3D::EStateId,

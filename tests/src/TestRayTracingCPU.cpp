@@ -27,7 +27,8 @@ int main(int argc, const char** argv)
     rendererRTCPU.AdaptCameraAspectRatio();
 
     auto scene = MakeSceneGraphNode<ObjectRayTracing>();
-    scene->SetLocalTransformation(Transformation3f { Zero<Vec3f>(), AxisAngle(Vec3f { 0.0f, -1.0f, -1.0f }, 0.1f) });
+    scene->SetLocalTransformation(
+        Transformation3f { Zero<Vec3f>(), AxisAngle(NormalizedSafe(Vec3f { 0.0f, -1.0f, -1.0f }), 0.1f) });
     {
       // Floor
       const auto floor_material = MaterialRayTracing { White<Color4f>() };

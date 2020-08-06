@@ -201,9 +201,6 @@ public:
   State& GetState() { return mState; }
   const State& GetState() const { return mState; }
 
-  template <auto TEStateIdToGuard>
-  [[nodiscard]] RendererStateGuard<TEStateIdToGuard> GetGuard();
-
 protected:
   // Shader
   void SetShaderProgram(const std::shared_ptr<ShaderProgram>& inShaderProgram) { mShaderProgram = inShaderProgram; }
@@ -297,7 +294,7 @@ private:
 template <>
 struct RendererFromEStateId<RendererGPU::EStateId>
 {
-  using Type = Renderer;
+  using Type = RendererGPU;
 };
 }
 

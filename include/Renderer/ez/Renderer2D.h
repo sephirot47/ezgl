@@ -108,6 +108,12 @@ public:
       const ETextHAlignment& inHAlignment = ETextHAlignment::CENTER,
       const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER);
 
+  // Overloaded
+  void Draw(const Triangle2f& inTriangle) { DrawTriangle(inTriangle); }
+  void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
+  void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
+  void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
+
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,
       std::shared_ptr<OrthographicCamera2f>, // EStateId::CAMERA

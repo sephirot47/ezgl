@@ -148,8 +148,8 @@ int main(int argc, const char** argv)
 
       renderer3D.SetBlendEnabled(true);
       {
-        const auto blend_factors_guard = renderer3D.GetGuard<Renderer::EStateId::BLEND_FACTORS>();
-        const auto blend_enabled_guard = renderer3D.GetGuard<Renderer::EStateId::BLEND_ENABLED>();
+        const auto blend_factors_guard = renderer3D.GetGuard<RendererGPU::EStateId::BLEND_FACTORS>();
+        const auto blend_enabled_guard = renderer3D.GetGuard<RendererGPU::EStateId::BLEND_ENABLED>();
         renderer3D.SetBlendFuncRGB(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
 
         renderer3D.GetMaterial().SetDiffuseColor(WithAlpha(Cyan<Color4f>(), 0.8f));

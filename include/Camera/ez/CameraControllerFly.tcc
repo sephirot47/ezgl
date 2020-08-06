@@ -134,8 +134,10 @@ void CameraControllerFly<T, N>::ApplyParameters()
 
   if constexpr (N == 3)
   {
-    const auto camera = mCamera.lock();
-    mCurrentRotationAngle = YX(AngleAxis(camera->GetRotation()));
+    if (const auto camera = mCamera.lock())
+    {
+      mCurrentRotationAngle = YX(AngleAxis(camera->GetRotation()));
+    }
   }
 }
 
