@@ -1,6 +1,7 @@
 #include "ez/AABox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
+#include "ez/Macros.h"
 #include "ez/OrthographicCamera.h"
 #include "ez/PerspectiveCamera.h"
 #include "ez/Renderer3D.h"
