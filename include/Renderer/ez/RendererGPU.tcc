@@ -80,8 +80,8 @@ void RendererGPU::DrawSegmentsGeneric(const Span<Segment<T, N>>& inSegments)
   segment_points.reserve(inSegments.GetNumberOfElements() * 2);
   for (const auto& segment : inSegments)
   {
-    segment_points.push_back(segment.GetFromPoint());
-    segment_points.push_back(segment.GetToPoint());
+    segment_points.push_back(segment.GetOrigin());
+    segment_points.push_back(segment.GetDestiny());
   }
 
   VAO vao;

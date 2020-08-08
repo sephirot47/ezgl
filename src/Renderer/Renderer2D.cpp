@@ -200,7 +200,7 @@ void Renderer2D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
 void Renderer2D::DrawAARect(const AARectf& inAARect)
 {
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAARect.GetCenter());
+  Translate(Center(inAARect));
   Scale(inAARect.GetSize());
   DrawMesh(MeshFactory::GetPlane());
 }
@@ -216,7 +216,7 @@ void Renderer2D::DrawAARectBoundary()
 void Renderer2D::DrawAARectBoundary(const AARectf& inAARect)
 {
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAARect.GetCenter());
+  Translate(Center(inAARect));
   Scale(inAARect.GetSize() * 0.5f);
   DrawAARectBoundary();
 }

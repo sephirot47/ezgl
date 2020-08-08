@@ -105,8 +105,8 @@ int main(int argc, const char** argv)
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 0.0f }, Vec3f { 1.0f, 1.5f, 1.8f });
   const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
   const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
-  const auto cylinder = Cylinderf { Vec3f { -2.0f, -0.9f, -0.9f }, Vec3f { 2.3f, -2.4f, 0.3f }, 0.4f };
-  const auto capsule = Capsulef { Vec3f { 0.0f, -0.9f, 0.9f }, Vec3f { 0.3f, -2.4f, -1.0f }, 0.3f };
+  const auto cylinder = Cylinderf { Vec3f { -1.0f, -1.5f, -0.6f }, Vec3f { 1.5f, -3.0f, 0.1f }, 0.4f };
+  const auto capsule = Capsulef { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
   const auto primitives = std::make_tuple(aabox, sphere, aacube, cylinder, capsule);
 
   // Create window
@@ -165,7 +165,7 @@ int main(int argc, const char** argv)
           if (!intersection_distance)
             continue;
 
-          const auto intersection_point = (segment.GetFromPoint() + Direction(segment) * (*intersection_distance));
+          const auto intersection_point = (segment.GetOrigin() + Direction(segment) * (*intersection_distance));
           renderer.SetPointSize(8.0f);
           renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
           renderer.DrawPoint(intersection_point);

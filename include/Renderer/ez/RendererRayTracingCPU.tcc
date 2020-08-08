@@ -35,14 +35,14 @@ namespace internal
     case ObjectRayTracing::ETypeId::SPHERE:
     {
       const auto& sphere = inObject.GetObject<Spheref>();
-      return NormalizedSafe(inIntersectionPoint - sphere.GetCenter());
+      return NormalizedSafe(inIntersectionPoint - Center(sphere));
     }
     break;
 
     case ObjectRayTracing::ETypeId::AABOX:
     {
       const auto& aabox = inObject.GetObject<AABoxf>();
-      const auto vector_from_center = (inIntersectionPoint - aabox.GetCenter());
+      const auto vector_from_center = (inIntersectionPoint - Center(aabox));
       const auto vector_from_center_from_0_to_1 = (vector_from_center / aabox.GetSize());
 
       const auto max_index = MaxIndex(Abs(vector_from_center_from_0_to_1));

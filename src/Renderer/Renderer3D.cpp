@@ -206,8 +206,8 @@ void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
   RENDERER_STATE_GUARD(this, Renderer3D::EStateId::TRANSFORM_MATRIX);
 
   DrawSegment(inArrowSegment);
-  Translate(inArrowSegment.GetToPoint());
-  Rotate(FromTo(Forward<Vec3f>(), Direction(inArrowSegment)));
+  Translate(inArrowSegment.GetDestiny());
+  Rotate(Orientation(inArrowSegment));
   Scale(Vec3f { 0.05f, 0.05f, 0.08f });
   DrawMesh(*sCone);
 }
@@ -234,7 +234,7 @@ void Renderer3D::DrawRay(const Ray3f& inRay, const float inRayDistance)
 
 void Renderer3D::DrawPlane(const Planef& inPlane, const float inPlaneSize)
 {
-  const auto plane_rotation = LookInDirection(inPlane.GetNormal());
+  const auto plane_rotation = FromTo(Forward<Vec3f>(), inPlane.GetNormal());
   const auto plane_points = std::array {
     Rotated(Vec3f(-inPlaneSize, -inPlaneSize, 0.0f), plane_rotation),
     Rotated(Vec3f(-inPlaneSize, inPlaneSize, 0.0f), plane_rotation),
@@ -288,7 +288,7 @@ void Renderer3D::DrawTriangleBoundary(const Triangle3f& inTriangle)
 void Renderer3D::DrawAABox(const AABoxf& inAABox)
 {
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAABox.GetCenter());
+  Translate(Center(inAABox));
   Scale(inAABox.GetSize() * 0.5f);
   DrawAABox();
 }
@@ -296,7 +296,7 @@ void Renderer3D::DrawAABox(const AABoxf& inAABox)
 void Renderer3D::DrawAABoxBoundary(const AABoxf& inAABox)
 {
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inAABox.GetCenter());
+  Translate(Center(inAABox));
   Scale(inAABox.GetSize() * 0.5f);
   DrawAABoxBoundary();
 }
@@ -323,7 +323,7 @@ void Renderer3D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
 
 void Renderer3D::DrawAARect(const AARectf& inAARect)
 {
-  Translate(XY0(inAARect.GetCenter()));
+  Translate(XY0(Center(inAARect)));
   Scale(XY1(inAARect.GetSize()) * 0.5f);
   DrawMesh(MeshFactory::GetPlane());
 }
@@ -338,7 +338,7 @@ void Renderer3D::DrawAARectBoundary()
 
 void Renderer3D::DrawAARectBoundary(const AARectf& inAARect)
 {
-  Translate(XY0(inAARect.GetCenter()));
+  Translate(XY0(Center(inAARect)));
   Scale(XY1(inAARect.GetSize()) * 0.5f);
   DrawAARectBoundary();
 }
@@ -348,8 +348,8 @@ void Renderer3D::DrawCapsule(const Capsulef& inCapsule,
     const std::size_t inNumLongitudes)
 {
   const auto transform_guard = GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
-  Translate((inCapsule.GetOrigin() + inCapsule.GetDestiny()) * 0.5f);
-  Rotate(LookInDirection(Direction(inCapsule)));
+  Translate(Center(inCapsule));
+  Rotate(Orientation(inCapsule));
   DrawMesh(MeshFactory::GetCapsule(inCapsule.GetRadius(),
       Length(inCapsule.GetSegment()),
       inNumHemisphereLatitudes,
@@ -358,11 +358,10 @@ void Renderer3D::DrawCapsule(const Capsulef& inCapsule,
 
 void Renderer3D::DrawCylinder(const Cylinderf& inCylinder, const std::size_t inNumLongitudes)
 {
-  const auto cylinder_center = ((inCylinder.GetOrigin() + inCylinder.GetDestiny()) * 0.5f);
   const auto cylinder_length = Length(inCylinder.GetSegment());
   const auto transform_guard = GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
-  Translate(cylinder_center);
-  Rotate(FromTo(Back<Vec3f>(), Direction(inCylinder)));
+  Translate(Center(inCylinder));
+  Rotate(Orientation(inCylinder));
   Scale(Vec3f { inCylinder.GetRadius() * 2.0f, inCylinder.GetRadius() * 2.0f, cylinder_length });
   DrawCylinder(inNumLongitudes);
 }
@@ -389,7 +388,7 @@ void Renderer3D::DrawSphere(std::size_t inNumLatitudes, std::size_t inNumLongitu
 void Renderer3D::DrawSphere(const Spheref& inSphere, std::size_t inNumLatitudes, std::size_t inNumLongitudes)
 {
   RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
-  Translate(inSphere.GetCenter());
+  Translate(Center(inSphere));
   Scale(inSphere.GetRadius());
   DrawSphere(inNumLatitudes, inNumLongitudes);
 }
