@@ -179,6 +179,7 @@ public:
       bool inConstantScale = false);
 
   // Overloaded
+  void Draw(const Vec3f& inPoint) { DrawPoint(inPoint); }
   void Draw(const Planef& inPlane) { DrawPlane(inPlane); }
   void Draw(const Segment3f& inSegment) { DrawSegment(inSegment); }
   void Draw(const Spheref& inSphere) { DrawSphere(inSphere); }

@@ -110,6 +110,7 @@ public:
       const ETextVAlignment& inVAlignment = ETextVAlignment::CENTER);
 
   // Overloaded
+  void Draw(const Vec2f& inPoint) { DrawPoint(inPoint); }
   void Draw(const Triangle2f& inTriangle) { DrawTriangle(inTriangle); }
   void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }

@@ -74,9 +74,9 @@ public:
     }
   };
 
-  std::array<Segment3f, 32> GetSegments() const
+  std::array<Segment3f, 128> GetSegments() const
   {
-    std::array<Segment3f, 32> segments;
+    std::array<Segment3f, 128> segments;
     for (int i = 0; i < segments.size(); ++i)
     {
       const auto f = (float(i) / segments.size());
@@ -156,9 +156,12 @@ int main(int argc, const char** argv)
       renderer.SetLineWidth(2.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
       renderer.GetMaterial().SetDiffuseColor(intersecting ? Red<Color4f>() : Green<Color4f>());
-      renderer.DrawSegment(segment);
+      renderer.Draw(segment);
 
+      renderer.SetPointSize(8.0f);
+      renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
       ForEach(primitives, [&](const auto& in_primitive) {
+        renderer.GetMaterial().SetDiffuseColor(Red<Color4f>());
         const auto intersection_distances = IntersectAll(segment, in_primitive);
         for (const auto& intersection_distance : intersection_distances)
         {
@@ -166,10 +169,13 @@ int main(int argc, const char** argv)
             continue;
 
           const auto intersection_point = (segment.GetOrigin() + Direction(segment) * (*intersection_distance));
-          renderer.SetPointSize(8.0f);
-          renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-          renderer.DrawPoint(intersection_point);
+          renderer.Draw(intersection_point);
         }
+
+        renderer.GetMaterial().SetDiffuseColor(Blue<Color4f>());
+        const auto closest_intersection_distance = IntersectClosest(segment, in_primitive);
+        if (closest_intersection_distance)
+          renderer.Draw((segment.GetOrigin() + Direction(segment) * (*closest_intersection_distance)));
       });
     }
 
