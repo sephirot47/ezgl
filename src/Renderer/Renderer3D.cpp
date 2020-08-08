@@ -167,7 +167,7 @@ void Renderer3D::AdaptToWindow(const Window& inWindow)
   AdaptCameraToWindow(inWindow);
 }
 
-void Renderer3D::DrawCustom(const std::function<void()> &inCustomDrawFunction)
+void Renderer3D::DrawCustom(const std::function<void()>& inCustomDrawFunction)
 {
   RendererGPU::DrawCustom(inCustomDrawFunction);
 }
@@ -207,7 +207,7 @@ void Renderer3D::DrawArrow(const Segment3f& inArrowSegment)
 
   DrawSegment(inArrowSegment);
   Translate(inArrowSegment.GetToPoint());
-  Rotate(LookInDirection(Direction(inArrowSegment)));
+  Rotate(FromTo(Forward<Vec3f>(), Direction(inArrowSegment)));
   Scale(Vec3f { 0.05f, 0.05f, 0.08f });
   DrawMesh(*sCone);
 }
@@ -341,6 +341,30 @@ void Renderer3D::DrawAARectBoundary(const AARectf& inAARect)
   Translate(XY0(inAARect.GetCenter()));
   Scale(XY1(inAARect.GetSize()) * 0.5f);
   DrawAARectBoundary();
+}
+
+void Renderer3D::DrawCapsule(const Capsulef& inCapsule,
+    const std::size_t inNumHemisphereLatitudes,
+    const std::size_t inNumLongitudes)
+{
+  const auto transform_guard = GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
+  Translate((inCapsule.GetOrigin() + inCapsule.GetDestiny()) * 0.5f);
+  Rotate(LookInDirection(Direction(inCapsule)));
+  DrawMesh(MeshFactory::GetCapsule(inCapsule.GetRadius(),
+      Length(inCapsule.GetSegment()),
+      inNumHemisphereLatitudes,
+      inNumLongitudes));
+}
+
+void Renderer3D::DrawCylinder(const Cylinderf& inCylinder, const std::size_t inNumLongitudes)
+{
+  const auto cylinder_center = ((inCylinder.GetOrigin() + inCylinder.GetDestiny()) * 0.5f);
+  const auto cylinder_length = Length(inCylinder.GetSegment());
+  const auto transform_guard = GetGuard<Renderer3D::EStateId::TRANSFORM_MATRIX>();
+  Translate(cylinder_center);
+  Rotate(FromTo(Back<Vec3f>(), Direction(inCylinder)));
+  Scale(Vec3f { inCylinder.GetRadius() * 2.0f, inCylinder.GetRadius() * 2.0f, cylinder_length });
+  DrawCylinder(inNumLongitudes);
 }
 
 void Renderer3D::DrawCylinder(std::size_t inNumLongitudes) { DrawMesh(MeshFactory::GetCylinder(inNumLongitudes)); }

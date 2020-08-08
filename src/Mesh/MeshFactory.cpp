@@ -68,15 +68,11 @@ Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes,
       = -(HalfCircleRads<float>() / (inNumLatitudes - (inIsHemisphere ? 2 : 1))) / (inIsHemisphere ? 2 : 1);
   const auto angle_y_increment = -FullCircleRads() / inNumLongitudes;
   auto angle_z = (inIsHemisphere ? 0.0f : QuarterCircleRads<float>());
-  std::vector<float> vertex_id_to_angles_y(inNumLongitudes * inNumLatitudes, 0.0f);
-  std::vector<float> vertex_id_to_angles_z(inNumLongitudes * inNumLatitudes, 0.0f);
   for (Mesh::VertexId z = 0; z < inNumLatitudes; ++z)
   {
     if (z == 0 || z == (inNumLatitudes - 1)) // South or north pole, single vertex
     {
       sphere.AddVertex(Vec3f { 0.0f, 0.0f, std::sin(angle_z) });
-      vertex_id_to_angles_y.at(sphere.GetNumberOfVertices() - 1) = 0.0f;
-      vertex_id_to_angles_z.at(sphere.GetNumberOfVertices() - 1) = angle_z;
       if (inIsHemisphere)
         continue;
     }
@@ -94,8 +90,6 @@ Mesh MeshFactory::GetSphere(const std::size_t inNumLatitudes,
         sphere.AddVertex(point);
 
         angle_y += angle_y_increment;
-        vertex_id_to_angles_y.at(sphere.GetNumberOfVertices() - 1) = angle_y;
-        vertex_id_to_angles_z.at(sphere.GetNumberOfVertices() - 1) = angle_z;
       }
     }
 
@@ -191,6 +185,88 @@ Mesh MeshFactory::GetCylinder(const std::size_t inNumLongitudes)
 
   ConsolidateMesh(cylinder);
   return cylinder;
+}
+
+Mesh MeshFactory::GetCapsule(const float inRadius,
+    const float inLength,
+    const std::size_t inNumHemisphereLatitudes,
+    const std::size_t inNumLongitudes)
+{
+  EXPECTS(inNumHemisphereLatitudes >= 2);
+  EXPECTS(inNumLongitudes >= 3);
+  EXPECTS(inLength >= 0.0f);
+
+  Mesh capsule;
+
+  // Add vertices
+  const auto num_total_latitudes = (inNumHemisphereLatitudes * 2 + 1);
+  const auto angle_z_increment = -(HalfCircleRads<float>() / (num_total_latitudes - 1));
+  const auto angle_y_increment = -FullCircleRads() / inNumLongitudes;
+  const auto half_length = (inLength / 2);
+  auto angle_z = QuarterCircleRads<float>();
+  for (Mesh::VertexId z = 0; z < num_total_latitudes; ++z)
+  {
+    const auto north_side = (z <= (num_total_latitudes / 2));
+    const auto z_length_offset = (half_length * (north_side ? 1 : -1));
+
+    if (z == 0 || z == (num_total_latitudes - 1)) // South or north pole, single vertex
+    {
+      capsule.AddVertex(Vec3f { 0.0f, 0.0f, std::sin(angle_z) * inRadius + z_length_offset });
+    }
+    else // Middle vertices
+    {
+      const auto position_z = std::sin(angle_z) * inRadius + z_length_offset;
+      const auto cos_z = std::cos(angle_z);
+
+      auto angle_y = 0.0f;
+      for (Mesh::VertexId y = 0; y < inNumLongitudes; ++y)
+      {
+        const auto position_x = cos_z * std::cos(angle_y) * inRadius;
+        const auto position_y = cos_z * std::sin(angle_y) * inRadius;
+        capsule.AddVertex(Vec3f { position_x, position_y, position_z });
+        angle_y += angle_y_increment;
+      }
+    }
+
+    if (z != num_total_latitudes / 2) // Do not increase angle in the middle
+      angle_z += angle_z_increment;
+  }
+
+  // Add faces
+  for (Mesh::VertexId z = 0; z < num_total_latitudes - 1; ++z)
+  {
+    const bool is_current_south_pole = (z == 0);
+    const bool is_up_north_pole = ((z + 1) == (num_total_latitudes - 1));
+    for (Mesh::VertexId y = 0; y < inNumLongitudes; ++y)
+    {
+      if (is_current_south_pole) // Current row is the south pole point
+      {
+        const auto south_pole_vertex_index = 0;
+        const auto up_vertex_index = 1 + y;
+        const auto up_right_vertex_index = 1 + ((y + 1) % inNumLongitudes);
+        capsule.AddFace(south_pole_vertex_index, up_right_vertex_index, up_vertex_index);
+      }
+      else if (!is_up_north_pole) // Middle vertices
+      {
+        const auto current_vertex_index = (1 + (z - 1) * inNumLongitudes) + y;
+        const auto right_vertex_index = (1 + (z - 1) * inNumLongitudes) + ((y + 1) % inNumLongitudes);
+        const auto up_vertex_index = (1 + z * inNumLongitudes) + y;
+        const auto up_right_vertex_index = (1 + z * inNumLongitudes) + ((y + 1) % inNumLongitudes);
+        capsule.AddFace(current_vertex_index, right_vertex_index, up_right_vertex_index);
+        capsule.AddFace(current_vertex_index, up_right_vertex_index, up_vertex_index);
+      }
+      else // Next row above is the north pole point
+      {
+        const auto current_vertex_index = (1 + (z - 1) * inNumLongitudes) + y;
+        const auto right_vertex_index = (1 + (z - 1) * inNumLongitudes) + ((y + 1) % inNumLongitudes);
+        const auto north_pole_vertex_index = (1 + ((num_total_latitudes - 2) * inNumLongitudes));
+        capsule.AddFace(north_pole_vertex_index, current_vertex_index, right_vertex_index);
+      }
+    }
+  }
+
+  ConsolidateMesh(capsule);
+  return capsule;
 }
 
 Mesh MeshFactory::GetTorus(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const float inHoleSize)

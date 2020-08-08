@@ -2,7 +2,9 @@
 
 #include "ez/AACube.h"
 #include "ez/Camera.h"
+#include "ez/Capsule.h"
 #include "ez/Color.h"
+#include "ez/Cylinder.h"
 #include "ez/DirectionalLight.h"
 #include "ez/ETextHAlignment.h"
 #include "ez/ETextVAlignment.h"
@@ -154,6 +156,10 @@ public:
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
   void DrawAARectBoundary(const AARectf& inAARect);
+  void DrawCapsule(const Capsulef& inCapsule,
+      const std::size_t inNumHemisphereLatitudes = 16,
+      const std::size_t inNumLongitudes = 16);
+  void DrawCylinder(const Cylinderf& inCylinder, const std::size_t inNumLongitudes = 32);
   void DrawCylinder(std::size_t inNumLongitudes = 32);
   void DrawTorus(std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32, float inHoleSize = 0.5f);
   void DrawCone(std::size_t inNumLongitudes = 32);
@@ -179,6 +185,8 @@ public:
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void Draw(const AABoxf& inAABox) { DrawAABox(inAABox); }
   void Draw(const AACubef& inAACube) { DrawAACube(inAACube); }
+  void Draw(const Capsulef& inCapsule) { DrawCapsule(inCapsule); }
+  void Draw(const Cylinderf& inCylinder) { DrawCylinder(inCylinder); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
   void DrawBoundary(const AABoxf& inAABox) { DrawAABoxBoundary(inAABox); }
 

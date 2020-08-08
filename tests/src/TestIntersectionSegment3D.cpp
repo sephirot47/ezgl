@@ -2,6 +2,7 @@
 #include "ez/AACube.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
+#include "ez/Capsule.h"
 #include "ez/HyperSphere.h"
 #include "ez/MathRandom.h"
 #include "ez/OrthographicCamera.h"
@@ -18,6 +19,8 @@ using namespace ez;
 class TestSegmentController : public InputListener
 {
 public:
+  static constexpr auto MinLength = 0.1f;
+
   void OnInput(const InputEvent& inInputEvent) override
   {
     if (inInputEvent.GetType() == InputEvent::EType::KEY)
@@ -49,7 +52,7 @@ public:
           if (key_event.mKey == EKey::W)
             mSegmentLength += delta_length;
           if (key_event.mKey == EKey::S)
-            mSegmentLength = std::max(mSegmentLength - delta_length, delta_length);
+            mSegmentLength = std::max(mSegmentLength - delta_length, MinLength);
         }
         else
         {
@@ -79,7 +82,7 @@ public:
       const auto f = (float(i) / segments.size());
       const auto segment_local_rotation = AngleAxis(f * FullCircleRads<float>(), Right<Vec3f>());
       const auto segment_rotation = (mSegmentRotation * segment_local_rotation);
-      segments[i] = Segment3f { mSegmentTranslation,
+      segments[i] = Segment3f { mSegmentTranslation + segment_rotation * (MinLength * Forward<Vec3f>()),
         mSegmentTranslation + segment_rotation * (mSegmentLength * Forward<Vec3f>()) };
     }
     return segments;
@@ -102,7 +105,9 @@ int main(int argc, const char** argv)
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 0.0f }, Vec3f { 1.0f, 1.5f, 1.8f });
   const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
   const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
-  const auto primitives = std::make_tuple(aabox, sphere, aacube);
+  const auto cylinder = Cylinderf { Vec3f { -2.0f, -0.9f, -0.9f }, Vec3f { 2.3f, -2.4f, 0.3f }, 0.4f };
+  const auto capsule = Capsulef { Vec3f { 0.0f, -0.9f, 0.9f }, Vec3f { 0.3f, -2.4f, -1.0f }, 0.3f };
+  const auto primitives = std::make_tuple(aabox, sphere, aacube, cylinder);
 
   // Create window
   Window::CreateOptions window_create_options;
@@ -168,11 +173,18 @@ int main(int argc, const char** argv)
       });
     }
 
+    renderer.GetMaterial().SetLightingEnabled(false);
+    renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
+    renderer.GetMaterial().SetDiffuseColor(Blue<Color4f>());
+    renderer.DrawArrow(Segment3f { cylinder.GetOrigin(),
+        cylinder.GetOrigin() + FromTo(Forward<Vec3f>(), Direction(cylinder)) * Forward<Vec3f>() * Length(cylinder) });
+
     renderer.GetMaterial().SetDiffuseColor(WithAlpha(White<Color4f>(), 0.5f));
     renderer.GetMaterial().SetLightingEnabled(true);
     renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
     renderer.SetBlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
     ForEach(primitives, [&](const auto& in_primitive) { renderer.Draw(in_primitive); });
+    // renderer.DrawCapsule(capsule);
 
     // Blit image to window
     GL::ClearDepth();

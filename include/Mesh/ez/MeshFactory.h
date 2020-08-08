@@ -17,6 +17,7 @@ public:
   static Mesh GetHemisphere(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes);
   static Mesh GetCone(const std::size_t inNumLongitudes);
   static Mesh GetCylinder(const std::size_t inNumLongitudes);
+  static Mesh GetCapsule(const float inRadius, const float inLength, const std::size_t inNumHemisphereLatitudes, const std::size_t inNumLongitudes);
   static Mesh
   GetTorus(const std::size_t inNumLatitudes, const std::size_t inNumLongitudes, const float inHoleSize = 0.5f);
 
