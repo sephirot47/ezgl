@@ -16,7 +16,7 @@ public:
 
   static std::string PreprocessShaderCode(const std::string_view inShaderCode,
       const Span<std::filesystem::path>& inIncludeDirs,
-      const std::filesystem::path &inFilePath = "");
+      const std::filesystem::path& inFilePath = "");
 
   static std::string PreprocessShaderErrorMessage(const std::string_view inErrorMessage);
 
@@ -29,6 +29,6 @@ private:
   static std::string PreprocessShaderCode(const std::string_view inShaderCode,
       const Span<std::filesystem::path>& inIncludeDirs,
       std::set<std::filesystem::path>& ioAlreadyProcessedFiles,
-      const std::filesystem::path &inFilePath = "");
+      const std::filesystem::path& inFilePath = "");
 };
 }

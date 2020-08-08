@@ -219,8 +219,7 @@ void Texture<TTextureTarget>::GetTextureSubImage(const Veci<N>& inOffset,
     const GL::ETextureOutputFormat inOutputFormat,
     const GL::ETextureOutputComponentFormat inOutputDataType,
     const GL::Int inMipMapLevel,
-    const MutableSpan<T>& outData
-    ) const
+    const MutableSpan<T>& outData) const
 {
   EXPECTS(inOffset + inSize <= GetSize());
 

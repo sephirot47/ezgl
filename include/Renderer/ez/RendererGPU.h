@@ -212,7 +212,7 @@ protected:
 
   // Draw helpers
   virtual void AdaptToWindow(const Window& inWindow);
-  void DrawCustom(const std::function<void()> &inCustomDrawFunction);
+  void DrawCustom(const std::function<void()>& inCustomDrawFunction);
   void DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
   void DrawMesh(const MeshDrawData& inMeshDrawData,
       const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);

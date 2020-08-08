@@ -85,7 +85,8 @@ public:
   // Draw
   void AdaptToWindow(const Window& inWindow);
   void DrawMesh(const Mesh& inMesh, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
-  void DrawMesh(const MeshDrawData& inMeshDrawData, const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
+  void DrawMesh(const MeshDrawData& inMeshDrawData,
+      const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
   void DrawPoint(const Vec2f& inPoint);
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);
