@@ -403,12 +403,12 @@ void Renderer3D::DrawCircleBoundary(std::size_t inNumVertices)
   DrawCircleSectionBoundaryGeneric<float, 3>(FullCircleRads(), inNumVertices);
 }
 
-void Renderer3D::DrawCircleSection(const AngleRads inAngle, std::size_t inNumVertices)
+void Renderer3D::DrawCircleSection(const AngleRads<float> inAngle, std::size_t inNumVertices)
 {
   DrawCircleSectionGeneric<float, 3>(inAngle, inNumVertices);
 }
 
-void Renderer3D::DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices)
+void Renderer3D::DrawCircleSectionBoundary(const AngleRads<float> inAngle, std::size_t inNumVertices)
 {
   DrawCircleSectionBoundaryGeneric<float, 3>(inAngle, inNumVertices);
 }

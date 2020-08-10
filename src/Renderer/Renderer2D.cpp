@@ -46,7 +46,7 @@ void Renderer2D::Translate(const Vec2f& inTranslation)
   auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * TranslationMat(inTranslation);
 }
-void Renderer2D::Rotate(const AngleRads inRotationAngle)
+void Renderer2D::Rotate(const AngleRads<float> inRotationAngle)
 {
   auto& model_matrix = mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>();
   model_matrix = model_matrix * RotationMat(inRotationAngle);
@@ -163,12 +163,12 @@ void Renderer2D::DrawLineStrip(const Span<Vec2f>& inLinePoints)
   DrawLineStripGeneric(inLinePoints);
 }
 
-void Renderer2D::DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices)
+void Renderer2D::DrawCircleSection(const AngleRads<float> inAngle, const std::size_t inNumVertices)
 {
   DrawCircleSectionGeneric<float, 2>(inAngle, inNumVertices);
 }
 
-void Renderer2D::DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices)
+void Renderer2D::DrawCircleSectionBoundary(const AngleRads<float> inAngle, const std::size_t inNumVertices)
 {
   DrawCircleSectionBoundaryGeneric<float, 2>(inAngle, inNumVertices);
 }

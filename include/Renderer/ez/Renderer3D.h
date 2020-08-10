@@ -168,8 +168,8 @@ public:
   void DrawSphere(const Spheref& inSphere, std::size_t inNumLatitudes = 32, std::size_t inNumLongitudes = 32);
   void DrawCircle(std::size_t inNumVertices = 32);
   void DrawCircleBoundary(std::size_t inNumVertices = 32);
-  void DrawCircleSection(const AngleRads inAngle, std::size_t inNumVertices = 32);
-  void DrawCircleSectionBoundary(const AngleRads inAngle, std::size_t inNumVertices = 32);
+  void DrawCircleSection(const AngleRads<float> inAngle, std::size_t inNumVertices = 32);
+  void DrawCircleSectionBoundary(const AngleRads<float> inAngle, std::size_t inNumVertices = 32);
   void DrawText(const std::string_view inText,
       const Font& inFont,
       const float inScale = 1.0f,

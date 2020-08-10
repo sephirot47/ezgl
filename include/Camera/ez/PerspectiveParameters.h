@@ -8,7 +8,7 @@ namespace ez
 template <typename T>
 struct PerspectiveParameters final
 {
-  AngleRads mFullAngleOfView = HalfPi<T>();
+  AngleRads<T> mFullAngleOfView = HalfPi<T>();
   T mAspectRatio = 1.0f;
   T mZNear = 0.05f;
   T mZFar = 1000.0f;

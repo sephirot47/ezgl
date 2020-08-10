@@ -67,7 +67,7 @@ public:
   const Mat3f& GetTransformMatrix() const { return mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
   Mat3f& GetTransformMatrix() { return mState.GetCurrent<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
   void Translate(const Vec2f& inTranslation);
-  void Rotate(const AngleRads inRotationAngle);
+  void Rotate(const AngleRads<float> inRotationAngle);
   void Scale(const Vec2f& inScale);
   void Scale(const float inScale);
   void PushTransformMatrix() { mState.PushTop<Renderer2D::EStateId::TRANSFORM_MATRIX>(); }
@@ -90,8 +90,8 @@ public:
   void DrawPoint(const Vec2f& inPoint);
   void DrawPoints(const Span<Vec2f>& inPoints);
   void DrawSegment(const Segment2f& inSegment);
-  void DrawCircleSection(const AngleRads inAngle, const std::size_t inNumVertices = 32);
-  void DrawCircleSectionBoundary(const AngleRads inAngle, const std::size_t inNumVertices = 32);
+  void DrawCircleSection(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
+  void DrawCircleSectionBoundary(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
   void DrawCircle(const std::size_t inNumVertices = 32);
   void DrawCircleBoundary(const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);

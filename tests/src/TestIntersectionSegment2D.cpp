@@ -8,7 +8,8 @@
 #include "ez/MathRandom.h"
 #include "ez/OrthographicCamera.h"
 #include "ez/PerspectiveCamera.h"
-#include "ez/Renderer3D.h"
+#include "ez/Ray.h"
+#include "ez/Renderer2D.h"
 #include "ez/Segment.h"
 #include "ez/TupleForEach.h"
 #include "ez/Window.h"
@@ -21,28 +22,22 @@ int main(int argc, const char** argv)
 {
   srand(1234);
 
-  const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 0.0f }, Vec3f { 1.0f, 1.5f, 1.8f });
-  const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
-  const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
-  const auto cylinder = Cylinderf { Vec3f { -1.0f, -1.5f, -0.6f }, Vec3f { 1.5f, -3.0f, 0.1f }, 0.4f };
-  const auto capsule = Capsulef { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
-  const auto primitives = std::make_tuple(aabox, sphere, aacube, cylinder, capsule);
+  const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
+  const auto primitives = std::make_tuple(aarect);
 
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Segment AABox intersection 3D";
+  window_create_options.mTitle = "Test Segment AABox intersection 2D";
   const auto window = std::make_shared<Window>(window_create_options);
 
-  TestSegmentController<3> segment_controller;
+  TestSegmentController<2> segment_controller;
   window->AddInputListener(&segment_controller);
 
   // Camera
-  const auto camera = std::make_shared<PerspectiveCameraf>();
-  camera->SetPosition(Back<Vec3f>() * 5.0f);
-  camera->LookAtPoint(Zero<Vec3f>());
+  const auto camera = std::make_shared<OrthographicCamera2f>();
 
   // Camera controller
-  CameraControllerFly3f camera_controller_fly;
+  CameraControllerFly2f camera_controller_fly;
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
   camera_controller_fly.GetParameters().mMinFlySpeed = 0.1f;
@@ -50,16 +45,16 @@ int main(int argc, const char** argv)
   camera_controller_fly.ApplyParameters();
 
   // Create renderer
-  Renderer3D renderer;
+  Renderer2D renderer;
 
   // Window loop
   window->Loop([&](const DeltaTime& inDeltaTime) {
     renderer.ResetState();
     renderer.SetCamera(camera);
     renderer.AdaptToWindow(*window);
+    camera->SetOrthoMin(-5.0f * One<Vec2f>());
+    camera->SetOrthoMax(5.0f * One<Vec2f>());
     renderer.Clear();
-
-    renderer.AddDirectionalLight(NormalizedSafe(Vec3f { -1.0f, -2.0f, -0.5f }), White<Color3f>());
 
     if (!segment_controller.IsControlEnabled())
     {
@@ -74,13 +69,13 @@ int main(int argc, const char** argv)
 
       renderer.SetLineWidth(2.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      renderer.GetMaterial().SetDiffuseColor(intersecting ? Red<Color4f>() : Green<Color4f>());
+      renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
       renderer.Draw(segment);
 
       renderer.SetPointSize(8.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
       ForEach(primitives, [&](const auto& in_primitive) {
-        renderer.GetMaterial().SetDiffuseColor(Red<Color4f>());
+        renderer.GetMaterial().SetColor(Red<Color4f>());
         const auto intersection_distances = IntersectAll(segment, in_primitive);
         for (const auto& intersection_distance : intersection_distances)
         {
@@ -91,15 +86,14 @@ int main(int argc, const char** argv)
           renderer.Draw(intersection_point);
         }
 
-        renderer.GetMaterial().SetDiffuseColor(Blue<Color4f>());
+        renderer.GetMaterial().SetColor(Blue<Color4f>());
         const auto closest_intersection_distance = IntersectClosest(segment, in_primitive);
         if (closest_intersection_distance)
           renderer.Draw((segment.GetOrigin() + Direction(segment) * (*closest_intersection_distance)));
       });
     }
 
-    renderer.GetMaterial().SetDiffuseColor(WithAlpha(White<Color4f>(), 0.5f));
-    renderer.GetMaterial().SetLightingEnabled(true);
+    renderer.GetMaterial().SetColor(WithAlpha(White<Color4f>(), 0.5f));
     renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
     renderer.SetBlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
     ForEach(primitives, [&](const auto& in_primitive) { renderer.Draw(in_primitive); });

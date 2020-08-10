@@ -229,9 +229,9 @@ protected:
       const bool inDrawArrays,
       const GL::Size inBeginArraysPrimitiveIndex);
   template <typename T, std::size_t N>
-  void DrawCircleSectionGeneric(const AngleRads inAngle, std::size_t inNumVertices);
+  void DrawCircleSectionGeneric(const AngleRads<T> inAngle, std::size_t inNumVertices);
   template <typename T, std::size_t N>
-  void DrawCircleSectionBoundaryGeneric(const AngleRads inAngle, std::size_t inNumVertices);
+  void DrawCircleSectionBoundaryGeneric(const AngleRads<T> inAngle, std::size_t inNumVertices);
   template <typename T, std::size_t N>
   void DrawTrianglesGeneric(const Span<Triangle<T, N>>& inTriangles);
   template <typename T>

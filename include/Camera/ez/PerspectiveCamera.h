@@ -11,11 +11,11 @@ template <typename T>
 class PerspectiveCamera final : public Camera<T, 3>
 {
 public:
-  void SetFullAngleOfView(const AngleRads inFullAngleOfView)
+  void SetFullAngleOfView(const AngleRads<T> inFullAngleOfView)
   {
     mPerspectiveParameters.mFullAngleOfView = inFullAngleOfView;
   }
-  AngleRads GetFullAngleOfView() const { return mPerspectiveParameters.mFullAngleOfView; }
+  AngleRads<T> GetFullAngleOfView() const { return mPerspectiveParameters.mFullAngleOfView; }
 
   void SetAspectRatio(const float inAspectRatio) { mPerspectiveParameters.mAspectRatio = inAspectRatio; }
   float GetAspectRatio() const { return mPerspectiveParameters.mAspectRatio; }

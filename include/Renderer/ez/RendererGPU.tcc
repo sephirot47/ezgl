@@ -6,7 +6,7 @@ namespace ez
 {
 
 template <typename T, std::size_t N>
-void RendererGPU::DrawCircleSectionGeneric(const AngleRads inAngle, std::size_t inNumVertices)
+void RendererGPU::DrawCircleSectionGeneric(const AngleRads<T> inAngle, std::size_t inNumVertices)
 {
   EXPECTS(inNumVertices >= 3);
 
@@ -31,7 +31,7 @@ void RendererGPU::DrawCircleSectionGeneric(const AngleRads inAngle, std::size_t 
 }
 
 template <typename T, std::size_t N>
-void RendererGPU::DrawCircleSectionBoundaryGeneric(const AngleRads inAngle, std::size_t inNumVertices)
+void RendererGPU::DrawCircleSectionBoundaryGeneric(const AngleRads<T> inAngle, std::size_t inNumVertices)
 {
   EXPECTS(inNumVertices >= 3);
 

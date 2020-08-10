@@ -8,11 +8,23 @@
 
 namespace ez
 {
+template <std::size_t N>
 class TestSegmentController : public InputListener
 {
 public:
   static constexpr auto MinLength = 0.1f;
 
+  TestSegmentController()
+  {
+    if constexpr (N == 2)
+    {
+      mSegmentRotation = 0.0f;
+    }
+    else
+    {
+      mSegmentRotation = AngleAxis(QuarterCircleRads<float>(), Up<Vecf<N>>());
+    }
+  }
   void OnInput(const InputEvent& inInputEvent) override
   {
     if (inInputEvent.GetType() == InputEvent::EType::KEY)
@@ -26,19 +38,7 @@ public:
         if (!IsControlEnabled())
           return;
 
-        if (key_event.IsShiftModifierPressed())
-        {
-          const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
-          if (key_event.mKey == EKey::A)
-            mSegmentRotation *= AngleAxis(delta_angle, Up<Vec3f>());
-          if (key_event.mKey == EKey::D)
-            mSegmentRotation *= AngleAxis(delta_angle, -Up<Vec3f>());
-          if (key_event.mKey == EKey::S)
-            mSegmentRotation *= AngleAxis(delta_angle, Forward<Vec3f>());
-          if (key_event.mKey == EKey::W)
-            mSegmentRotation *= AngleAxis(delta_angle, -Forward<Vec3f>());
-        }
-        else if (key_event.IsAltModifierPressed())
+        if (key_event.IsAltModifierPressed())
         {
           const auto delta_length = 0.1f;
           if (key_event.mKey == EKey::W)
@@ -50,32 +50,72 @@ public:
         {
           const auto delta_displacement = 0.1f;
           if (key_event.mKey == EKey::A)
-            mSegmentTranslation += delta_displacement * Left<Vec3f>();
+            mSegmentTranslation += delta_displacement * Left<Vecf<N>>();
           if (key_event.mKey == EKey::D)
-            mSegmentTranslation += delta_displacement * Right<Vec3f>();
+            mSegmentTranslation += delta_displacement * Right<Vecf<N>>();
           if (key_event.mKey == EKey::E)
-            mSegmentTranslation += delta_displacement * Down<Vec3f>();
+            mSegmentTranslation += delta_displacement * Down<Vecf<N>>();
           if (key_event.mKey == EKey::Q)
-            mSegmentTranslation += delta_displacement * Up<Vec3f>();
-          if (key_event.mKey == EKey::W)
-            mSegmentTranslation += delta_displacement * Forward<Vec3f>();
-          if (key_event.mKey == EKey::S)
-            mSegmentTranslation += delta_displacement * Back<Vec3f>();
+            mSegmentTranslation += delta_displacement * Up<Vecf<N>>();
+          if constexpr (N >= 3)
+          {
+            if (key_event.mKey == EKey::W)
+              mSegmentTranslation += delta_displacement * Forward<Vecf<N>>();
+            if (key_event.mKey == EKey::S)
+              mSegmentTranslation += delta_displacement * Back<Vecf<N>>();
+          }
+        }
+
+        if constexpr (N >= 3)
+        {
+          if (key_event.IsShiftModifierPressed())
+          {
+            const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
+            if (key_event.mKey == EKey::A)
+              mSegmentRotation *= AngleAxis(delta_angle, Up<Vec3f>());
+            if (key_event.mKey == EKey::D)
+              mSegmentRotation *= AngleAxis(delta_angle, -Up<Vec3f>());
+            if (key_event.mKey == EKey::S)
+              mSegmentRotation *= AngleAxis(delta_angle, Forward<Vec3f>());
+            if (key_event.mKey == EKey::W)
+              mSegmentRotation *= AngleAxis(delta_angle, -Forward<Vec3f>());
+          }
         }
       }
     }
   }
 
-  std::array<Segment3f, 128> GetSegments() const
+  std::array<Segment<float, N>, 128> GetSegments() const
   {
-    std::array<Segment3f, 128> segments;
+    std::array<Segment<float, N>, 128> segments;
     for (int i = 0; i < segments.size(); ++i)
     {
       const auto f = (float(i) / segments.size());
-      const auto segment_local_rotation = AngleAxis(f * FullCircleRads<float>(), Right<Vec3f>());
-      const auto segment_rotation = (mSegmentRotation * segment_local_rotation);
-      segments[i] = Segment3f { mSegmentTranslation + segment_rotation * (MinLength * Forward<Vec3f>()),
-        mSegmentTranslation + segment_rotation * (mSegmentLength * Forward<Vec3f>()) };
+
+      RotationType_t<float, N> segment_local_rotation;
+      if constexpr (N == 2)
+      {
+        segment_local_rotation = (f * FullCircleRads<float>());
+      }
+      else
+      {
+        segment_local_rotation = AngleAxis(f * FullCircleRads<float>(), Right<Vecf<N>>());
+      }
+
+      if constexpr (N == 2)
+      {
+        const auto segment_rotation = segment_local_rotation;
+        segments[i]
+            = Segment<float, N> { mSegmentTranslation + Rotated((MinLength * Right<Vecf<N>>()), segment_rotation),
+                mSegmentTranslation + Rotated((mSegmentLength * Right<Vecf<N>>()), segment_rotation) };
+      }
+      else
+      {
+        const auto segment_rotation = Rotated(segment_local_rotation, mSegmentRotation);
+        segments[i]
+            = Segment<float, N> { mSegmentTranslation + Rotated((MinLength * Forward<Vecf<N>>()), segment_rotation),
+                mSegmentTranslation + Rotated((mSegmentLength * Forward<Vecf<N>>()), segment_rotation) };
+      }
     }
     return segments;
   }
@@ -85,8 +125,8 @@ public:
 private:
   bool mControlEnabled = false;
 
-  Quatf mSegmentRotation = AngleAxis(QuarterCircleRads<float>(), Up<Vec3f>());
-  Vec3f mSegmentTranslation = Zero<Vec3f>();
+  RotationType_t<float, N> mSegmentRotation;
+  Vecf<N> mSegmentTranslation = Zero<Vecf<N>>();
   float mSegmentLength = 1.0f;
 };
 }
