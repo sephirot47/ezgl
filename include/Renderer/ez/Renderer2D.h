@@ -1,11 +1,13 @@
 #pragma once
 
+#include "ez/AAHyperCube.h"
 #include "ez/Camera.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
 #include "ez/ETextHAlignment.h"
 #include "ez/ETextVAlignment.h"
 #include "ez/Framebuffer.h"
+#include "ez/HyperSphere.h"
 #include "ez/Macros.h"
 #include "ez/Material2D.h"
 #include "ez/Math.h"
@@ -92,6 +94,8 @@ public:
   void DrawSegment(const Segment2f& inSegment);
   void DrawCircleSection(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
   void DrawCircleSectionBoundary(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
+  void DrawCircle(const Circlef& inCircle, std::size_t inNumVertices = 32);
+  void DrawCircleBoundary(const Circlef& inCircle, const std::size_t inNumVertices = 32);
   void DrawCircle(const std::size_t inNumVertices = 32);
   void DrawCircleBoundary(const std::size_t inNumVertices = 32);
   void DrawSegments(const Span<Segment2f>& inSegments);
@@ -99,6 +103,10 @@ public:
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangles(const Span<Triangle2f>& inTriangles);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
+  void DrawAASquare();
+  void DrawAASquare(const AASquaref& inAASquare);
+  void DrawAASquareBoundary();
+  void DrawAASquareBoundary(const AASquaref& inAASquare);
   void DrawAARect();
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
@@ -113,6 +121,9 @@ public:
   void Draw(const Vec2f& inPoint) { DrawPoint(inPoint); }
   void Draw(const Triangle2f& inTriangle) { DrawTriangle(inTriangle); }
   void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
+  void Draw(const Circlef& inCircle) { DrawCircle(inCircle); }
+  void Draw(const AASquaref& inAASquare) { DrawAASquare(inAASquare); }
+  void DrawBoundary(const AASquaref& inAASquare) { DrawAASquareBoundary(inAASquare); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
 

@@ -163,6 +163,22 @@ void Renderer2D::DrawLineStrip(const Span<Vec2f>& inLinePoints)
   DrawLineStripGeneric(inLinePoints);
 }
 
+void Renderer2D::DrawCircle(const Circlef& inCircle, std::size_t inNumVertices)
+{
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(Center(inCircle));
+  Scale(inCircle.GetRadius());
+  DrawCircle(inNumVertices);
+}
+
+void Renderer2D::DrawCircleBoundary(const Circlef& inCircle, const std::size_t inNumVertices)
+{
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(Center(inCircle));
+  Scale(inCircle.GetRadius());
+  DrawCircleBoundary(inNumVertices);
+}
+
 void Renderer2D::DrawCircleSection(const AngleRads<float> inAngle, const std::size_t inNumVertices)
 {
   DrawCircleSectionGeneric<float, 2>(inAngle, inNumVertices);
@@ -193,6 +209,17 @@ void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
   DrawSegments(MakeSpan({ Segment2f { inTriangle[0], inTriangle[1] },
       Segment2f { inTriangle[1], inTriangle[2] },
       Segment2f { inTriangle[2], inTriangle[0] } }));
+}
+
+void Renderer2D::DrawAASquare() { DrawAARect(); }
+
+void Renderer2D::DrawAASquare(const AASquaref& inAASquare) { DrawAARect(MakeAAHyperBoxFromAAHyperCube(inAASquare)); }
+
+void Renderer2D::DrawAASquareBoundary() { DrawAARectBoundary(); }
+
+void Renderer2D::DrawAASquareBoundary(const AASquaref& inAASquare)
+{
+  DrawAARectBoundary(MakeAAHyperBoxFromAAHyperCube(inAASquare));
 }
 
 void Renderer2D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
