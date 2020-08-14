@@ -2,6 +2,7 @@
 
 #include "ez/AAHyperCube.h"
 #include "ez/Camera.h"
+#include "ez/Capsule.h"
 #include "ez/Color.h"
 #include "ez/DirectionalLight.h"
 #include "ez/ETextHAlignment.h"
@@ -98,6 +99,7 @@ public:
   void DrawCircleBoundary(const Circlef& inCircle, const std::size_t inNumVertices = 32);
   void DrawCircle(const std::size_t inNumVertices = 32);
   void DrawCircleBoundary(const std::size_t inNumVertices = 32);
+  void DrawCapsule(const Capsule2f& inCapsule, const std::size_t inNumHemicircleSegments = 16);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
@@ -123,6 +125,7 @@ public:
   void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
   void Draw(const Circlef& inCircle) { DrawCircle(inCircle); }
   void Draw(const AASquaref& inAASquare) { DrawAASquare(inAASquare); }
+  void Draw(const Capsule2f& inCapsule) { DrawCapsule(inCapsule); }
   void DrawBoundary(const AASquaref& inAASquare) { DrawAASquareBoundary(inAASquare); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }

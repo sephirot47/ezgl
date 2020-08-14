@@ -22,18 +22,18 @@ int main(int argc, const char** argv)
 {
   srand(1234);
 
-  const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
-  const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
-  const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
+  // const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
+  // const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
+  // const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
   const auto other_segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
-  const auto primitives = std::make_tuple(aarect, aasquare, circle, other_segment);
+  const auto primitives = std::make_tuple(other_segment); // aarect, aasquare, circle, other_segment);
 
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Segment intersection 2D";
+  window_create_options.mTitle = "Test Segment distance 2D";
   const auto window = std::make_shared<Window>(window_create_options);
 
-  TestSegmentController<2, 128> segment_controller;
+  TestSegmentController<2, 1> segment_controller;
   window->AddInputListener(&segment_controller);
 
   // Camera
@@ -67,33 +67,32 @@ int main(int argc, const char** argv)
     const auto segments = segment_controller.GetSegments();
     for (const auto& segment : segments)
     {
-      auto intersecting = false;
-      ForEach(primitives, [&](const auto& in_primitive) { intersecting |= IntersectCheck(segment, in_primitive); });
-
       renderer.SetLineWidth(2.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
+      renderer.GetMaterial().SetColor(Green<Color4f>());
       renderer.Draw(segment);
+
+      auto min_distance = Max<float>();
+      ForEach(primitives, [&](const auto& in_primitive) {
+        min_distance = Min(Distance(segment, in_primitive), min_distance);
+        const auto closest_point_0 = ClosestPoint(segment, in_primitive);
+        const auto closest_point_1 = ClosestPoint(in_primitive, segment);
+        renderer.GetMaterial().SetColor(Purple<Color4f>());
+        renderer.Draw(closest_point_0);
+        renderer.Draw(closest_point_1);
+        renderer.Draw(Segment2f { closest_point_0, closest_point_1 });
+      });
+
+      if (min_distance > 0.0f && min_distance != Max<float>())
+      {
+        const auto distance_capsule = Capsule2f { segment.GetOrigin(), segment.GetDestiny(), min_distance };
+        renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
+        renderer.GetMaterial().SetColor(WithAlpha(Cyan<Color4f>(), 0.25f));
+        renderer.DrawCapsule(distance_capsule, 32);
+      }
 
       renderer.SetPointSize(8.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      ForEach(primitives, [&](const auto& in_primitive) {
-        renderer.GetMaterial().SetColor(Red<Color4f>());
-        const auto intersection_distances = IntersectAll(segment, in_primitive);
-        for (const auto& intersection_distance : intersection_distances)
-        {
-          if (!intersection_distance)
-            continue;
-
-          const auto intersection_point = (segment.GetOrigin() + Direction(segment) * (*intersection_distance));
-          renderer.Draw(intersection_point);
-        }
-
-        renderer.GetMaterial().SetColor(Blue<Color4f>());
-        const auto closest_intersection_distance = IntersectClosest(segment, in_primitive);
-        if (closest_intersection_distance)
-          renderer.Draw((segment.GetOrigin() + Direction(segment) * (*closest_intersection_distance)));
-      });
     }
 
     renderer.GetMaterial().SetColor(WithAlpha(White<Color4f>(), 0.5f));

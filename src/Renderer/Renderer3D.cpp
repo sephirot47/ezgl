@@ -6,7 +6,6 @@
 #include "ez/GL.h"
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
-#include "ez/Geometry.h"
 #include "ez/HyperSphere.h"
 #include "ez/Math.h"
 #include "ez/MeshDrawData.h"
@@ -234,18 +233,15 @@ void Renderer3D::DrawRay(const Ray3f& inRay, const float inRayDistance)
 
 void Renderer3D::DrawPlane(const Planef& inPlane, const float inPlaneSize)
 {
-  const auto plane_rotation = FromTo(Forward<Vec3f>(), inPlane.GetNormal());
-  const auto plane_points = std::array {
-    Rotated(Vec3f(-inPlaneSize, -inPlaneSize, 0.0f), plane_rotation),
-    Rotated(Vec3f(-inPlaneSize, inPlaneSize, 0.0f), plane_rotation),
-    Rotated(Vec3f(inPlaneSize, -inPlaneSize, 0.0f), plane_rotation),
-    Rotated(Vec3f(inPlaneSize, inPlaneSize, 0.0f), plane_rotation),
-  };
+  RendererStateGuard<Renderer3D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(inPlane.GetArbitraryPoint());
+  Rotate(FromTo(Forward<Vec3f>(), inPlane.GetNormal()));
+  Scale(inPlaneSize);
 
-  DrawTriangles(MakeSpan({
-      Triangle3f(plane_points[0], plane_points[2], plane_points[1]),
-      Triangle3f(plane_points[1], plane_points[2], plane_points[3]),
-  }));
+  RendererStateGuard<Renderer3D::EStateId::CULL_FACE_ENABLED> cull_face_guard(*this);
+  SetCullFaceEnabled(false);
+
+  DrawAARect();
 }
 
 void Renderer3D::DrawPoint(const Vec3f& inPoint) { DrawPoints(MakeSpan({ inPoint })); }
@@ -343,7 +339,7 @@ void Renderer3D::DrawAARectBoundary(const AARectf& inAARect)
   DrawAARectBoundary();
 }
 
-void Renderer3D::DrawCapsule(const Capsulef& inCapsule,
+void Renderer3D::DrawCapsule(const Capsule3f& inCapsule,
     const std::size_t inNumHemisphereLatitudes,
     const std::size_t inNumLongitudes)
 {

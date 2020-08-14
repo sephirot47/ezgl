@@ -8,7 +8,7 @@
 
 namespace ez
 {
-template <std::size_t N>
+template <std::size_t N, std::size_t NumSegments>
 class TestSegmentController : public InputListener
 {
 public:
@@ -25,6 +25,7 @@ public:
       mSegmentRotation = AngleAxis(QuarterCircleRads<float>(), Up<Vecf<N>>());
     }
   }
+
   void OnInput(const InputEvent& inInputEvent) override
   {
     if (inInputEvent.GetType() == InputEvent::EType::KEY)
@@ -48,9 +49,16 @@ public:
         }
         else if (key_event.IsShiftModifierPressed())
         {
-          if constexpr (N >= 3)
+          const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
+          if constexpr (N == 2)
           {
-            const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
+            if (key_event.mKey == EKey::A)
+              mSegmentRotation += delta_angle;
+            if (key_event.mKey == EKey::D)
+              mSegmentRotation -= delta_angle;
+          }
+          else
+          {
             if (key_event.mKey == EKey::A)
               mSegmentRotation *= AngleAxis(delta_angle, Up<Vec3f>());
             if (key_event.mKey == EKey::D)
@@ -59,6 +67,10 @@ public:
               mSegmentRotation *= AngleAxis(delta_angle, Forward<Vec3f>());
             if (key_event.mKey == EKey::W)
               mSegmentRotation *= AngleAxis(delta_angle, -Forward<Vec3f>());
+            if (key_event.mKey == EKey::Q)
+              mSegmentRotation *= AngleAxis(delta_angle, Right<Vec3f>());
+            if (key_event.mKey == EKey::E)
+              mSegmentRotation *= AngleAxis(delta_angle, -Right<Vec3f>());
           }
         }
         else
@@ -92,18 +104,19 @@ public:
     }
   }
 
-  std::array<Segment<float, N>, 128> GetSegments() const
+  std::array<Segment<float, N>, NumSegments> GetSegments() const
   {
-    std::array<Segment<float, N>, 128> segments;
+    std::array<Segment<float, N>, NumSegments> segments;
     for (int i = 0; i < segments.size(); ++i)
     {
       const auto f = (float(i) / segments.size());
       if constexpr (N == 2)
       {
         const auto segment_local_rotation = (f * FullCircleRads<float>());
+        const auto segment_rotation = Rotated(mSegmentRotation, segment_local_rotation);
         segments[i]
-            = Segment<float, N> { mSegmentTranslation + Rotated((MinLength * Right<Vecf<N>>()), segment_local_rotation),
-                mSegmentTranslation + Rotated((mSegmentLength * Right<Vecf<N>>()), segment_local_rotation) };
+            = Segment<float, N> { mSegmentTranslation + Rotated((MinLength * Right<Vecf<N>>()), segment_rotation),
+                mSegmentTranslation + Rotated((mSegmentLength * Right<Vecf<N>>()), segment_rotation) };
       }
       else
       {

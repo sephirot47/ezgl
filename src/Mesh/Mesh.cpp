@@ -459,14 +459,12 @@ void Mesh::ComputeCornerNormals(const float inMinEdgeAngleToSmooth)
     const auto internal_corner_id = (corner_id % 3);
     const auto vertex_id = mFacesData.at(face_id).mVerticesIds.at(internal_corner_id);
     const auto& face_normal = mFacesData.at(face_id).mNormal;
-    assert(IsNormalized(face_normal));
 
     const auto neighbor_face_ids = GetNeighborFacesIds(vertex_id);
     auto normal_sum = Zero<Vec3f>();
     for (const auto& neighbor_face_id : neighbor_face_ids)
     {
       const auto& neighbor_face_normal = mFacesData.at(neighbor_face_id).mNormal;
-      assert(IsNormalized(neighbor_face_normal));
 
       const auto edge_dot = Dot(face_normal, neighbor_face_normal);
       if (edge_dot >= min_edge_dot_to_smooth)

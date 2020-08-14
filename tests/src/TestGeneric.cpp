@@ -3,7 +3,6 @@
 #include "ez/EBO.h"
 #include "ez/FileUtils.h"
 #include "ez/Framebuffer.h"
-#include "ez/Geometry.h"
 #include "ez/Image2D.h"
 #include "ez/Macros.h"
 #include "ez/Material3D.h"

@@ -6,7 +6,6 @@
 #include "ez/GL.h"
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
-#include "ez/Geometry.h"
 #include "ez/Math.h"
 #include "ez/Mesh.h"
 #include "ez/MeshDrawData.h"
@@ -194,6 +193,24 @@ void Renderer2D::DrawCircle(const std::size_t inNumVertices) { DrawCircleSection
 void Renderer2D::DrawCircleBoundary(const std::size_t inNumVertices)
 {
   DrawCircleSectionBoundary(FullCircleRads(), inNumVertices);
+}
+
+void Renderer2D::DrawCapsule(const Capsule2f& inCapsule, const std::size_t inNumHemicircleSegments)
+{
+  if (IsVeryEqual(SqLength(inCapsule), 0.0f))
+  {
+    DrawCircle(Circlef { inCapsule.GetOrigin(), inCapsule.GetRadius() }, inNumHemicircleSegments);
+  }
+  else
+  {
+    DrawCircle(Circlef { inCapsule.GetOrigin(), inCapsule.GetRadius() }, inNumHemicircleSegments);
+    DrawCircle(Circlef { inCapsule.GetDestiny(), inCapsule.GetRadius() }, inNumHemicircleSegments);
+
+    RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+    Translate(Center(inCapsule));
+    Rotate(Orientation(inCapsule));
+    DrawAARect(MakeAAHyperBoxFromCenterSize(Zero<Vec2f>(), Vec2f { Length(inCapsule), inCapsule.GetRadius() * 2.0f }));
+  }
 }
 
 void Renderer2D::DrawTriangle(const Triangle2f& inTriangle) { DrawTriangles(MakeSpan({ inTriangle })); }

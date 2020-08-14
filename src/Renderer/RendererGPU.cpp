@@ -5,7 +5,6 @@
 #include "ez/GL.h"
 #include "ez/GLGuard.h"
 #include "ez/GLTypeTraits.h"
-#include "ez/Geometry.h"
 #include "ez/Math.h"
 #include "ez/MeshDrawData.h"
 #include "ez/MeshFactory.h"

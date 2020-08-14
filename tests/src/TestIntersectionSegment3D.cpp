@@ -25,15 +25,16 @@ int main(int argc, const char** argv)
   const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
   const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
   const auto cylinder = Cylinderf { Vec3f { -1.0f, -1.5f, -0.6f }, Vec3f { 1.5f, -3.0f, 0.1f }, 0.4f };
-  const auto capsule = Capsulef { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
-  const auto primitives = std::make_tuple(aabox, sphere, aacube, cylinder, capsule);
+  const auto capsule = Capsule3f { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
+  const auto plane = Planef { Normalized(Vec3f { 0.1f, 1.0f, -0.2 }), Vec3f { 1.0f, -4.0f, -1.0f } };
+  const auto primitives = std::make_tuple(aabox, sphere, aacube, cylinder, capsule, plane);
 
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Segment AABox intersection 3D";
+  window_create_options.mTitle = "Test Segment intersection 3D";
   const auto window = std::make_shared<Window>(window_create_options);
 
-  TestSegmentController<3> segment_controller;
+  TestSegmentController<3, 128> segment_controller;
   window->AddInputListener(&segment_controller);
 
   // Camera

@@ -5,11 +5,11 @@
 #include "ez/CameraControllerFly.h"
 #include "ez/Capsule.h"
 #include "ez/HyperSphere.h"
+#include "ez/MathCommon.h"
 #include "ez/MathRandom.h"
 #include "ez/OrthographicCamera.h"
 #include "ez/PerspectiveCamera.h"
-#include "ez/Ray.h"
-#include "ez/Renderer2D.h"
+#include "ez/Renderer3D.h"
 #include "ez/Segment.h"
 #include "ez/TupleForEach.h"
 #include "ez/Window.h"
@@ -22,25 +22,30 @@ int main(int argc, const char** argv)
 {
   srand(1234);
 
-  const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
-  const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
-  const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
-  const auto other_segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
-  const auto primitives = std::make_tuple(aarect, aasquare, circle, other_segment);
+  // const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 0.0f }, Vec3f { 1.0f, 1.5f, 1.8f });
+  // const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
+  // const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
+  // const auto cylinder = Cylinderf { Vec3f { -1.0f, -1.5f, -0.6f }, Vec3f { 1.5f, -3.0f, 0.1f }, 0.4f };
+  // const auto capsule = Capsulef { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
+  const auto plane = Planef { Normalized(Vec3f { 0.1f, 1.0f, -0.2 }), Vec3f { 1.0f, -4.0f, -1.0f } };
+  const auto static_segment = Segment3f { Vec3f { 0.1f, 1.0f, -0.2f }, Vec3f { 2.0f, 2.0f, 1.0f } };
+  const auto primitives = std::make_tuple(plane, static_segment);
 
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Segment intersection 2D";
+  window_create_options.mTitle = "Test Segment distance 3D";
   const auto window = std::make_shared<Window>(window_create_options);
 
-  TestSegmentController<2, 128> segment_controller;
+  TestSegmentController<3, 1> segment_controller;
   window->AddInputListener(&segment_controller);
 
   // Camera
-  const auto camera = std::make_shared<OrthographicCamera2f>();
+  const auto camera = std::make_shared<PerspectiveCameraf>();
+  camera->SetPosition(Back<Vec3f>() * 5.0f);
+  camera->LookAtPoint(Zero<Vec3f>());
 
   // Camera controller
-  CameraControllerFly2f camera_controller_fly;
+  CameraControllerFly3f camera_controller_fly;
   camera_controller_fly.SetCamera(camera);
   camera_controller_fly.SetWindow(window);
   camera_controller_fly.GetParameters().mMinFlySpeed = 0.1f;
@@ -48,16 +53,16 @@ int main(int argc, const char** argv)
   camera_controller_fly.ApplyParameters();
 
   // Create renderer
-  Renderer2D renderer;
+  Renderer3D renderer;
 
   // Window loop
   window->Loop([&](const DeltaTime& inDeltaTime) {
     renderer.ResetState();
     renderer.SetCamera(camera);
     renderer.AdaptToWindow(*window);
-    camera->SetOrthoMin(-5.0f * One<Vec2f>());
-    camera->SetOrthoMax(5.0f * One<Vec2f>());
     renderer.Clear();
+
+    renderer.AddDirectionalLight(NormalizedSafe(Vec3f { -1.0f, -2.0f, -0.5f }), White<Color3f>());
 
     if (!segment_controller.IsControlEnabled())
     {
@@ -67,36 +72,29 @@ int main(int argc, const char** argv)
     const auto segments = segment_controller.GetSegments();
     for (const auto& segment : segments)
     {
-      auto intersecting = false;
-      ForEach(primitives, [&](const auto& in_primitive) { intersecting |= IntersectCheck(segment, in_primitive); });
-
       renderer.SetLineWidth(2.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
+      renderer.GetMaterial().SetDiffuseColor(Green<Color4f>());
       renderer.Draw(segment);
+
+      auto min_distance = Max<float>();
+      ForEach(primitives,
+          [&](const auto& in_primitive) { min_distance = Min(Distance(segment, in_primitive), min_distance); });
+
+      if (min_distance > 0.0f && min_distance != Max<float>())
+      {
+        const auto distance_capsule = Capsulef { segment.GetOrigin(), segment.GetDestiny(), min_distance };
+        renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
+        renderer.GetMaterial().SetDiffuseColor(WithAlpha(Cyan<Color4f>(), 0.5f));
+        renderer.Draw(distance_capsule);
+      }
 
       renderer.SetPointSize(8.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      ForEach(primitives, [&](const auto& in_primitive) {
-        renderer.GetMaterial().SetColor(Red<Color4f>());
-        const auto intersection_distances = IntersectAll(segment, in_primitive);
-        for (const auto& intersection_distance : intersection_distances)
-        {
-          if (!intersection_distance)
-            continue;
-
-          const auto intersection_point = (segment.GetOrigin() + Direction(segment) * (*intersection_distance));
-          renderer.Draw(intersection_point);
-        }
-
-        renderer.GetMaterial().SetColor(Blue<Color4f>());
-        const auto closest_intersection_distance = IntersectClosest(segment, in_primitive);
-        if (closest_intersection_distance)
-          renderer.Draw((segment.GetOrigin() + Direction(segment) * (*closest_intersection_distance)));
-      });
     }
 
-    renderer.GetMaterial().SetColor(WithAlpha(White<Color4f>(), 0.5f));
+    renderer.GetMaterial().SetDiffuseColor(WithAlpha(White<Color4f>(), 0.5f));
+    renderer.GetMaterial().SetLightingEnabled(true);
     renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
     renderer.SetBlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
     ForEach(primitives, [&](const auto& in_primitive) { renderer.Draw(in_primitive); });

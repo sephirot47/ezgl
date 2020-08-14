@@ -156,7 +156,7 @@ public:
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
   void DrawAARectBoundary(const AARectf& inAARect);
-  void DrawCapsule(const Capsulef& inCapsule,
+  void DrawCapsule(const Capsule3f& inCapsule,
       const std::size_t inNumHemisphereLatitudes = 16,
       const std::size_t inNumLongitudes = 16);
   void DrawCylinder(const Cylinderf& inCylinder, const std::size_t inNumLongitudes = 32);
@@ -186,7 +186,7 @@ public:
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void Draw(const AABoxf& inAABox) { DrawAABox(inAABox); }
   void Draw(const AACubef& inAACube) { DrawAACube(inAACube); }
-  void Draw(const Capsulef& inCapsule) { DrawCapsule(inCapsule); }
+  void Draw(const Capsule3f& inCapsule) { DrawCapsule(inCapsule); }
   void Draw(const Cylinderf& inCylinder) { DrawCylinder(inCylinder); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
   void DrawBoundary(const AABoxf& inAABox) { DrawAABoxBoundary(inAABox); }
