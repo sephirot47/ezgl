@@ -20,8 +20,6 @@ using namespace ez;
 
 int main(int argc, const char** argv)
 {
-  srand(1234);
-
   // const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
   // const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
   // const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
