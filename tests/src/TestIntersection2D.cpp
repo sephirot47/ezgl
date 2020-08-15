@@ -1,4 +1,4 @@
-#include "TestSegmentController.h"
+#include "TestPrimitiveController.h"
 #include "ez/AABox.h"
 #include "ez/AACube.h"
 #include "ez/BinaryIndex.h"
@@ -25,16 +25,17 @@ int main(int argc, const char** argv)
   const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
   const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
   const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
-  const auto other_segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
-  const auto primitives = std::make_tuple(aarect, aasquare, circle, other_segment);
+  const auto segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
+  const auto primitives = std::make_tuple(aarect, aasquare, circle, segment);
+  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Segment2f, 128> {});
 
   // Create window
   Window::CreateOptions window_create_options;
-  window_create_options.mTitle = "Test Segment intersection 2D";
+  window_create_options.mTitle = "Test intersection 2D";
   const auto window = std::make_shared<Window>(window_create_options);
 
-  TestSegmentController<2, 128> segment_controller;
-  window->AddInputListener(&segment_controller);
+  ForEach(main_primitives_controllers,
+      [&](auto& main_primitive_controller) { window->AddInputListener(&main_primitive_controller); });
 
   // Camera
   const auto camera = std::make_shared<OrthographicCamera2f>();
@@ -51,6 +52,7 @@ int main(int argc, const char** argv)
   Renderer2D renderer;
 
   // Window loop
+  const auto& selected_main_primitive_controller = std::get<0>(main_primitives_controllers);
   window->Loop([&](const DeltaTime& inDeltaTime) {
     renderer.ResetState();
     renderer.SetCamera(camera);
@@ -59,40 +61,42 @@ int main(int argc, const char** argv)
     camera->SetOrthoMax(5.0f * One<Vec2f>());
     renderer.Clear();
 
-    if (!segment_controller.IsControlEnabled())
+    if (!selected_main_primitive_controller.IsControlEnabled())
     {
       camera_controller_fly.Update(inDeltaTime);
     }
 
-    const auto segments = segment_controller.GetSegments();
-    for (const auto& segment : segments)
+    const auto main_primitives = selected_main_primitive_controller.GetPrimitives();
+    for (const auto& main_primitive : main_primitives)
     {
       auto intersecting = false;
-      ForEach(primitives, [&](const auto& in_primitive) { intersecting |= IntersectCheck(segment, in_primitive); });
+      ForEach(primitives,
+          [&](const auto& in_primitive) { intersecting |= IntersectCheck(main_primitive, in_primitive); });
 
       renderer.SetLineWidth(2.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
       renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
-      renderer.Draw(segment);
+      renderer.Draw(main_primitive);
 
       renderer.SetPointSize(8.0f);
       renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
       ForEach(primitives, [&](const auto& in_primitive) {
         renderer.GetMaterial().SetColor(Red<Color4f>());
-        const auto intersection_distances = IntersectAll(segment, in_primitive);
+        const auto intersection_distances = IntersectAll(main_primitive, in_primitive);
         for (const auto& intersection_distance : intersection_distances)
         {
           if (!intersection_distance)
             continue;
 
-          const auto intersection_point = (segment.GetOrigin() + Direction(segment) * (*intersection_distance));
+          const auto intersection_point
+              = (main_primitive.GetOrigin() + Direction(main_primitive) * (*intersection_distance));
           renderer.Draw(intersection_point);
         }
 
         renderer.GetMaterial().SetColor(Blue<Color4f>());
-        const auto closest_intersection_distance = IntersectClosest(segment, in_primitive);
+        const auto closest_intersection_distance = IntersectClosest(main_primitive, in_primitive);
         if (closest_intersection_distance)
-          renderer.Draw((segment.GetOrigin() + Direction(segment) * (*closest_intersection_distance)));
+          renderer.Draw((main_primitive.GetOrigin() + Direction(main_primitive) * (*closest_intersection_distance)));
       });
     }
 

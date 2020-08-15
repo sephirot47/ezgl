@@ -48,6 +48,10 @@ int main(int argc, const char** argv)
     PEEK(IntersectClosest(line2, line2));
     PEEK(IntersectClosest(line2, ray2));
     PEEK(IntersectClosest(line2, segment2));
+    PEEK(IntersectClosest(line2, circle));
+    PEEK(IntersectClosest(line2, aasquare));
+    PEEK(IntersectClosest(line2, aarect));
+    PEEK(IntersectClosest(line2, capsule2));
 
     // IntersectAll
     PEEK(IntersectAll(line2, line2));
@@ -59,10 +63,10 @@ int main(int argc, const char** argv)
     PEEK(IntersectAll(line2, capsule2));
 
     // ClosestPoint
-    /*
     PEEK(ClosestPoint(line2, line2));
     PEEK(ClosestPoint(line2, ray2));
     PEEK(ClosestPoint(line2, segment2));
+    /*
     PEEK(ClosestPoint(line2, circle));
     PEEK(ClosestPoint(line2, aasquare));
     PEEK(ClosestPoint(line2, aarect));
