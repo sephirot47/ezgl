@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ez/AAHyperBox.h"
 #include "ez/HyperSphere.h"
 #include "ez/Image2D.h"
 #include "ez/ObjectRayTracing.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ez/MathTypeTraits.h"
 #include "ez/Quat.h"
 #include "ez/Vec.h"
 #include "ez/Window.h"
@@ -7,10 +8,11 @@
 
 namespace ez
 {
-template <typename TPrimitive, std::size_t NumPrimitives>
+template <typename TPrimitive, std::size_t NumPrimitives = 1>
 class TestPrimitiveController : public InputListener
 {
 public:
+  using PrimitiveType = TPrimitive;
   static constexpr auto N = NumComponents_v<TPrimitive>;
   static constexpr auto MinLength = 0.1f;
 
@@ -42,10 +44,29 @@ public:
         if (key_event.IsAltModifierPressed())
         {
           const auto delta_length = 0.1f;
-          if (key_event.mKey == EKey::W)
-            mPrimitiveLength += delta_length;
-          if (key_event.mKey == EKey::S)
-            mPrimitiveLength = std::max(mPrimitiveLength - delta_length, MinLength);
+          if (key_event.mKey == EKey::D)
+            mPrimitiveSize[0] += delta_length;
+          else if (key_event.mKey == EKey::A)
+            mPrimitiveSize[0] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+
+          if constexpr (N == 2)
+          {
+            if (key_event.mKey == EKey::W)
+              mPrimitiveSize[1] += delta_length;
+            else if (key_event.mKey == EKey::S)
+              mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+          }
+          else
+          {
+            if (key_event.mKey == EKey::Q)
+              mPrimitiveSize[1] += delta_length;
+            else if (key_event.mKey == EKey::E)
+              mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+            else if (key_event.mKey == EKey::W)
+              mPrimitiveSize[2] += delta_length;
+            else if (key_event.mKey == EKey::S)
+              mPrimitiveSize[2] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+          }
         }
         else if (key_event.IsShiftModifierPressed())
         {
@@ -110,21 +131,46 @@ public:
     for (int i = 0; i < primitives.size(); ++i)
     {
       const auto f = (float(i) / primitives.size());
+      Vecf<N> forward_vector;
+      RotationType_t<float, N> primitive_local_rotation;
       if constexpr (N == 2)
       {
-        const auto primitive_local_rotation = (f * FullCircleRads<float>());
-        const auto primitive_rotation = Rotated(mPrimitiveRotation, primitive_local_rotation);
-        primitives[i]
-            = TPrimitive { mPrimitiveTranslation + Rotated((MinLength * Right<Vecf<N>>()), primitive_rotation),
-                mPrimitiveTranslation + Rotated((mPrimitiveLength * Right<Vecf<N>>()), primitive_rotation) };
+        primitive_local_rotation = (f * FullCircleRads<float>());
+        forward_vector = Right<Vecf<N>>();
       }
       else
       {
-        const auto primitive_local_rotation = AngleAxis(f * FullCircleRads<float>(), Right<Vecf<N>>());
-        const auto primitive_rotation = Rotated(mPrimitiveRotation, primitive_local_rotation);
+        primitive_local_rotation = AngleAxis(f * FullCircleRads<float>(), Right<Vecf<N>>());
+        forward_vector = Forward<Vecf<N>>();
+      }
+
+      const auto primitive_rotation = Rotated(mPrimitiveRotation, primitive_local_rotation);
+      const auto forward_vector_rotated = NormalizedSafe(Rotated(forward_vector, primitive_rotation));
+      if constexpr (IsLine_v<TPrimitive>)
+      {
+        primitives[i] = TPrimitive { mPrimitiveTranslation, forward_vector_rotated };
+      }
+      else if constexpr (IsRay_v<TPrimitive>)
+      {
         primitives[i]
-            = TPrimitive { mPrimitiveTranslation + Rotated((MinLength * Forward<Vecf<N>>()), primitive_rotation),
-                mPrimitiveTranslation + Rotated((mPrimitiveLength * Forward<Vecf<N>>()), primitive_rotation) };
+            = TPrimitive { mPrimitiveTranslation + MinLength * forward_vector_rotated, forward_vector_rotated };
+      }
+      else if constexpr (IsSegment_v<TPrimitive>)
+      {
+        primitives[i] = TPrimitive { mPrimitiveTranslation + MinLength * forward_vector_rotated,
+          mPrimitiveTranslation + (MinLength + mPrimitiveSize[0]) * forward_vector_rotated };
+      }
+      else if constexpr (IsAAHyperCube_v<TPrimitive>)
+      {
+        primitives[i] = MakeAAHyperCubeFromCenterSize(mPrimitiveTranslation, mPrimitiveSize[0]);
+      }
+      else if constexpr (IsHyperSphere_v<TPrimitive>)
+      {
+        primitives[i] = HyperSpheref<N> { mPrimitiveTranslation, mPrimitiveSize[0] };
+      }
+      else if constexpr (IsAAHyperBox_v<TPrimitive>)
+      {
+        primitives[i] = MakeAAHyperBoxFromCenterSize(mPrimitiveTranslation, mPrimitiveSize);
       }
     }
     return primitives;
@@ -137,6 +183,6 @@ private:
 
   RotationType_t<float, N> mPrimitiveRotation;
   Vecf<N> mPrimitiveTranslation = Zero<Vecf<N>>();
-  float mPrimitiveLength = 1.0f;
+  Vecf<N> mPrimitiveSize = One<Vecf<N>>();
 };
 }

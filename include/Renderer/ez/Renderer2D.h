@@ -92,6 +92,8 @@ public:
       const RendererGPU::EDrawType inDrawType = RendererGPU::EDrawType::SOLID);
   void DrawPoint(const Vec2f& inPoint);
   void DrawPoints(const Span<Vec2f>& inPoints);
+  void DrawLine(const Line2f& inLine, const float inLength = 999.0f);
+  void DrawRay(const Ray2f& inRay, const float inLength = 999.0f);
   void DrawSegment(const Segment2f& inSegment);
   void DrawCircleSection(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
   void DrawCircleSectionBoundary(const AngleRads<float> inAngle, const std::size_t inNumVertices = 32);
@@ -100,6 +102,8 @@ public:
   void DrawCircle(const std::size_t inNumVertices = 32);
   void DrawCircleBoundary(const std::size_t inNumVertices = 32);
   void DrawCapsule(const Capsule2f& inCapsule, const std::size_t inNumHemicircleSegments = 16);
+  void DrawLines(const Span<Line2f>& inLines, const float inLength = 999.0f);
+  void DrawRays(const Span<Ray2f>& inRays, const float inLength = 999.0f);
   void DrawSegments(const Span<Segment2f>& inSegments);
   void DrawLineStrip(const Span<Vec2f>& inLinePoints);
   void DrawTriangle(const Triangle2f& inTriangle);
@@ -122,6 +126,8 @@ public:
   // Overloaded
   void Draw(const Vec2f& inPoint) { DrawPoint(inPoint); }
   void Draw(const Triangle2f& inTriangle) { DrawTriangle(inTriangle); }
+  void Draw(const Line2f& inLine) { DrawLine(inLine); }
+  void Draw(const Ray2f& inRay) { DrawRay(inRay); }
   void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
   void Draw(const Circlef& inCircle) { DrawCircle(inCircle); }
   void Draw(const AASquaref& inAASquare) { DrawAASquare(inAASquare); }

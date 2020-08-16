@@ -26,14 +26,9 @@ struct ObjectRayTracingInSpace
 };
 
 template <EIntersectMode TIntersectMode, typename T, std::size_t N>
-auto Intersect(const ObjectRayTracingInSpace& inObjectInSpace, const Ray<T, N>& inRay)
-{
-  return Intersect<TIntersectMode>(inObjectInSpace.mWorldBoundingAABox, inRay);
-}
-template <EIntersectMode TIntersectMode, typename T, std::size_t N>
 auto Intersect(const Ray<T, N>& inRay, const ObjectRayTracingInSpace& inObjectInSpace)
 {
-  return Intersect<TIntersectMode, T, N>(inObjectInSpace, inRay);
+  return Intersect<TIntersectMode>(inRay, inObjectInSpace.mWorldBoundingAABox);
 }
 
 template <EIntersectMode TIntersectMode, typename T, std::size_t N>

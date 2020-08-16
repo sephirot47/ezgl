@@ -27,12 +27,33 @@ int main(int argc, const char** argv)
   const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
   const auto segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
   const auto primitives = std::make_tuple(aarect, aasquare, circle, segment);
-  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Segment2f, 128> {});
+  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Segment2f, 128> {},
+      TestPrimitiveController<Ray2f, 128> {},
+      TestPrimitiveController<Line2f, 128> {},
+      TestPrimitiveController<Circlef> {},
+      TestPrimitiveController<AASquaref> {},
+      TestPrimitiveController<AARectf> {});
+  constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
+  int selected_main_primitive_index = 0;
 
   // Create window
   Window::CreateOptions window_create_options;
   window_create_options.mTitle = "Test intersection 2D";
   const auto window = std::make_shared<Window>(window_create_options);
+  window->SetInputEventCallback([&](const InputEvent& inInputEvent) {
+    if (inInputEvent.GetType() == InputEvent::EType::KEY)
+    {
+      const auto key_event = inInputEvent.As<InputEvent::EType::KEY>();
+      if (key_event.IsPressOrRepeat())
+      {
+        if (key_event.mKey == EKey::LEFT)
+          --selected_main_primitive_index;
+        else if (key_event.mKey == EKey::RIGHT)
+          ++selected_main_primitive_index;
+        selected_main_primitive_index = (selected_main_primitive_index + NumMainPrimitives) % NumMainPrimitives;
+      }
+    }
+  });
 
   ForEach(main_primitives_controllers,
       [&](auto& main_primitive_controller) { window->AddInputListener(&main_primitive_controller); });
@@ -52,7 +73,6 @@ int main(int argc, const char** argv)
   Renderer2D renderer;
 
   // Window loop
-  const auto& selected_main_primitive_controller = std::get<0>(main_primitives_controllers);
   window->Loop([&](const DeltaTime& inDeltaTime) {
     renderer.ResetState();
     renderer.SetCamera(camera);
@@ -61,44 +81,53 @@ int main(int argc, const char** argv)
     camera->SetOrthoMax(5.0f * One<Vec2f>());
     renderer.Clear();
 
-    if (!selected_main_primitive_controller.IsControlEnabled())
-    {
-      camera_controller_fly.Update(inDeltaTime);
-    }
+    int main_primitive_i = 0;
+    ForEach(main_primitives_controllers, [&](const auto& main_primitive_controller) {
+      if (main_primitive_i++ != selected_main_primitive_index)
+        return;
 
-    const auto main_primitives = selected_main_primitive_controller.GetPrimitives();
-    for (const auto& main_primitive : main_primitives)
-    {
-      auto intersecting = false;
-      ForEach(primitives,
-          [&](const auto& in_primitive) { intersecting |= IntersectCheck(main_primitive, in_primitive); });
+      if (!main_primitive_controller.IsControlEnabled())
+        camera_controller_fly.Update(inDeltaTime);
 
-      renderer.SetLineWidth(2.0f);
-      renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
-      renderer.Draw(main_primitive);
+      const auto main_subprimitives = main_primitive_controller.GetPrimitives();
+      for (const auto& main_subprimitive : main_subprimitives)
+      {
+        auto intersecting = false;
+        ForEach(primitives,
+            [&](const auto& in_primitive) { intersecting |= IntersectCheck(main_subprimitive, in_primitive); });
 
-      renderer.SetPointSize(8.0f);
-      renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-      ForEach(primitives, [&](const auto& in_primitive) {
-        renderer.GetMaterial().SetColor(Red<Color4f>());
-        const auto intersection_distances = IntersectAll(main_primitive, in_primitive);
-        for (const auto& intersection_distance : intersection_distances)
+        renderer.SetLineWidth(2.0f);
+        renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
+        renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
+        renderer.Draw(main_subprimitive);
+
+        using MainPrimitiveType = typename std::remove_cvref_t<decltype(main_primitive_controller)>::PrimitiveType;
+        if constexpr (IsLine_v<MainPrimitiveType> || IsRay_v<MainPrimitiveType> || IsSegment_v<MainPrimitiveType>)
         {
-          if (!intersection_distance)
-            continue;
+          renderer.SetPointSize(8.0f);
+          renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
+          ForEach(primitives, [&](const auto& in_primitive) {
+            renderer.GetMaterial().SetColor(Red<Color4f>());
+            const auto intersection_distances = IntersectAll(main_subprimitive, in_primitive);
+            for (const auto& intersection_distance : intersection_distances)
+            {
+              if (!intersection_distance)
+                continue;
 
-          const auto intersection_point
-              = (main_primitive.GetOrigin() + Direction(main_primitive) * (*intersection_distance));
-          renderer.Draw(intersection_point);
+              const auto intersection_point
+                  = (main_subprimitive.GetOrigin() + Direction(main_subprimitive) * (*intersection_distance));
+              renderer.Draw(intersection_point);
+            }
+
+            renderer.GetMaterial().SetColor(Blue<Color4f>());
+            const auto closest_intersection_distance = IntersectClosest(main_subprimitive, in_primitive);
+            if (closest_intersection_distance)
+              renderer.Draw(
+                  (main_subprimitive.GetOrigin() + Direction(main_subprimitive) * (*closest_intersection_distance)));
+          });
         }
-
-        renderer.GetMaterial().SetColor(Blue<Color4f>());
-        const auto closest_intersection_distance = IntersectClosest(main_primitive, in_primitive);
-        if (closest_intersection_distance)
-          renderer.Draw((main_primitive.GetOrigin() + Direction(main_primitive) * (*closest_intersection_distance)));
-      });
-    }
+      }
+    });
 
     renderer.GetMaterial().SetColor(WithAlpha(White<Color4f>(), 0.5f));
     renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);

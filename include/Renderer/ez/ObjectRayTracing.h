@@ -82,11 +82,11 @@ auto Intersect(const ObjectRayTracing& inObject, const Ray<T, N>& inRay)
         if constexpr (IsLight_v<TObject>)
         {
           assert(!"This should never be called");
-          return Intersect<TIntersectMode>(AABoxf {}, inRay); // Dummy value. Must match common return type.
+          return Intersect<TIntersectMode>(inRay, AABoxf {}); // Dummy value. Must match common return type.
         }
         else
         {
-          return Intersect<TIntersectMode>(inObject, inRay);
+          return Intersect<TIntersectMode>(inRay, inObject);
         }
       },
       inObject.GetObjectVariant());

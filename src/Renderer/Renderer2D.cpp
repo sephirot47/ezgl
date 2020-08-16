@@ -144,6 +144,32 @@ void Renderer2D::DrawPoints(const Span<Vec2f>& inPoints)
   DrawPointsGeneric(inPoints);
 }
 
+void Renderer2D::DrawLine(const Line2f& inLine, const float inLength)
+{
+  DrawSegment(Segment2f { inLine.GetOrigin(), inLine.GetPoint(inLength) });
+}
+
+void Renderer2D::DrawLines(const Span<Line2f>& inLines, const float inLength)
+{
+  std::vector<Segment2f> lines_segments;
+  for (const auto& in_line : inLines)
+    lines_segments.push_back(Segment2f { in_line.GetOrigin(), in_line.GetPoint(inLength) });
+  DrawSegments(MakeSpan(lines_segments));
+}
+
+void Renderer2D::DrawRay(const Ray2f& inRay, const float inLength)
+{
+  DrawSegment(Segment2f { inRay.GetOrigin(), inRay.GetPoint(inLength) });
+}
+
+void Renderer2D::DrawRays(const Span<Ray2f>& inRays, const float inLength)
+{
+  std::vector<Segment2f> rays_segments;
+  for (const auto& in_ray : inRays)
+    rays_segments.push_back(Segment2f { in_ray.GetOrigin(), in_ray.GetPoint(inLength) });
+  DrawSegments(MakeSpan(rays_segments));
+}
+
 void Renderer2D::DrawSegment(const Segment2f& inSegment)
 {
   SetShaderProgram(sShaderProgram);
@@ -164,6 +190,9 @@ void Renderer2D::DrawLineStrip(const Span<Vec2f>& inLinePoints)
 
 void Renderer2D::DrawCircle(const Circlef& inCircle, std::size_t inNumVertices)
 {
+  if (IsVeryEqual(inCircle.GetRadius(), 0.0f))
+    return;
+
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(Center(inCircle));
   Scale(inCircle.GetRadius());
@@ -172,6 +201,9 @@ void Renderer2D::DrawCircle(const Circlef& inCircle, std::size_t inNumVertices)
 
 void Renderer2D::DrawCircleBoundary(const Circlef& inCircle, const std::size_t inNumVertices)
 {
+  if (IsVeryEqual(inCircle.GetRadius(), 0.0f))
+    return;
+
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(Center(inCircle));
   Scale(inCircle.GetRadius());
@@ -197,6 +229,9 @@ void Renderer2D::DrawCircleBoundary(const std::size_t inNumVertices)
 
 void Renderer2D::DrawCapsule(const Capsule2f& inCapsule, const std::size_t inNumHemicircleSegments)
 {
+  if (IsVeryEqual(SqLength(inCapsule), 0.0f) || IsVeryEqual(inCapsule.GetRadius(), 0.0f))
+    return;
+
   if (IsVeryEqual(SqLength(inCapsule), 0.0f))
   {
     DrawCircle(Circlef { inCapsule.GetOrigin(), inCapsule.GetRadius() }, inNumHemicircleSegments);

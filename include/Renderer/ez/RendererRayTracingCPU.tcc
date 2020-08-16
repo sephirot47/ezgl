@@ -97,7 +97,7 @@ auto RendererRayTracingCPU::RayTraceInScene(const SceneElements& inSceneElements
     const auto& intersected_drawable_transformation = intersected_drawable_in_space.mWorldTransformation;
     const auto intersected_drawable = intersected_drawable_in_space.mDrawable;
     const auto local_ray = InverseTransformed(inRay, intersected_drawable_transformation); // Ray in object/local space
-    const auto drawable_intersection_distance_opt = IntersectClosest(*intersected_drawable, local_ray);
+    const auto drawable_intersection_distance_opt = IntersectClosest(local_ray, *intersected_drawable);
     if (!drawable_intersection_distance_opt)
       continue;
 
