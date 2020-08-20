@@ -263,17 +263,6 @@ void Renderer2D::DrawTriangleBoundary(const Triangle2f& inTriangle)
       Segment2f { inTriangle[2], inTriangle[0] } }));
 }
 
-void Renderer2D::DrawAASquare() { DrawAARect(); }
-
-void Renderer2D::DrawAASquare(const AASquaref& inAASquare) { DrawAARect(MakeAAHyperBoxFromAAHyperCube(inAASquare)); }
-
-void Renderer2D::DrawAASquareBoundary() { DrawAARectBoundary(); }
-
-void Renderer2D::DrawAASquareBoundary(const AASquaref& inAASquare)
-{
-  DrawAARectBoundary(MakeAAHyperBoxFromAAHyperCube(inAASquare));
-}
-
 void Renderer2D::DrawAARect() { DrawMesh(MeshFactory::GetPlane()); }
 
 void Renderer2D::DrawAARect(const AARectf& inAARect)
@@ -281,7 +270,7 @@ void Renderer2D::DrawAARect(const AARectf& inAARect)
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(Center(inAARect));
   Scale(inAARect.GetSize());
-  DrawMesh(MeshFactory::GetPlane());
+  DrawAARect();
 }
 
 void Renderer2D::DrawAARectBoundary()
@@ -297,6 +286,24 @@ void Renderer2D::DrawAARectBoundary(const AARectf& inAARect)
   RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
   Translate(Center(inAARect));
   Scale(inAARect.GetSize() * 0.5f);
+  DrawAARectBoundary();
+}
+
+void Renderer2D::DrawRect(const Rectf& inRect)
+{
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(Center(inRect));
+  Rotate(Orientation(inRect));
+  Scale(inRect.GetSize());
+  DrawAARect();
+}
+
+void Renderer2D::DrawRectBoundary(const Rectf& inRect)
+{
+  RendererStateGuard<Renderer2D::EStateId::TRANSFORM_MATRIX> transform_guard(*this);
+  Translate(Center(inRect));
+  Rotate(Orientation(inRect));
+  Scale(inRect.GetExtents());
   DrawAARectBoundary();
 }
 

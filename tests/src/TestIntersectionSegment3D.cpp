@@ -1,6 +1,5 @@
 #include "TestSegmentController.h"
-#include "ez/AABox.h"
-#include "ez/AACube.h"
+#include "ez/AAHyperBox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/Capsule.h"
@@ -23,7 +22,6 @@ int main(int argc, const char** argv)
 
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 0.0f }, Vec3f { 1.0f, 1.5f, 1.8f });
   const auto sphere = Spheref { Vec3f { 1.5f, -0.2f, 0.1f }, 0.7f };
-  const auto aacube = AACubef { Vec3f { 0.0f, 0.4f, -0.1f }, 0.6f };
   const auto cylinder = Cylinderf { Vec3f { -1.0f, -1.5f, -0.6f }, Vec3f { 1.5f, -3.0f, 0.1f }, 0.4f };
   const auto capsule = Capsule3f { Vec3f { 0.4f, -0.9f, 0.9f }, Vec3f { 1.3f, -2.2f, -1.0f }, 0.3f };
   const auto plane = Planef { Normalized(Vec3f { 0.1f, 1.0f, -0.2 }), Vec3f { 1.0f, -4.0f, -1.0f } };

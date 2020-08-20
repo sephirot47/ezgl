@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/AARect.h"
+#include "ez/AAHyperBox.h"
 #include "ez/Color.h"
 #include "ez/Flags.h"
 #include "ez/Macros.h"

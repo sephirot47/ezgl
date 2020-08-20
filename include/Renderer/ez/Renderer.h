@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/AARect.h"
+#include "ez/AAHyperBox.h"
 #include "ez/RenderTarget.h"
 #include "ez/RendererStateGuard.h"
 #include "ez/RendererStateStacks.h"

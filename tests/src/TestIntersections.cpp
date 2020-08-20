@@ -1,4 +1,4 @@
-#include "ez/AABox.h"
+#include "ez/AAHyperBox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/Macros.h"

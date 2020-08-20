@@ -1,6 +1,5 @@
 #include "TestSegmentController.h"
-#include "ez/AABox.h"
-#include "ez/AACube.h"
+#include "ez/AAHyperBox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/Capsule.h"
@@ -21,10 +20,9 @@ using namespace ez;
 int main(int argc, const char** argv)
 {
   // const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
-  // const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
   // const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
   const auto other_segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
-  const auto primitives = std::make_tuple(other_segment); // aarect, aasquare, circle, other_segment);
+  const auto primitives = std::make_tuple(other_segment); // aarect, circle, other_segment);
 
   // Create window
   Window::CreateOptions window_create_options;

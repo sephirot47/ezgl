@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ez/AACube.h"
 #include "ez/Camera.h"
 #include "ez/Capsule.h"
 #include "ez/Color.h"
@@ -9,6 +8,7 @@
 #include "ez/ETextHAlignment.h"
 #include "ez/ETextVAlignment.h"
 #include "ez/Framebuffer.h"
+#include "ez/HyperBox.h"
 #include "ez/Macros.h"
 #include "ez/Material3D.h"
 #include "ez/Math.h"
@@ -148,10 +148,6 @@ public:
   void DrawAABoxBoundary(const AABoxf& inAABox);
   void DrawAABox();
   void DrawAABoxBoundary();
-  void DrawAACube(const AACubef& inAACube) { DrawAABox(MakeAAHyperBoxFromAAHyperCube(inAACube)); }
-  void DrawAACubeBoundary(const AACubef& inAACube) { DrawAABoxBoundary(MakeAAHyperBoxFromAAHyperCube(inAACube)); }
-  void DrawAACube() { DrawAABox(); }
-  void DrawAACubeBoundary() { DrawAABoxBoundary(); }
   void DrawAARect();
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
@@ -185,7 +181,6 @@ public:
   void Draw(const Spheref& inSphere) { DrawSphere(inSphere); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void Draw(const AABoxf& inAABox) { DrawAABox(inAABox); }
-  void Draw(const AACubef& inAACube) { DrawAACube(inAACube); }
   void Draw(const Capsule3f& inCapsule) { DrawCapsule(inCapsule); }
   void Draw(const Cylinderf& inCylinder) { DrawCylinder(inCylinder); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }

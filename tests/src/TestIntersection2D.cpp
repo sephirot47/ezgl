@@ -1,9 +1,9 @@
 #include "TestPrimitiveController.h"
-#include "ez/AABox.h"
-#include "ez/AACube.h"
+#include "ez/AAHyperBox.h"
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/Capsule.h"
+#include "ez/HyperBox.h"
 #include "ez/HyperSphere.h"
 #include "ez/MathRandom.h"
 #include "ez/OrthographicCamera.h"
@@ -23,16 +23,17 @@ int main(int argc, const char** argv)
   srand(1234);
 
   const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
-  const auto aasquare = AASquaref { Vec2f { -1.0f, -2.0f }, 0.5f };
+  const auto rect = Rectf { Vec2f { -2.0f, -2.0f }, Vec2f { 1.0f, 1.5f } * 0.5f, 0.57f };
   const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
   const auto segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
-  const auto primitives = std::make_tuple(aarect, aasquare, circle, segment);
+  const auto capsule = Capsule2f { Vec2f { 1.0f, -2.0f }, Vec2f { 1.7f, -1.6f }, 0.3f };
+  const auto primitives = std::make_tuple(aarect, rect, circle, segment, capsule);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Segment2f, 128> {},
       TestPrimitiveController<Ray2f, 128> {},
       TestPrimitiveController<Line2f, 128> {},
       TestPrimitiveController<Circlef> {},
-      TestPrimitiveController<AASquaref> {},
-      TestPrimitiveController<AARectf> {});
+      TestPrimitiveController<Rectf> {},
+      TestPrimitiveController<Capsule2f> {});
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
 
@@ -90,8 +91,10 @@ int main(int argc, const char** argv)
         camera_controller_fly.Update(inDeltaTime);
 
       const auto main_subprimitives = main_primitive_controller.GetPrimitives();
-      for (const auto& main_subprimitive : main_subprimitives)
+      for (const auto main_subprimitive : main_subprimitives)
       {
+        using MainPrimitiveType = typename std::remove_cvref_t<decltype(main_primitive_controller)>::PrimitiveType;
+
         auto intersecting = false;
         ForEach(primitives,
             [&](const auto& in_primitive) { intersecting |= IntersectCheck(main_subprimitive, in_primitive); });
@@ -101,7 +104,6 @@ int main(int argc, const char** argv)
         renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
         renderer.Draw(main_subprimitive);
 
-        using MainPrimitiveType = typename std::remove_cvref_t<decltype(main_primitive_controller)>::PrimitiveType;
         if constexpr (IsLine_v<MainPrimitiveType> || IsRay_v<MainPrimitiveType> || IsSegment_v<MainPrimitiveType>)
         {
           renderer.SetPointSize(8.0f);

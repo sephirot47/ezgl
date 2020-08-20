@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ez/AAHyperCube.h"
 #include "ez/Camera.h"
 #include "ez/Capsule.h"
 #include "ez/Color.h"
@@ -8,6 +7,7 @@
 #include "ez/ETextHAlignment.h"
 #include "ez/ETextVAlignment.h"
 #include "ez/Framebuffer.h"
+#include "ez/HyperBox.h"
 #include "ez/HyperSphere.h"
 #include "ez/Macros.h"
 #include "ez/Material2D.h"
@@ -109,14 +109,12 @@ public:
   void DrawTriangle(const Triangle2f& inTriangle);
   void DrawTriangles(const Span<Triangle2f>& inTriangles);
   void DrawTriangleBoundary(const Triangle2f& inTriangle);
-  void DrawAASquare();
-  void DrawAASquare(const AASquaref& inAASquare);
-  void DrawAASquareBoundary();
-  void DrawAASquareBoundary(const AASquaref& inAASquare);
   void DrawAARect();
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
   void DrawAARectBoundary(const AARectf& inAARect);
+  void DrawRect(const Rectf& inRect);
+  void DrawRectBoundary(const Rectf& inRect);
   void DrawText(const std::string_view inText,
       const Font& inFont,
       const float inScale = 1.0f,
@@ -130,11 +128,11 @@ public:
   void Draw(const Ray2f& inRay) { DrawRay(inRay); }
   void Draw(const Segment2f& inSegment) { DrawSegment(inSegment); }
   void Draw(const Circlef& inCircle) { DrawCircle(inCircle); }
-  void Draw(const AASquaref& inAASquare) { DrawAASquare(inAASquare); }
   void Draw(const Capsule2f& inCapsule) { DrawCapsule(inCapsule); }
-  void DrawBoundary(const AASquaref& inAASquare) { DrawAASquareBoundary(inAASquare); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
-  void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }
+  void DrawBoundary(const AARectf& inRect) { DrawAARectBoundary(inRect); }
+  void Draw(const Rectf& inRect) { DrawRect(inRect); }
+  void DrawBoundary(const Rectf& inRect) { DrawRectBoundary(inRect); }
 
   // State
   using StateTupleOfStacks = TupleOfStacks<Renderer2D::EStateId,

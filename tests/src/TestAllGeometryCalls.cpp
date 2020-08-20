@@ -1,5 +1,4 @@
 #include "ez/AAHyperBox.h"
-#include "ez/AAHyperCube.h"
 #include "ez/Capsule.h"
 #include "ez/Cylinder.h"
 #include "ez/HyperSphere.h"
@@ -19,7 +18,6 @@ int main(int argc, const char** argv)
   Ray2f ray2;
   Segment2f segment2;
   Circlef circle;
-  AASquaref aasquare;
   AARectf aarect;
   Capsule2f capsule2;
 
@@ -28,7 +26,6 @@ int main(int argc, const char** argv)
   Segment3f segment3;
   Planef plane;
   Spheref sphere;
-  AACubef aacube;
   AABoxf aabox;
   Capsule3f capsule3;
   Cylinderf cylinder;
@@ -40,7 +37,6 @@ int main(int argc, const char** argv)
     PEEK(IntersectCheck(line2, ray2));
     PEEK(IntersectCheck(line2, segment2));
     PEEK(IntersectCheck(line2, circle));
-    PEEK(IntersectCheck(line2, aasquare));
     PEEK(IntersectCheck(line2, aarect));
     PEEK(IntersectCheck(line2, capsule2));
 
@@ -49,7 +45,6 @@ int main(int argc, const char** argv)
     PEEK(IntersectClosest(line2, ray2));
     PEEK(IntersectClosest(line2, segment2));
     PEEK(IntersectClosest(line2, circle));
-    PEEK(IntersectClosest(line2, aasquare));
     PEEK(IntersectClosest(line2, aarect));
     PEEK(IntersectClosest(line2, capsule2));
 
@@ -58,7 +53,6 @@ int main(int argc, const char** argv)
     PEEK(IntersectAll(line2, ray2));
     PEEK(IntersectAll(line2, segment2));
     PEEK(IntersectAll(line2, circle));
-    PEEK(IntersectAll(line2, aasquare));
     PEEK(IntersectAll(line2, aarect));
     PEEK(IntersectAll(line2, capsule2));
 
@@ -68,7 +62,6 @@ int main(int argc, const char** argv)
     PEEK(ClosestPoint(line2, segment2));
     /*
     PEEK(ClosestPoint(line2, circle));
-    PEEK(ClosestPoint(line2, aasquare));
     PEEK(ClosestPoint(line2, aarect));
     PEEK(ClosestPoint(line2, capsule2));
     */
@@ -79,7 +72,6 @@ int main(int argc, const char** argv)
     PEEK(SqDistance(line2, ray2));
     PEEK(SqDistance(line2, segment2));
     PEEK(SqDistance(line2, circle));
-    PEEK(SqDistance(line2, aasquare));
     PEEK(SqDistance(line2, aarect));
     PEEK(SqDistance(line2, capsule2));
     */

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "ez/AAHyperBox.h"
+#include "ez/Capsule.h"
+#include "ez/HyperBox.h"
+#include "ez/HyperSphere.h"
 #include "ez/MathTypeTraits.h"
 #include "ez/Quat.h"
 #include "ez/Vec.h"
@@ -54,7 +58,7 @@ public:
             if (key_event.mKey == EKey::W)
               mPrimitiveSize[1] += delta_length;
             else if (key_event.mKey == EKey::S)
-              mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+              mPrimitiveSize[1] = std::max(mPrimitiveSize[1] - delta_length, MinLength);
           }
           else
           {
@@ -65,7 +69,7 @@ public:
             else if (key_event.mKey == EKey::W)
               mPrimitiveSize[2] += delta_length;
             else if (key_event.mKey == EKey::S)
-              mPrimitiveSize[2] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+              mPrimitiveSize[2] = std::max(mPrimitiveSize[2] - delta_length, MinLength);
           }
         }
         else if (key_event.IsShiftModifierPressed())
@@ -127,6 +131,9 @@ public:
 
   std::array<TPrimitive, NumPrimitives> GetPrimitives() const
   {
+    using T = ValueType_t<TPrimitive>;
+    static constexpr auto N = NumComponents_v<TPrimitive>;
+
     std::array<TPrimitive, NumPrimitives> primitives;
     for (int i = 0; i < primitives.size(); ++i)
     {
@@ -160,10 +167,6 @@ public:
         primitives[i] = TPrimitive { mPrimitiveTranslation + MinLength * forward_vector_rotated,
           mPrimitiveTranslation + (MinLength + mPrimitiveSize[0]) * forward_vector_rotated };
       }
-      else if constexpr (IsAAHyperCube_v<TPrimitive>)
-      {
-        primitives[i] = MakeAAHyperCubeFromCenterSize(mPrimitiveTranslation, mPrimitiveSize[0]);
-      }
       else if constexpr (IsHyperSphere_v<TPrimitive>)
       {
         primitives[i] = HyperSpheref<N> { mPrimitiveTranslation, mPrimitiveSize[0] };
@@ -171,6 +174,16 @@ public:
       else if constexpr (IsAAHyperBox_v<TPrimitive>)
       {
         primitives[i] = MakeAAHyperBoxFromCenterSize(mPrimitiveTranslation, mPrimitiveSize);
+      }
+      else if constexpr (IsHyperBox_v<TPrimitive>)
+      {
+        primitives[i] = HyperBox<T, N> { mPrimitiveTranslation, mPrimitiveSize * 0.5f, primitive_rotation };
+      }
+      else if constexpr (IsCapsule_v<TPrimitive>)
+      {
+        primitives[i] = Capsulef<N> { mPrimitiveTranslation - mPrimitiveSize[0] * 0.5f * forward_vector_rotated,
+          mPrimitiveTranslation + mPrimitiveSize[0] * 0.5f * forward_vector_rotated,
+          mPrimitiveSize[1] };
       }
     }
     return primitives;
