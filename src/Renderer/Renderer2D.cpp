@@ -146,7 +146,7 @@ void Renderer2D::DrawPoints(const Span<Vec2f>& inPoints)
 
 void Renderer2D::DrawLine(const Line2f& inLine, const float inLength)
 {
-  DrawSegment(Segment2f { inLine.GetOrigin(), inLine.GetPoint(inLength) });
+  DrawSegment(Segment2f { inLine.GetPoint(-inLength * 0.5f), inLine.GetPoint(inLength * 0.5f) });
 }
 
 void Renderer2D::DrawLines(const Span<Line2f>& inLines, const float inLength)

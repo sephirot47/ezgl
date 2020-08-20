@@ -22,16 +22,20 @@ int main(int argc, const char** argv)
 {
   srand(1234);
 
+  const auto point = Vec2f { 3.0f, 1.0f };
+  const auto line = Line2f { Vec2f { 5.5f, 1.0f }, Direction(Vec2f { 1.1f, -0.2f }) };
+  const auto ray = Ray2f { Vec2f { -3.5f, 1.0f }, Direction(Vec2f { -1.1f, 3.2f }) };
+  const auto segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -2.6f, 3.4f } };
+  const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
   const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
   const auto rect = Rectf { Vec2f { -2.0f, -2.0f }, Vec2f { 1.0f, 1.5f } * 0.5f, 0.57f };
-  const auto circle = Circlef { Vec2f { 1.0f, 0.0f }, 0.5f };
-  const auto segment = Segment2f { Vec2f { 1.0f, 1.3f }, Vec2f { -1.1f, 2.4f } };
   const auto capsule = Capsule2f { Vec2f { 1.0f, -2.0f }, Vec2f { 1.7f, -1.6f }, 0.3f };
-  const auto primitives = std::make_tuple(aarect, rect, circle, segment, capsule);
-  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Segment2f, 128> {},
+  const auto primitives = std::make_tuple(point, line, ray, segment, circle, aarect, rect, capsule);
+  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line2f, 128> {},
       TestPrimitiveController<Ray2f, 128> {},
-      TestPrimitiveController<Line2f, 128> {},
+      TestPrimitiveController<Segment2f, 128> {},
       TestPrimitiveController<Circlef> {},
+      TestPrimitiveController<AARectf> {},
       TestPrimitiveController<Rectf> {},
       TestPrimitiveController<Capsule2f> {});
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();

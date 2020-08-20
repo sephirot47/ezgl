@@ -24,11 +24,11 @@ public:
   {
     if constexpr (N == 2)
     {
-      mPrimitiveRotation = 0.0f;
+      mPrimitiveRotation = (QuarterCircleRads<float>() * 0.5f);
     }
     else
     {
-      mPrimitiveRotation = AngleAxis(QuarterCircleRads<float>(), Up<Vecf<N>>());
+      mPrimitiveRotation = AngleAxis(QuarterCircleRads<float>() * 0.5f, Up<Vecf<N>>());
     }
   }
 
