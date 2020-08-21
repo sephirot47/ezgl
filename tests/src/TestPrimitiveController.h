@@ -185,6 +185,14 @@ public:
           mPrimitiveTranslation + mPrimitiveSize[0] * 0.5f * forward_vector_rotated,
           mPrimitiveSize[1] };
       }
+      else if constexpr (IsTriangle_v<TPrimitive>)
+      {
+        const auto up = (mPrimitiveSize * Up<Vecf<N>>());
+        const auto right = (mPrimitiveSize * Right<Vecf<N>>());
+        primitives[i] = Trianglef<N> { mPrimitiveTranslation + Rotated(-up * 0.5f + right, primitive_rotation),
+          mPrimitiveTranslation + Rotated(up * 0.5f, primitive_rotation),
+          mPrimitiveTranslation + Rotated(-up * 0.5f - right, primitive_rotation) };
+      }
     }
     return primitives;
   }
