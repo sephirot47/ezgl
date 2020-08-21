@@ -30,8 +30,8 @@ int main(int argc, const char** argv)
   const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
   const auto rect = Rectf { Vec2f { -2.0f, -2.0f }, Vec2f { 1.0f, 1.5f } * 0.5f, 0.57f };
   const auto capsule = Capsule2f { Vec2f { 1.0f, -2.0f }, Vec2f { 1.7f, -1.6f }, 0.3f };
-  const auto triangle = Triangle2f { Vec2f { 0.1f, 0.4f }, Vec2f { 0.7f, -0.1f }, Vec2f { 0.3f, 0.9f } };
-  const auto primitives = std::make_tuple(point); // , line, ray, segment, circle, aarect, rect, capsule); //, triangle);
+  const auto triangle = Triangle2f { Vec2f { 0.1f, -3.4f }, Vec2f { 0.7f, -3.1f }, Vec2f { 0.3f, -3.9f } };
+  const auto primitives = std::make_tuple(point, line, ray, segment, circle, aarect, rect, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line2f, 128> {},
       TestPrimitiveController<Ray2f, 128> {},
       TestPrimitiveController<Segment2f, 128> {},
