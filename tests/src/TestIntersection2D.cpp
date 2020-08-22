@@ -3,6 +3,7 @@
 #include "ez/BinaryIndex.h"
 #include "ez/CameraControllerFly.h"
 #include "ez/Capsule.h"
+#include "ez/Font.h"
 #include "ez/HyperBox.h"
 #include "ez/HyperSphere.h"
 #include "ez/MathRandom.h"
@@ -17,6 +18,10 @@
 #include <cstdlib>
 
 using namespace ez;
+
+template <typename TPrimitivesControllersTuple>
+std::string GetPrimitiveName(const TPrimitivesControllersTuple& inPrimitivesControllersTuple,
+    const int inSelectedPrimitiveIndex);
 
 int main(int argc, const char** argv)
 {
@@ -62,8 +67,10 @@ int main(int argc, const char** argv)
     }
   });
 
+  const Font font("/home/sephirot47/ezgl/res/Fonts/Ubuntu-Regular.ttf", 128);
+
   ForEach(main_primitives_controllers,
-      [&](auto& main_primitive_controller) { window->AddInputListener(&main_primitive_controller); });
+      [&](auto& in_main_primitive_controller) { window->AddInputListener(&in_main_primitive_controller); });
 
   // Camera
   const auto camera = std::make_shared<OrthographicCamera2f>();
@@ -89,17 +96,20 @@ int main(int argc, const char** argv)
     renderer.Clear();
 
     int main_primitive_i = 0;
-    ForEach(main_primitives_controllers, [&](const auto& main_primitive_controller) {
+    ForEach(main_primitives_controllers, [&](const auto& in_main_primitive_controller) {
       if (main_primitive_i++ != selected_main_primitive_index)
         return;
 
-      if (!main_primitive_controller.IsControlEnabled())
+      if (!window->IsKeyPressed(EKey::LEFT_ALT) && !window->IsKeyPressed(EKey::LEFT_CONTROL)
+          && !window->IsKeyPressed(EKey::LEFT_SHIFT))
+      {
         camera_controller_fly.Update(inDeltaTime);
+      }
 
-      const auto main_subprimitives = main_primitive_controller.GetPrimitives();
+      const auto main_subprimitives = in_main_primitive_controller.GetPrimitives();
       for (const auto main_subprimitive : main_subprimitives)
       {
-        using MainPrimitiveType = typename std::remove_cvref_t<decltype(main_primitive_controller)>::PrimitiveType;
+        using MainPrimitiveType = typename std::remove_cvref_t<decltype(in_main_primitive_controller)>::PrimitiveType;
 
         auto intersecting = false;
         ForEach(primitives,
@@ -142,6 +152,22 @@ int main(int argc, const char** argv)
     renderer.SetBlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
     ForEach(primitives, [&](const auto& in_primitive) { renderer.Draw(in_primitive); });
 
+    renderer.PushTransformMatrix();
+    renderer.Translate(Vec2f { -5.0f, -5.0f } + Vec2f { 0.1f, 0.1f });
+    renderer.GetMaterial().SetColor(White<Color4f>());
+    renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
+
+    const auto primitive_name = GetPrimitiveName(main_primitives_controllers, selected_main_primitive_index);
+    const std::string text = "Left/Right: change primitive (Current: " + primitive_name
+        + ")\n"
+          "Up/Down: change mode (Current: Intersection) \n"
+          "WASD: Move camera\n"
+          "Ctrl + WASD: Move primitive\n"
+          "Shift + WASD: Rotate primitive\n"
+          "Alt + WASD: Resize primitive";
+    renderer.DrawText(text, font, 0.002f, ETextHAlignment::LEFT, ETextVAlignment::BOTTOM);
+    renderer.PopTransformMatrix();
+
     // Blit image to window
     GL::ClearDepth();
     renderer.Blit();
@@ -150,4 +176,34 @@ int main(int argc, const char** argv)
     return Window::ELoopResult::KEEP_LOOPING;
   });
   return EXIT_SUCCESS;
+}
+
+template <typename TPrimitivesControllersTuple>
+std::string GetPrimitiveName(const TPrimitivesControllersTuple& inPrimitivesControllersTuple,
+    const int inSelectedPrimitiveIndex)
+{
+  std::string primitive_name = "Unknown";
+  int main_primitive_i = 0;
+  ForEach(inPrimitivesControllersTuple, [&](const auto& in_main_primitive_controller) {
+    using MainPrimitiveType = typename std::remove_cvref_t<decltype(in_main_primitive_controller)>::PrimitiveType;
+    if (main_primitive_i++ != inSelectedPrimitiveIndex)
+      return;
+    if constexpr (IsLine_v<MainPrimitiveType>)
+      primitive_name = "Line";
+    if constexpr (IsRay_v<MainPrimitiveType>)
+      primitive_name = "Ray";
+    if constexpr (IsSegment_v<MainPrimitiveType>)
+      primitive_name = "Segment";
+    if constexpr (IsHyperSphere_v<MainPrimitiveType>)
+      primitive_name = "Circle";
+    if constexpr (IsAAHyperBox_v<MainPrimitiveType>)
+      primitive_name = "AARect";
+    if constexpr (IsHyperBox_v<MainPrimitiveType>)
+      primitive_name = "Rect";
+    if constexpr (IsCapsule_v<MainPrimitiveType>)
+      primitive_name = "Capsule";
+    if constexpr (IsTriangle_v<MainPrimitiveType>)
+      primitive_name = "Triangle";
+  });
+  return primitive_name;
 }

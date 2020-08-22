@@ -39,12 +39,6 @@ public:
       const auto key_event = inInputEvent.As<InputEvent::EType::KEY>();
       if (key_event.IsPressOrRepeat())
       {
-        if (key_event.mKey == EKey::TAB)
-          mControlEnabled = !mControlEnabled;
-
-        if (!IsControlEnabled())
-          return;
-
         if (key_event.IsAltModifierPressed())
         {
           const auto delta_length = 0.1f;
@@ -98,7 +92,7 @@ public:
               mPrimitiveRotation *= AngleAxis(delta_angle, -Right<Vec3f>());
           }
         }
-        else
+        else if (key_event.IsControlModifierPressed())
         {
           const auto delta_displacement = 0.1f;
           if (key_event.mKey == EKey::A)

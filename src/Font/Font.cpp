@@ -89,8 +89,8 @@ AARectf Font::GetCharacterAtlasTextureCoordinatesRect(const char inCharacter) co
 {
   const auto character_atlas_rect = GetCharacterAtlasRect(inCharacter);
 
-  auto character_texture_coordinates_rect_min = Vec2f(character_atlas_rect.GetMin()) / mAtlasTexture->GetWidth();
-  auto character_texture_coordinates_rect_max = Vec2f(character_atlas_rect.GetMax()) / mAtlasTexture->GetHeight();
+  const auto character_texture_coordinates_rect_min = Vec2f(character_atlas_rect.GetMin()) / mAtlasTexture->GetWidth();
+  const auto character_texture_coordinates_rect_max = Vec2f(character_atlas_rect.GetMax()) / mAtlasTexture->GetHeight();
 
   EXPECTS(IsBetween(character_texture_coordinates_rect_min, Zero<Vec2f>(), One<Vec2f>()));
   EXPECTS(IsBetween(character_texture_coordinates_rect_max, Zero<Vec2f>(), One<Vec2f>()));
@@ -134,9 +134,16 @@ Mesh Font::GetTextMesh(const std::string_view inText,
     for (std::size_t i = 0; i < inText.size(); ++i)
     {
       const auto character = inText[i];
-      const auto character_size = Vec2f(GetCharacterSize(character));
+      if (character == '\n')
+      {
+        current_baseline[0] = 0;
+        current_baseline[1] -= (GetLineHeight() + GetLineGap());
+        character_rects.push_back(AARectf{Zero<Vec2f>(), Zero<Vec2f>()});
+        continue;
+      }
 
       auto character_rect = AARectf(GetCharacterRect(character));
+      const auto character_size = character_rect.GetSize();
       const auto character_rect_min = Vec2f { character_rect.GetMin()[0], -character_rect.GetMax()[1] };
       const auto character_rect_max = Vec2f { character_rect.GetMax()[0], -character_rect.GetMin()[1] };
       character_rect.SetMinMax(character_rect_min, character_rect_max);
@@ -164,8 +171,8 @@ Mesh Font::GetTextMesh(const std::string_view inText,
   const auto alignment_offset = GetAlignmentOffset(text_rect, inHAlignment, inVAlignment);
   for (std::size_t i = 0; i < inText.size(); ++i)
   {
-    const auto character = inText[i];
-    const auto& character_rect = character_rects[i] + alignment_offset;
+    const auto character = inText.at(i);
+    const auto& character_rect = Translated(character_rects[i], alignment_offset);
 
     for (const auto& character_rect_point : character_rect) { text_mesh.AddVertex(XY0(character_rect_point)); }
 
@@ -216,8 +223,8 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
 
   const auto ascent = GetAscent();
   const auto descent = GetDescent();
-  const auto line_height = GetLineHeight();
-
+  UNUSED(ascent);
+  UNUSED(descent);
   switch (inVAlignment)
   {
   case ETextVAlignment::TOP:
@@ -225,7 +232,7 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
     break;
 
   case ETextVAlignment::CENTER:
-    alignment_offset[1] = -ascent + line_height * 0.5f;
+    alignment_offset[1] = (inTextRect.GetSize()[1] - ascent) * 0.5f;
     break;
 
   case ETextVAlignment::BASELINE:
@@ -233,7 +240,7 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
     break;
 
   case ETextVAlignment::BOTTOM:
-    alignment_offset[1] = -descent;
+    alignment_offset[1] = inTextRect.GetSize()[1] - ascent;
     break;
   }
 
@@ -264,7 +271,7 @@ uint64_t Font::ComputeAtlasCharactersPlacement(const std::string_view inCharacte
 
   // Now simply write characters one after the other, and when we arrive to the end of the line, skip to the next line
   auto current_character_top_left = Zero<Vec2ul>();
-  mCharactersAtlasRects.resize(256);
+  mCharactersAtlasRects = std::vector<AARectul>(256, AARectul { Zero<Vec2ul>(), Zero<Vec2ul>() });
   for (const auto& atlas_character : inCharacters)
   {
     EXPECTS(static_cast<uint64_t>(atlas_character) < mCharactersAtlasRects.size());
