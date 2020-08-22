@@ -35,7 +35,7 @@ int main(int argc, const char** argv)
   const auto aarect = MakeAAHyperBoxFromCenterSize(Vec2f { -1.5f, 0.0f }, Vec2f { 1.0f, 1.5f });
   const auto rect = Rectf { Vec2f { -2.0f, -2.0f }, Vec2f { 1.0f, 1.5f } * 0.5f, 0.57f };
   const auto capsule = Capsule2f { Vec2f { 1.0f, -2.0f }, Vec2f { 1.7f, -1.6f }, 0.3f };
-  const auto triangle = Triangle2f { Vec2f { 0.1f, -3.4f }, Vec2f { 0.7f, -3.1f }, Vec2f { 0.3f, -3.9f } };
+  const auto triangle = Triangle2f { Vec2f { 0.1f, -3.0f }, Vec2f { 1.7f, -3.7f }, Vec2f { 0.3f, -4.7f } };
   const auto primitives = std::make_tuple(point, line, ray, segment, circle, aarect, rect, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line2f, 128> {},
       TestPrimitiveController<Ray2f, 128> {},
@@ -112,12 +112,18 @@ int main(int argc, const char** argv)
         using MainPrimitiveType = typename std::remove_cvref_t<decltype(in_main_primitive_controller)>::PrimitiveType;
 
         auto intersecting = false;
-        ForEach(primitives,
-            [&](const auto& in_primitive) { intersecting |= IntersectCheck(main_subprimitive, in_primitive); });
+        auto contained = false;
+        ForEach(primitives, [&](const auto& in_primitive) {
+          using PrimitiveType = std::remove_cvref_t<decltype(in_primitive)>;
+          intersecting |= IntersectCheck(main_subprimitive, in_primitive);
+          if constexpr (!IsVec_v<PrimitiveType>)
+            contained |= Contains(in_primitive, main_subprimitive);
+        });
 
         renderer.SetLineWidth(2.0f);
         renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
-        renderer.GetMaterial().SetColor(intersecting ? Red<Color4f>() : Green<Color4f>());
+        renderer.GetMaterial().SetColor(
+            contained ? Red<Color4f>() : (intersecting ? Yellow<Color4f>() : Green<Color4f>()));
         renderer.Draw(main_subprimitive);
 
         if constexpr (IsLine_v<MainPrimitiveType> || IsRay_v<MainPrimitiveType> || IsSegment_v<MainPrimitiveType>)
@@ -160,11 +166,11 @@ int main(int argc, const char** argv)
     const auto primitive_name = GetPrimitiveName(main_primitives_controllers, selected_main_primitive_index);
     const std::string text = "Left/Right: change primitive (Current: " + primitive_name
         + ")\n"
-          "Up/Down: change mode (Current: Intersection) \n"
           "WASD: Move camera\n"
           "Ctrl + WASD: Move primitive\n"
           "Shift + WASD: Rotate primitive\n"
-          "Alt + WASD: Resize primitive";
+          "Alt + WASD: Resize primitive\n"
+          "Green = Not-Intersecting, Yellow = Intersecting, Red = Contained";
     renderer.DrawText(text, font, 0.002f, ETextHAlignment::LEFT, ETextVAlignment::BOTTOM);
     renderer.PopTransformMatrix();
 
