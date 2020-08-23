@@ -48,6 +48,8 @@ int main(int argc, const char** argv)
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
 
+  for (const auto segment : MakeSegmentsRange(aarect)) { PEEK(segment); }
+
   // Create window
   Window::CreateOptions window_create_options;
   window_create_options.mTitle = "Test intersection 2D";
@@ -156,7 +158,7 @@ int main(int argc, const char** argv)
           // ClosestPoint
           ForEach(primitives, [&](const auto& in_primitive) {
             const auto closest_point_in_main_subprimitive = ClosestPoint(main_subprimitive, in_primitive);
-            const auto closest_point_in_primitive = ClosestPoint(in_primitive, main_subprimitive);
+            const auto closest_point_in_primitive = ClosestPoint(in_primitive, closest_point_in_main_subprimitive);
 
             renderer.GetMaterial().SetColor(Purple<Color4f>());
             renderer.Draw(closest_point_in_main_subprimitive);

@@ -13,7 +13,7 @@ void RendererGPU::DrawCircleSectionGeneric(const AngleRads<T> inAngle, std::size
   const auto GetCirclePoint = [inAngle, inNumVertices](std::size_t inIndex) {
     const auto progress = (inIndex / static_cast<T>(inNumVertices - 1));
     const auto angle = inAngle * progress;
-    const auto point = WithPart<0, 1>(Zero<Vec<T, N>>(), Vec2f { std::cos(angle), std::sin(angle) });
+    const auto point = WithPart<0, 2>(Zero<Vec<T, N>>(), Vec2f { std::cos(angle), std::sin(angle) });
     return point;
   };
 
@@ -38,7 +38,7 @@ void RendererGPU::DrawCircleSectionBoundaryGeneric(const AngleRads<T> inAngle, s
   const auto GetCirclePoint = [inAngle, inNumVertices](std::size_t inIndex) {
     const auto progress = (inIndex / static_cast<T>(inNumVertices - 1));
     const auto angle = inAngle * progress;
-    const auto point = WithPart<0, 1>(Zero<Vec<T, N>>(), Vec2f { std::cos(angle), std::sin(angle) });
+    const auto point = WithPart<0, 2>(Zero<Vec<T, N>>(), Vec2f { std::cos(angle), std::sin(angle) });
     return point;
   };
 
