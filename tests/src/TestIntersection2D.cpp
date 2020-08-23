@@ -128,6 +128,7 @@ int main(int argc, const char** argv)
 
         if constexpr (IsLine_v<MainPrimitiveType> || IsRay_v<MainPrimitiveType> || IsSegment_v<MainPrimitiveType>)
         {
+          // Intersection point
           renderer.SetPointSize(8.0f);
           renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
           ForEach(primitives, [&](const auto& in_primitive) {
@@ -148,6 +149,19 @@ int main(int argc, const char** argv)
             if (closest_intersection_distance)
               renderer.Draw(
                   (main_subprimitive.GetOrigin() + Direction(main_subprimitive) * (*closest_intersection_distance)));
+          });
+        }
+        else
+        {
+          // ClosestPoint
+          ForEach(primitives, [&](const auto& in_primitive) {
+            const auto closest_point_in_main_subprimitive = ClosestPoint(main_subprimitive, in_primitive);
+            const auto closest_point_in_primitive = ClosestPoint(in_primitive, main_subprimitive);
+
+            renderer.GetMaterial().SetColor(Purple<Color4f>());
+            renderer.Draw(closest_point_in_main_subprimitive);
+            renderer.Draw(closest_point_in_primitive);
+            renderer.Draw(Segment2f { closest_point_in_main_subprimitive, closest_point_in_primitive });
           });
         }
       }

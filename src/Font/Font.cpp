@@ -138,7 +138,7 @@ Mesh Font::GetTextMesh(const std::string_view inText,
       {
         current_baseline[0] = 0;
         current_baseline[1] -= (GetLineHeight() + GetLineGap());
-        character_rects.push_back(AARectf{Zero<Vec2f>(), Zero<Vec2f>()});
+        character_rects.push_back(AARectf { Zero<Vec2f>(), Zero<Vec2f>() });
         continue;
       }
 
@@ -174,7 +174,8 @@ Mesh Font::GetTextMesh(const std::string_view inText,
     const auto character = inText.at(i);
     const auto& character_rect = Translated(character_rects[i], alignment_offset);
 
-    for (const auto& character_rect_point : character_rect) { text_mesh.AddVertex(XY0(character_rect_point)); }
+    for (const auto& character_rect_point : MakePointsRange(character_rect))
+    { text_mesh.AddVertex(XY0(character_rect_point)); }
 
     const auto i4 = i * 4;
     const auto face_id_0 = text_mesh.AddFace(i4, i4 + 2, i4 + 1);
