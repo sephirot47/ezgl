@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/Input.h"
-#include "ez/Window.h"
+#include <ez/Input.h>
+#include <ez/Window.h>
 #include <memory>
 
 namespace ez

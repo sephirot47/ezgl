@@ -1,4 +1,4 @@
-#include "ez/GLBindableObject.h"
+#include <ez/GLBindableObject.h>
 
 namespace ez
 {

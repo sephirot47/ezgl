@@ -1,4 +1,4 @@
-#include "ez/SSBO.h"
+#include <ez/SSBO.h>
 
 namespace ez
 {

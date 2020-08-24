@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/Color.h"
-#include "ez/MathInitializers.h"
-#include "ez/Span.h"
+#include <ez/Color.h>
+#include <ez/MathInitializers.h>
+#include <ez/Span.h>
 #include <filesystem>
 #include <vector>
 

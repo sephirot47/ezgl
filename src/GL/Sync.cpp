@@ -1,4 +1,4 @@
-#include "ez/Sync.h"
+#include <ez/Sync.h>
 
 namespace ez
 {

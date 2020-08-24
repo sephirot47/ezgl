@@ -1,12 +1,12 @@
-#include "ez/AAHyperBox.h"
-#include "ez/BinaryIndex.h"
-#include "ez/CameraControllerFly.h"
-#include "ez/Macros.h"
-#include "ez/OrthographicCamera.h"
-#include "ez/PerspectiveCamera.h"
+#include <ez/AAHyperBox.h>
+#include <ez/BinaryIndex.h>
+#include <ez/CameraControllerFly.h>
+#include <ez/Macros.h>
+#include <ez/OrthographicCamera.h>
+#include <ez/PerspectiveCamera.h>
 #include "ez/Renderer3D.h"
-#include "ez/Triangle.h"
-#include "ez/Window.h"
+#include <ez/Triangle.h>
+#include <ez/Window.h>
 #include <cstdlib>
 
 using namespace ez;

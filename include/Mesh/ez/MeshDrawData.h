@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ez/EBO.h"
-#include "ez/GLGuard.h"
-#include "ez/GLTypeTraits.h"
-#include "ez/Mesh.h"
-#include "ez/VAO.h"
-#include "ez/VBO.h"
+#include <ez/EBO.h>
+#include <ez/GLGuard.h>
+#include <ez/GLTypeTraits.h>
+#include <ez/Mesh.h>
+#include <ez/VAO.h>
+#include <ez/VBO.h>
 #include <memory>
 
 namespace ez

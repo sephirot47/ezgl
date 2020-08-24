@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/GL.h"
-#include "ez/Mat.h"
-#include "ez/Vec.h"
+#include <ez/GL.h>
+#include <ez/Mat.h>
+#include <ez/Vec.h>
 #include <GL/glew.h>
 
 namespace ez

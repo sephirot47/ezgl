@@ -1,7 +1,7 @@
 #include "ez/Material2D.h"
-#include "ez/ShaderProgram.h"
+#include <ez/ShaderProgram.h>
 #include "ez/Texture2D.h"
-#include "ez/TextureFactory.h"
+#include <ez/TextureFactory.h>
 
 namespace ez
 {

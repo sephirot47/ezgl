@@ -1,12 +1,12 @@
-#include "ez/CameraControllerFly.h"
-#include "ez/Font.h"
+#include <ez/CameraControllerFly.h>
+#include <ez/Font.h>
 #include "ez/Image2D.h"
-#include "ez/MeshFactory.h"
-#include "ez/PerspectiveCamera.h"
+#include <ez/MeshFactory.h>
+#include <ez/PerspectiveCamera.h>
 #include "ez/Renderer3D.h"
-#include "ez/RendererRayTracingCPU.h"
-#include "ez/SceneGraphNode.h"
-#include "ez/Window.h"
+#include <ez/RendererRayTracingCPU.h>
+#include <ez/SceneGraphNode.h>
+#include <ez/Window.h>
 #include <cstdlib>
 
 using namespace ez;

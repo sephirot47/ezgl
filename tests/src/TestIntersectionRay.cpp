@@ -1,12 +1,12 @@
-#include "ez/CameraControllerFly.h"
-#include "ez/HyperSphere.h"
-#include "ez/MeshFactory.h"
-#include "ez/Octree.h"
-#include "ez/PerspectiveCamera.h"
-#include "ez/Plane.h"
+#include <ez/CameraControllerFly.h>
+#include <ez/HyperSphere.h>
+#include <ez/MeshFactory.h>
+#include <ez/Octree.h>
+#include <ez/PerspectiveCamera.h>
+#include <ez/Plane.h>
 #include "ez/Renderer3D.h"
-#include "ez/VAO.h"
-#include "ez/Window.h"
+#include <ez/VAO.h>
+#include <ez/Window.h>
 #include <cstdlib>
 #include <stack>
 #include <vector>
@@ -49,8 +49,8 @@ int main(int argc, const char** argv)
   std::vector<Ray3f> rays;
   std::vector<Triangle3f> hit_triangles;
   std::vector<Vec3f> hit_points;
-  window->SetMouseButtonEventCallback([&](const MoustButtonEvent& inMoustButtonEvent) {
-    if (inMoustButtonEvent.IsPress() && inMoustButtonEvent.mButton == EMouseButton::LEFT)
+  window->AddMouseButtonEventCallback([&](const MouseButtonEvent& inMouseButtonEvent) {
+    if (inMouseButtonEvent.IsPress() && inMouseButtonEvent.mButton == EMouseButton::LEFT)
     {
       const auto mouse_position = window->GetMousePositionViewport();
       const auto mouse_ray = camera->GetViewportRay(mouse_position);

@@ -1,7 +1,7 @@
-#include "ez/MeshFactory.h"
-#include "ez/Math.h"
-#include "ez/Mesh.h"
-#include "ez/Quat.h"
+#include <ez/MeshFactory.h>
+#include <ez/Math.h>
+#include <ez/Mesh.h>
+#include <ez/Quat.h>
 
 namespace ez
 {

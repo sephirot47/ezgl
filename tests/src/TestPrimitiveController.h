@@ -1,14 +1,14 @@
 #pragma once
 
-#include "ez/AAHyperBox.h"
-#include "ez/Capsule.h"
-#include "ez/HyperBox.h"
-#include "ez/HyperSphere.h"
-#include "ez/InputListener.h"
-#include "ez/MathTypeTraits.h"
-#include "ez/Quat.h"
-#include "ez/Vec.h"
-#include "ez/Window.h"
+#include <ez/AAHyperBox.h>
+#include <ez/Capsule.h>
+#include <ez/HyperBox.h>
+#include <ez/HyperSphere.h>
+#include <ez/InputListener.h>
+#include <ez/MathTypeTraits.h>
+#include <ez/Quat.h>
+#include <ez/Vec.h>
+#include <ez/Window.h>
 #include <array>
 
 namespace ez

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/GLTypeTraits.h"
-#include "ez/Math.h"
-#include "ez/Texture.h"
+#include <ez/GLTypeTraits.h>
+#include <ez/Math.h>
+#include <ez/Texture.h>
 #include <memory>
 
 namespace ez

@@ -1,9 +1,9 @@
-#include "ez/Font.h"
-#include "ez/Vec.h"
+#include <ez/Font.h>
+#include <ez/Vec.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "ez/Image2D.h"
-#include "ez/MathSwizzling.h"
-#include "ez/Mesh.h"
+#include <ez/MathSwizzling.h>
+#include <ez/Mesh.h>
 #include "ez/stb_truetype.h"
 #include <fstream>
 #include <numeric>

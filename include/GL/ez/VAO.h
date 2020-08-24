@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/GL.h"
-#include "ez/GLBindableObject.h"
-#include "ez/GLGuard.h"
+#include <ez/GL.h>
+#include <ez/GLBindableObject.h>
+#include <ez/GLGuard.h>
 #include <cstdint>
 #include <memory>
 #include <vector>

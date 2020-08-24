@@ -1,5 +1,5 @@
-#include "ez/Macros.h"
-#include "ez/PerspectiveCamera.h"
+#include <ez/Macros.h>
+#include <ez/PerspectiveCamera.h>
 
 namespace ez
 {

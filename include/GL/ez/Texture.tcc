@@ -1,4 +1,4 @@
-#include "ez/Texture.h"
+#include <ez/Texture.h>
 
 namespace ez
 {

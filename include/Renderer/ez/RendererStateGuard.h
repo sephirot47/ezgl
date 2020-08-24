@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/Macros.h"
+#include <ez/Macros.h>
 #include <type_traits>
 
 namespace ez

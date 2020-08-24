@@ -1,5 +1,5 @@
-#include "ez/GL.h"
-#include "ez/VBO.h"
+#include <ez/GL.h>
+#include <ez/VBO.h>
 
 namespace ez
 {

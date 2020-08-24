@@ -1,9 +1,9 @@
 #ifdef MESH_IO
 
-#include "ez/MeshIO.h"
-#include "ez/Macros.h"
-#include "ez/Math.h"
-#include "ez/Mesh.h"
+#include <ez/MeshIO.h>
+#include <ez/Macros.h>
+#include <ez/Math.h>
+#include <ez/Mesh.h>
 #include <assimp/Exporter.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

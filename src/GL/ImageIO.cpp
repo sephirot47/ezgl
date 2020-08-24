@@ -1,6 +1,6 @@
-#include "ez/ImageIO.h"
+#include <ez/ImageIO.h>
 #include "ez/Image2D.h"
-#include "ez/Macros.h"
+#include <ez/Macros.h>
 #include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/Camera.h"
-#include "ez/Math.h"
-#include "ez/PerspectiveParameters.h"
-#include "ez/Ray.h"
+#include <ez/Camera.h>
+#include <ez/Math.h>
+#include <ez/PerspectiveParameters.h>
+#include <ez/Ray.h>
 
 namespace ez
 {

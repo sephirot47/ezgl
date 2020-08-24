@@ -1,10 +1,10 @@
-#include "ez/Mesh.h"
-#include "ez/Macros.h"
-#include "ez/Math.h"
-#include "ez/MeshIO.h"
-#include "ez/MeshIterators.h"
-#include "ez/StreamOperators.h"
-#include "ez/Transformation.h"
+#include <ez/Mesh.h>
+#include <ez/Macros.h>
+#include <ez/Math.h>
+#include <ez/MeshIO.h>
+#include <ez/MeshIterators.h>
+#include <ez/StreamOperators.h>
+#include <ez/Transformation.h>
 #include <algorithm>
 #include <cassert>
 #include <unordered_map>

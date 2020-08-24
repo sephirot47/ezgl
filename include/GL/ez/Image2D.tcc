@@ -1,6 +1,6 @@
 #include "ez/Image2D.h"
-#include "ez/ImageIO.h"
-#include "ez/Math.h"
+#include <ez/ImageIO.h>
+#include <ez/Math.h>
 
 namespace ez
 {

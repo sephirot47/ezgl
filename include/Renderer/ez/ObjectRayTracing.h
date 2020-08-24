@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ez/AAHyperBox.h"
-#include "ez/CommonTypeTraits.h"
-#include "ez/DirectionalLight.h"
-#include "ez/HyperSphere.h"
-#include "ez/MaterialRayTracing.h"
-#include "ez/Transformation.h"
+#include <ez/AAHyperBox.h>
+#include <ez/CommonTypeTraits.h>
+#include <ez/DirectionalLight.h>
+#include <ez/HyperSphere.h>
+#include <ez/MaterialRayTracing.h>
+#include <ez/Transformation.h>
 #include <variant>
 
 namespace ez

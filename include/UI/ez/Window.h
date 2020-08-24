@@ -1,8 +1,8 @@
 
 #pragma once
-#include "ez/GL.h"
-#include "ez/Input.h"
-#include "ez/Time.h"
+#include <ez/GL.h>
+#include <ez/Input.h>
+#include <ez/Time.h>
 #include <cstdint>
 #include <functional>
 #include <memory>

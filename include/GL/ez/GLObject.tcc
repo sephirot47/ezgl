@@ -1,4 +1,4 @@
-#include "ez/GLObject.h"
+#include <ez/GLObject.h>
 
 namespace ez
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/MathInitializers.h"
-#include "ez/Transformation.h"
-#include "ez/Vec.h"
+#include <ez/MathInitializers.h>
+#include <ez/Transformation.h>
+#include <ez/Vec.h>
 #include <cstdint>
 
 namespace ez

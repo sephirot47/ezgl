@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ez/Camera.h"
-#include "ez/MathInitializers.h"
-#include "ez/Time.h"
-#include "ez/Vec.h"
-#include "ez/Window.h"
+#include <ez/Camera.h>
+#include <ez/MathInitializers.h>
+#include <ez/Time.h>
+#include <ez/Vec.h>
+#include <ez/Window.h>
 #include <chrono>
 #include <memory>
 

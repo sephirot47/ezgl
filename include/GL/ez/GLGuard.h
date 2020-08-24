@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/GL.h"
+#include <ez/GL.h>
 #include <functional>
 #include <type_traits>
 

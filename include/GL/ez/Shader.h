@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/FileUtils.h"
-#include "ez/GL.h"
-#include "ez/GLObject.h"
+#include <ez/FileUtils.h>
+#include <ez/GL.h>
+#include <ez/GLObject.h>
 #include <cstdint>
 #include <string>
 #include <string_view>

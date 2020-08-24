@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/Mesh.h"
-#include "ez/Segment.h"
+#include <ez/Mesh.h>
+#include <ez/Segment.h>
 #include <vector>
 
 namespace ez

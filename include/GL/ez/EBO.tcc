@@ -1,4 +1,4 @@
-#include "ez/EBO.h"
+#include <ez/EBO.h>
 
 namespace ez
 {

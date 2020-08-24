@@ -1,5 +1,5 @@
-#include "ez/GL.h"
-#include "ez/ShaderProgram.h"
+#include <ez/GL.h>
+#include <ez/ShaderProgram.h>
 
 namespace ez
 {

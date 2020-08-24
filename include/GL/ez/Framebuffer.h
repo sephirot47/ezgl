@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/GLBindableObject.h"
-#include "ez/MathInitializers.h"
+#include <ez/GLBindableObject.h>
+#include <ez/MathInitializers.h>
 #include "ez/Texture2D.h"
-#include "ez/Vec.h"
+#include <ez/Vec.h>
 #include <array>
 #include <memory>
 #include <variant>

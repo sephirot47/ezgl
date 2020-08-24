@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ez/GL.h"
-#include "ez/GLBindableObject.h"
-#include "ez/GLGuard.h"
-#include "ez/Mat.h"
-#include "ez/Shader.h"
-#include "ez/Vec.h"
+#include <ez/GL.h>
+#include <ez/GLBindableObject.h>
+#include <ez/GLGuard.h>
+#include <ez/Mat.h>
+#include <ez/Shader.h>
+#include <ez/Vec.h>
 #include <cstdint>
 #include <optional>
 #include <string_view>

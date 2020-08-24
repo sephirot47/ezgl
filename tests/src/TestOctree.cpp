@@ -1,10 +1,10 @@
-#include "ez/CameraControllerFly.h"
-#include "ez/MeshFactory.h"
-#include "ez/Octree.h"
-#include "ez/PerspectiveCamera.h"
+#include <ez/CameraControllerFly.h>
+#include <ez/MeshFactory.h>
+#include <ez/Octree.h>
+#include <ez/PerspectiveCamera.h>
 #include "ez/Renderer3D.h"
-#include "ez/VAO.h"
-#include "ez/Window.h"
+#include <ez/VAO.h>
+#include <ez/Window.h>
 #include <cstdlib>
 #include <stack>
 #include <vector>

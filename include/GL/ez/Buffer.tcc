@@ -1,5 +1,5 @@
-#include "ez/Buffer.h"
-#include "ez/GL.h"
+#include <ez/Buffer.h>
+#include <ez/GL.h>
 
 namespace ez
 {

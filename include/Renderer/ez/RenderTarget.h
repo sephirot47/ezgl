@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ez/GL.h"
-#include "ez/GLGuard.h"
-#include "ez/MathInitializers.h"
+#include <ez/GL.h>
+#include <ez/GLGuard.h>
+#include <ez/MathInitializers.h>
 #include <memory>
 
 namespace ez

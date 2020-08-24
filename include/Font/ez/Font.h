@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/ETextHAlignment.h"
-#include "ez/ETextVAlignment.h"
+#include <ez/ETextHAlignment.h>
+#include <ez/ETextVAlignment.h>
 #include "ez/Texture2D.h"
 #include "ez/stb_truetype.h"
 #include <filesystem>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/GLBindableObject.h"
-#include "ez/GLGuard.h"
-#include "ez/MathForward.h"
-#include "ez/Vec.h"
+#include <ez/GLBindableObject.h>
+#include <ez/GLGuard.h>
+#include <ez/MathForward.h>
+#include <ez/Vec.h>
 
 namespace ez
 {

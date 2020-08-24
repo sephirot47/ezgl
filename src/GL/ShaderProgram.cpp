@@ -1,7 +1,7 @@
-#include "ez/ShaderProgram.h"
-#include "ez/GL.h"
-#include "ez/Macros.h"
-#include "ez/Shader.h"
+#include <ez/ShaderProgram.h>
+#include <ez/GL.h>
+#include <ez/Macros.h>
+#include <ez/Shader.h>
 #include <GL/glew.h>
 #include <cassert>
 #include <stdexcept>

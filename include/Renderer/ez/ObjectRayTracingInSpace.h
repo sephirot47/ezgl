@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/Mat.h"
-#include "ez/ObjectRayTracing.h"
+#include <ez/Mat.h>
+#include <ez/ObjectRayTracing.h>
 
 namespace ez
 {

@@ -1,5 +1,5 @@
-#include "ez/Macros.h"
-#include "ez/Renderer.h"
+#include <ez/Macros.h>
+#include <ez/Renderer.h>
 
 namespace ez
 {

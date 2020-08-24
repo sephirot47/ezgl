@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/Color.h"
-#include "ez/MathInitializers.h"
-#include "ez/TypeTraits.h"
-#include "ez/Vec.h"
+#include <ez/Color.h>
+#include <ez/MathInitializers.h>
+#include <ez/TypeTraits.h>
+#include <ez/Vec.h>
 
 namespace ez
 {

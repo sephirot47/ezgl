@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ez/Macros.h"
-#include "ez/Mat.h"
-#include "ez/MathInitializers.h"
-#include "ez/MeshIterators.h"
-#include "ez/Range.h"
-#include "ez/Triangle.h"
-#include "ez/Vec.h"
+#include <ez/Macros.h>
+#include <ez/Mat.h>
+#include <ez/MathInitializers.h>
+#include <ez/MeshIterators.h>
+#include <ez/Range.h>
+#include <ez/Triangle.h>
+#include <ez/Vec.h>
 #include <algorithm>
 #include <array>
 #include <filesystem>

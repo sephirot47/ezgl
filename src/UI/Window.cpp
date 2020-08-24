@@ -1,6 +1,6 @@
-#include "ez/Window.h"
-#include "ez/InputListener.h"
-#include "ez/Macros.h"
+#include <ez/Window.h>
+#include <ez/InputListener.h>
+#include <ez/Macros.h>
 #include <GL/glew.h>
 #include <algorithm>
 #include <thread>

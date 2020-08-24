@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/GL.h"
-#include "ez/TextureFactory.h"
+#include <ez/GL.h>
+#include <ez/TextureFactory.h>
 #include <memory>
 
 namespace ez

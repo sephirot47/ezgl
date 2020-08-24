@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ez/AAHyperBox.h"
-#include "ez/RenderTarget.h"
-#include "ez/RendererStateGuard.h"
-#include "ez/RendererStateStacks.h"
+#include <ez/AAHyperBox.h>
+#include <ez/RenderTarget.h>
+#include <ez/RendererStateGuard.h>
+#include <ez/RendererStateStacks.h>
 #include <cstdint>
 #include <functional>
 #include <memory>

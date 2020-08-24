@@ -1,9 +1,9 @@
-#include "ez/VAO.h"
-#include "ez/EBO.h"
-#include "ez/GL.h"
-#include "ez/GLGuard.h"
-#include "ez/Macros.h"
-#include "ez/VBO.h"
+#include <ez/VAO.h>
+#include <ez/EBO.h>
+#include <ez/GL.h>
+#include <ez/GLGuard.h>
+#include <ez/Macros.h>
+#include <ez/VBO.h>
 #include <GL/glew.h>
 
 namespace ez

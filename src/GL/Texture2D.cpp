@@ -1,5 +1,5 @@
 #include "ez/Texture2D.h"
-#include "ez/GL.h"
+#include <ez/GL.h>
 #include "ez/Image2D.h"
 
 namespace ez

@@ -1,7 +1,7 @@
-#include "ez/ShaderProgramFactory.h"
-#include "ez/Shader.h"
-#include "ez/ShaderPreprocessor.h"
-#include "ez/ShaderProgram.h"
+#include <ez/ShaderProgramFactory.h>
+#include <ez/Shader.h>
+#include <ez/ShaderPreprocessor.h>
+#include <ez/ShaderProgram.h>
 #include <string_view>
 
 namespace ez

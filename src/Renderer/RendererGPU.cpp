@@ -1,19 +1,19 @@
-#include "ez/RendererGPU.h"
-#include "ez/Camera.h"
-#include "ez/DirectionalLight.h"
-#include "ez/FileUtils.h"
-#include "ez/GL.h"
-#include "ez/GLGuard.h"
-#include "ez/GLTypeTraits.h"
-#include "ez/Math.h"
-#include "ez/MeshDrawData.h"
-#include "ez/MeshFactory.h"
-#include "ez/PointLight.h"
-#include "ez/ShaderProgram.h"
-#include "ez/TextureFactory.h"
-#include "ez/TextureOperations.h"
-#include "ez/UBO.h"
-#include "ez/Window.h"
+#include <ez/RendererGPU.h>
+#include <ez/Camera.h>
+#include <ez/DirectionalLight.h>
+#include <ez/FileUtils.h>
+#include <ez/GL.h>
+#include <ez/GLGuard.h>
+#include <ez/GLTypeTraits.h>
+#include <ez/Math.h>
+#include <ez/MeshDrawData.h>
+#include <ez/MeshFactory.h>
+#include <ez/PointLight.h>
+#include <ez/ShaderProgram.h>
+#include <ez/TextureFactory.h>
+#include <ez/TextureOperations.h>
+#include <ez/UBO.h>
+#include <ez/Window.h>
 
 namespace ez
 {

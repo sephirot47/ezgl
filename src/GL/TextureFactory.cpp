@@ -1,6 +1,6 @@
-#include "ez/TextureFactory.h"
+#include <ez/TextureFactory.h>
 #include "ez/Image2D.h"
-#include "ez/Math.h"
+#include <ez/Math.h>
 #include "ez/Texture2D.h"
 
 namespace ez

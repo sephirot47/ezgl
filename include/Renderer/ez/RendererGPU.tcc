@@ -1,6 +1,6 @@
-#include "ez/Renderer.h"
-#include "ez/VAO.h"
-#include "ez/VBO.h"
+#include <ez/Renderer.h>
+#include <ez/VAO.h>
+#include <ez/VBO.h>
 
 namespace ez
 {

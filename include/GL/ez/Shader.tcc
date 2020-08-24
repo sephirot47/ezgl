@@ -1,6 +1,6 @@
-#include "ez/FileUtils.h"
-#include "ez/Shader.h"
-#include "ez/ShaderPreprocessor.h"
+#include <ez/FileUtils.h>
+#include <ez/Shader.h>
+#include <ez/ShaderPreprocessor.h>
 
 namespace ez
 {

@@ -1,5 +1,5 @@
-#include "ez/VAO.h"
-#include "ez/VAOVertexAttrib.h"
+#include <ez/VAO.h>
+#include <ez/VAOVertexAttrib.h>
 
 namespace ez
 {

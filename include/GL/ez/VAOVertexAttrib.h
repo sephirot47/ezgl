@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/GLTypeTraits.h"
+#include <ez/GLTypeTraits.h>
 #include <GL/glew.h>
 
 namespace ez

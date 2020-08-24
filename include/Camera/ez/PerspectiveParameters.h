@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/MathInitializers.h"
-#include "ez/Vec.h"
+#include <ez/MathInitializers.h>
+#include <ez/Vec.h>
 
 namespace ez
 {

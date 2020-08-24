@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/Camera.h"
-#include "ez/OrthographicParameters.h"
+#include <ez/Camera.h>
+#include <ez/OrthographicParameters.h>
 
 namespace ez
 {

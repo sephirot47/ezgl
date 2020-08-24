@@ -1,6 +1,6 @@
-#include "ez/PerspectiveCamera.h"
+#include <ez/PerspectiveCamera.h>
 #include "ez/Renderer3D.h"
-#include "ez/Window.h"
+#include <ez/Window.h>
 #include <cstdlib>
 
 using namespace ez;

@@ -1,8 +1,8 @@
-#include "ez/MeshDrawData.h"
-#include "ez/EBO.h"
-#include "ez/StreamOperators.h"
-#include "ez/VAO.h"
-#include "ez/VBO.h"
+#include <ez/MeshDrawData.h>
+#include <ez/EBO.h>
+#include <ez/StreamOperators.h>
+#include <ez/VAO.h>
+#include <ez/VBO.h>
 #include <numeric>
 
 namespace ez

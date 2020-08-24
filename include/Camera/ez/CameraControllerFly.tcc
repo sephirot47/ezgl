@@ -1,6 +1,6 @@
-#include "ez/Camera.h"
-#include "ez/CameraControllerFly.h"
-#include "ez/Window.h"
+#include <ez/Camera.h>
+#include <ez/CameraControllerFly.h>
+#include <ez/Window.h>
 
 namespace ez
 {

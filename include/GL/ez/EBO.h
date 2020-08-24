@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ez/Buffer.h"
+#include <ez/Buffer.h>
 
 namespace ez
 {

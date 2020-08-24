@@ -1,14 +1,14 @@
-#include "ez/AAHyperBox.h"
-#include "ez/Capsule.h"
-#include "ez/Cylinder.h"
-#include "ez/HyperSphere.h"
-#include "ez/Line.h"
-#include "ez/Macros.h"
-#include "ez/MathForward.h"
-#include "ez/MathIntersections.h"
-#include "ez/Plane.h"
-#include "ez/Ray.h"
-#include "ez/Segment.h"
+#include <ez/AAHyperBox.h>
+#include <ez/Capsule.h>
+#include <ez/Cylinder.h>
+#include <ez/HyperSphere.h>
+#include <ez/Line.h>
+#include <ez/Macros.h>
+#include <ez/MathForward.h>
+#include <ez/MathIntersections.h>
+#include <ez/Plane.h>
+#include <ez/Ray.h>
+#include <ez/Segment.h>
 
 using namespace ez;
 

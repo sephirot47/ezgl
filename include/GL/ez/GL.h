@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ez/AAHyperBox.h"
-#include "ez/Color.h"
-#include "ez/Flags.h"
-#include "ez/Macros.h"
-#include "ez/Mat.h"
-#include "ez/Span.h"
-#include "ez/Vec.h"
+#include <ez/AAHyperBox.h>
+#include <ez/Color.h>
+#include <ez/Flags.h>
+#include <ez/Macros.h>
+#include <ez/Mat.h>
+#include <ez/Span.h>
+#include <ez/Vec.h>
 #include <GL/glew.h>
 #include <array>
 #include <cstdint>

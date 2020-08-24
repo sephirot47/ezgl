@@ -1,4 +1,4 @@
-#include "ez/Window.h"
+#include <ez/Window.h>
 
 namespace ez
 {

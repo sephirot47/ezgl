@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ez/Math.h"
-#include "ez/TypeTraits.h"
+#include <ez/Math.h>
+#include <ez/TypeTraits.h>
 
 namespace ez
 {
