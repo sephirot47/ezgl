@@ -49,38 +49,34 @@ int main(int argc, const char** argv)
   std::vector<Ray3f> rays;
   std::vector<Triangle3f> hit_triangles;
   std::vector<Vec3f> hit_points;
-  window->SetInputEventCallback([&](const InputEvent& inInputEvent) {
-    if (inInputEvent.GetType() == InputEvent::EType::MOUSE_BUTTON)
+  window->SetMouseButtonEventCallback([&](const MoustButtonEvent& inMoustButtonEvent) {
+    if (inMoustButtonEvent.IsPress() && inMoustButtonEvent.mButton == EMouseButton::LEFT)
     {
-      const auto& mouse_button_event = inInputEvent.As<InputEvent::EType::MOUSE_BUTTON>();
-      if (mouse_button_event.IsPress() && mouse_button_event.mButton == EMouseButton::LEFT)
+      const auto mouse_position = window->GetMousePositionViewport();
+      const auto mouse_ray = camera->GetViewportRay(mouse_position);
+
+      rays.push_back(mouse_ray);
+
+      const auto mesh_triangles = mesh.GetTriangles();
+      const auto mesh_intersections = IntersectAll(octree, mouse_ray);
+      for (const auto& mesh_intersection : mesh_intersections)
       {
-        const auto mouse_position = window->GetMousePositionViewport();
-        const auto mouse_ray = camera->GetViewportRay(mouse_position);
+        hit_points.push_back(mouse_ray.GetPoint(mesh_intersection.mDistance));
+        hit_triangles.push_back(mesh_triangles.at(mesh_intersection.mPrimitiveIndex));
+      }
 
-        rays.push_back(mouse_ray);
+      const auto sphere_intersection_result = IntersectAll(mouse_ray, sphere);
+      for (const auto& sphere_intersection : sphere_intersection_result)
+      {
+        if (sphere_intersection)
+          hit_points.push_back(mouse_ray.GetPoint(*sphere_intersection));
+      }
 
-        const auto mesh_triangles = mesh.GetTriangles();
-        const auto mesh_intersections = IntersectAll(octree, mouse_ray);
-        for (const auto& mesh_intersection : mesh_intersections)
-        {
-          hit_points.push_back(mouse_ray.GetPoint(mesh_intersection.mDistance));
-          hit_triangles.push_back(mesh_triangles.at(mesh_intersection.mPrimitiveIndex));
-        }
-
-        const auto sphere_intersection_result = IntersectAll(mouse_ray, sphere);
-        for (const auto& sphere_intersection : sphere_intersection_result)
-        {
-          if (sphere_intersection)
-            hit_points.push_back(mouse_ray.GetPoint(*sphere_intersection));
-        }
-
-        const auto box_intersection_result = IntersectAll(mouse_ray, box);
-        for (const auto& box_intersection : box_intersection_result)
-        {
-          if (box_intersection)
-            hit_points.push_back(mouse_ray.GetPoint(*box_intersection));
-        }
+      const auto box_intersection_result = IntersectAll(mouse_ray, box);
+      for (const auto& box_intersection : box_intersection_result)
+      {
+        if (box_intersection)
+          hit_points.push_back(mouse_ray.GetPoint(*box_intersection));
       }
     }
   });

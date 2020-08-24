@@ -142,69 +142,50 @@ void CameraControllerFly<T, N>::ApplyParameters()
 }
 
 template <typename T, std::size_t N>
-void CameraControllerFly<T, N>::OnInput(const InputEvent& inInputEvent)
+void CameraControllerFly<T, N>::OnKeyEvent(const KeyEvent& inKeyEvent)
 {
-  const auto camera = mCamera.lock();
-  if (!camera)
-    return;
+  mWantsToSlowDown = inKeyEvent.IsAltModifierPressed();
+  mWantsToSpeedUp = inKeyEvent.IsShiftModifierPressed();
 
-  switch (inInputEvent.GetType())
+  switch (inKeyEvent.mKey)
   {
-  case InputEvent::EType::MOUSE_SCROLL:
-  {
-    const auto& scroll_event = inInputEvent.As<InputEvent::EType::MOUSE_SCROLL>();
-    mCurrentFlySpeed += mParameters.mScrollAccelerationFactor * mCurrentFlySpeed * -scroll_event.mDeltaScroll[1];
-    mCurrentFlySpeed = Clamp(mCurrentFlySpeed, mParameters.mMinFlySpeed, mParameters.mMaxFlySpeed);
-  }
-  break;
-
-  case InputEvent::EType::KEY:
-  {
-    const auto& key_event = inInputEvent.As<InputEvent::EType::KEY>();
-
-    mWantsToSlowDown = key_event.IsAltModifierPressed();
-    mWantsToSpeedUp = key_event.IsShiftModifierPressed();
-    switch (key_event.mKey)
-    {
-    case EKey::W:
-      mWantsToMoveForward = key_event.IsPressOrRepeat();
-      break;
-    case EKey::S:
-      mWantsToMoveBack = key_event.IsPressOrRepeat();
-      break;
-    case EKey::A:
-      mWantsToMoveLeft = key_event.IsPressOrRepeat();
-      break;
-    case EKey::D:
-      mWantsToMoveRight = key_event.IsPressOrRepeat();
-      break;
-    case EKey::Q:
-      mWantsToMoveUp = key_event.IsPressOrRepeat();
-      break;
-    case EKey::E:
-      mWantsToMoveDown = key_event.IsPressOrRepeat();
-      break;
-    default:
-      break;
-    }
-  }
-  break;
-
-  case InputEvent::EType::MOUSE_BUTTON:
-  {
-    const auto& mouse_button_event = inInputEvent.As<InputEvent::EType::MOUSE_BUTTON>();
-
-    if (mouse_button_event.mButton == EMouseButton::RIGHT)
-      mWantsToRotate = mouse_button_event.IsPress();
-
-    if (mouse_button_event.mButton == EMouseButton::MIDDLE)
-      mWantsToPan = mouse_button_event.IsPress();
-
+  case EKey::W:
+    mWantsToMoveForward = inKeyEvent.IsPressOrRepeat();
     break;
-  }
-
+  case EKey::S:
+    mWantsToMoveBack = inKeyEvent.IsPressOrRepeat();
+    break;
+  case EKey::A:
+    mWantsToMoveLeft = inKeyEvent.IsPressOrRepeat();
+    break;
+  case EKey::D:
+    mWantsToMoveRight = inKeyEvent.IsPressOrRepeat();
+    break;
+  case EKey::Q:
+    mWantsToMoveUp = inKeyEvent.IsPressOrRepeat();
+    break;
+  case EKey::E:
+    mWantsToMoveDown = inKeyEvent.IsPressOrRepeat();
+    break;
   default:
     break;
   }
+}
+
+template <typename T, std::size_t N>
+void CameraControllerFly<T, N>::OnMouseButtonEvent(const MouseButtonEvent& inMouseButtonEvent)
+{
+  if (inMouseButtonEvent.mButton == EMouseButton::RIGHT)
+    mWantsToRotate = inMouseButtonEvent.IsPress();
+
+  if (inMouseButtonEvent.mButton == EMouseButton::MIDDLE)
+    mWantsToPan = inMouseButtonEvent.IsPress();
+}
+
+template <typename T, std::size_t N>
+void CameraControllerFly<T, N>::OnMouseScrollEvent(const MouseScrollEvent& inMouseScrollEvent)
+{
+  mCurrentFlySpeed += mParameters.mScrollAccelerationFactor * mCurrentFlySpeed * -inMouseScrollEvent.mDeltaScroll[1];
+  mCurrentFlySpeed = Clamp(mCurrentFlySpeed, mParameters.mMinFlySpeed, mParameters.mMaxFlySpeed);
 }
 }

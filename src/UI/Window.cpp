@@ -1,8 +1,10 @@
 #include "ez/Window.h"
+#include "ez/InputListener.h"
 #include "ez/Macros.h"
 #include <GL/glew.h>
 #include <algorithm>
 #include <thread>
+#include <type_traits>
 
 namespace ez
 {
@@ -15,7 +17,6 @@ void GLFWMouseEnterExitCallback(GLFWwindow* inGLFWWindow, int inMouseEntered);
 void GLFWMouseScrollCallback(GLFWwindow* inGLFWWindow, double inDeltaScrollX, double inDeltaScrollY);
 void GLFWKeyCallback(GLFWwindow* inGLFWWindow, int inKey, int inScancode, int inAction, int inModifiers);
 
-// During init, enable debug output
 Window::Window(const Window::CreateOptions& inCreateOptions)
 {
   if (!glfwInit())
@@ -78,20 +79,14 @@ Window::~Window()
 }
 
 bool Window::ShouldClose() const { return glfwWindowShouldClose(mHandle); }
-
 void Window::SwapBuffers() { glfwSwapBuffers(mHandle); }
-
 void Window::PollEvents() { glfwPollEvents(); }
-
 void Window::Maximize() { glfwMaximizeWindow(mHandle); }
-
 void Window::Minimize() { glfwIconifyWindow(mHandle); }
-
 void Window::SetCursorMode(const Window::ECursorMode inCursorMode)
 {
   glfwSetInputMode(mHandle, GLFW_CURSOR, static_cast<int>(inCursorMode));
 }
-
 void Window::SetInterFrameRestTime(const Seconds& inInterFrameRestTime) { mInterFrameRestTime = inInterFrameRestTime; }
 
 Vec2i Window::GetSize() const
@@ -139,11 +134,48 @@ void Window::Loop(const Window::LoopCallback& inLoopCallback)
   }
 }
 
-void Window::SetInputEventCallback(const Window::InputEventCallback& inInputEventCallback)
+void Window::AddInputEventCallback(const Window::InputEventCallback& inInputEventCallback)
 {
-  mInputEventCallback = inInputEventCallback;
+  mInputEventCallbacks.push_back(inInputEventCallback);
 }
-const Window::InputEventCallback& Window::GetInputEventCallback() const { return mInputEventCallback; }
+void Window::AddKeyEventCallback(const Window::KeyEventCallback& inKeyEventCallback)
+{
+  mKeyEventCallbacks.push_back(inKeyEventCallback);
+}
+void Window::AddMouseButtonEventCallback(const Window::MouseButtonEventCallback& inMouseButtonEventCallback)
+{
+  mMouseButtonEventCallbacks.push_back(inMouseButtonEventCallback);
+}
+void Window::AddMouseEnterExitEventCallback(const Window::MouseEnterExitEventCallback& inMouseEnterExitEventCallback)
+{
+  mMouseEnterExitEventCallbacks.push_back(inMouseEnterExitEventCallback);
+}
+void Window::AddMouseMoveEventCallback(const Window::MouseMoveEventCallback& inMouseMoveEventCallback)
+{
+  mMouseMoveEventCallbacks.push_back(inMouseMoveEventCallback);
+}
+void Window::AddMouseScrollEventCallback(const Window::MouseScrollEventCallback& inMouseScrollEventCallback)
+{
+  mMouseScrollEventCallbacks.push_back(inMouseScrollEventCallback);
+}
+const std::vector<Window::InputEventCallback>& Window::GetInputEventCallbacks() const { return mInputEventCallbacks; }
+const std::vector<Window::KeyEventCallback>& Window::GetKeyEventCallbacks() const { return mKeyEventCallbacks; }
+const std::vector<Window::MouseButtonEventCallback>& Window::GetMouseButtonEventCallbacks() const
+{
+  return mMouseButtonEventCallbacks;
+}
+const std::vector<Window::MouseEnterExitEventCallback>& Window::GetMouseEnterExitEventCallbacks() const
+{
+  return mMouseEnterExitEventCallbacks;
+}
+const std::vector<Window::MouseMoveEventCallback>& Window::GetMouseMoveEventCallbacks() const
+{
+  return mMouseMoveEventCallbacks;
+}
+const std::vector<Window::MouseScrollEventCallback>& Window::GetMouseScrollEventCallbacks() const
+{
+  return mMouseScrollEventCallbacks;
+}
 
 bool Window::IsMouseButtonPressed(const EMouseButton& inMouseButton)
 {
@@ -173,10 +205,24 @@ template <typename TInputEvent>
 void CallInputEventCallback(GLFWwindow* inGLFWWindow, const TInputEvent& inInputEvent)
 {
   const Window& window = *(reinterpret_cast<Window*>(glfwGetWindowUserPointer(inGLFWWindow)));
-  if (const auto& input_event_callback = window.GetInputEventCallback())
-    input_event_callback({ inInputEvent });
+  // Call callbacks
+  {
+    for (const auto& event_callback : window.GetInputEventCallbacks()) event_callback({ inInputEvent });
 
-  for (auto& input_listener : window.GetInputListeners()) input_listener->OnInput({ inInputEvent });
+    if constexpr (std::is_same_v<TInputEvent, KeyEvent>)
+      for (const auto& event_callback : window.GetKeyEventCallbacks()) event_callback(inInputEvent);
+    else if constexpr (std::is_same_v<TInputEvent, MouseButtonEvent>)
+      for (const auto& event_callback : window.GetMouseButtonEventCallbacks()) event_callback(inInputEvent);
+    else if constexpr (std::is_same_v<TInputEvent, MouseEnterExitEvent>)
+      for (const auto& event_callback : window.GetMouseEnterExitEventCallbacks()) event_callback(inInputEvent);
+    else if constexpr (std::is_same_v<TInputEvent, MouseMoveEvent>)
+      for (const auto& event_callback : window.GetMouseMoveEventCallbacks()) event_callback(inInputEvent);
+    else if constexpr (std::is_same_v<TInputEvent, MouseScrollEvent>)
+      for (const auto& event_callback : window.GetMouseScrollEventCallbacks()) event_callback(inInputEvent);
+  }
+
+  // Call InputListeners
+  for (auto& input_listener : window.GetInputListeners()) input_listener->OnInputEvent({ inInputEvent });
 }
 
 void Window::AddInputListener(InputListener* inInputListener) { mInputListeners.push_back(inInputListener); }
@@ -225,21 +271,5 @@ void GLFWKeyCallback(GLFWwindow* inGLFWWindow, int inKey, int inScancode, int in
   key_event.mModifiers = static_cast<EModifierKey>(inModifiers);
   CallInputEventCallback(inGLFWWindow, key_event);
 };
-
-InputListener::~InputListener()
-{
-  if (const auto window = mWindow.lock())
-    window->RemoveInputListener(this);
-}
-
-void InputListener::ListenToInput(const std::shared_ptr<Window>& inWindow)
-{
-  EXPECTS(inWindow);
-  mWindow = inWindow;
-
-  inWindow->AddInputListener(this);
-}
-
-const std::weak_ptr<Window>& InputListener::GetWindow() const { return mWindow; }
 
 }

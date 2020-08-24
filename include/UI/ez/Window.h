@@ -13,7 +13,7 @@ class GLFWwindow;
 
 namespace ez
 {
-struct InputListener;
+class InputListener;
 
 class Window final
 {
@@ -74,15 +74,30 @@ public:
   using LoopCallback = std::function<Window::ELoopResult(const DeltaTime)>;
   void Loop(const Window::LoopCallback& inLoopCallback);
 
-  // Input callbacks
-  using InputEventCallback = std::function<void(const InputEvent&)>;
-  void SetInputEventCallback(const Window::InputEventCallback& inInputEventCallback);
-  const Window::InputEventCallback& GetInputEventCallback() const;
-
   // Input listeners
   void AddInputListener(InputListener* inInputListener);
   void RemoveInputListener(InputListener* inInputListener);
   const std::vector<InputListener*>& GetInputListeners() const;
+
+  // Input callbacks
+  using InputEventCallback = std::function<void(const InputEvent&)>;
+  using KeyEventCallback = std::function<void(const KeyEvent&)>;
+  using MouseButtonEventCallback = std::function<void(const MouseButtonEvent&)>;
+  using MouseEnterExitEventCallback = std::function<void(const MouseEnterExitEvent&)>;
+  using MouseMoveEventCallback = std::function<void(const MouseMoveEvent&)>;
+  using MouseScrollEventCallback = std::function<void(const MouseScrollEvent&)>;
+  void AddInputEventCallback(const Window::InputEventCallback& inInputEventCallback);
+  void AddKeyEventCallback(const Window::KeyEventCallback& inKeyEventCallback);
+  void AddMouseButtonEventCallback(const Window::MouseButtonEventCallback& inMouseButtonEventCallback);
+  void AddMouseEnterExitEventCallback(const Window::MouseEnterExitEventCallback& inMouseEnterExitEventCallback);
+  void AddMouseMoveEventCallback(const Window::MouseMoveEventCallback& inMouseMoveEventCallback);
+  void AddMouseScrollEventCallback(const Window::MouseScrollEventCallback& inMouseScrollEventCallback);
+  const std::vector<InputEventCallback>& GetInputEventCallbacks() const;
+  const std::vector<KeyEventCallback>& GetKeyEventCallbacks() const;
+  const std::vector<MouseButtonEventCallback>& GetMouseButtonEventCallbacks() const;
+  const std::vector<MouseEnterExitEventCallback>& GetMouseEnterExitEventCallbacks() const;
+  const std::vector<MouseMoveEventCallback>& GetMouseMoveEventCallbacks() const;
+  const std::vector<MouseScrollEventCallback>& GetMouseScrollEventCallbacks() const;
 
   // Input direct
   bool IsMouseButtonPressed(const EMouseButton& inMouseButton);
@@ -92,22 +107,18 @@ public:
 
 private:
   GLFWwindow* mHandle = nullptr;
-  InputEventCallback mInputEventCallback;
-  std::vector<InputListener*> mInputListeners;
   Seconds mInterFrameRestTime = 1ms;
-};
 
-class InputListener
-{
-public:
-  virtual ~InputListener();
-  void ListenToInput(const std::shared_ptr<Window>& inWindow);
+  // InputListeners
+  std::vector<InputListener*> mInputListeners;
 
-  virtual void OnInput(const InputEvent& inInputEvent) = 0;
-  const std::weak_ptr<Window>& GetWindow() const;
-
-private:
-  std::weak_ptr<Window> mWindow;
+  // Input callbacks
+  std::vector<InputEventCallback> mInputEventCallbacks;
+  std::vector<KeyEventCallback> mKeyEventCallbacks;
+  std::vector<MouseButtonEventCallback> mMouseButtonEventCallbacks;
+  std::vector<MouseEnterExitEventCallback> mMouseEnterExitEventCallbacks;
+  std::vector<MouseMoveEventCallback> mMouseMoveEventCallbacks;
+  std::vector<MouseScrollEventCallback> mMouseScrollEventCallbacks;
 };
 
 }

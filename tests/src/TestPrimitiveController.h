@@ -4,6 +4,7 @@
 #include "ez/Capsule.h"
 #include "ez/HyperBox.h"
 #include "ez/HyperSphere.h"
+#include "ez/InputListener.h"
 #include "ez/MathTypeTraits.h"
 #include "ez/Quat.h"
 #include "ez/Vec.h"
@@ -32,92 +33,88 @@ public:
     }
   }
 
-  void OnInput(const InputEvent& inInputEvent) override
+  void OnKeyEvent(const KeyEvent& inKeyEvent) override
   {
-    if (inInputEvent.GetType() == InputEvent::EType::KEY)
+    if (inKeyEvent.IsPressOrRepeat())
     {
-      const auto key_event = inInputEvent.As<InputEvent::EType::KEY>();
-      if (key_event.IsPressOrRepeat())
+      if (inKeyEvent.IsAltModifierPressed())
       {
-        if (key_event.IsAltModifierPressed())
-        {
-          const auto delta_length = 0.1f;
-          if (key_event.mKey == EKey::D)
-            mPrimitiveSize[0] += delta_length;
-          else if (key_event.mKey == EKey::A)
-            mPrimitiveSize[0] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+        const auto delta_length = 0.1f;
+        if (inKeyEvent.mKey == EKey::D)
+          mPrimitiveSize[0] += delta_length;
+        else if (inKeyEvent.mKey == EKey::A)
+          mPrimitiveSize[0] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
 
-          if constexpr (N == 2)
-          {
-            if (key_event.mKey == EKey::W)
-              mPrimitiveSize[1] += delta_length;
-            else if (key_event.mKey == EKey::S)
-              mPrimitiveSize[1] = std::max(mPrimitiveSize[1] - delta_length, MinLength);
-          }
-          else
-          {
-            if (key_event.mKey == EKey::Q)
-              mPrimitiveSize[1] += delta_length;
-            else if (key_event.mKey == EKey::E)
-              mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
-            else if (key_event.mKey == EKey::W)
-              mPrimitiveSize[2] += delta_length;
-            else if (key_event.mKey == EKey::S)
-              mPrimitiveSize[2] = std::max(mPrimitiveSize[2] - delta_length, MinLength);
-          }
-        }
-        else if (key_event.IsShiftModifierPressed())
+        if constexpr (N == 2)
         {
-          const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
-          if constexpr (N == 2)
-          {
-            if (key_event.mKey == EKey::A)
-              mPrimitiveRotation += delta_angle;
-            if (key_event.mKey == EKey::D)
-              mPrimitiveRotation -= delta_angle;
-          }
-          else
-          {
-            if (key_event.mKey == EKey::A)
-              mPrimitiveRotation *= AngleAxis(delta_angle, Up<Vec3f>());
-            if (key_event.mKey == EKey::D)
-              mPrimitiveRotation *= AngleAxis(delta_angle, -Up<Vec3f>());
-            if (key_event.mKey == EKey::S)
-              mPrimitiveRotation *= AngleAxis(delta_angle, Forward<Vec3f>());
-            if (key_event.mKey == EKey::W)
-              mPrimitiveRotation *= AngleAxis(delta_angle, -Forward<Vec3f>());
-            if (key_event.mKey == EKey::Q)
-              mPrimitiveRotation *= AngleAxis(delta_angle, Right<Vec3f>());
-            if (key_event.mKey == EKey::E)
-              mPrimitiveRotation *= AngleAxis(delta_angle, -Right<Vec3f>());
-          }
+          if (inKeyEvent.mKey == EKey::W)
+            mPrimitiveSize[1] += delta_length;
+          else if (inKeyEvent.mKey == EKey::S)
+            mPrimitiveSize[1] = std::max(mPrimitiveSize[1] - delta_length, MinLength);
         }
-        else if (key_event.IsControlModifierPressed())
+        else
         {
-          const auto delta_displacement = 0.1f;
-          if (key_event.mKey == EKey::A)
-            mPrimitiveTranslation += delta_displacement * Left<Vecf<N>>();
-          if (key_event.mKey == EKey::D)
-            mPrimitiveTranslation += delta_displacement * Right<Vecf<N>>();
+          if (inKeyEvent.mKey == EKey::Q)
+            mPrimitiveSize[1] += delta_length;
+          else if (inKeyEvent.mKey == EKey::E)
+            mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+          else if (inKeyEvent.mKey == EKey::W)
+            mPrimitiveSize[2] += delta_length;
+          else if (inKeyEvent.mKey == EKey::S)
+            mPrimitiveSize[2] = std::max(mPrimitiveSize[2] - delta_length, MinLength);
+        }
+      }
+      else if (inKeyEvent.IsShiftModifierPressed())
+      {
+        const auto delta_angle = QuarterCircleRads<float>() * 0.05f;
+        if constexpr (N == 2)
+        {
+          if (inKeyEvent.mKey == EKey::A)
+            mPrimitiveRotation += delta_angle;
+          if (inKeyEvent.mKey == EKey::D)
+            mPrimitiveRotation -= delta_angle;
+        }
+        else
+        {
+          if (inKeyEvent.mKey == EKey::A)
+            mPrimitiveRotation *= AngleAxis(delta_angle, Up<Vec3f>());
+          if (inKeyEvent.mKey == EKey::D)
+            mPrimitiveRotation *= AngleAxis(delta_angle, -Up<Vec3f>());
+          if (inKeyEvent.mKey == EKey::S)
+            mPrimitiveRotation *= AngleAxis(delta_angle, Forward<Vec3f>());
+          if (inKeyEvent.mKey == EKey::W)
+            mPrimitiveRotation *= AngleAxis(delta_angle, -Forward<Vec3f>());
+          if (inKeyEvent.mKey == EKey::Q)
+            mPrimitiveRotation *= AngleAxis(delta_angle, Right<Vec3f>());
+          if (inKeyEvent.mKey == EKey::E)
+            mPrimitiveRotation *= AngleAxis(delta_angle, -Right<Vec3f>());
+        }
+      }
+      else if (inKeyEvent.IsControlModifierPressed())
+      {
+        const auto delta_displacement = 0.1f;
+        if (inKeyEvent.mKey == EKey::A)
+          mPrimitiveTranslation += delta_displacement * Left<Vecf<N>>();
+        if (inKeyEvent.mKey == EKey::D)
+          mPrimitiveTranslation += delta_displacement * Right<Vecf<N>>();
 
-          if constexpr (N == 2)
-          {
-            if (key_event.mKey == EKey::S)
-              mPrimitiveTranslation += delta_displacement * Down<Vecf<N>>();
-            if (key_event.mKey == EKey::W)
-              mPrimitiveTranslation += delta_displacement * Up<Vecf<N>>();
-          }
-          else
-          {
-            if (key_event.mKey == EKey::E)
-              mPrimitiveTranslation += delta_displacement * Down<Vecf<N>>();
-            if (key_event.mKey == EKey::Q)
-              mPrimitiveTranslation += delta_displacement * Up<Vecf<N>>();
-            if (key_event.mKey == EKey::W)
-              mPrimitiveTranslation += delta_displacement * Forward<Vecf<N>>();
-            if (key_event.mKey == EKey::S)
-              mPrimitiveTranslation += delta_displacement * Back<Vecf<N>>();
-          }
+        if constexpr (N == 2)
+        {
+          if (inKeyEvent.mKey == EKey::S)
+            mPrimitiveTranslation += delta_displacement * Down<Vecf<N>>();
+          if (inKeyEvent.mKey == EKey::W)
+            mPrimitiveTranslation += delta_displacement * Up<Vecf<N>>();
+        }
+        else
+        {
+          if (inKeyEvent.mKey == EKey::E)
+            mPrimitiveTranslation += delta_displacement * Down<Vecf<N>>();
+          if (inKeyEvent.mKey == EKey::Q)
+            mPrimitiveTranslation += delta_displacement * Up<Vecf<N>>();
+          if (inKeyEvent.mKey == EKey::W)
+            mPrimitiveTranslation += delta_displacement * Forward<Vecf<N>>();
+          if (inKeyEvent.mKey == EKey::S)
+            mPrimitiveTranslation += delta_displacement * Back<Vecf<N>>();
         }
       }
     }

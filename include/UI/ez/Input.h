@@ -1,7 +1,10 @@
 #pragma once
 
 #include "ez/Flags.h"
+#include "ez/Vec.h"
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <cassert>
 #include <variant>
 
 namespace ez

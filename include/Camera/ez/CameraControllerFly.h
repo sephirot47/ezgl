@@ -10,8 +10,6 @@
 
 namespace ez
 {
-struct InputEvent;
-
 template <typename T, std::size_t N>
 class CameraControllerFly : public InputListener
 {
@@ -53,7 +51,11 @@ public:
   const CameraControllerFly::Parameters& GetParameters() const { return mParameters; }
 
   void ApplyParameters();
-  virtual void OnInput(const InputEvent& inInputEvent) override;
+
+  // InputListener
+  virtual void OnKeyEvent(const KeyEvent& inKeyEvent) override;
+  virtual void OnMouseButtonEvent(const MouseButtonEvent& inMouseButtonEvent) override;
+  virtual void OnMouseScrollEvent(const MouseScrollEvent& inMouseScrollEvent) override;
 
 private:
   Parameters mParameters;
