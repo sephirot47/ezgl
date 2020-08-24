@@ -47,6 +47,7 @@ int main(int argc, const char** argv)
       TestPrimitiveController<Triangle2f> {});
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
+  auto see_closest_points = false;
 
   for (const auto segment : MakeSegmentsRange(aarect)) { PEEK(segment); }
 
@@ -64,6 +65,8 @@ int main(int argc, const char** argv)
           --selected_main_primitive_index;
         else if (key_event.mKey == EKey::RIGHT)
           ++selected_main_primitive_index;
+        else if (key_event.mKey == EKey::C)
+          see_closest_points = !see_closest_points;
         selected_main_primitive_index = (selected_main_primitive_index + NumMainPrimitives) % NumMainPrimitives;
       }
     }
@@ -153,10 +156,10 @@ int main(int argc, const char** argv)
                   (main_subprimitive.GetOrigin() + Direction(main_subprimitive) * (*closest_intersection_distance)));
           });
         }
-        else
+        else if (see_closest_points)
         {
           // ClosestPoint
-          ForEach(primitives, [&](const auto& in_primitive) {
+                    ForEach(primitives, [&](const auto& in_primitive) {
             const auto closest_point_in_main_subprimitive = ClosestPoint(main_subprimitive, in_primitive);
             const auto closest_point_in_primitive = ClosestPoint(in_primitive, closest_point_in_main_subprimitive);
 
@@ -186,6 +189,7 @@ int main(int argc, const char** argv)
           "Ctrl + WASD: Move primitive\n"
           "Shift + WASD: Rotate primitive\n"
           "Alt + WASD: Resize primitive\n"
+          "C: Toggle see closest points lines (" + (see_closest_points ? "ON" : "OFF") + ")\n"
           "Green = Not-Intersecting, Yellow = Intersecting, Red = Contained";
     renderer.DrawText(text, font, 0.002f, ETextHAlignment::LEFT, ETextVAlignment::BOTTOM);
     renderer.PopTransformMatrix();
