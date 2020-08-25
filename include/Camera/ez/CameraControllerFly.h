@@ -1,11 +1,12 @@
 #pragma once
 
+#include <chrono>
 #include <ez/Camera.h>
+#include <ez/InputListener.h>
 #include <ez/MathInitializers.h>
 #include <ez/Time.h>
 #include <ez/Vec.h>
 #include <ez/Window.h>
-#include <chrono>
 #include <memory>
 
 namespace ez

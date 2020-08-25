@@ -49,6 +49,7 @@ private:
   std::vector<AARectul> mCharactersAtlasRects;
 
   Vec2f GetAlignmentOffset(const AARectf& inTextRect,
+      const int inNumTextLines,
       const ETextHAlignment& inHAlignment,
       const ETextVAlignment& inVAlignment) const;
   uint64_t ComputeAtlasCharactersPlacement(const std::string_view inCharacters);

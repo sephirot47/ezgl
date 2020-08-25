@@ -1,12 +1,12 @@
-#include <ez/CameraControllerFly.h>
-#include <ez/Font.h>
 #include "ez/Image2D.h"
-#include <ez/MeshFactory.h>
-#include <ez/PerspectiveCamera.h>
 #include "ez/Renderer2D.h"
 #include "ez/Renderer3D.h"
-#include <ez/Window.h>
 #include <cstdlib>
+#include <ez/CameraControllerFly.h>
+#include <ez/Font.h>
+#include <ez/MeshFactory.h>
+#include <ez/PerspectiveCamera.h>
+#include <ez/Window.h>
 
 using namespace ez;
 
@@ -73,25 +73,30 @@ int main(int argc, const char** argv)
     renderer3D.Translate(Down<Vec3f>() * 8.0f);
     renderer3D.Scale(0.3f);
 
-    constexpr auto h_alignment_names = std::array { "left", "center", "right" };
-    constexpr auto v_alignment_names = std::array { "top", "center", "baseline", "bottom" };
-    for (const auto h_alignment : { ETextHAlignment::LEFT, ETextHAlignment::CENTER, ETextHAlignment::RIGHT })
+    constexpr auto h_alignment_names = std::array { "Left", "Center", "Right" };
+    constexpr auto v_alignment_names = std::array { "Top", "Center", "Baseline", "Bottom" };
+    for (const auto multiline : { false, true })
     {
-      for (const auto v_alignment :
-          { ETextVAlignment::TOP, ETextVAlignment::CENTER, ETextVAlignment::BASELINE, ETextVAlignment::BOTTOM })
+      for (const auto h_alignment : { ETextHAlignment::LEFT, ETextHAlignment::CENTER, ETextHAlignment::RIGHT })
       {
-        renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
-        renderer3D.DrawSegment(Segment3f { Down<Vec3f>(), Up<Vec3f>() });
-        renderer3D.DrawSegment(Segment3f { Left<Vec3f>() * 10.0f, Right<Vec3f>() * 10.0f });
+        for (const auto v_alignment :
+            { ETextVAlignment::TOP, ETextVAlignment::CENTER, ETextVAlignment::BASELINE, ETextVAlignment::BOTTOM })
+        {
+          renderer3D.GetMaterial().SetDiffuseColor(Red<Color4f>());
+          renderer3D.DrawSegment(Segment3f { Down<Vec3f>(), Up<Vec3f>() });
+          renderer3D.DrawSegment(Segment3f { Left<Vec3f>() * 10.0f, Right<Vec3f>() * 10.0f });
 
-        auto text = std::string {};
-        text += h_alignment_names[static_cast<int>(h_alignment)];
-        text += "_";
-        text += v_alignment_names[static_cast<int>(v_alignment)];
+          auto text = std::string {};
+          text += h_alignment_names[static_cast<int>(h_alignment)];
+          text += "_";
+          text += v_alignment_names[static_cast<int>(v_alignment)];
+          if (multiline)
+            text += "\nMultiline text\n_Testerino_";
 
-        renderer3D.GetMaterial().SetDiffuseColor(Blue<Color4f>());
-        renderer3D.DrawText(text, font_small, 0.04f, h_alignment, v_alignment);
-        renderer3D.Translate(Down<Vec3f>() * 4.0f);
+          renderer3D.GetMaterial().SetDiffuseColor(Blue<Color4f>());
+          renderer3D.DrawText(text, font_small, 0.04f, h_alignment, v_alignment);
+          renderer3D.Translate(Down<Vec3f>() * (multiline ? 12.0f : 4.0f));
+        }
       }
     }
 

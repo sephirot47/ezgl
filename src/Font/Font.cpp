@@ -2,9 +2,9 @@
 #include <ez/Vec.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "ez/Image2D.h"
+#include "ez/stb_truetype.h"
 #include <ez/MathSwizzling.h>
 #include <ez/Mesh.h>
-#include "ez/stb_truetype.h"
 #include <fstream>
 #include <numeric>
 #include <vector>
@@ -126,6 +126,7 @@ Mesh Font::GetTextMesh(const std::string_view inText,
     const ETextVAlignment& inVAlignment) const
 {
   // Get character rects
+  int num_text_lines = 1;
   auto text_rect = AARectf();
   std::vector<AARectf> character_rects;
   character_rects.reserve(inText.size());
@@ -139,6 +140,7 @@ Mesh Font::GetTextMesh(const std::string_view inText,
         current_baseline[0] = 0;
         current_baseline[1] -= (GetLineHeight() + GetLineGap());
         character_rects.push_back(AARectf { Zero<Vec2f>(), Zero<Vec2f>() });
+        ++num_text_lines;
         continue;
       }
 
@@ -168,7 +170,7 @@ Mesh Font::GetTextMesh(const std::string_view inText,
 
   // Build mesh
   Mesh text_mesh;
-  const auto alignment_offset = GetAlignmentOffset(text_rect, inHAlignment, inVAlignment);
+  const auto alignment_offset = GetAlignmentOffset(text_rect, num_text_lines, inHAlignment, inVAlignment);
   for (std::size_t i = 0; i < inText.size(); ++i)
   {
     const auto character = inText.at(i);
@@ -203,6 +205,7 @@ Mesh Font::GetTextMesh(const std::string_view inText,
 }
 
 Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
+    const int inNumTextLines,
     const ETextHAlignment& inHAlignment,
     const ETextVAlignment& inVAlignment) const
 {
@@ -222,10 +225,11 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
     break;
   }
 
-  const auto ascent = GetAscent();
   const auto descent = GetDescent();
-  UNUSED(ascent);
-  UNUSED(descent);
+  const auto ascent = GetAscent();
+  const auto line_height = GetLineHeight();
+  const auto line_gap = GetLineGap();
+  const auto all_lines_added_height = (line_height * inNumTextLines) + (line_gap * (inNumTextLines - 1));
   switch (inVAlignment)
   {
   case ETextVAlignment::TOP:
@@ -233,7 +237,7 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
     break;
 
   case ETextVAlignment::CENTER:
-    alignment_offset[1] = (inTextRect.GetSize()[1] - ascent) * 0.5f;
+    alignment_offset[1] = -ascent + (all_lines_added_height - descent) * 0.5f;
     break;
 
   case ETextVAlignment::BASELINE:
@@ -241,7 +245,7 @@ Vec2f Font::GetAlignmentOffset(const AARectf& inTextRect,
     break;
 
   case ETextVAlignment::BOTTOM:
-    alignment_offset[1] = inTextRect.GetSize()[1] - ascent;
+    alignment_offset[1] = -ascent + (all_lines_added_height - descent);
     break;
   }
 
