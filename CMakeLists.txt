@@ -8,8 +8,9 @@ project(ezgl)
 # Options ==============================================================
 # ======================================================================
 
-# If enabled, it will support mesh IO but will need
-option(EZGL_COMPILE_MESH_IO "Whether to compile Mesh IO or not. If enabled, assimp library will be required. ON by default. " ON)
+option(EZGL_COMPILE_MESH_IO "Whether to compile Mesh IO or not. If enabled, assimp library will be required. ON by default." ON)
+option(EZGL_COMPILE_TESTS "Whether to compile tests or not." OFF)
+option(EZGL_COMPILE_EXAMPLES "Whether to compile examples or not." OFF)
 
 # ======================================================================
 # ======================================================================
@@ -143,7 +144,9 @@ target_link_libraries(ezgl ezmath)
 # Tests ================================================================
 # ======================================================================
 
-add_subdirectory(tests)
+if (EZGL_COMPILE_TESTS)
+  add_subdirectory(tests)
+endif()
 
 # ======================================================================
 # ======================================================================
@@ -153,7 +156,9 @@ add_subdirectory(tests)
 # Examples =============================================================
 # ======================================================================
 
-add_subdirectory(examples)
+if (EZGL_COMPILE_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 # ======================================================================
 # ======================================================================
