@@ -1,4 +1,7 @@
 #include "TestPrimitiveController.h"
+#include "ez/Renderer2D.h"
+#include <array>
+#include <cstdlib>
 #include <ez/AAHyperBox.h>
 #include <ez/BinaryIndex.h>
 #include <ez/CameraControllerFly.h>
@@ -10,12 +13,9 @@
 #include <ez/OrthographicCamera.h>
 #include <ez/PerspectiveCamera.h>
 #include <ez/Ray.h>
-#include "ez/Renderer2D.h"
 #include <ez/Segment.h>
 #include <ez/TupleForEach.h>
 #include <ez/Window.h>
-#include <array>
-#include <cstdlib>
 
 using namespace ez;
 
@@ -27,6 +27,7 @@ int main(int argc, const char** argv)
 {
   srand(1234);
 
+  constexpr auto NumLines = 64;
   const auto point = Vec2f { 3.0f, 1.0f };
   const auto line = Line2f { Vec2f { 5.5f, 1.0f }, Direction(Vec2f { 1.1f, -0.2f }) };
   const auto ray = Ray2f { Vec2f { -3.5f, 1.0f }, Direction(Vec2f { -1.1f, 3.2f }) };
@@ -37,9 +38,9 @@ int main(int argc, const char** argv)
   const auto capsule = Capsule2f { Vec2f { 1.0f, -2.0f }, Vec2f { 1.7f, -1.6f }, 0.3f };
   const auto triangle = Triangle2f { Vec2f { 0.1f, -3.0f }, Vec2f { 1.7f, -3.7f }, Vec2f { 0.3f, -4.7f } };
   const auto primitives = std::make_tuple(point, line, ray, segment, circle, aarect, rect, capsule, triangle);
-  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line2f, 128> {},
-      TestPrimitiveController<Ray2f, 128> {},
-      TestPrimitiveController<Segment2f, 128> {},
+  auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line2f, NumLines> {},
+      TestPrimitiveController<Ray2f, NumLines> {},
+      TestPrimitiveController<Segment2f, NumLines> {},
       TestPrimitiveController<Circlef> {},
       TestPrimitiveController<AARectf> {},
       TestPrimitiveController<Rectf> {},
