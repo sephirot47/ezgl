@@ -32,7 +32,7 @@ int main(int argc, const char** argv)
   const auto line = Line3f { Vec3f { -1.0f, 3.0f, -3.0f }, Direction(Vec3f { 1.0f, 2.0f, 3.0f }) };
   const auto ray = Ray3f { Vec3f { -3.5f, 1.0f, 0.0f }, Direction(Vec3f { -1.1f, 3.3f, 0.0f }) };
   const auto segment = Segment3f { Vec3f { 1.0f, 1.3f, 0.0f }, Vec3f { -2.6f, 3.4f, 0.0f } };
-  // Plane
+  const auto plane = Plane { Normalized(Vec3f { 1.0f, 1.3f, -0.1f }), Vec3f { 1.0f, 0.5f, -1.0f } };
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 1.0f }, Vec3f { 1.0f, 1.5f, 3.0f });
   const auto box = Boxf { Vec3f { -2.0f, -2.0f, -2.0f },
     Vec3f { 2.0f, 1.5f, 1.0f },
@@ -41,17 +41,17 @@ int main(int argc, const char** argv)
   const auto capsule = Capsule3f { Vec3f { 1.0f, 1.0f, 1.0f }, Vec3f { 1.7f, 0.6f, 2.0f }, 0.3f };
   const auto triangle
       = Triangle3f { Vec3f { 0.1f, -3.0f, 2.0f }, Vec3f { 1.7f, -3.7f, 1.3f }, Vec3f { 0.3f, -4.7f, 0.1f } };
-  const auto primitives = std::make_tuple(point, line, ray, segment); // , aabox, box, cylinder, capsule, triangle);
+  const auto primitives
+      = std::make_tuple(point, line, ray, segment); // , plane, aabox, box, cylinder, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line3f, NumLines> {},
       TestPrimitiveController<Ray3f, NumLines> {},
-      TestPrimitiveController<Segment3f, NumLines> {}
-      // Plane
-      // TestPrimitiveController<AABoxf> {},
-      // TestPrimitiveController<Boxf> {},
-      // TestPrimitiveController<Cylinderf> {},
-      // TestPrimitiveController<Capsule3f> {},
-      // TestPrimitiveController<Triangle3f> {}
-      );
+      TestPrimitiveController<Segment3f, NumLines> {} // TestPrimitiveController<Plane> {},
+                                                      // TestPrimitiveController<AABoxf> {},
+                                                      // TestPrimitiveController<Boxf> {},
+                                                      // TestPrimitiveController<Cylinderf> {},
+                                                      // TestPrimitiveController<Capsule3f> {},
+                                                      // TestPrimitiveController<Triangle3f> {}
+  );
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
   auto see_closest_points = false;
