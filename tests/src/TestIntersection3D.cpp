@@ -33,6 +33,7 @@ int main(int argc, const char** argv)
   const auto ray = Ray { Vec3f { -3.5f, 1.0f, 0.0f }, Direction(Vec3f { -1.1f, 3.3f, 0.0f }) };
   const auto segment = Segment { Vec3f { 1.0f, 1.3f, 0.0f }, Vec3f { -2.6f, 3.4f, 0.0f } };
   const auto plane = Plane { Normalized(Vec3f { 1.0f, 1.3f, -0.1f }), Vec3f { 1.0f, 2.5f, -1.0f } };
+  const auto sphere = Spheref { Vec3f { 1.0f, -3.0f, 1.0f }, 1.337f };
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 1.0f }, Vec3f { 1.0f, 1.5f, 3.0f });
   const auto box = Boxf { Vec3f { -2.0f, -2.0f, -2.0f },
     Vec3f { 2.0f, 1.5f, 1.0f },
@@ -41,11 +42,13 @@ int main(int argc, const char** argv)
   const auto capsule = Capsule3f { Vec3f { 1.0f, 1.0f, 1.0f }, Vec3f { 1.7f, 0.6f, 2.0f }, 0.3f };
   const auto triangle
       = Triangle3f { Vec3f { 0.1f, -3.0f, 2.0f }, Vec3f { 1.7f, -3.7f, 1.3f }, Vec3f { 0.3f, -4.7f, 0.1f } };
-  const auto primitives = std::make_tuple(point, line, ray, segment, plane, aabox, box); // , cylinder, capsule, triangle);
+  const auto primitives
+      = std::make_tuple(point, line, ray, segment, plane, sphere, aabox, box); // , cylinder, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line3f, NumLines> {},
       TestPrimitiveController<Ray3f, NumLines> {},
       TestPrimitiveController<Segment3f, NumLines> {},
       TestPrimitiveController<Planef> {},
+      TestPrimitiveController<Spheref> {},
       TestPrimitiveController<AABoxf> {},
       TestPrimitiveController<Boxf> {} // TestPrimitiveController<Cylinderf> {},
                                        // TestPrimitiveController<Capsule3f> {},
@@ -99,6 +102,8 @@ int main(int argc, const char** argv)
     renderer.AdaptToWindow(*window);
     renderer.Clear();
 
+    renderer.AddDirectionalLight(Normalized(Vec3f { 1.0f, -2.0f, -0.3f }), White<Color3f>());
+
     int main_primitive_i = 0;
     ForEach(main_primitives_controllers, [&](const auto& in_main_primitive_controller) {
       if (main_primitive_i++ != selected_main_primitive_index)
@@ -128,7 +133,7 @@ int main(int argc, const char** argv)
         renderer.SetDepthFunc(GL::EDepthFunc::ALWAYS);
         renderer.GetMaterial().SetDiffuseColor(
             contained ? Red<Color4f>() : (intersecting ? Yellow<Color4f>() : Green<Color4f>()));
-        renderer.GetMaterial().SetLightingEnabled(false);
+        renderer.GetMaterial().SetLightingEnabled(true);
         renderer.Draw(main_subprimitive);
 
         if constexpr (IsLine_v<MainPrimitiveType> || IsRay_v<MainPrimitiveType> || IsSegment_v<MainPrimitiveType>)
@@ -175,7 +180,7 @@ int main(int argc, const char** argv)
       }
     });
 
-    renderer.GetMaterial().SetDiffuseColor(WithAlpha(White<Color4f>(), 0.5f));
+    renderer.GetMaterial().SetDiffuseColor(White<Color4f>());
     renderer.SetDepthFunc(GL::EDepthFunc::LEQUAL);
     renderer.SetBlendFunc(GL::EBlendFactor::SRC_ALPHA, GL::EBlendFactor::ONE_MINUS_SRC_ALPHA);
     ForEach(primitives, [&](const auto& in_primitive) { renderer.Draw(in_primitive); });
