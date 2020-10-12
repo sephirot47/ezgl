@@ -28,7 +28,7 @@ int main(int argc, const char** argv)
   srand(1234);
 
   constexpr auto NumLines = 64;
-  const auto point = Vec3f { 3.0f, 1.0f, 0.0f };
+  const auto point = Vec3f { 3.0f, -0.5f, 0.0f };
   const auto line = Line3f { Vec3f { -1.0f, 3.0f, -3.0f }, Direction(Vec3f { 1.0f, 2.0f, 3.0f }) };
   const auto ray = Ray { Vec3f { -3.5f, 1.0f, 0.0f }, Direction(Vec3f { -1.1f, 3.3f, 0.0f }) };
   const auto segment = Segment { Vec3f { 1.0f, 1.3f, 0.0f }, Vec3f { -2.6f, 3.4f, 0.0f } };
@@ -42,12 +42,12 @@ int main(int argc, const char** argv)
   const auto triangle
       = Triangle3f { Vec3f { 0.1f, -3.0f, 2.0f }, Vec3f { 1.7f, -3.7f, 1.3f }, Vec3f { 0.3f, -4.7f, 0.1f } };
   const auto primitives
-      = std::make_tuple(point, line, ray, segment, plane); // , aabox, box, cylinder, capsule, triangle);
+      = std::make_tuple(point, line, ray, segment, plane, aabox); // , box, cylinder, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line3f, NumLines> {},
       TestPrimitiveController<Ray3f, NumLines> {},
       TestPrimitiveController<Segment3f, NumLines> {},
-      TestPrimitiveController<Planef> {} // TestPrimitiveController<AABoxf> {},
-                                         // TestPrimitiveController<Boxf> {},
+      TestPrimitiveController<Planef> {},
+      TestPrimitiveController<AABoxf> {} // TestPrimitiveController<Boxf> {},
                                          // TestPrimitiveController<Cylinderf> {},
                                          // TestPrimitiveController<Capsule3f> {},
                                          // TestPrimitiveController<Triangle3f> {}
