@@ -30,9 +30,9 @@ int main(int argc, const char** argv)
   constexpr auto NumLines = 64;
   const auto point = Vec3f { 3.0f, 1.0f, 0.0f };
   const auto line = Line3f { Vec3f { -1.0f, 3.0f, -3.0f }, Direction(Vec3f { 1.0f, 2.0f, 3.0f }) };
-  const auto ray = Ray3f { Vec3f { -3.5f, 1.0f, 0.0f }, Direction(Vec3f { -1.1f, 3.3f, 0.0f }) };
-  const auto segment = Segment3f { Vec3f { 1.0f, 1.3f, 0.0f }, Vec3f { -2.6f, 3.4f, 0.0f } };
-  const auto plane = Plane { Normalized(Vec3f { 1.0f, 1.3f, -0.1f }), Vec3f { 1.0f, 0.5f, -1.0f } };
+  const auto ray = Ray { Vec3f { -3.5f, 1.0f, 0.0f }, Direction(Vec3f { -1.1f, 3.3f, 0.0f }) };
+  const auto segment = Segment { Vec3f { 1.0f, 1.3f, 0.0f }, Vec3f { -2.6f, 3.4f, 0.0f } };
+  const auto plane = Plane { Normalized(Vec3f { 1.0f, 1.3f, -0.1f }), Vec3f { 1.0f, 2.5f, -1.0f } };
   const auto aabox = MakeAAHyperBoxFromCenterSize(Vec3f { -1.5f, 0.0f, 1.0f }, Vec3f { 1.0f, 1.5f, 3.0f });
   const auto box = Boxf { Vec3f { -2.0f, -2.0f, -2.0f },
     Vec3f { 2.0f, 1.5f, 1.0f },
@@ -42,15 +42,15 @@ int main(int argc, const char** argv)
   const auto triangle
       = Triangle3f { Vec3f { 0.1f, -3.0f, 2.0f }, Vec3f { 1.7f, -3.7f, 1.3f }, Vec3f { 0.3f, -4.7f, 0.1f } };
   const auto primitives
-      = std::make_tuple(point, line, ray, segment); // , plane, aabox, box, cylinder, capsule, triangle);
+      = std::make_tuple(point, line, ray, segment, plane); // , aabox, box, cylinder, capsule, triangle);
   auto main_primitives_controllers = std::make_tuple(TestPrimitiveController<Line3f, NumLines> {},
       TestPrimitiveController<Ray3f, NumLines> {},
-      TestPrimitiveController<Segment3f, NumLines> {} // TestPrimitiveController<Plane> {},
-                                                      // TestPrimitiveController<AABoxf> {},
-                                                      // TestPrimitiveController<Boxf> {},
-                                                      // TestPrimitiveController<Cylinderf> {},
-                                                      // TestPrimitiveController<Capsule3f> {},
-                                                      // TestPrimitiveController<Triangle3f> {}
+      TestPrimitiveController<Segment3f, NumLines> {},
+      TestPrimitiveController<Planef> {} // TestPrimitiveController<AABoxf> {},
+                                         // TestPrimitiveController<Boxf> {},
+                                         // TestPrimitiveController<Cylinderf> {},
+                                         // TestPrimitiveController<Capsule3f> {},
+                                         // TestPrimitiveController<Triangle3f> {}
   );
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
@@ -161,6 +161,9 @@ int main(int argc, const char** argv)
         {
           // ClosestPoint
           ForEach(primitives, [&](const auto& in_primitive) {
+            if (IntersectCheck(main_subprimitive, in_primitive))
+              return;
+
             const auto closest_point_in_main_subprimitive = ClosestPoint(main_subprimitive, in_primitive);
             const auto closest_point_in_primitive = ClosestPoint(in_primitive, closest_point_in_main_subprimitive);
 

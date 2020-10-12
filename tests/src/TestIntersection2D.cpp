@@ -155,6 +155,9 @@ int main(int argc, const char** argv)
         {
           // ClosestPoint
           ForEach(primitives, [&](const auto& in_primitive) {
+            if (IntersectCheck(main_subprimitive, in_primitive))
+              return;
+
             const auto closest_point_in_main_subprimitive = ClosestPoint(main_subprimitive, in_primitive);
             const auto closest_point_in_primitive = ClosestPoint(in_primitive, closest_point_in_main_subprimitive);
 

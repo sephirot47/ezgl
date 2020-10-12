@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <ez/AAHyperBox.h>
 #include <ez/Capsule.h>
 #include <ez/HyperBox.h>
@@ -9,7 +10,6 @@
 #include <ez/Quat.h>
 #include <ez/Vec.h>
 #include <ez/Window.h>
-#include <array>
 
 namespace ez
 {
@@ -157,6 +157,10 @@ public:
       {
         primitives[i] = TPrimitive { mPrimitiveTranslation + MinLength * forward_vector_rotated,
           mPrimitiveTranslation + (MinLength + mPrimitiveSize[0]) * forward_vector_rotated };
+      }
+      else if constexpr (IsPlane_v<TPrimitive>)
+      {
+        primitives[i] = Planef(NormalizedSafe(Direction(mPrimitiveRotation)), mPrimitiveTranslation);
       }
       else if constexpr (IsHyperSphere_v<TPrimitive>)
       {

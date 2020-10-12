@@ -135,7 +135,7 @@ public:
   void DrawArrow(const Segment3f& inArrowSegment);
   void DrawAxes();
   void DrawRay(const Ray3f& inRay, const float inDistance = 999999.9f);
-  void DrawPlane(const Planef& inPlane, const float inPlaneSize = 5.0f);
+  void DrawPlane(const Planef& inPlane, const float inPlaneSize = 9999.9f);
   void DrawPoint(const Vec3f& inPoint);
   void DrawPoints(const Span<Vec3f>& inPoints);
   void DrawSegment(const Segment3f& inSegment);
