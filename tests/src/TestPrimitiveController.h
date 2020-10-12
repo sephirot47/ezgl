@@ -57,7 +57,7 @@ public:
           if (inKeyEvent.mKey == EKey::Q)
             mPrimitiveSize[1] += delta_length;
           else if (inKeyEvent.mKey == EKey::E)
-            mPrimitiveSize[1] = std::max(mPrimitiveSize[0] - delta_length, MinLength);
+            mPrimitiveSize[1] = std::max(mPrimitiveSize[1] - delta_length, MinLength);
           else if (inKeyEvent.mKey == EKey::W)
             mPrimitiveSize[2] += delta_length;
           else if (inKeyEvent.mKey == EKey::S)

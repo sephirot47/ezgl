@@ -1,5 +1,5 @@
 #include "TestPrimitiveController.h"
-#include "ez/Renderer2D.h"
+#include <ez/Renderer2D.h>
 #include <array>
 #include <cstdlib>
 #include <ez/AAHyperBox.h>
@@ -49,8 +49,6 @@ int main(int argc, const char** argv)
   constexpr int NumMainPrimitives = std::tuple_size<decltype(main_primitives_controllers)>();
   int selected_main_primitive_index = 0;
   auto see_closest_points = false;
-
-  for (const auto segment : MakeSegmentsRange(aarect)) { PEEK(segment); }
 
   // Create window
   Window::CreateOptions window_create_options;

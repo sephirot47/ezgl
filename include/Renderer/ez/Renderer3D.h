@@ -140,6 +140,7 @@ public:
   void DrawPoints(const Span<Vec3f>& inPoints);
   void DrawSegment(const Segment3f& inSegment);
   void DrawSegments(const Span<Segment3f>& inSegments);
+  void DrawLine(const Line3f &inLine);
   void DrawLineStrip(const Span<Vec3f>& inLinePoints);
   void DrawTriangle(const Triangle3f& inTriangle);
   void DrawTriangles(const Span<Triangle3f>& inTriangles);
@@ -148,6 +149,7 @@ public:
   void DrawAABoxBoundary(const AABoxf& inAABox);
   void DrawAABox();
   void DrawAABoxBoundary();
+  void DrawBox(const Boxf& inBox);
   void DrawAARect();
   void DrawAARect(const AARectf& inAARect);
   void DrawAARectBoundary();
@@ -176,11 +178,14 @@ public:
 
   // Overloaded
   void Draw(const Vec3f& inPoint) { DrawPoint(inPoint); }
-  void Draw(const Planef& inPlane) { DrawPlane(inPlane); }
+  void Draw(const Line3f& inLine) { DrawLine(inLine); }
+  void Draw(const Ray3f& inRay) { DrawRay(inRay); }
   void Draw(const Segment3f& inSegment) { DrawSegment(inSegment); }
+  void Draw(const Planef& inPlane) { DrawPlane(inPlane); }
   void Draw(const Spheref& inSphere) { DrawSphere(inSphere); }
   void Draw(const AARectf& inAARect) { DrawAARect(inAARect); }
   void Draw(const AABoxf& inAABox) { DrawAABox(inAABox); }
+  void Draw(const Boxf& inBox) { DrawBox(inBox); }
   void Draw(const Capsule3f& inCapsule) { DrawCapsule(inCapsule); }
   void Draw(const Cylinderf& inCylinder) { DrawCylinder(inCylinder); }
   void DrawBoundary(const AARectf& inAARect) { DrawAARectBoundary(inAARect); }

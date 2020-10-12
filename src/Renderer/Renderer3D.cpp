@@ -260,6 +260,11 @@ void Renderer3D::DrawSegments(const Span<Segment3f>& inSegments)
   DrawSegmentsGeneric(inSegments);
 }
 
+void Renderer3D::DrawLine(const Line3f &inLine)
+{
+  DrawSegment({inLine.GetPoint(-9999.9f), inLine.GetPoint(9999.9f)});
+}
+
 void Renderer3D::DrawLineStrip(const Span<Vec3f>& inLinePoints)
 {
   SetShaderProgram(sOnlyColorShaderProgram);
@@ -337,6 +342,16 @@ void Renderer3D::DrawAARectBoundary(const AARectf& inAARect)
   Translate(XY0(Center(inAARect)));
   Scale(XY1(inAARect.GetSize()) * 0.5f);
   DrawAARectBoundary();
+}
+
+void Renderer3D::DrawBox(const Boxf& inBox)
+{
+  PushTransformMatrix();
+  Translate(Center(inBox));
+  Rotate(Orientation(inBox));
+  Scale(inBox.GetExtents());
+  DrawAABox();
+  PopTransformMatrix();
 }
 
 void Renderer3D::DrawCapsule(const Capsule3f& inCapsule,
